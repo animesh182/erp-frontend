@@ -1,23 +1,35 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import { Menu } from "lucide-react";
+import { Menu, ChevronDown, ChevronRight } from "lucide-react";
 import { navItems } from "./sidebar";
 import { usePathname } from "next/navigation";
 import { CompanyIcon } from "./companyicon";
 
 export default function MobileSidebar() {
   const pathname = usePathname();
+  const [expandedItem, setExpandedItem] = useState(null);
+
+  const toggleExpand = (label) => {
+    setExpandedItem(expandedItem === label ? null : label);
+  };
+
+  const isActive = (href) => {
+    if (href === "/dashboard") {
+      return pathname === "/dashboard" || pathname === "/dashboard/";
+    }
+    return pathname.startsWith(href + "/") || pathname === href;
+  };
+
+  const isParentActive = (item) => {
+    return (
+      item.subItems && item.subItems.some((subItem) => isActive(subItem.href))
+    );
+  };
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -36,34 +48,53 @@ export default function MobileSidebar() {
             <span className="sr-only">Avinto AS</span>
           </Link>
           {navItems.map((navItem) => (
-            <Link
-              key={navItem.label}
-              href={navItem.href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
-                pathname === navItem.href ? "bg-muted text-primary" : ""
-              }`}
-            >
-              {navItem.icon}
-              {navItem.label}
-            </Link>
+            <div key={navItem.label}>
+              <Link
+                href={navItem.href}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted/80 
+                  ${
+                    isActive(navItem.href) || isParentActive(navItem)
+                      ? "bg-muted text-primary"
+                      : "text-muted-foreground hover:text-primary"
+                  }`}
+                onClick={(e) => {
+                  if (navItem.subItems) {
+                    e.preventDefault();
+                    toggleExpand(navItem.label);
+                  }
+                }}
+              >
+                {navItem.icon}
+                {navItem.label}
+                {navItem.subItems &&
+                  (expandedItem === navItem.label ? (
+                    <ChevronDown className="ml-auto h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="ml-auto h-4 w-4" />
+                  ))}
+              </Link>
+              {navItem.subItems && expandedItem === navItem.label && (
+                <div className="ml-6 mt-2">
+                  {navItem.subItems.map((subItem) => (
+                    <Link
+                      key={subItem.label}
+                      href={subItem.href}
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted/80 
+                        ${
+                          isActive(subItem.href)
+                            ? "bg-muted text-primary"
+                            : "text-muted-foreground hover:text-primary"
+                        }`}
+                    >
+                      {subItem.icon}
+                      {subItem.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </nav>
-        {/* <div className="mt-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle>Upgrade to Pro</CardTitle>
-              <CardDescription>
-                Unlock all features and get unlimited access to our support
-                team.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button size="sm" className="w-full">
-                Upgrade
-              </Button>
-            </CardContent>
-          </Card>
-        </div> */}
       </SheetContent>
     </Sheet>
   );
