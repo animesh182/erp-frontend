@@ -16,7 +16,7 @@ export default function KpiCard({
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <span className={`text-muted-foreground ${iconSize}`}>
-          {React.cloneElement(icon, { className: iconSize })}
+          {icon && React.cloneElement(icon, { className: iconSize })}
         </span>
         {/* Add text-sm or other Tailwind size classes here */}
       </CardHeader>
