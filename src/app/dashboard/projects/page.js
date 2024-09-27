@@ -11,6 +11,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { formInputs } from "./Inputs";
 import { EditProjectSheet } from "@/components/EditProjectSheet";
 import { toast } from "sonner";
+import { AddClientDialog } from "@/components/AddClientDialog";
 
 export default function Projects() {
   const methods = useForm();
@@ -343,6 +344,11 @@ export default function Projects() {
     setIsSheetOpen(false);
   };
 
+  const handleClientAdd = (formData) => {
+    toast.success("Client added successfully");
+    console.log("Client added", formData);
+  };
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between w-full">
@@ -373,6 +379,7 @@ export default function Projects() {
           >
             <PlusCircle className="h-4 w-4" /> Add Project
           </Button>
+          <AddClientDialog onAddClient={handleClientAdd} />
         </div>
       </div>
       <div className="flex flex-col items-center gap-1 text-left w-full">
