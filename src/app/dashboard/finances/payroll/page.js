@@ -1,13 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import DataTable from "@/components/ui/data-table";
-import { CreditCard, DollarSign } from "lucide-react";
+import { CreditCard, DollarSign, Download } from "lucide-react";
 import { columns } from "@/app/dashboard/finances/payroll/Columns";
 import { formatAmountToNOK } from "@/lib/utils";
 import KpiCard from "@/components/kpicard";
 import { toast } from "sonner";
 import { subDays, format } from "date-fns";
 import { useForm, FormProvider } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { UploadSheetDialog } from "@/components/UploadSheetDialog";
 
 export default function Payroll() {
   const methods = useForm();
@@ -152,6 +154,10 @@ export default function Payroll() {
     },
   ];
 
+  const handleSheetDownload = () => {
+    console.log("Downloading payroll sheet");
+  };
+
   const onEditRow = (editedData) => {
     toast.success("Row updated");
     console.log(editedData, "edited data");
@@ -160,7 +166,14 @@ export default function Payroll() {
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="flex flex-wrap gap-4 md:gap-6 lg:gap-6">
+      <div className="flex w-full justify-end gap-4">
+        <Button size="sm" className="gap-2" onClick={handleSheetDownload}>
+          <Download className="h-4 w-4" />
+          Get Payroll Sheet
+        </Button>
+        <UploadSheetDialog />
+      </div>
+      <div className="flex gap-4 md:gap-6 lg:gap-6">
         {kpivalues.map((card) => (
           <KpiCard
             key={card.title}

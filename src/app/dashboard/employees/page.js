@@ -205,6 +205,7 @@ export default function Employees() {
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddEmployee={onAddEmployee}
+        //the edit employee is on the employee details tab
       />
     </main>
   );

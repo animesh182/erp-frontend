@@ -155,7 +155,7 @@ export default function Transactions() {
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <h2 className="text-lg font-semibold">Overview</h2>
 
-      <div className="flex flex-wrap gap-4">
+      <div className="flex gap-4 w-full">
         {kpiData.map((kpi, index) => (
           <KpiCard
             key={index}
