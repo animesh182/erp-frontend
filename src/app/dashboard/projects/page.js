@@ -374,7 +374,7 @@ export default function Projects() {
           <Button
             variant="secondary"
             size="sm"
-            className="bg-primary text-white hover:bg-primary cursor-pointer gap-2"
+            className="gap-2"
             onClick={handleProjectAdd}
           >
             <PlusCircle className="h-4 w-4" /> Add Project
