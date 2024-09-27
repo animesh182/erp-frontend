@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Bar,
   BarChart,
@@ -18,36 +18,17 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { UserCircleIcon } from "lucide-react";
+const colorPalette = [
+  "#4A90E2",
+  "#E47CF5",
+  "#F5A623",
+  "#50E3C2",
+  "#FF7F50",
+  "#B22222",
+  "#DAA520",
+  "#4682B4",
+];
 
-function convertHoursToPercentage(data, maxHours = 8) {
-  return data.map((item) => {
-    const convertedItem = { ...item };
-    Object.keys(item).forEach((key) => {
-      if (key !== "name") {
-        convertedItem[key] = (item[key] / maxHours) * 100;
-      }
-    });
-    return convertedItem;
-  });
-}
-const chartConfig = {
-  "Avinto ERP": {
-    color: "#4A90E2",
-    label: "Avinto ERP",
-  },
-  "Jambo Booking House": {
-    color: "#E47CF5",
-    label: "Jambo Booking House",
-  },
-  "Basic Booking App": {
-    color: "#F5A623",
-    label: "Basic Booking App",
-  },
-  Ebibaaha: {
-    color: "#50E3C2",
-    label: "Ebibaaha",
-  },
-};
 function calculateRemainingHours(item, maxHours = 8) {
   const totalCompleted = Object.keys(item)
     .filter((key) => key !== "name")
@@ -55,10 +36,49 @@ function calculateRemainingHours(item, maxHours = 8) {
   return maxHours - totalCompleted;
 }
 
-// Custom YAxis tick to display both name and remaining hours
+function convertHoursToPercentage(data = [], maxHours = 8) {
+  if (!Array.isArray(data)) {
+    return []; // Return an empty array if data is not an array
+  }
+  return data.map((item) => {
+    const convertedItem = { ...item };
+    Object.keys(item).forEach((key) => {
+      if (key !== "name") {
+        convertedItem[key] = (item[key] / maxHours) * 100; // Convert to percentage
+      }
+    });
+    return convertedItem;
+  });
+}
+function generateChartConfig(rawData) {
+  const projectNames = new Set();
+  rawData.forEach((user) => {
+    Object.keys(user).forEach((key) => {
+      if (key !== "name") {
+        projectNames.add(key);
+      }
+    });
+  });
+  // console.log(projectNames, "pN");
+
+  const chartConfig = {};
+  // console.log([...projectNames], "aaaaaa");
+
+  [...projectNames].forEach((projectName, index) => {
+    console.log(chartConfig[projectName]);
+    chartConfig[projectName] = {
+      color: colorPalette[index % colorPalette.length],
+      label: projectName,
+    };
+  });
+  return chartConfig;
+}
 
 export default function EmployeeMonthlyHours({ rawData }) {
+  if (!rawData) return <>Loading...</>;
   const data = convertHoursToPercentage(rawData);
+  const chartConfig = useMemo(() => generateChartConfig(rawData), [rawData]);
+
   const CustomYAxisTick = ({ x, y, payload }) => {
     const remainingHours = calculateRemainingHours(rawData[payload.index]);
 

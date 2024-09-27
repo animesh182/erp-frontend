@@ -17,40 +17,7 @@ import KpiCard from "@/components/kpicard";
 import ProfitLossChart from "@/components/charts/ProfitLoss";
 import DateRangePicker from "@/components/DateRangePicker";
 import { useState, useEffect } from "react";
-const rawData = [
-  {
-    name: "Olivia Smith",
-    "Basic Booking App": 1,
-    Ebibaaha: 7,
-  },
-  {
-    name: "Ethan Smith",
-    "Avinto ERP": 2,
-
-    Ebibaaha: 6,
-  },
-  {
-    name: "Ryan Reynolds",
-    "Avinto ERP": 2.5,
-    "Jambo Booking House": 2.5,
-    Ebibaaha: 3,
-  },
-  {
-    name: "Emily Johnson",
-    "Avinto ERP": 3,
-    "Jambo Booking House": 2,
-    "Basic Booking App": 3,
-  },
-  {
-    name: "Nathan Sullivan",
-    "Avinto ERP": 8,
-  },
-  {
-    name: "Isabella Rodriguez",
-    Ebibaaha: 8,
-  },
-];
-
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 const projectBudget = [
   {
     project: "Basic Booking App",
@@ -244,11 +211,20 @@ export const profitLossData = [
 const ongoingProjects = projectBudget.filter((project) => !project.completed);
 const completedProjects = projectBudget.filter((project) => project.completed);
 export default function Dashboard() {
+  const [resourceUtilData, setResourceUtilData] = useState();
+  const authToken =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI3MzcyNDc0LCJpYXQiOjE3MjczNjUyNzQsImp0aSI6IjhjZDMxNWE1YjdlNjQ2OTJiYTBiOWUzNDlhN2ViOTQ1IiwidXNlcl9pZCI6Mn0.HnKGk0424TOQh1P4ZZLP714gb_TKmbQJvRhNucsRFhw";
   const initialEndDate = new Date(); // Today's date
   const initialStartDate = subDays(initialEndDate, 28); // 4 weeks ago
   const [startDate, setStartDate] = useState(initialStartDate);
   const [endDate, setEndDate] = useState(initialEndDate);
   const [data, setData] = useState([]); // State to hold the fetched data
+  useEffect(() => {
+    fetchResourceUtilization();
+  }, []);
+  useEffect(() => {
+    fetchKpiData();
+  }, []);
   useEffect(() => {
     if (startDate && endDate) {
       fetchData(startDate, endDate);
@@ -268,6 +244,57 @@ export default function Dashboard() {
     setStartDate(startDate);
     setEndDate(endDate);
   };
+  const fetchKpiData = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/finance_kpis/`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch Kpi data");
+      }
+      const data = await response.json();
+      console.log(data, "kpidata");
+    } catch (error) {
+      console.error("Failed to fetch the KPI data");
+    }
+  };
+  const fetchResourceUtilization = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/user_projects_utilization/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`, // Replace with your token
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch resource utilization data");
+      }
+
+      const data = await response.json();
+
+      const transformedData = data.map((user) => {
+        const userProjects = {};
+        user.projects.forEach((project) => {
+          userProjects[project.project_name] = project.utilization;
+        });
+
+        return {
+          name: user.user_name || "Unknown", // Handle empty usernames
+          ...userProjects,
+        };
+      });
+
+      setResourceUtilData(transformedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
@@ -360,7 +387,7 @@ export default function Dashboard() {
           <Button>View More</Button>
         </CardHeader>
         <CardContent>
-          <EmployeeMonthlyHours rawData={rawData} />
+          <EmployeeMonthlyHours rawData={resourceUtilData} />
         </CardContent>
       </Card>
       {/* </div> */}
