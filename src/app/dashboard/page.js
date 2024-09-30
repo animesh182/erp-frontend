@@ -57,6 +57,7 @@ import { useKpi } from "@/hooks/useKpi";
 //   },
 // ];
 
+
 // const projectBudget = [
 //   {
 //     project: "Basic Booking App",
@@ -99,6 +100,8 @@ import { useKpi } from "@/hooks/useKpi";
 //     completed: true,
 //   },
 // ];
+
+
 // const kpiData = [
 //   {
 //     title: "Total Revenue",
@@ -160,6 +163,8 @@ import { useKpi } from "@/hooks/useKpi";
 //     isTrend: false,
 //   },
 // ];
+
+
 export const profitLossData = [
   {
     name: "Jan",
@@ -284,22 +289,16 @@ export default function Dashboard() {
   
   const {data:employeeData,isLoading,isError,error}=useEmployeeUtilization();
   
-  const {data:projectBudget,isLoading:load,isError:err}=useProjectInvoices();
+  const {data:projectBudget,isLoading:isInvoiceLoading,isError:isInvoiceError,error:invoiceError}=useProjectInvoices();
 
   const{data:kpiData}=useKpi()
   const filteredKpiData = kpiData?.filter((data) => data.title !== "Total Expense");
 
-
-  // if (load) return <p>Loading...</p>;
-  // if (err) return <p>errorr</p>;
-
-  if (!projectBudget) {
-    return <p>Loading....</p>;
-  }
+  if(!projectBudget|| isLoading || isInvoiceLoading ) return <p>loading....</p>
+  if(isError) return <p>{error.message}</p>
+  if(isInvoiceError) return <p>{invoiceError.message}</p>
   const ongoingProjects = projectBudget.filter((project) => !project.completed);
 const completedProjects = projectBudget.filter((project) => project.completed);
-  if(isLoading) return <p>loading....</p>
-  if(isError) return <p>{error.message}</p>
 
   return (
     <>
