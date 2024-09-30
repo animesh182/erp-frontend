@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { formatAmountToNOK } from "@/lib/utils";
 import { useState } from "react";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
+import { toast } from "sonner";
 
 const EmployeeDetailsTab = ({ employeeDetails }) => {
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
@@ -81,6 +82,7 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
 
   const handleEditEmployee = (updatedData) => {
     // Handle the updated employee data here
+    toast.success("Employee edited successfully");
     console.log("Updated employee data:", updatedData);
     // You might want to update the state or send this data to an API
   };
