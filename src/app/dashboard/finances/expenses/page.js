@@ -10,6 +10,11 @@ import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
 import { subDays, format } from "date-fns";
 
 import { useForm, FormProvider } from "react-hook-form";
+import { useExpense } from "@/hooks/useExpense";
+import { useQuery } from "@tanstack/react-query";
+import { getExpenses } from "@/app/api/expense/getExpense";
+import { useAddExpense } from "@/sevices/useExpenseServices";
+
 
 export default function Expenses() {
   const methods = useForm();
@@ -19,6 +24,9 @@ export default function Expenses() {
   const [endDate, setEndDate] = useState(initialEndDate);
   const [data, setData] = useState([]); // State to hold the fetched data
   const [projectOptions, setProjectOptions] = useState([]);
+
+  const {mutate}=useAddExpense();
+
 
   const pjOptions = [
     { id: "1", name: "ebibaaha" },
@@ -53,119 +61,121 @@ export default function Expenses() {
     setEndDate(endDate);
   };
 
-  const expenses = [
-    {
-      name: "ebibaaha",
-      projectName: "ebibaaha",
-      invoice: "#123",
-      invoiceIssuedDate: "Jan 12, 2021",
-      paidDate: "Jan 12, 2021",
-      status: "paid",
-      type: "recurring",
-      amount: 1000,
-      costType: "direct-cost",
-    },
-    {
-      name: "TechSolutions Inc.",
-      projectName: "Cloud Storage",
-      invoice: "#456",
-      invoiceIssuedDate: "Feb 15, 2021",
-      paidDate: "Feb 20, 2021",
-      status: "paid",
-      type: "one-time",
-      amount: 2500,
-      costType: "direct-cost",
-    },
-    {
-      name: "Green Energy Co.",
-      projectName: "Solar Panels",
-      invoice: "#789",
-      invoiceIssuedDate: "Mar 3, 2021",
-      paidDate: "Mar 10, 2021",
-      status: "paid",
-      type: "recurring",
-      amount: 5000,
-      costType: "direct-cost",
-    },
-    {
-      name: "FixLife Gym",
-      projectName: "Membership Software",
-      invoice: "#101",
-      invoiceIssuedDate: "Apr 1, 2021",
-      paidDate: null,
-      status: "pending",
-      type: "recurring",
-      amount: 750,
-      costType: "direct-cost",
-    },
-    {
-      name: "EducationLearn Academy",
-      projectName: "Online Course Platform",
-      invoice: "#202",
-      invoiceIssuedDate: "May 5, 2021",
-      paidDate: "May 7, 2021",
-      status: "paid",
-      type: "one-time",
-      amount: 3000,
-      costType: "fixed-cost",
-    },
-    {
-      name: "FreshFoods Market",
-      projectName: "Inventory Management System",
-      invoice: "#303",
-      invoiceIssuedDate: "Jun 10, 2021",
-      paidDate: "Jun 15, 2021",
-      status: "paid",
-      type: "recurring",
-      amount: 1200,
-      costType: "npa-cost",
-    },
-    {
-      name: "SwiftShip Logistics",
-      projectName: "Tracking Software",
-      invoice: "#404",
-      invoiceIssuedDate: "Jul 7, 2021",
-      paidDate: null,
-      status: "pending",
-      type: "one-time",
-      amount: 4000,
-      costType: "direct-cost",
-    },
-    {
-      name: "CreativeCo Design",
-      projectName: "Graphic Design Tool",
-      invoice: "#505",
-      invoiceIssuedDate: "Aug 20, 2021",
-      paidDate: "Aug 25, 2021",
-      status: "paid",
-      type: "recurring",
-      amount: 900,
-      costType: "npa-cost",
-    },
-    {
-      name: "HealthFirst Clinic",
-      projectName: "Patient Management System",
-      invoice: "#606",
-      invoiceIssuedDate: "Sep 1, 2021",
-      paidDate: "Sep 5, 2021",
-      status: "paid",
-      type: "one-time",
-      amount: 6000,
-      costType: "direct-cost",
-    },
-    {
-      name: "GreenLeaf Landscaping",
-      projectName: "Scheduling App",
-      invoice: "#707",
-      invoiceIssuedDate: "Oct 12, 2021",
-      paidDate: null,
-      status: "pending",
-      type: "recurring",
-      amount: 800,
-      costType: "fixed-cost",
-    },
-  ];
+  // const expenses = [
+  //   {
+  //     name: "ebibaaha",
+  //     projectName: "ebibaaha",
+  //     invoice: "#123",
+  //     invoiceIssuedDate: "Jan 12, 2021",
+  //     paidDate: "Jan 12, 2021",
+  //     status: "paid",
+  //     type: "recurring",
+  //     amount: 1000,
+  //     costType: "direct-cost",
+  //   },
+  //   {
+  //     name: "TechSolutions Inc.",
+  //     projectName: "Cloud Storage",
+  //     invoice: "#456",
+  //     invoiceIssuedDate: "Feb 15, 2021",
+  //     paidDate: "Feb 20, 2021",
+  //     status: "paid",
+  //     type: "one-time",
+  //     amount: 2500,
+  //     costType: "direct-cost",
+  //   },
+  //   {
+  //     name: "Green Energy Co.",
+  //     projectName: "Solar Panels",
+  //     invoice: "#789",
+  //     invoiceIssuedDate: "Mar 3, 2021",
+  //     paidDate: "Mar 10, 2021",
+  //     status: "paid",
+  //     type: "recurring",
+  //     amount: 5000,
+  //     costType: "direct-cost",
+  //   },
+  //   {
+  //     name: "FixLife Gym",
+  //     projectName: "Membership Software",
+  //     invoice: "#101",
+  //     invoiceIssuedDate: "Apr 1, 2021",
+  //     paidDate: null,
+  //     status: "pending",
+  //     type: "recurring",
+  //     amount: 750,
+  //     costType: "direct-cost",
+  //   },
+  //   {
+  //     name: "EducationLearn Academy",
+  //     projectName: "Online Course Platform",
+  //     invoice: "#202",
+  //     invoiceIssuedDate: "May 5, 2021",
+  //     paidDate: "May 7, 2021",
+  //     status: "paid",
+  //     type: "one-time",
+  //     amount: 3000,
+  //     costType: "fixed-cost",
+  //   },
+  //   {
+  //     name: "FreshFoods Market",
+  //     projectName: "Inventory Management System",
+  //     invoice: "#303",
+  //     invoiceIssuedDate: "Jun 10, 2021",
+  //     paidDate: "Jun 15, 2021",
+  //     status: "paid",
+  //     type: "recurring",
+  //     amount: 1200,
+  //     costType: "npa-cost",
+  //   },
+  //   {
+  //     name: "SwiftShip Logistics",
+  //     projectName: "Tracking Software",
+  //     invoice: "#404",
+  //     invoiceIssuedDate: "Jul 7, 2021",
+  //     paidDate: null,
+  //     status: "pending",
+  //     type: "one-time",
+  //     amount: 4000,
+  //     costType: "direct-cost",
+  //   },
+  //   {
+  //     name: "CreativeCo Design",
+  //     projectName: "Graphic Design Tool",
+  //     invoice: "#505",
+  //     invoiceIssuedDate: "Aug 20, 2021",
+  //     paidDate: "Aug 25, 2021",
+  //     status: "paid",
+  //     type: "recurring",
+  //     amount: 900,
+  //     costType: "npa-cost",
+  //   },
+  //   {
+  //     name: "HealthFirst Clinic",
+  //     projectName: "Patient Management System",
+  //     invoice: "#606",
+  //     invoiceIssuedDate: "Sep 1, 2021",
+  //     paidDate: "Sep 5, 2021",
+  //     status: "paid",
+  //     type: "one-time",
+  //     amount: 6000,
+  //     costType: "direct-cost",
+  //   },
+  //   {
+  //     name: "GreenLeaf Landscaping",
+  //     projectName: "Scheduling App",
+  //     invoice: "#707",
+  //     invoiceIssuedDate: "Oct 12, 2021",
+  //     paidDate: null,
+  //     status: "pending",
+  //     type: "recurring",
+  //     amount: 800,
+  //     costType: "fixed-cost",
+  //   },
+  // ];
+  
   const onAddRow = (newRowData) => {
+    // mutate(newRowData);
     toast.success("New row added");
     console.log(newRowData, "in form");
   };
@@ -175,10 +185,26 @@ export default function Expenses() {
     console.log(editedData, "edited data");
     // Update the data in your state or send it to the server
   };
+
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is zero-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  };
+
+
+const {data:expenses,isLoading,isError,error}=useExpense(formatDate(startDate),formatDate(endDate))
+if(isLoading) return <p>loading....</p>
+if(isError) return error.message
+
+
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <FormProvider {...methods}>
-        <DataTable
+        {expenses && <DataTable
           title={"Expenses"}
           subtitle={"List of all expenses in the company"}
           columns={columns}
@@ -192,7 +218,7 @@ export default function Expenses() {
           onDateChange={handleDateChange}
           initialStartDate={startDate} // Pass initial start date
           initialEndDate={endDate} // Pass initial end date
-        />
+        />}
       </FormProvider>
     </main>
   );

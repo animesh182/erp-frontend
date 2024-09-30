@@ -96,7 +96,6 @@ function DataTable({
       router.push(`/dashboard/projects/${id}`);
     }
   };
-
   return (
     <EditRowContext.Provider value={{ onEditRow }}>
       <div className="w-full">

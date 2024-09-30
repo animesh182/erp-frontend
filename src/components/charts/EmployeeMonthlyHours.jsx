@@ -47,6 +47,20 @@ const chartConfig = {
     color: "#50E3C2",
     label: "Ebibaaha",
   },
+
+
+  Changeride:{
+ color: "#D8BFD8",
+    label: "Changeride",
+  },
+  Hokkaido:{
+    color: "#E47CF5",
+    label: "ChangHokkaidoeride",
+  },
+  "Avinto Test":{
+    color: "#90EE90",
+    label: "Avinto Test",
+  },
 };
 function calculateRemainingHours(item, maxHours = 8) {
   const totalCompleted = Object.keys(item)

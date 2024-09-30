@@ -8,6 +8,8 @@ import KpiCard from "@/components/kpicard";
 import { toast } from "sonner";
 import { subDays, format } from "date-fns";
 import { useForm, FormProvider } from "react-hook-form";
+import { usePayroll } from "@/hooks/usePayroll";
+import { usePayrollKpi } from "@/hooks/usePayrollKpi";
 
 export default function Payroll() {
   const methods = useForm();
@@ -158,7 +160,19 @@ export default function Payroll() {
     // Update the data in your state or send it to the server
   };
 
+
+  // const {data:payroll,isError ,isLoading,error}= usePayroll();
+  // const{data:kpivalues,isError:isErrorKpi,isLoading:isLoadingKpi,error:errorKpi}=usePayrollKpi();
+
+  // if (isLoading) return <p>loading....</p>
+  // if (isError) return <p>{error.message}</p>
+
+
+
+
   return (
+    <>
+    {payroll && kpivalues && (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex flex-wrap gap-4 md:gap-6 lg:gap-6">
         {kpivalues.map((card) => (
@@ -186,5 +200,6 @@ export default function Payroll() {
         />
       </FormProvider>
     </main>
+    )}</>
   );
 }

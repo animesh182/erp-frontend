@@ -14,9 +14,10 @@ import TableTitle from "@/components/TableTitle";
 import ProjectHealth from "@/components/ProjectHealth";
 import { useRouter } from "next/navigation";
 
-export default function CardLayout({ projects }) {
+export default function CardLayout({ projects  }) {
   console.log(projects);
   const router = useRouter();
+
 
   const handleCardClick = (projectId) => {
     router.push(`/dashboard/projects/${projectId}`);

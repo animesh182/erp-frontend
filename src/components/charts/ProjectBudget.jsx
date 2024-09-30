@@ -57,36 +57,78 @@ function RenderLegend() {
   );
 }
 
+// const chartConfig = {
+//   "Avinto ERP": {
+//     color: "#4A90E2",
+//     label: "Avinto ERP",
+//   },
+//   "Jambo Booking House": {
+//     color: "#E47CF5",
+//     label: "Jambo Booking House",
+//   },
+//   "Basic Booking App": {
+//     color: "#F5A623",
+//     label: "Basic Booking App",
+//   },
+//   Ebibaaha: {
+//     color: "#50C878", // Emerald green
+//     label: "Ebibaaha",
+//   },
+//   Changeride: {
+//     color: "#FF6347", // Tomato red
+//     label: "Changeride",
+//   },
+//   "Tutor App": {
+//     color: "#FFD700", // Gold
+//     label: "Tutor App",
+//   },
+//   Logistikk: {
+//     color: "#9370DB", // Medium Purple
+//     label: "Logistikk",
+//   },
+// };
+
 const chartConfig = {
-  "Avinto ERP": {
+  Hokkaido: {
     color: "#4A90E2",
-    label: "Avinto ERP",
+    label: "Hokkaido",
   },
-  "Jambo Booking House": {
+  "Avinto Test": {
     color: "#E47CF5",
-    label: "Jambo Booking House",
+    label: "Avinto Test",
   },
-  "Basic Booking App": {
+  "Jambo Travel House": {
     color: "#F5A623",
-    label: "Basic Booking App",
-  },
-  Ebibaaha: {
-    color: "#50C878", // Emerald green
-    label: "Ebibaaha",
+    label: "Jambo Travel House",
   },
   Changeride: {
-    color: "#FF6347", // Tomato red
+    color: "#50C878", // Emerald green
     label: "Changeride",
   },
-  "Tutor App": {
-    color: "#FFD700", // Gold
-    label: "Tutor App",
+  Ebibaaha: {
+    color: "#FF6347", // Tomato red
+    label: "Ebibaaha",
   },
-  Logistikk: {
+  Santa: {
+    color: "#FFD700", // Gold
+    label: "Santa",
+  },
+  "Ruslin Project": {
     color: "#9370DB", // Medium Purple
-    label: "Logistikk",
+    label: "Ruslin Project",
+  },
+  Hyundai: {
+    color: "#9370DB", // Medium Purple
+    label: "Hyundai",
+  },
+  "SAusbifa Project": {
+    color: "#9370DB", // Medium Purple
+    label: "SAusbifa Project",
   },
 };
+
+
+
 
 export default function ProjectBudgetChart({ rawData }) {
   const updatedChartData = calculateExpensePercentage(rawData);

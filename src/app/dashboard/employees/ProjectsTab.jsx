@@ -8,10 +8,11 @@ import AssignProjectForm from "./AssignProjectForm";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
 import { ProjectCard } from "@/components/ProjectCard";
 
-const ProjectsTab = ({ employeeProjects }) => {
+const ProjectsTab = ({ employeeId }) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const openSheet = () => setIsSheetOpen(true);
+
 
   return (
     <div>
@@ -37,7 +38,7 @@ const ProjectsTab = ({ employeeProjects }) => {
             <PlusCircle className="h-4 w-4" /> Assign Project
           </Button>
         </div>
-        <ProjectCard />
+        <ProjectCard userId={employeeId}/>
       </div>
     </div>
   );

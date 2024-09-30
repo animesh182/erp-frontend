@@ -10,29 +10,30 @@ import { profitLossData } from "../../page";
 import ProfitLossChart from "@/components/charts/ProfitLoss";
 import { DollarSign, CreditCard, Users2 } from "lucide-react";
 import KpiCard from "@/components/kpicard";
-const kpiData = [
-  {
-    title: "Total Revenue",
-    value: 750000,
-    change: 20.1,
-    period: "month",
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-  {
-    title: "Total Expenses",
-    value: 550000,
-    change: 19,
-    period: "month",
-    icon: <CreditCard />,
-  },
-  {
-    title: "Total Profit",
-    value: 200000,
-    change: 19,
-    period: "month",
-    icon: <Users2 />,
-  },
-];
+import { useKpi } from "@/hooks/useKpi";
+// const kpiData = [
+//   {
+//     title: "Total Revenue",
+//     value: 750000,
+//     change: 20.1,
+//     period: "month",
+//     icon: <DollarSign className="w-4 h-4" />,
+//   },
+//   {
+//     title: "Total Expenses",
+//     value: 550000,
+//     change: 19,
+//     period: "month",
+//     icon: <CreditCard />,
+//   },
+//   {
+//     title: "Total Profit",
+//     value: 200000,
+//     change: 19,
+//     period: "month",
+//     icon: <Users2 />,
+//   },
+// ];
 export const projectionData = [
   {
     name: "Jan",
@@ -123,8 +124,11 @@ export const projectionData = [
   },
 ];
 export default function ProfitLoss() {
-  console.log();
+  const{data}=useKpi();
+  const kpiData=data?.slice(0,3)
   return (
+    <>
+    {kpiData && (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <Card>
         <CardHeader className="flex-row justify-between items-center">
@@ -158,6 +162,7 @@ export default function ProfitLoss() {
           </div>
         </CardContent>
       </Card>
-    </main>
+    </main>)}
+    </>
   );
 }

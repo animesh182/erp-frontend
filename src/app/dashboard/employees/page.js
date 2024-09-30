@@ -14,6 +14,9 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
+import {useEmployeeProjects, useEmployees } from "@/hooks/useEmployees";
+
+
 
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -21,87 +24,55 @@ export default function Employees() {
   const [activeTab, setActiveTab] = useState("employeeDetails");
   const [employeeDetails, setEmployeeDetails] = useState(null);
 
-  const [payments, setPayments] = useState([
-    {
-      id: "728ed52f",
-      employeeName: "John Doe",
-      imageUrl: "/default-avatar.jpg",
-      email: "john.doe@example.com",
-      role: "Software Engineer",
-      type: "Executive",
-      salary: 12000,
-    },
-    {
-      id: "489e1d42",
-      employeeName: "Jane Smith",
-      imageUrl: "/default-avatar.jpg",
-      email: "jane.smith@example.com",
-      role: "Product Manager",
-      type: "Full-time",
-      salary: 11000,
-    },
-    {
-      id: "153b3a2c",
-      employeeName: "Bob Johnson",
-      imageUrl: "/default-avatar.jpg",
-      email: "bob.johnson@example.com",
-      role: "UX Designer",
-      type: "Part-time",
-      salary: 8000,
-    },
-    {
-      id: "621f4e3b",
-      employeeName: "Alice Williams",
-      imageUrl: "/default-avatar.jpg",
-      email: "alice.williams@example.com",
-      role: "Data Analyst",
-      type: "Full-time",
-      salary: 9500,
-    },
-    {
-      id: "984c7d6a",
-      employeeName: "Charlie Brown",
-      imageUrl: "/default-avatar.jpg",
-      email: "charlie.brown@example.com",
-      role: "Marketing Specialist",
-      type: "Contract",
-      salary: 8500,
-    },
-  ]);
+  const { data: payments, isLoading, isError, error } = useEmployees();
 
   useEffect(() => {
-    // Simulating a fetch request for employee details
-    const fetchEmployeeDetails = async () => {
-      // Replace this with actual API call later
-      const mockResponse = {
-        employeeId: "EMP002",
-        dateOfBirth: "2002-12-03",
-        gender: "Female",
-        maritalStatus: "Married",
-        country: "United States",
-        phone: "+1 (555) 123-8567",
-        email: "janedoe@example.com",
-        linkedInName: "Jane Doe",
-        linkedInUrl: "https://www.linkedin.com/in/janedoe",
-        jobTitle: "Software Engineer",
-        level: "L3",
-        department: "Engineering",
-        employeeType: "Full-time",
-        supervisor: "John Doe",
-        salary: 90000,
-        panNumber: "ABCDE1224F",
-      };
+    if (selectedEmployee && payments) {
 
-      // Simulate API delay
-      // await new Promise((resolve) => setTimeout(resolve, 500));
+      const employee = payments.find(emp => emp.id === selectedEmployee.id);
 
-      setEmployeeDetails(mockResponse);
-    };
-
-    if (selectedEmployee) {
-      fetchEmployeeDetails();
+      if (employee) {
+        setEmployeeDetails(employee);
+      }
     }
-  }, [selectedEmployee]);
+  }, [selectedEmployee, payments]);
+
+  // useEffect(() => {
+  //   // Simulating a fetch request for employee details
+  //   const fetchEmployeeDetails = async () => {
+  //     // Replace this with actual API call later
+  //     const mockResponse = {
+  //       employeeId: "EMP002",
+  //       dateOfBirth: "2002-12-03",
+  //       gender: "Female",
+  //       maritalStatus: "Married",
+  //       country: "United States",
+  //       phone: "+1 (555) 123-8567",
+  //       email: "janedoe@example.com",
+  //       linkedInName: "Jane Doe",
+  //       linkedInUrl: "https://www.linkedin.com/in/janedoe",
+  //       jobTitle: "Software Engineer",
+  //       level: "L3",
+  //       department: "Engineering",
+  //       employeeType: "Full-time",
+  //       supervisor: "John Doe",
+  //       salary: 90000,
+  //       panNumber: "ABCDE1224F",
+  //     };
+
+  //     // Simulate API delay
+  //     // await new Promise((resolve) => setTimeout(resolve, 500));
+
+  //     setEmployeeDetails(mockResponse);
+  //   };
+  //   if (selectedEmployee) {
+  //     fetchEmployeeDetails();
+  //   }
+  // }, [selectedEmployee]);
+
+
+
+  
 
   useEffect(() => {
     setActiveTab("employeeDetails");
@@ -110,6 +81,9 @@ export default function Employees() {
   const handleEmployeeAdd = () => {
     setIsSheetOpen(true);
   };
+
+ 
+ 
 
   const onAddEmployee = (formData) => {
     // Generate a new ID (you might want to use a more robust method in production)
@@ -129,7 +103,13 @@ export default function Employees() {
     setSelectedEmployee(row);
   };
 
+  
+  if(isLoading) return <p>loading.....</p>
+  if(isError) return <p>{error.message}</p>
+
   return (
+    <>
+    {payments && (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="items-center">
         <div className="flex flex-row justify-end">
@@ -155,21 +135,21 @@ export default function Employees() {
               <div className="flex items-center gap-3">
                 <Avatar className="w-12 h-12">
                   <AvatarImage
-                    src={selectedEmployee?.imageUrl || "/default-avatar.jpg"}
+                    src={selectedEmployee?.imageUrl}
                     className="object-cover"
                   />
                   <AvatarFallback className="text-lg font-semibold">
                     <span>
-                      {selectedEmployee?.employeeName?.charAt(0) || "JD"}
+                      {selectedEmployee?.employeeName?.charAt(0)}
                     </span>
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col items-start">
                   <div className="text-lg font-medium">
-                    {selectedEmployee?.employeeName || "John Doe"}
+                    {selectedEmployee?.employeeName}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {selectedEmployee?.role || "Product Manager"}
+                    {selectedEmployee?.role}
                   </div>
                 </div>
               </div>
@@ -191,7 +171,7 @@ export default function Employees() {
                   <EmployeeDetailsTab employeeDetails={employeeDetails} />
                 </TabsContent>
                 <TabsContent value="projects">
-                  <ProjectsTab employeeId={selectedEmployee?.id} />
+                  <ProjectsTab employeeId={selectedEmployee?.userId} />
                 </TabsContent>
                 <TabsContent value="payroll">
                   <PayrollTab employeeId={selectedEmployee?.id} />
@@ -206,6 +186,7 @@ export default function Employees() {
         onClose={() => setIsSheetOpen(false)}
         onAddEmployee={onAddEmployee}
       />
-    </main>
+    </main>)}
+    </>
   );
 }
