@@ -11,7 +11,11 @@ import { useForm, FormProvider } from "react-hook-form";
 import { formInputs } from "./Inputs";
 import { EditProjectSheet } from "@/components/EditProjectSheet";
 import { toast } from "sonner";
+<<<<<<< HEAD
 import { useProjects } from "@/hooks/useProjects";
+=======
+import { AddClientDialog } from "@/components/AddClientDialog";
+>>>>>>> e6e03a4bf34e999dce2cc45420ddb9c18e9f395b
 
 export default function Projects () {
   const methods = useForm();
@@ -343,10 +347,19 @@ export default function Projects () {
     console.log(formData);
     setIsSheetOpen(false);
   };
+<<<<<<< HEAD
 const {data:projects,isError,isLoading,error}=useProjects();
 console.log(projects,"proporp")
 if(isLoading) return <p>loading....</p>
 if(isError) return error.message
+=======
+
+  const handleClientAdd = (formData) => {
+    toast.success("Client added successfully");
+    console.log("Client added", formData);
+  };
+
+>>>>>>> e6e03a4bf34e999dce2cc45420ddb9c18e9f395b
   return (
     <>
    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
@@ -373,11 +386,12 @@ if(isError) return error.message
           <Button
             variant="secondary"
             size="sm"
-            className="bg-primary text-white hover:bg-primary cursor-pointer gap-2"
+            className="gap-2"
             onClick={handleProjectAdd}
           >
             <PlusCircle className="h-4 w-4" /> Add Project
           </Button>
+          <AddClientDialog onAddClient={handleClientAdd} />
         </div>
       </div>
       <div className="flex flex-col items-center gap-1 text-left w-full">
