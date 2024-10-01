@@ -1,14 +1,15 @@
-"use client"; // Ensure this is at the top of the file
+"use client"; // This marks the component as a Client Component
 
 import React, { useState, useEffect } from "react";
-
-import { columns } from "./Columns";
 import { useForm, FormProvider } from "react-hook-form";
-
 import DataTable from "@/components/ui/data-table";
-import { formInputs } from "./Inputs";
 import { toast } from "sonner";
 import { subDays, format } from "date-fns";
+import { columns } from "./Columns";
+import { formInputs } from "./Inputs";
+import { fetchInvoices } from "@/app/api/invoice";
+import { updateInvoice } from "@/app/api/revenue_edit";
+import { addInvoice } from "@/app/api/revenue_add";
 
 export default function Revenue() {
   const methods = useForm();
@@ -18,158 +19,145 @@ export default function Revenue() {
   const [startDate, setStartDate] = useState(initialStartDate);
   const [endDate, setEndDate] = useState(initialEndDate);
   const [data, setData] = useState([]); // State to hold the fetched data
-  const [projectOptions, setProjectOptions] = useState([]);
-
-  const pjOptions = [
-    { id: "1", name: "ebibaaha" },
-    { id: "2", name: "Cloud Storage" },
-    { id: "3", name: "Solar Panels" },
-    { id: "4", name: "Membership Software" },
-    { id: "5", name: "Online Course Platform" },
-    { id: "6", name: "Inventory Management System" },
-    { id: "7", name: "Tracking Software" },
-    { id: "8", name: "Graphic Design Tool" },
-    { id: "9", name: "Patient Management System" },
-    { id: "10", name: "Scheduling App" },
-  ];
+  const [loading, setLoading] = useState(true); // Loading state
+  const [projectOptions, setProjectOptions] = useState(true);
 
   useEffect(() => {
     if (startDate && endDate) {
-      fetchData(startDate, endDate);
+      fetchData(startDate, endDate); // Fetch data on date change
     }
   }, [startDate, endDate]);
 
-  const fetchData = (startDate, endDate) => {
-    console.log("Fetching data from:", startDate, "to:", endDate);
+  const fetchData = async (startDate, endDate) => {
+    setLoading(true); // Set loading state before fetching data
+    try {
+      const fetchedData = await fetchInvoices(
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd")
+      );
 
-    // Replace this with your actual data fetching logic
-    // For example, you could fetch data from an API and update the state:
-    // fetch(`/api/revenues?start=${startDate}&end=${endDate}`)
-    //   .then(response => response.json())
-    //   .then(fetchedData => setData(fetchedData));
+      // Map the fetched data to match your table column structure
+      const mappedData = fetchedData.map((invoice) => ({
+        id: invoice.id,
+        name: invoice.name,
+        projectName: invoice.project_name,
+        invoice: `#INV${invoice.id}`, // Generate an invoice number if needed
+        invoiceIssuedDate: invoice.issued_date,
+        paidDate: invoice.payment_date,
+        status: invoice.payment_status === 2 ? "paid" : "pending",
+        type: invoice.transaction_type,
+        amount: invoice.amount,
+        project_id: invoice.project_id,
+      }));
 
-    // Mocked data fetch for demonstration
-    const fetchedData = [
-      // Add your data here or fetch from your API
-    ];
-    setData(fetchedData);
+      // Extract unique project options from invoices using project_id and project_name
+      const projectOptions = Array.from(
+        new Map(
+          fetchedData.map((invoice) => [
+            invoice.project_id,
+            {
+              id: invoice.project_id,
+              name: invoice.project_name,
+            },
+          ])
+        ).values()
+      );
+
+      console.log(mappedData, "Invoice data with project mapping");
+      console.log(projectOptions, "Dynamically generated project options");
+
+      setData(mappedData);
+      setProjectOptions(projectOptions); // Store project options in state
+      toast.success("Data fetched successfully");
+    } catch (error) {
+      toast.error("Failed to fetch data");
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
   const handleDateChange = (startDate, endDate) => {
     setStartDate(startDate);
     setEndDate(endDate);
   };
-  const revenues = [
-    {
-      name: "ebibaaha Invoice",
-      projectName: "ebibaaha",
-      invoice: "#EBI001",
-      invoiceIssuedDate: "Jan 12, 2023",
-      paidDate: "Jan 20, 2023",
-      status: "paid",
-      type: "recurring",
-      amount: 10000,
-    },
-    {
-      name: "Cloud Storage Invoice",
-      projectName: "Cloud Storage",
-      invoice: "#CLS002",
-      invoiceIssuedDate: "Feb 15, 2023",
-      paidDate: "Feb 28, 2023",
-      status: "paid",
-      type: "one-time",
-      amount: 25000,
-    },
-    {
-      name: "Solar Panels Invoice",
-      projectName: "Solar Panels",
-      invoice: "#SOL003",
-      invoiceIssuedDate: "Mar 3, 2023",
-      paidDate: "Mar 18, 2023",
-      status: "paid",
-      type: "recurring",
-      amount: 50000,
-    },
-    {
-      name: "Membership Software Invoice",
-      projectName: "Membership Software",
-      invoice: "#MEM004",
-      invoiceIssuedDate: "Apr 1, 2023",
-      paidDate: null,
-      status: "pending",
-      type: "recurring",
-      amount: 7500,
-    },
-    {
-      name: "Online Course Platform Invoice",
-      projectName: "Online Course Platform",
-      invoice: "#OCP005",
-      invoiceIssuedDate: "May 5, 2023",
-      paidDate: "May 15, 2023",
-      status: "paid",
-      type: "one-time",
-      amount: 30000,
-    },
-    {
-      name: "Inventory Management System Invoice",
-      projectName: "Inventory Management System",
-      invoice: "#IMS006",
-      invoiceIssuedDate: "Jun 10, 2023",
-      paidDate: null,
-      status: "pending",
-      type: "recurring",
-      amount: 15000,
-    },
-    {
-      name: "Tracking Software Invoice",
-      projectName: "Tracking Software",
-      invoice: "#TRK007",
-      invoiceIssuedDate: "Jul 7, 2023",
-      paidDate: "Jul 21, 2023",
-      status: "paid",
-      type: "one-time",
-      amount: 20000,
-    },
-    {
-      name: "Graphic Design Tool Invoice",
-      projectName: "Graphic Design Tool",
-      invoice: "#GDT008",
-      invoiceIssuedDate: "Aug 15, 2023",
-      paidDate: "Aug 30, 2023",
-      status: "paid",
-      type: "recurring",
-      amount: 12000,
-    },
-    {
-      name: "Patient Management System Invoice",
-      projectName: "Patient Management System",
-      invoice: "#PMS009",
-      invoiceIssuedDate: "Sep 1, 2023",
-      paidDate: null,
-      status: "pending",
-      type: "one-time",
-      amount: 40000,
-    },
-    {
-      name: "Scheduling App Invoice",
-      projectName: "Scheduling App",
-      invoice: "#SCH010",
-      invoiceIssuedDate: "Oct 10, 2023",
-      paidDate: "Oct 25, 2023",
-      status: "paid",
-      type: "recurring",
-      amount: 8000,
-    },
-  ];
 
-  const onAddRow = (newRowData) => {
-    toast.success("New row added");
-    console.log(newRowData, "in form");
+  const onAddRow = async (newRowData) => {
+    try {
+      // Find project_id based on projectName from projectOptions
+      const selectedProject = projectOptions.find(
+        (project) => project.name === newRowData.projectName
+      );
+
+      if (!selectedProject) {
+        throw new Error("Project not found or project name is invalid");
+      }
+
+      const addedInvoice = await addInvoice({
+        name: newRowData.name,
+        paidDate: newRowData.paidDate,
+        client: 1, // Assuming client ID is hardcoded or dynamic
+        amount: newRowData.amount,
+        project_id: selectedProject.id, // Use project_id based on projectName
+        status: newRowData.status === "paid" ? 2 : 1,
+        payment_type: newRowData.payment_type,
+      });
+
+      // Update the table data with the newly added invoice
+      setData((prevData) => [...prevData, addedInvoice]); // Append the new row to the table data
+      toast.success("New row added successfully");
+    } catch (error) {
+      toast.error("Failed to add new row");
+      console.error("Error adding row:", error.message);
+    }
   };
 
-  const onEditRow = (editedData) => {
-    toast.success("Row updated");
-    console.log(editedData, "edited data");
-    // Update the data in your state or send it to the server
+  const onEditRow = async (editedData) => {
+    try {
+      console.log("Edited data before update:", editedData);
+
+      if (!editedData.id) {
+        throw new Error("Invoice ID is missing in edited data");
+      }
+
+      // Map project name to project_id
+      const selectedProject = projectOptions.find(
+        (project) => project.name === editedData.projectName
+      );
+
+      if (!selectedProject) {
+        throw new Error("Project not found or project name is invalid");
+      }
+
+      const formattedPaidDate = editedData.paidDate
+        ? format(new Date(editedData.paidDate), "yyyy-MM-dd")
+        : null;
+
+      const payload = {
+        name: editedData.name,
+        paidDate: formattedPaidDate,
+        client: editedData.client || 1, // Default client
+        amount: editedData.amount,
+        project_id: selectedProject.id, // Get the project_id
+        status: editedData.status === "paid" ? 2 : 1, // Status handling
+        type: editedData.type, // Make sure `type` is sent as `one-time` or `recurring`
+      };
+
+      console.log("Payload being sent to the API:", payload);
+
+      const updatedInvoice = await updateInvoice(editedData.id, payload);
+
+      setData((prevData) =>
+        prevData.map((row) =>
+          row.id === updatedInvoice.id ? updatedInvoice : row
+        )
+      );
+
+      toast.success("Row updated successfully");
+    } catch (error) {
+      toast.error("Failed to update row");
+      console.error("Error updating row:", error.message);
+    }
   };
 
   return (
@@ -179,16 +167,17 @@ export default function Revenue() {
           title={"Revenue"}
           subtitle={"List of all revenue in the company"}
           columns={columns}
-          data={revenues}
-          projectOptions={pjOptions}
+          data={data} // Use dynamic data here
+          projectOptions={projectOptions} // Pass dynamic project options
           formInputs={formInputs}
           isTableAddFormEnabled={true}
           onAddRow={onAddRow}
-          onEditRow={onEditRow} //gets passed through the context in datatable
+          onEditRow={onEditRow} // Pass the edit function
           filterColumn={"status"}
           onDateChange={handleDateChange}
           initialStartDate={startDate} // Pass initial start date
           initialEndDate={endDate} // Pass initial end date
+          loading={loading} // Pass loading state to the DataTable component if necessary
         />
       </FormProvider>
     </main>

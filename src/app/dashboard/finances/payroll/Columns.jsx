@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK } from "@/lib/utils";
 import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { formInputs } from "@/app/dashboard/payroll/Inputs";
+import { format } from "date-fns";
+
 export const columns = [
   {
     accessorKey: "name",
@@ -56,6 +58,10 @@ export const columns = [
     accessorKey: "paidDate",
     header: "Paid Date",
     enableSorting: false,
+    cell: ({ row }) => {
+      const { paidDate } = row.original;
+      return <span>{format(paidDate, "MMM d, yyyy")}</span>;
+    },
   },
 
   {

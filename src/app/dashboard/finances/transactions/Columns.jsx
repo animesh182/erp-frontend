@@ -4,6 +4,7 @@ import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
+import { format } from "date-fns";
 
 export const columns = [
   {
@@ -27,6 +28,10 @@ export const columns = [
     accessorKey: "invoiceIssuedDate",
     header: "Invoice Issued Date",
     enableSorting: false,
+    cell: ({ row }) => {
+      const { invoiceIssuedDate } = row.original;
+      return <span>{format(invoiceIssuedDate, "MMM d, yyyy")}</span>;
+    },
   },
   {
     accessorKey: "status",

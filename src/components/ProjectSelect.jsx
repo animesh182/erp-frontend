@@ -12,14 +12,12 @@ import {
 import { Input } from "./ui/input";
 
 export const ProjectSelect = ({ projectOptions, value, onChange }) => {
-  //   console.log(value, "value"); // This confirms that you're receiving the value correctly
-
   if (!projectOptions) {
     return <Input placeholder="Add" value={value} disabled />;
   }
 
   return (
-    <Select onValueChange={onChange} disabled={!projectOptions}>
+    <Select onValueChange={onChange} value={value}>
       <SelectTrigger>
         <SelectValue placeholder="Select Project">
           {value || "Select Project"}
@@ -28,7 +26,7 @@ export const ProjectSelect = ({ projectOptions, value, onChange }) => {
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Project</SelectLabel>
-          {projectOptions?.map((project) => (
+          {projectOptions.map((project) => (
             <SelectItem key={project.id} value={project.name}>
               {project.name}
             </SelectItem>
