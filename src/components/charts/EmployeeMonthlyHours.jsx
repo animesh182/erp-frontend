@@ -59,13 +59,9 @@ function generateChartConfig(rawData) {
       }
     });
   });
-  // console.log(projectNames, "pN");
 
   const chartConfig = {};
-  // console.log([...projectNames], "aaaaaa");
-
   [...projectNames].forEach((projectName, index) => {
-    console.log(chartConfig[projectName]);
     chartConfig[projectName] = {
       color: colorPalette[index % colorPalette.length],
       label: projectName,
@@ -81,7 +77,6 @@ export default function EmployeeMonthlyHours({ rawData }) {
 
   const CustomYAxisTick = ({ x, y, payload }) => {
     const remainingHours = calculateRemainingHours(rawData[payload.index]);
-
     return (
       <g transform={`translate(${x},${y})`}>
         <foreignObject x={-150} y={-10} width="150" height="40">
@@ -94,8 +89,13 @@ export default function EmployeeMonthlyHours({ rawData }) {
             <div className="flex flex-col w-full">
               <div className="font-semibold">{payload.value}</div>
               <div className="text-[10px]">
-                {remainingHours} {""}
-                {remainingHours === 1 ? "hour available" : "hours available"}
+                {remainingHours < 0
+                  ? `${Math.abs(remainingHours)} hours Overtime`
+                  : `${remainingHours} ${
+                      remainingHours === 1
+                        ? "hour available"
+                        : "hours available"
+                    }`}
               </div>
             </div>
           </div>

@@ -9,7 +9,9 @@ export const columns = [
     accessorKey: "employeeName",
     header: "Employee Name",
     cell: ({ row }) => {
+      console.log(row);
       const { imageUrl, employeeName, email } = row.original; // Access the full row data
+
       return (
         <MultiLineNameCell
           imageUrl={imageUrl}
