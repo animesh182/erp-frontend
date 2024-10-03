@@ -9,13 +9,13 @@ export const columns = [
     accessorKey: "employeeName",
     header: "Employee Name",
     cell: ({ row }) => {
-      console.log(row);
-      const { imageUrl, employeeName, email } = row.original; // Access the full row data
+      // console.log(row);
+      const { imageUrl, full_name, email } = row.original; // Access the full row data
 
       return (
         <MultiLineNameCell
           imageUrl={imageUrl}
-          title={employeeName}
+          title={full_name}
           subtitle={email}
         />
       );
@@ -23,12 +23,12 @@ export const columns = [
     enableSorting: false,
   },
   {
-    accessorKey: "role",
+    accessorKey: "role_title",
     header: "Role",
     enableSorting: false,
   },
   {
-    accessorKey: "type",
+    accessorKey: "employment_type",
     header: "Type",
     enableSorting: false,
   },

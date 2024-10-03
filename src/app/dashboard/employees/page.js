@@ -14,8 +14,9 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
-import getEmployees from "@/app/api/employees/getEmployees";
+// import getEmployees from "@/app/api/employees/getEmployees";
 import { RectangleSkeleton } from "@/components/Skeletons";
+import { getEmployeesWithRoles } from "@/app/api/employees/getEmployees";
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -72,12 +73,11 @@ export default function Employees() {
   useEffect(() => {
     const getEmployeeDetails = async () => {
       try {
-        const { status, data } = await getEmployees();
-        console.log(data);
+        const { status, data } = await getEmployeesWithRoles();
         if (status === 200) {
           setEmployeeDetails(data);
         } else {
-          console.error("Failed to fetch KPI data");
+          console.error("Failed to fetch employee data");
         }
       } catch (error) {
         console.error("Error fetching employee details:", error);
@@ -86,6 +86,7 @@ export default function Employees() {
 
     getEmployeeDetails();
   }, []);
+  console.log(employeeDetails, "eD");
 
   useEffect(() => {
     setActiveTab("employeeDetails");
@@ -112,6 +113,7 @@ export default function Employees() {
   const handleRowSelect = (row) => {
     setSelectedEmployee(row);
   };
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="items-center">
@@ -121,26 +123,27 @@ export default function Employees() {
           </Button>
         </div>
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 py-4 px-0">
-          <div className="flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
-            {employeeDetails && employeeDetails.length > 0 && (
-              <>
-                <TableTitle
-                  title="List of Employees"
-                  subtitle="List of all employees in the company"
-                  totalItemCount={employeeDetails.length}
-                />
-                <SimpleDataTable
-                  columns={columns}
-                  data={payments}
-                  onRowSelect={handleRowSelect}
-                />
-              </>
-              // ) : (
-              //   <>
-              //     <RectangleSkeleton />
-              //     Loading employee data...
-              //   </>
-            )}
+          <div className="h-full flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
+            {
+              employeeDetails && employeeDetails.length > 0 && (
+                <>
+                  <TableTitle
+                    title="List of Employees"
+                    subtitle="List of all employees in the company"
+                    totalItemCount={employeeDetails.length}
+                  />
+                  <SimpleDataTable
+                    columns={columns}
+                    data={employeeDetails}
+                    onRowSelect={handleRowSelect}
+                  />
+                </>
+              )
+              // : (
+              //   <div className=" ">
+              //     <RectangleSkeleton height={"745"} />
+              //   </div>
+            }
           </div>
           <div className="flex flex-col items-center gap-1 text-center border rounded-md">
             <div className="h-24 w-full flex items-center bg-muted px-5 min-h-24">

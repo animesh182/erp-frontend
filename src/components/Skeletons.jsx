@@ -11,7 +11,7 @@ export function KpiSkeleton() {
 export function RectangleSkeleton() {
   return (
     <div className="flex flex-col ">
-      <Skeleton className="h-96 w-full rounded-xl" />
+      <Skeleton className="h-full w-full rounded-xl" />
     </div>
   );
 }
