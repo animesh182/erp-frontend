@@ -5,151 +5,29 @@ import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
 
 const PayrollTab = ({ payrollData }) => {
-  // If payrollData is not provided, use this default data
-  const defaultPayrollData = [
-    {
-      name: "John Doe",
-      paymentDate: "2023-05-01",
-      paymentType: "Direct Deposit",
-      salary: 5000,
-    },
-    {
-      name: "Jane Smith",
-      paymentDate: "2023-05-31",
-      paymentType: "Check",
-      salary: 5500,
-    },
-    {
-      name: "Bob Johnson",
-      paymentDate: "2023-05-01",
-      paymentType: "Direct Deposit",
-      salary: 4800,
-    },
-    {
-      name: "Alice Brown",
-      paymentDate: "2023-05-01",
-      paymentType: "Direct Deposit",
-      salary: 6000,
-    },
-    {
-      name: "Charlie Davis",
-      paymentDate: "2023-05-01",
-      paymentType: "Check",
-      salary: 5200,
-    },
-    {
-      name: "Eva Wilson",
-      paymentDate: "2023-05-15",
-      paymentType: "Direct Deposit",
-      salary: 5300,
-    },
-    {
-      name: "Frank Miller",
-      paymentDate: "2023-05-15",
-      paymentType: "Direct Deposit",
-      salary: 4900,
-    },
-    {
-      name: "Grace Lee",
-      paymentDate: "2023-05-15",
-      paymentType: "Check",
-      salary: 5700,
-    },
-    {
-      name: "Henry Taylor",
-      paymentDate: "2023-05-15",
-      paymentType: "Direct Deposit",
-      salary: 5100,
-    },
-    {
-      name: "Ivy Clark",
-      paymentDate: "2023-05-15",
-      paymentType: "Direct Deposit",
-      salary: 5400,
-    },
-    {
-      name: "Jack Robinson",
-      paymentDate: "2023-05-31",
-      paymentType: "Check",
-      salary: 5800,
-    },
-    {
-      name: "Karen White",
-      paymentDate: "2023-05-31",
-      paymentType: "Direct Deposit",
-      salary: 5250,
-    },
-    {
-      name: "Liam Harris",
-      paymentDate: "2023-05-31",
-      paymentType: "Direct Deposit",
-      salary: 4950,
-    },
-    {
-      name: "Mia Turner",
-      paymentDate: "2023-05-31",
-      paymentType: "Check",
-      salary: 5600,
-    },
-    {
-      name: "Noah Martinez",
-      paymentDate: "2023-05-31",
-      paymentType: "Direct Deposit",
-      salary: 5150,
-    },
-    // Additional dummy data
-    {
-      name: "Olivia Johnson",
-      paymentDate: "2023-06-15",
-      paymentType: "Direct Deposit",
-      salary: 5350,
-    },
-    {
-      name: "Peter Brown",
-      paymentDate: "2023-06-15",
-      paymentType: "Check",
-      salary: 5450,
-    },
-    {
-      name: "Quinn Davis",
-      paymentDate: "2023-06-15",
-      paymentType: "Direct Deposit",
-      salary: 5050,
-    },
-    {
-      name: "Rachel Wilson",
-      paymentDate: "2023-06-30",
-      paymentType: "Direct Deposit",
-      salary: 5550,
-    },
-    {
-      name: "Samuel Miller",
-      paymentDate: "2023-06-30",
-      paymentType: "Check",
-      salary: 5750,
-    },
-  ];
-
-  const data = payrollData || defaultPayrollData;
-
+  const data = payrollData;
+  // console.log(data);
   const columns = [
     {
-      accessorKey: "name",
+      accessorKey: "description",
       header: "Name",
     },
     {
-      accessorKey: "paymentDate",
+      accessorKey: "payment_date",
       header: "Payment Date",
       cell: ({ row }) =>
-        format(new Date(row.original.paymentDate), "MMM d, yyyy"),
+        format(new Date(row.original.payment_date), "MMM d, yyyy"),
     },
     {
-      accessorKey: "salary",
+      accessorKey: "type",
+      header: "Type",
+    },
+    {
+      accessorKey: "amount",
       header: "Salary",
-      cell: ({ row }) => formatAmountToNOK(row.original.salary),
+      cell: ({ row }) => formatAmountToNOK(row.original.amount),
     },
   ];
-
   return (
     <div className="p-6 space-y-4">
       <h4 className="text-xl font-bold">Payroll</h4>
@@ -168,7 +46,9 @@ const PayrollTab = ({ payrollData }) => {
             </div>
             <div className="text-lg font-semibold">
               {formatAmountToNOK(
-                data.reduce((sum, row) => sum + row.salary, 0)
+                data.reduce((sum, row) => {
+                  return sum + parseFloat(row.amount);
+                }, 0)
               )}
             </div>
           </div>

@@ -9,6 +9,7 @@ import CustomSheetTitle from "@/components/CustomSheetTitle";
 import { ProjectCard } from "@/components/ProjectCard";
 
 const ProjectsTab = ({ employeeProjects }) => {
+  console.log(employeeProjects, "emp");
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const openSheet = () => setIsSheetOpen(true);

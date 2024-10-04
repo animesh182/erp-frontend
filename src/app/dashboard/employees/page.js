@@ -86,7 +86,7 @@ export default function Employees() {
 
     getEmployeeDetails();
   }, []);
-  console.log(employeeDetails, "eD");
+  // console.log(employeeDetails, "eD");
 
   useEffect(() => {
     setActiveTab("employeeDetails");
@@ -111,6 +111,7 @@ export default function Employees() {
   };
 
   const handleRowSelect = (row) => {
+    // console.log(row);
     setSelectedEmployee(row);
   };
 
@@ -161,10 +162,10 @@ export default function Employees() {
                 </Avatar>
                 <div className="flex flex-col items-start">
                   <div className="text-lg font-medium">
-                    {selectedEmployee?.employeeName || "John Doe"}
+                    {selectedEmployee?.full_name || "John Doe"}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {selectedEmployee?.role || "Product Manager"}
+                    {selectedEmployee?.role_title || "Product Manager"}
                   </div>
                 </div>
               </div>
@@ -183,18 +184,23 @@ export default function Employees() {
               </TabsList>
               <div className="flex-1 overflow-y-auto">
                 <TabsContent value="employeeDetails">
-                  {/* <EmployeeDetailsTab employeeDetails={employeeDetails} /> */}
+                  <EmployeeDetailsTab employeeDetails={selectedEmployee} />
                 </TabsContent>
                 <TabsContent value="projects">
-                  <ProjectsTab employeeId={selectedEmployee?.id} />
+                  <ProjectsTab
+                    employeeProjects={selectedEmployee?.user_projects}
+                  />
                 </TabsContent>
                 <TabsContent value="payroll">
-                  <PayrollTab employeeId={selectedEmployee?.id} />
+                  <PayrollTab
+                    payrollData={selectedEmployee?.salary_payment_history || []}
+                  />
                 </TabsContent>
               </div>
             </Tabs>
           </div>
         </div>
+        {console.log(selectedEmployee)}
       </div>
       <EditEmployeeSheet
         isOpen={isSheetOpen}
