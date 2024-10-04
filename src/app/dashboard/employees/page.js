@@ -14,13 +14,14 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
-
+// import getEmployees from "@/app/api/employees/getEmployees";
+import { RectangleSkeleton } from "@/components/Skeletons";
+import { getEmployeesWithRoles } from "@/app/api/employees/getEmployees";
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeTab, setActiveTab] = useState("employeeDetails");
-  const [employeeDetails, setEmployeeDetails] = useState(null);
-
+  const [employeeDetails, setEmployeeDetails] = useState([]);
   const [payments, setPayments] = useState([
     {
       id: "728ed52f",
@@ -70,38 +71,22 @@ export default function Employees() {
   ]);
 
   useEffect(() => {
-    // Simulating a fetch request for employee details
-    const fetchEmployeeDetails = async () => {
-      // Replace this with actual API call later
-      const mockResponse = {
-        employeeId: "EMP002",
-        dateOfBirth: "2002-12-03",
-        gender: "Female",
-        maritalStatus: "Married",
-        country: "United States",
-        phone: "+1 (555) 123-8567",
-        email: "janedoe@example.com",
-        linkedInName: "Jane Doe",
-        linkedInUrl: "https://www.linkedin.com/in/janedoe",
-        jobTitle: "Software Engineer",
-        level: "L3",
-        department: "Engineering",
-        employeeType: "Full-time",
-        supervisor: "John Doe",
-        salary: 90000,
-        panNumber: "ABCDE1224F",
-      };
-
-      // Simulate API delay
-      // await new Promise((resolve) => setTimeout(resolve, 500));
-
-      setEmployeeDetails(mockResponse);
+    const getEmployeeDetails = async () => {
+      try {
+        const { status, data } = await getEmployeesWithRoles();
+        if (status === 200) {
+          setEmployeeDetails(data);
+        } else {
+          console.error("Failed to fetch employee data");
+        }
+      } catch (error) {
+        console.error("Error fetching employee details:", error);
+      }
     };
 
-    if (selectedEmployee) {
-      fetchEmployeeDetails();
-    }
-  }, [selectedEmployee]);
+    getEmployeeDetails();
+  }, []);
+  // console.log(employeeDetails, "eD");
 
   useEffect(() => {
     setActiveTab("employeeDetails");
@@ -126,6 +111,7 @@ export default function Employees() {
   };
 
   const handleRowSelect = (row) => {
+    // console.log(row);
     setSelectedEmployee(row);
   };
 
@@ -138,17 +124,27 @@ export default function Employees() {
           </Button>
         </div>
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 py-4 px-0">
-          <div className="flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
-            <TableTitle
-              title="List of Employees"
-              subtitle="List of all employees in the company"
-              totalItemCount={payments.length}
-            />
-            <SimpleDataTable
-              columns={columns}
-              data={payments}
-              onRowSelect={handleRowSelect}
-            />
+          <div className="h-full flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
+            {
+              employeeDetails && employeeDetails.length > 0 && (
+                <>
+                  <TableTitle
+                    title="List of Employees"
+                    subtitle="List of all employees in the company"
+                    totalItemCount={employeeDetails.length}
+                  />
+                  <SimpleDataTable
+                    columns={columns}
+                    data={employeeDetails}
+                    onRowSelect={handleRowSelect}
+                  />
+                </>
+              )
+              // : (
+              //   <div className=" ">
+              //     <RectangleSkeleton height={"745"} />
+              //   </div>
+            }
           </div>
           <div className="flex flex-col items-center gap-1 text-center border rounded-md">
             <div className="h-24 w-full flex items-center bg-muted px-5 min-h-24">
@@ -166,10 +162,10 @@ export default function Employees() {
                 </Avatar>
                 <div className="flex flex-col items-start">
                   <div className="text-lg font-medium">
-                    {selectedEmployee?.employeeName || "John Doe"}
+                    {selectedEmployee?.full_name || "John Doe"}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {selectedEmployee?.role || "Product Manager"}
+                    {selectedEmployee?.role_title || "Product Manager"}
                   </div>
                 </div>
               </div>
@@ -188,23 +184,29 @@ export default function Employees() {
               </TabsList>
               <div className="flex-1 overflow-y-auto">
                 <TabsContent value="employeeDetails">
-                  <EmployeeDetailsTab employeeDetails={employeeDetails} />
+                  <EmployeeDetailsTab employeeDetails={selectedEmployee} />
                 </TabsContent>
                 <TabsContent value="projects">
-                  <ProjectsTab employeeId={selectedEmployee?.id} />
+                  <ProjectsTab
+                    employeeProjects={selectedEmployee?.user_projects}
+                  />
                 </TabsContent>
                 <TabsContent value="payroll">
-                  <PayrollTab employeeId={selectedEmployee?.id} />
+                  <PayrollTab
+                    payrollData={selectedEmployee?.salary_payment_history || []}
+                  />
                 </TabsContent>
               </div>
             </Tabs>
           </div>
         </div>
+        {console.log(selectedEmployee)}
       </div>
       <EditEmployeeSheet
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddEmployee={onAddEmployee}
+        //the edit employee is on the employee details tab
       />
     </main>
   );

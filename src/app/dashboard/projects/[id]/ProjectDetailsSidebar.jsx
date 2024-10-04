@@ -13,6 +13,7 @@ const ProjectDetailsSidebar = () => (
         <Edit className="h-4 w-4" />
         Edit
       </Button>
+      {/* change to assign employee */}
     </div>
     <div className="text-muted-foreground text-pretty text-sm">
       Depending on the client, this may already be well-defined, but you might

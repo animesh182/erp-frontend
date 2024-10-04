@@ -155,8 +155,10 @@ export default function ProjectBudgetChart({ rawData }) {
                 <text
                   x={x}
                   y={y - (lines.length - 1) * 5} // Adjust y position for multiple lines
-                  stroke={recurringProjects.includes(label) ? "#2563EB" : ""} // Blue if recurring, black otherwise
-                  strokeWidth={0.4}
+                  stroke={
+                    recurringProjects.includes(label) ? "#2563EB" : "#000000"
+                  } // Blue if recurring, black otherwise
+                  strokeWidth={0.6}
                   fontSize={12}
                   fontWeight={500}
                   textAnchor="end"

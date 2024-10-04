@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { formatAmountToNOK } from "@/lib/utils";
 import { useState } from "react";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
+import { toast } from "sonner";
 
 const EmployeeDetailsTab = ({ employeeDetails }) => {
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
@@ -16,41 +17,41 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
   }
 
   const basicDetails = [
-    { label: "Employee ID", value: employeeDetails?.employeeId },
-    {
-      label: "Date of Birth",
-      value: format(new Date(employeeDetails?.dateOfBirth), "MMM dd yyyy"),
-    },
-    { label: "Gender", value: employeeDetails?.gender },
-    {
-      label: "Marital Status",
-      value: employeeDetails?.maritalStatus,
-    },
+    { label: "Employee ID", value: employeeDetails?.id },
+    // {
+    //   label: "Date of Birth",
+    //   value: format(new Date(employeeDetails?.dateOfBirth), "MMM dd yyyy"),
+    // },
+    // { label: "Gender", value: employeeDetails?.gender },
+    // {
+    //   label: "Marital Status",
+    //   value: employeeDetails?.maritalStatus,
+    // },
   ];
 
   const contactInformation = [
     { label: "Country", value: employeeDetails?.country },
-    { label: "Phone", value: employeeDetails?.phone },
+    { label: "Phone", value: employeeDetails?.phone_number },
     { label: "Email", value: employeeDetails?.email },
-    {
-      label: "LinkedIn",
-      value: employeeDetails?.linkedInName,
-      link: employeeDetails?.linkedInUrl,
-    },
+    // {
+    //   label: "LinkedIn",
+    //   value: employeeDetails?.linkedInName,
+    //   link: employeeDetails?.linkedInUrl,
+    // },
   ];
 
   const employmentDetails = [
     {
       label: "Job Title",
-      value: employeeDetails?.jobTitle,
+      value: employeeDetails?.role_title,
     },
-    { label: "Level", value: employeeDetails?.level },
-    { label: "Department", value: employeeDetails?.department },
+    // { label: "Level", value: employeeDetails?.level }, level api is not working
+    // { label: "Department", value: employeeDetails?.department },
     {
       label: "Employee Type",
-      value: employeeDetails?.employeeType,
+      value: employeeDetails?.employment_type,
     },
-    { label: "Supervisor", value: employeeDetails?.supervisor },
+    // { label: "Supervisor", value: employeeDetails?.supervisor },
   ];
 
   const compensationAndBenefits = [
@@ -58,7 +59,7 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
       label: "Salary",
       value: `${formatAmountToNOK(employeeDetails?.salary)} per month`,
     },
-    { label: "PAN Number", value: employeeDetails?.panNumber },
+    { label: "PAN Number", value: employeeDetails?.PAN },
   ];
 
   const renderDetailItem = ({ label, value, link }) => (
@@ -81,6 +82,7 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
 
   const handleEditEmployee = (updatedData) => {
     // Handle the updated employee data here
+    toast.success("Employee edited successfully");
     console.log("Updated employee data:", updatedData);
     // You might want to update the state or send this data to an API
   };

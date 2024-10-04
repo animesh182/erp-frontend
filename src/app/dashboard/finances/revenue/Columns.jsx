@@ -4,6 +4,7 @@ import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
+import { format } from "date-fns";
 
 export const columns = [
   {
@@ -27,6 +28,10 @@ export const columns = [
     accessorKey: "invoiceIssuedDate",
     header: "Invoice Issued Date",
     enableSorting: false,
+    cell: ({ row }) => {
+      const { invoiceIssuedDate } = row.original;
+      return <span>{format(invoiceIssuedDate, "MMM d, yyyy")}</span>;
+    },
   },
   {
     accessorKey: "status",
@@ -51,6 +56,10 @@ export const columns = [
     accessorKey: "paidDate",
     header: "Paid Date",
     enableSorting: false,
+    cell: ({ row }) => {
+      const { paidDate } = row.original;
+      return <span>{format(paidDate, "MMM d, yyyy")}</span>;
+    },
   },
 
   {
@@ -58,18 +67,19 @@ export const columns = [
     header: "Type",
     enableSorting: false,
     cell: ({ row }) => {
-      const { type } = row.original;
-      return <span className="capitalize">{type}</span>;
+      const paymentType =
+        row.original.type === "one-time" ? "One-time" : "Recurring";
+      return <span>{paymentType}</span>;
     },
   },
   {
     accessorKey: "amount",
     header: "Amount",
     enableSorting: false,
-    cell: ({ row }) => {
-      const { amount } = row.original;
-      return formatAmountToNOK(amount);
-    },
+    // cell: ({ row }) => {
+    //   const { amount } = row.original;
+    //   return formatAmountToNOK(amount);
+    // },
   },
   {
     accessorKey: "actions",

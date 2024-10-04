@@ -1,13 +1,17 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import DataTable from "@/components/ui/data-table";
-import { CreditCard, DollarSign } from "lucide-react";
+import { CreditCard, DollarSign, Download } from "lucide-react";
 import { columns } from "@/app/dashboard/finances/payroll/Columns";
 import { formatAmountToNOK } from "@/lib/utils";
 import KpiCard from "@/components/kpicard";
 import { toast } from "sonner";
 import { subDays, format } from "date-fns";
 import { useForm, FormProvider } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { UploadSheetDialog } from "@/components/UploadSheetDialog";
+import { fetchPayroll } from "@/app/api/payroll"; // Import the fetchSalaries function
+import { updatePayroll } from "@/app/api/update_payroll"; // Import the updateSalary function
 
 export default function Payroll() {
   const methods = useForm();
@@ -16,20 +20,7 @@ export default function Payroll() {
   const [startDate, setStartDate] = useState(initialStartDate);
   const [endDate, setEndDate] = useState(initialEndDate);
   const [data, setData] = useState([]); // State to hold the fetched data
-  const [projectOptions, setProjectOptions] = useState([]);
-
-  const pjOptions = [
-    { id: "1", name: "ebibaaha" },
-    { id: "2", name: "Cloud Storage" },
-    { id: "3", name: "Solar Panels" },
-    { id: "4", name: "Membership Software" },
-    { id: "5", name: "Online Course Platform" },
-    { id: "6", name: "Inventory Management System" },
-    { id: "7", name: "Tracking Software" },
-    { id: "8", name: "Graphic Design Tool" },
-    { id: "9", name: "Patient Management System" },
-    { id: "10", name: "Scheduling App" },
-  ];
+  const [loading, setLoading] = useState(true); // Add a loading state
 
   useEffect(() => {
     if (startDate && endDate) {
@@ -37,99 +28,41 @@ export default function Payroll() {
     }
   }, [startDate, endDate]);
 
-  const fetchData = (startDate, endDate) => {
-    console.log("Fetching data from:", startDate, "to:", endDate);
+  const fetchData = async (startDate, endDate) => {
+    setLoading(true); // Set loading state before fetching data
+    try {
+      // Fetch data using the fetchSalaries function
+      const fetchedData = await fetchPayroll(
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd")
+      );
 
-    // Replace this with your actual data fetching logic
-    // For example, you could fetch data from an API and update the state:
-    // fetch(`/api/revenues?start=${startDate}&end=${endDate}`)
-    //   .then(response => response.json())
-    //   .then(fetchedData => setData(fetchedData));
+      // Map the fetched data to match your table structure
+      const mappedData = fetchedData.map((item) => ({
+        name: item.description,
+        projectName: null, // If no projectName is available
+        invoice: `#${item.id}`,
+        invoiceIssuedDate: item.invoice_issued_date,
+        paidDate: item.payment_date,
+        status: item.payment_status.toLowerCase(), // Assuming it's "Paid" or "Pending"
+        type: item.type.toLowerCase(), // Ensure type is properly formatted
+        amount: parseFloat(item.amount), // Convert amount to a number
+      }));
 
-    // Mocked data fetch for demonstration
-    const fetchedData = [
-      // Add your data here or fetch from your API
-    ];
-    setData(fetchedData);
+      setData(mappedData); // Store the fetched data in state
+      toast.success("Data fetched successfully");
+    } catch (error) {
+      toast.error("Failed to fetch data");
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Stop loading after fetching data
+    }
   };
 
   const handleDateChange = (startDate, endDate) => {
     setStartDate(startDate);
     setEndDate(endDate);
   };
-
-  const payroll = [
-    {
-      name: "Noah Salary June",
-      projectName: null,
-      invoice: "#3066",
-      invoiceIssuedDate: "Jan 6, 2024",
-      paidDate: "Jan 6, 2024",
-      status: "paid",
-      type: "salary",
-      amount: 31600,
-    },
-    {
-      name: "Olivia Salary June",
-      projectName: null,
-      invoice: "#3067",
-      invoiceIssuedDate: "Mar 12, 2024",
-      paidDate: null,
-      status: "pending",
-      type: "salary",
-      amount: 24200,
-    },
-    {
-      name: "Smith Salary June",
-      projectName: null,
-      invoice: "#3068",
-      invoiceIssuedDate: "Jun 8, 2024",
-      paidDate: null,
-      status: "pending",
-      type: "freelance",
-      amount: 83700,
-    },
-    {
-      name: "Emma Salary June",
-      projectName: null,
-      invoice: "#3068",
-      invoiceIssuedDate: "Jun 27, 2024",
-      paidDate: "Jun 27, 2024",
-      status: "paid",
-      type: "overtime",
-      amount: 87400,
-    },
-    {
-      name: "Liam Salary June",
-      projectName: null,
-      invoice: "#3069",
-      invoiceIssuedDate: "Jul 1, 2024",
-      paidDate: "Jul 1, 2024",
-      status: "paid",
-      type: "overtime",
-      amount: 72100,
-    },
-    {
-      name: "Noah Salary June",
-      projectName: null,
-      invoice: "#3068",
-      invoiceIssuedDate: "Jun 8, 2024",
-      paidDate: null,
-      status: "pending",
-      type: "freelance",
-      amount: 83700,
-    },
-    {
-      name: "Krystal Salary June",
-      projectName: null,
-      invoice: "#3068",
-      invoiceIssuedDate: "Jun 27, 2024",
-      paidDate: "Jun 27, 2024",
-      status: "paid",
-      type: "salary",
-      amount: 87400,
-    },
-  ];
 
   const kpivalues = [
     {
@@ -152,15 +85,48 @@ export default function Payroll() {
     },
   ];
 
-  const onEditRow = (editedData) => {
-    toast.success("Row updated");
-    console.log(editedData, "edited data");
-    // Update the data in your state or send it to the server
+  const handleSheetDownload = () => {
+    console.log("Downloading payroll sheet");
+  };
+
+  const onEditRow = async (editedData) => {
+    try {
+      console.log("Edited data:", editedData); // Log the edited data
+
+      // Send the edited data to the server
+      const updatedSalary = await updateSalary(editedData.id, {
+        description: editedData.name,
+        invoice_issued_date: editedData.invoiceIssuedDate,
+        payment_date: editedData.paidDate,
+        payment_status: editedData.status === "paid" ? "Paid" : "Pending",
+        type: editedData.type, // Ensure type is sent correctly
+        amount: editedData.amount,
+      });
+
+      // Update the table state with the updated salary data
+      setData((prevData) =>
+        prevData.map((row) =>
+          row.id === updatedSalary.id ? updatedSalary : row
+        )
+      );
+
+      toast.success("Row updated successfully");
+    } catch (error) {
+      toast.error("Failed to update row");
+      console.error("Error updating row:", error.message);
+    }
   };
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="flex flex-wrap gap-4 md:gap-6 lg:gap-6">
+      <div className="flex w-full justify-end gap-4">
+        <Button size="sm" className="gap-2" onClick={handleSheetDownload}>
+          <Download className="h-4 w-4" />
+          Get Payroll Sheet
+        </Button>
+        <UploadSheetDialog />
+      </div>
+      <div className="flex gap-4 md:gap-6 lg:gap-6">
         {kpivalues.map((card) => (
           <KpiCard
             key={card.title}
@@ -176,13 +142,13 @@ export default function Payroll() {
           title={"Payroll"}
           subtitle="View and manage comprehensive salary details of all employees"
           columns={columns}
-          data={payroll}
+          data={data} // Use dynamic data here
           isTableAddFormEnabled={false}
           onEditRow={onEditRow}
           initialStartDate={startDate}
           initialEndDate={endDate}
-          projectOptions={pjOptions}
           onDateChange={handleDateChange}
+          loading={loading} // Pass loading state to the DataTable component if necessary
         />
       </FormProvider>
     </main>

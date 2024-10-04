@@ -11,6 +11,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { formInputs } from "./Inputs";
 import { EditProjectSheet } from "@/components/EditProjectSheet";
 import { toast } from "sonner";
+import { AddClientDialog } from "@/components/AddClientDialog";
 
 export default function Projects() {
   const methods = useForm();
@@ -337,10 +338,67 @@ export default function Projects() {
     console.log("Updated Project:", updatedProject);
   };
 
-  const onAddProject = (formData) => {
-    toast.success("Project added successfully");
+  const onAddProject = async (formData) => {
+    try {
+      const response = await fetch("/api/project/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        //   {
+        //     "name": "asd", !!
+        //     "health": "at-risk!!
+        //     "projectCategory": "asdas",!!
+        //     "platform": "asd",
+        //     "clientName": "asd",
+        //     "clientEmail": "asd@gmail.com",!!
+        //     "status": "ongoing",!!
+        //     "teamMembersCount": "12",
+        //     "progress": "23",!!
+        //     "startDate": "2024-09-25",!!
+        //     "endDate": "2024-09-11",
+        //     "budget": "2000",!!
+        //     "projectDescription": "asd"
+        // }
+        body: JSON.stringify({
+          name: formData.name,
+          amount: formData.budget,
+          start_date: formData.startDate,
+          // estimated_duration: Cannot find it in the frontend,
+          budget: formData.budget,
+          type: formData.projectCategory,
+          client: formData.clientName,
+          project_status: formData.status,
+          completion: formData.progress,
+          project_health: formData.health,
+          // Might not be correct from here onwards
+          platform: formData.platform,
+          client_email: formData.clientEmail,
+          teamMembersCount: formData.teamMembersCount,
+          end_date: formData.endDate,
+          project_description: formData.projectDescription,
+        }),
+      });
+      console.log("here");
+      if (!response.ok) {
+        toast.error("There was an error adding the project");
+      }
+      const result = await response.json();
+      console.log(result);
+
+      toast.success("Project added successfully");
+      console.log("Added Project:", result);
+      setIsSheetOpen(false);
+    } catch (error) {
+      toast.error("Failed to add project");
+      console.error("Error adding project:", error);
+    }
     console.log(formData);
-    setIsSheetOpen(false);
+  };
+
+  const handleClientAdd = (formData) => {
+    toast.success("Client added successfully");
+    console.log("Client added", formData);
   };
 
   return (
@@ -368,11 +426,12 @@ export default function Projects() {
           <Button
             variant="secondary"
             size="sm"
-            className="bg-primary text-white hover:bg-primary cursor-pointer gap-2"
+            className="gap-2"
             onClick={handleProjectAdd}
           >
             <PlusCircle className="h-4 w-4" /> Add Project
           </Button>
+          <AddClientDialog onAddClient={handleClientAdd} />
         </div>
       </div>
       <div className="flex flex-col items-center gap-1 text-left w-full">
