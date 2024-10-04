@@ -71,10 +71,10 @@ function generateChartConfig(rawData) {
 }
 
 export default function EmployeeMonthlyHours({ rawData }) {
-  if (!rawData) return <>Loading...</>;
-  const data = convertHoursToPercentage(rawData);
   const chartConfig = useMemo(() => generateChartConfig(rawData), [rawData]);
+  const data = useMemo(() => convertHoursToPercentage(rawData), [rawData]);
 
+  if (!rawData) return <>Loading...</>;
   const CustomYAxisTick = ({ x, y, payload }) => {
     const remainingHours = calculateRemainingHours(rawData[payload.index]);
     return (
