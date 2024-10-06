@@ -16,64 +16,20 @@ import { toast } from "sonner";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
 // import getEmployees from "@/app/api/employees/getEmployees";
 import { RectangleSkeleton } from "@/components/Skeletons";
-import { getEmployeesWithRoles } from "@/app/api/employees/getEmployees";
+import {
+  getEmployees,
+  getEmployeesWithRoles,
+} from "@/app/api/employees/getEmployees";
+import { apiClient } from "@/lib/utils";
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeTab, setActiveTab] = useState("employeeDetails");
   const [employeeDetails, setEmployeeDetails] = useState([]);
-  const [payments, setPayments] = useState([
-    {
-      id: "728ed52f",
-      employeeName: "John Doe",
-      imageUrl: "/default-avatar.jpg",
-      email: "john.doe@example.com",
-      role: "Software Engineer",
-      type: "Executive",
-      salary: 12000,
-    },
-    {
-      id: "489e1d42",
-      employeeName: "Jane Smith",
-      imageUrl: "/default-avatar.jpg",
-      email: "jane.smith@example.com",
-      role: "Product Manager",
-      type: "Full-time",
-      salary: 11000,
-    },
-    {
-      id: "153b3a2c",
-      employeeName: "Bob Johnson",
-      imageUrl: "/default-avatar.jpg",
-      email: "bob.johnson@example.com",
-      role: "UX Designer",
-      type: "Part-time",
-      salary: 8000,
-    },
-    {
-      id: "621f4e3b",
-      employeeName: "Alice Williams",
-      imageUrl: "/default-avatar.jpg",
-      email: "alice.williams@example.com",
-      role: "Data Analyst",
-      type: "Full-time",
-      salary: 9500,
-    },
-    {
-      id: "984c7d6a",
-      employeeName: "Charlie Brown",
-      imageUrl: "/default-avatar.jpg",
-      email: "charlie.brown@example.com",
-      role: "Marketing Specialist",
-      type: "Contract",
-      salary: 8500,
-    },
-  ]);
-
   useEffect(() => {
     const getEmployeeDetails = async () => {
       try {
-        const { status, data } = await getEmployeesWithRoles();
+        const { status, data } = await getEmployees();
         if (status === 200) {
           setEmployeeDetails(data);
         } else {
@@ -95,19 +51,52 @@ export default function Employees() {
   const handleEmployeeAdd = () => {
     setIsSheetOpen(true);
   };
-
-  const onAddEmployee = (formData) => {
+  // console.log(selectedEmployee);
+  const onAddEmployee = async (formData) => {
     // Generate a new ID (you might want to use a more robust method in production)
-    toast.success("Employee added successfully");
-    console.log(formData);
-
-    const newId = `employee_${Date.now()}`;
-    const newEmployee = {
-      id: newId,
-      ...formData,
+    const payload = {
+      employee_id: formData.employeeId,
+      full_name: formData.linkedInName,
+      email: formData.email,
+      password: "avinto123",
+      employee_id: formData.employeeId,
+      salary: formData.salary,
+      employment_type: formData.employeeType,
+      role: formData.role,
+      country: formData.country,
+      phone_number: formData.phone,
+      PAN: formData.panNumber,
+      start_date: formData.startDate,
+      end_date: formData.endDate || null,
+      level: formData.level,
+      gender: formData.gender,
+      marital_status: formData.maritalStatus,
+      linkedin_name: formData.linkedInName,
+      linkedin_url: formData.linkedInUrl,
+      date_of_birth: formData.dateOfBirth,
     };
-    setPayments([...payments, newEmployee]);
-    setIsSheetOpen(false);
+    try {
+      const response = await apiClient(
+        `${process.env.NEXT_PUBLIC_API_URL}api/users/register/`,
+        {
+          method: "POST",
+          body: JSON.stringify(payload),
+        }
+      );
+      if (response.ok) {
+        toast.success("Employee added successfully");
+        // setIsSheetOpen(false);
+      }
+    } catch (error) {
+      toast.error("There was an error adding the employee");
+      console.error(error);
+    }
+
+    // const newId = `employee_${Date.now()}`;
+    // const newEmployee = {
+    //   formData,
+    // };
+    // setEmployeeDetails([...employeeDetails, newEmployee]);
   };
 
   const handleRowSelect = (row) => {
@@ -165,7 +154,7 @@ export default function Employees() {
                     {selectedEmployee?.full_name || "John Doe"}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {selectedEmployee?.role_title || "Product Manager"}
+                    {selectedEmployee?.role || "Product Manager"}
                   </div>
                 </div>
               </div>
@@ -189,23 +178,23 @@ export default function Employees() {
                 <TabsContent value="projects">
                   <ProjectsTab
                     employeeProjects={selectedEmployee?.user_projects}
+                    userId={selectedEmployee?.id}
                   />
                 </TabsContent>
                 <TabsContent value="payroll">
-                  <PayrollTab
-                    payrollData={selectedEmployee?.salary_payment_history || []}
-                  />
+                  <PayrollTab payrollData={selectedEmployee?.payroll || []} />
                 </TabsContent>
               </div>
             </Tabs>
           </div>
         </div>
-        {console.log(selectedEmployee)}
+        {/* {console.log(selectedEmployee)} */}
       </div>
       <EditEmployeeSheet
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddEmployee={onAddEmployee}
+        // employeeData={selectedEmployee}
         //the edit employee is on the employee details tab
       />
     </main>

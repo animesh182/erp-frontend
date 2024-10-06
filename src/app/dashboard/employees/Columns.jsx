@@ -23,12 +23,12 @@ export const columns = [
     enableSorting: false,
   },
   {
-    accessorKey: "role_title",
+    accessorKey: "role",
     header: "Role",
     enableSorting: false,
   },
   {
-    accessorKey: "employment_type",
+    accessorKey: "level",
     header: "Type",
     enableSorting: false,
   },

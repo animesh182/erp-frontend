@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import Cookies from "js-cookie";
-
+import { differenceInDays } from "date-fns";
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
@@ -15,7 +15,9 @@ export function formatAmountToNOK(amount) {
     maximumFractionDigits: 0,
   }).format(amount);
 }
-
+export function getDifferenceInDays(startDate, endDate) {
+  return differenceInDays(endDate, startDate);
+}
 export function formatAmountDecimalToNOK(amount) {
   if (!amount) return "-";
   return new Intl.NumberFormat("nb-NO", {

@@ -9,7 +9,7 @@ const PayrollTab = ({ payrollData }) => {
   // console.log(data);
   const columns = [
     {
-      accessorKey: "description",
+      accessorKey: "name",
       header: "Name",
     },
     {
@@ -19,8 +19,9 @@ const PayrollTab = ({ payrollData }) => {
         format(new Date(row.original.payment_date), "MMM d, yyyy"),
     },
     {
-      accessorKey: "type",
-      header: "Type",
+      accessorKey: "payment_type",
+      header: "Payment Method",
+      cell: ({ row }) => row.original.payment_method || "N/A",
     },
     {
       accessorKey: "amount",
@@ -37,7 +38,7 @@ const PayrollTab = ({ payrollData }) => {
             <span className="text-sm text-muted-foreground">
               Total Payslips
             </span>
-            <span className="text-lg font-semibold">18</span>
+            <span className="text-lg font-semibold">{payrollData?.length}</span>
           </div>
           <Separator orientation="vertical" className="mx-6 h-auto" />
           <div className="flex flex-col w-1/2">
