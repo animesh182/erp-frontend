@@ -17,12 +17,15 @@ import {
   RectangleSkeleton,
   SkeletonCard,
 } from "@/components/Skeletons";
+import { apiClient } from "@/lib/utils";
 export default function Projects() {
   const methods = useForm();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [projects, setProjects] = useState([]);
   const [roles, setRoles] = useState([]);
   const [isCardLayout, setIsCardLayout] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
+
   // console.log(projects);
   // handle toggle layout
   const handleToggleLayout = (value) => {
@@ -82,38 +85,57 @@ export default function Projects() {
 
   const onAddProject = async (formData) => {
     try {
-      const response = await fetch("/api/project/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        //   {
-        //     "name": "asd", !!
-        //     "health": "at-risk!!
-        //     "projectCategory": "asdas",!!
-        //     "platform": "asd",
-        //     "clientName": "asd",
-        //     "clientEmail": "asd@gmail.com",!!
-        //     "status": "ongoing",!!
-        //     "teamMembersCount": "12",
-        //     "progress": "23",!!
-        //     "startDate": "2024-09-25",!!
-        //     "endDate": "2024-09-11",
-        //     "budget": "2000",!!
-        //     "projectDescription": "asd"
-        // }
+      const response = await apiClient(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/project/`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            name: formData.name,
+            amount: formData.budget,
+            start_date: formData.startDate,
+            budget: formData.budget,
+            type: formData.projectCategory || "default_type", // Ensure `type` is not blank
+            client: formData.clientName, // Fix this field (see below)
+            project_status: formData.status,
+            completion: formData.progress,
+            project_health: formData.health,
+            platform: formData.platform,
+            client_email: formData.clientEmail,
+            teamMembersCount: formData.teamMembersCount,
+            end_date: formData.endDate,
+            project_description: formData.projectDescription,
+          }),
+        }
+      );
+
+      toast.success("Project added successfully");
+
+      // Update the projects state with the newly added project
+      setProjects((prevProjects) => [...prevProjects, response]);
+
+      setIsSheetOpen(false);
+    } catch (error) {
+      toast.error("Failed to add project");
+      console.error("Error adding project:", error.message);
+    }
+  };
+
+  const onEditProject = async (projectId, formData) => {
+    console.log(projectId, "client");
+    try {
+      // Use apiClient to make the PUT request
+      const response = await apiClient(`/api/project/${projectId}`, {
+        method: "PUT", // Use PUT for updating
         body: JSON.stringify({
           name: formData.name,
           amount: formData.budget,
           start_date: formData.startDate,
-          // estimated_duration: Cannot find it in the frontend,
           budget: formData.budget,
           type: formData.projectCategory,
-          client: formData.clientName,
+          client: formData.clientName, // Ensure this is the client ID (PK), not the name
           project_status: formData.status,
           completion: formData.progress,
           project_health: formData.health,
-          // Might not be correct from here onwards
           platform: formData.platform,
           client_email: formData.clientEmail,
           teamMembersCount: formData.teamMembersCount,
@@ -121,26 +143,30 @@ export default function Projects() {
           project_description: formData.projectDescription,
         }),
       });
-      console.log("here");
-      if (!response.ok) {
-        toast.error("There was an error adding the project");
-      }
-      const result = await response.json();
-      console.log(result);
 
-      toast.success("Project added successfully");
-      console.log("Added Project:", result);
+      toast.success("Project updated successfully");
+
+      // Update the projects state with the updated project
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.id === projectId ? response : project
+        )
+      );
+
       setIsSheetOpen(false);
     } catch (error) {
-      toast.error("Failed to add project");
-      console.error("Error adding project:", error);
+      toast.error("Failed to update project");
+      console.error("Error updating project:", error.message);
     }
-    console.log(formData);
   };
 
   const handleClientAdd = (formData) => {
     toast.success("Client added successfully");
     console.log("Client added", formData);
+  };
+  const handleProjectEdit = (project) => {
+    setEditingProject(project); // Set the project to be edited
+    setIsSheetOpen(true); // Open the sheet
   };
 
   return (
@@ -176,7 +202,7 @@ export default function Projects() {
           <AddClientDialog onAddClient={handleClientAdd} />
         </div>
       </div>
-      <div className="flex flex-col items-center gap-1 text-left w-full">
+      <div className="flex flex-col items-center gap-1 text-left w-full ">
         {projects && projects.length > 0 ? (
           isCardLayout ? (
             <CardLayout
@@ -205,6 +231,8 @@ export default function Projects() {
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddProject={onAddProject}
+        onEditProject={onEditProject}
+        editingProject={editingProject} // Pass the editing project
       />
     </main>
   );

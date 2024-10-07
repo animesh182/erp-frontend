@@ -61,10 +61,14 @@ export const formInputs = [
     required: true,
   },
   {
-    component: <Input placeholder="Client Email" type="email" />,
+    component: (
+      <Input placeholder="Client Email" type="email" disabled={false} />
+    ),
+
     name: "clientEmail",
     required: true,
   },
+
   {
     component: (
       <Select>
