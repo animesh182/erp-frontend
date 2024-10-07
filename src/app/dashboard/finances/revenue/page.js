@@ -28,6 +28,19 @@ export default function Revenue() {
     }
   }, [startDate, endDate]);
 
+  const mapStatusToValue = (status) => {
+    switch (status.toLowerCase()) {
+      case "paid":
+        return 2; // Paid
+      case "pending":
+        return 1; // Pending
+      case "canceled":
+        return 3; // Canceled
+      default:
+        return 2; // Default to Pending if status is unrecognized
+    }
+  };
+
   const fetchData = async (startDate, endDate) => {
     setLoading(true); // Set loading state before fetching data
     try {
@@ -84,6 +97,8 @@ export default function Revenue() {
 
   const onAddRow = async (newRowData) => {
     try {
+      console.log("New row data status:", newRowData.status); // Log status value
+
       // Find project_id based on projectName from projectOptions
       const selectedProject = projectOptions.find(
         (project) => project.name === newRowData.projectName
@@ -92,14 +107,18 @@ export default function Revenue() {
       if (!selectedProject) {
         throw new Error("Project not found or project name is invalid");
       }
+      console.log("Status captured from form:", newRowData.status);
+
+      const paymentStatus = mapStatusToValue(newRowData.status); // Use the mapping function
+      const paymentDate = paymentStatus === 2 ? newRowData.paidDate : null; // Only set paidDate if status is "Paid"
 
       const addedInvoice = await addInvoice({
         name: newRowData.name,
-        paidDate: newRowData.paidDate,
+        paidDate: paymentDate, // Set the paidDate or leave it null
         client: 1, // Assuming client ID is hardcoded or dynamic
         amount: newRowData.amount,
         project_id: selectedProject.id, // Use project_id based on projectName
-        status: newRowData.status === "paid" ? 2 : 1,
+        status: paymentStatus, // Set the correct status
         payment_type: newRowData.payment_type,
       });
 
@@ -114,7 +133,7 @@ export default function Revenue() {
 
   const onEditRow = async (editedData) => {
     try {
-      console.log("Edited data before update:", editedData);
+      console.log("Edited data status:", editedData.status); // Log status value
 
       if (!editedData.id) {
         throw new Error("Invoice ID is missing in edited data");
@@ -129,17 +148,16 @@ export default function Revenue() {
         throw new Error("Project not found or project name is invalid");
       }
 
-      const formattedPaidDate = editedData.paidDate
-        ? format(new Date(editedData.paidDate), "yyyy-MM-dd")
-        : null;
+      const paymentStatus = mapStatusToValue(editedData.status); // Map status correctly
+      const paymentDate = paymentStatus === 2 ? editedData.paidDate : null; // Only set paidDate if status is "Paid"
 
       const payload = {
         name: editedData.name,
-        paidDate: formattedPaidDate,
+        paidDate: paymentDate, // Set the paidDate or null
         client: editedData.client || 1, // Default client
         amount: editedData.amount,
         project_id: selectedProject.id, // Get the project_id
-        status: editedData.status === "paid" ? 2 : 1, // Status handling
+        status: paymentStatus, // Set the correct status
         type: editedData.type, // Make sure `type` is sent as `one-time` or `recurring`
       };
 
