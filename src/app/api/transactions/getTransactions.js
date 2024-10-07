@@ -17,10 +17,39 @@ export const getTransactions = async () => {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
   
-      return await res.json(); // Return the parsed JSON data
+      return await res.json(); 
     } catch (error) {
       console.error("Error fetching data:", error);
-      throw error; // Rethrow the error to be handled by React Query
+      throw error; 
     }
+  };
+  
+
+
+  export const updateTransactions = async (transactionData) => {
+    console.log(transactionData, "naya ako data");
+  
+    if (!transactionData || !transactionData.id) {
+      throw new Error("Transaction ID is missing");
+    }
+  
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${transactionData.id}/`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(transactionData),
+    }).then((res) => res.json());
+  };
+
+
+  export const deleteTransaction = async(transactionId) => {
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${transactionId}`, {
+      method: "DELETE",
+      headers:{
+        "Authorization": `Bearer ${accessToken}`,
+      },
+    }).then(() => transactionId);
   };
   

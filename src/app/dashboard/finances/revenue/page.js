@@ -1,4 +1,4 @@
-"use client"; // Ensure this is at the top of the file
+"use client";
 
 import React, { useState, useEffect } from "react";
 
@@ -10,7 +10,8 @@ import { formInputs } from "./Inputs";
 import { toast } from "sonner";
 import { subDays, format } from "date-fns";
 import { useRevenue } from "@/hooks/useRevenue";
-import { useAddRevenue } from "@/sevices/useRevenueServices";
+import { useAddRevenue, useUpdateRevenue } from "@/sevices/useRevenueServices";
+import { formatDateApiFormat } from "@/lib/utils";
 
 export default function Revenue() {
   const methods = useForm();
@@ -164,7 +165,8 @@ export default function Revenue() {
   // ];
 
 
-  const {mutate}=useAddRevenue();
+  // const {mutate}=useAddRevenue();
+  const { mutate:editRevenue } = useUpdateRevenue();
   // const onAddRow = (newRowData) => {
   //   mutate(newRowData)
   //   toast.success("New row added");
@@ -172,34 +174,52 @@ export default function Revenue() {
   // };
 
   const onAddRow = (newRowData) => {
-    const transformedData = {
-      invoice_details: {
-        id: newRowData.invoice, 
-        name: newRowData.name, 
-        amount: newRowData.amount, 
-        payment_date: newRowData.paidDate || null, 
-        issued_date: newRowData.invoiceIssuedDate, 
-        project_name: newRowData.projectName, 
-        payment_status: newRowData.status === "paid" ? 2 : newRowData.status === "unpaid" ? 1 : 0,
-        payment_type: newRowData.type, 
-        client: 1,
-        transaction_type: "Revenue", 
-      }
-    };
+    // const transformedData = {
+    //   invoice_details: {
+    //     id: newRowData.invoice, 
+    //     name: newRowData.name, 
+    //     amount: newRowData.amount, 
+    //     payment_date: newRowData.paidDate || null, 
+    //     issued_date: newRowData.invoiceIssuedDate, 
+    //     project_name: newRowData.projectName, 
+    //     payment_status: newRowData.status === "paid" ? 2 : newRowData.status === "unpaid" ? 1 : 0,
+    //     payment_type: newRowData.type, 
+    //     client: 1,
+    //     transaction_type: "Revenue", 
+    //   }
+    // };
   
-    // Now mutate with the transformed data
-    mutate(transformedData);
+    // // Now mutate with the transformed data
+    // mutate(transformedData);
     toast.success("New row added");
     console.log(transformedData, "Transformed data to be sent");
   };
 
   const onEditRow = (editedData) => {
+   
+
+    const transformedData = {
+    
+        id: editedData.invoice.replace(/^#/, ''), 
+        name: editedData.name, 
+        amount: editedData.amount, 
+        payment_date: formatDateApiFormat(editedData.paidDate)  || null, 
+        issued_date: formatDateApiFormat(editedData.invoiceIssuedDate), 
+        project_name: editedData.projectName, 
+        payment_status: editedData.status === "paid" ? 2 : editedData.status === "pending" ? 1 : 3,
+        payment_type: editedData.type === "One-Time" || editedData.type === "one-time" ? 1 : 2,
+   
+      
+    };
+
+    editRevenue(transformedData);
     toast.success("Row updated");
-    console.log(editedData, "edited data");
     // Update the data in your state or send it to the server
   };
 
-  const {data:revenues}=useRevenue();
+  const {data:revenues,isLoading:isRevenueLoading,isError:isRevenueError,error:revenueError}=useRevenue();
+  if(isRevenueLoading) return <p>laoding...</p>
+  if(isRevenueError) return <p>{revenueError}</p>
 
 
   return (

@@ -3,7 +3,9 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK } from "@/lib/utils";
 import TableActionsDropdown from "@/components/TableActionsDropdown";
-import { formInputs } from "@/app/dashboard/payroll/Inputs";
+import { formInputs } from "./Inputs";
+import { useDeletePayroll } from "@/sevices/usePayrollServices";
+// import { formInputs } from "@/app/dashboard/payroll/Inputs";
 export const columns = [
   {
     accessorKey: "name",
@@ -82,10 +84,15 @@ export const columns = [
     cell: ({ row }) => {
       const rowData = row.original;
 
+      
+      const { mutate: deletePayroll } = useDeletePayroll();
       const handleDelete = () => {
-        console.log("Delete", row.original.id);
-        // Handle delete action
+        console.log("Delete", row.original);
+        if (window.confirm(`Are you sure you want to delete payroll of id ${row.original.id} ?`)) {
+          deletePayroll(row.original.id); 
+        }
       };
+
 
       return (
         <div className="flex items-center">

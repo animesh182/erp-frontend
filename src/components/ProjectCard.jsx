@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dot } from "lucide-react";
 import { format } from "date-fns";
 import { useEmployeeProjects } from "@/hooks/useEmployees";
-import { useProjectById, useProjectz } from "@/hooks/useProjects";
+import { useProjectByIdForEmployees } from "@/hooks/useProjects";
 
 export function ProjectCard({ userId }) {
   const { data: employeeProjects, isLoading: employeeLoading, isError: employeeError, error } = useEmployeeProjects(userId);
@@ -15,7 +15,7 @@ export function ProjectCard({ userId }) {
   const projectIds = employeeProjects?.map(project => project.projectId) || [];
   console.log("projectIds:", projectIds);
 
-  const { data: projectsData, isLoading: projectsLoading, isError: projectsError } = useProjectById(projectIds);
+  const { data: projectsData, isLoading: projectsLoading, isError: projectsError } = useProjectByIdForEmployees(projectIds);
 
   console.log("projectsData:", projectsData);
 

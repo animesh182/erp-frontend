@@ -1,4 +1,6 @@
+import { updateInvoice } from "@/app/api/invoices/manageInvoices";
 import { addRevenue, deleteRevenue, updateRevenue } from "@/app/api/revenue/getRevenue";
+import { useRevenue } from "@/hooks/useRevenue";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useAddRevenue = () => {
@@ -19,7 +21,7 @@ export const useAddRevenue = () => {
   };
   
 
-  export const useDeletePost = () => {
+  export const useDeleteRevenue = () => {
     const queryClient = useQueryClient();
     return useMutation({
       mutationFn: deleteRevenue,
@@ -33,14 +35,22 @@ export const useAddRevenue = () => {
 
   export const useUpdateRevenue = () => {
     const queryClient = useQueryClient();
+    const { refetch } = useRevenue(); 
+
     return useMutation({
-      mutationFn: updateRevenue,
-      onSuccess: (updatedRevenue) => {
-        queryClient.setQueryData(["revenue"], (oldRevenueData) => {
-          return oldRevenueData.map((revenue) =>
-            revenue.id === updatedRevenue.id ? updatedRevenue : revenue
-          );
-        });
-      },
+        mutationFn: updateInvoice,
+        onSuccess: (updatedRevenue) => {
+          
+            queryClient.setQueryData(["revenue"], (oldQueryData) => {
+             
+                const newData = oldQueryData.map((revenue) =>
+                    revenue.id === updatedRevenue.id ? updatedRevenue : revenue
+                );
+              
+                return newData;
+                
+            });
+            refetch();
+        },
     });
-  };
+};

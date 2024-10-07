@@ -13,7 +13,8 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useExpense } from "@/hooks/useExpense";
 import { useQuery } from "@tanstack/react-query";
 import { getExpenses } from "@/app/api/expense/getExpense";
-import { useAddExpense } from "@/sevices/useExpenseServices";
+import { useAddExpense, useUpdateExpenses, useUpdateExpensesCostType } from "@/sevices/useExpenseServices";
+import { formatDateApiFormat } from "@/lib/utils";
 
 
 export default function Expenses() {
@@ -25,9 +26,9 @@ export default function Expenses() {
   const [data, setData] = useState([]); // State to hold the fetched data
   const [projectOptions, setProjectOptions] = useState([]);
 
-  const {mutate}=useAddExpense();
-
-
+  // const {mutate}=useAddExpense();
+  const { mutate:editExpense } = useUpdateExpenses();
+  const{mutate:editCostType}=useUpdateExpensesCostType();
   const pjOptions = [
     { id: "1", name: "ebibaaha" },
     { id: "2", name: "Cloud Storage" },
@@ -180,10 +181,46 @@ export default function Expenses() {
     console.log(newRowData, "in form");
   };
 
+  const costTypeMapping = {
+    "direct-cost": 1,
+    "npa-cost": 2,
+    "fixed-cost": 3,
+    "freelance": 4,
+    "overtime": 5,
+    "salary": 6
+};
+
+
+
+
   const onEditRow = (editedData) => {
+    console.log(editedData.type,"datatda")
+
+    const matchingExpense = expenses.find(expense => expense.invoice === editedData.invoice);
+
+    const expenseId = matchingExpense ? matchingExpense.id : null;
+    const transformedData = {
+    
+      id: editedData.invoice.replace(/^#/, ''), 
+      name: editedData.name, 
+      amount: editedData.amount, 
+      payment_date: formatDateApiFormat(editedData.paidDate)  || null, 
+      issued_date: formatDateApiFormat(editedData.invoiceIssuedDate), 
+      project_name: editedData.projectName, 
+      payment_status: editedData.status === "paid" ? 2 : editedData.status === "pending" ? 1 : 3,
+      payment_type: editedData.type === "One-Time" || editedData.type === "one-time" ? 1 : 2,
+ 
+    
+  };
+  
+  const costTypeEdit = {
+    
+    id:expenseId,
+    cost_type: costTypeMapping[editedData.costType] , 
+};
+  editCostType(costTypeEdit);
+  editExpense(transformedData);
     toast.success("Row updated");
-    console.log(editedData, "edited data");
-    // Update the data in your state or send it to the server
   };
 
   const formatDate = (date) => {
@@ -195,9 +232,9 @@ export default function Expenses() {
   };
 
 
-const {data:expenses,isLoading,isError,error}=useExpense(formatDate(startDate),formatDate(endDate))
+const {data:expenses,isLoading,isError,error}=useExpense()
 if(isLoading) return <p>loading....</p>
-if(isError) return error.message
+if(isError) return <p>{error.message}</p>
 
 
 

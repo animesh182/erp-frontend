@@ -11,6 +11,7 @@ import ProfitLossChart from "@/components/charts/ProfitLoss";
 import { DollarSign, CreditCard, Users2 } from "lucide-react";
 import KpiCard from "@/components/kpicard";
 import { useKpi } from "@/hooks/useKpi";
+import { useProfitLoss } from "@/hooks/useProfitLoss";
 // const kpiData = [
 //   {
 //     title: "Total Revenue",
@@ -34,101 +35,109 @@ import { useKpi } from "@/hooks/useKpi";
 //     icon: <Users2 />,
 //   },
 // ];
-export const projectionData = [
-  {
-    name: "Jan",
-    totalIncome: 400000,
-    expenses: 100000,
-    netIncome: 300000, // Actual profit amount
-    profitPercentage: 79, // Profit as a percentage
-  },
-  {
-    name: "Feb",
-    totalIncome: 180000,
-    expenses: 120000,
-    netIncome: 60000,
-    profitPercentage: 33.33,
-  },
-  {
-    name: "Mar",
-    totalIncome: 200000,
-    expenses: 100000,
-    netIncome: 100000,
-    profitPercentage: 50,
-  },
-  {
-    name: "Apr",
-    totalIncome: 300000,
-    expenses: 150000,
-    netIncome: 150000,
-    profitPercentage: 50,
-  },
-  {
-    name: "May",
-    totalIncome: 350000,
-    expenses: 100000,
-    netIncome: 250000,
-    profitPercentage: 71,
-  },
-  {
-    name: "Jun",
-    totalIncome: 400000,
-    expenses: 150000,
-    netIncome: 250000,
-    profitPercentage: 63,
-  },
-  {
-    name: "Jul",
-    totalIncome: 500000,
-    expenses: 100000,
-    netIncome: 400000,
-    profitPercentage: 80,
-  },
-  {
-    name: "Aug",
-    totalIncome: 450000,
-    expenses: 150000,
-    netIncome: 300000,
-    profitPercentage: 67,
-  },
-  {
-    name: "Sep",
-    totalIncome: 500000,
-    expenses: 100000,
-    netIncome: 400000,
-    profitPercentage: 80,
-  },
-  {
-    name: "Oct",
-    totalIncome: 600000,
-    expenses: 150000,
-    netIncome: 450000,
-    profitPercentage: 75,
-    isProjected: true,
-  },
-  {
-    name: "Nov",
-    totalIncome: 500000,
-    expenses: 100000,
-    netIncome: 400000,
-    profitPercentage: 80,
-    isProjected: true,
-  },
-  {
-    name: "Dec",
-    totalIncome: 450000,
-    expenses: 150000,
-    netIncome: 300000,
-    profitPercentage: 67,
-    isProjected: true,
-  },
-];
+
+
+// export const projectionData = [
+//   {
+//     name: "Jan",
+//     totalIncome: 400000,
+//     expenses: 100000,
+//     netIncome: 300000, // Actual profit amount
+//     profitPercentage: 79, // Profit as a percentage
+//   },
+//   {
+//     name: "Feb",
+//     totalIncome: 180000,
+//     expenses: 120000,
+//     netIncome: 60000,
+//     profitPercentage: 33.33,
+//   },
+//   {
+//     name: "Mar",
+//     totalIncome: 200000,
+//     expenses: 100000,
+//     netIncome: 100000,
+//     profitPercentage: 50,
+//   },
+//   {
+//     name: "Apr",
+//     totalIncome: 300000,
+//     expenses: 150000,
+//     netIncome: 150000,
+//     profitPercentage: 50,
+//   },
+//   {
+//     name: "May",
+//     totalIncome: 350000,
+//     expenses: 100000,
+//     netIncome: 250000,
+//     profitPercentage: 71,
+//   },
+//   {
+//     name: "Jun",
+//     totalIncome: 400000,
+//     expenses: 150000,
+//     netIncome: 250000,
+//     profitPercentage: 63,
+//   },
+//   {
+//     name: "Jul",
+//     totalIncome: 500000,
+//     expenses: 100000,
+//     netIncome: 400000,
+//     profitPercentage: 80,
+//   },
+//   {
+//     name: "Aug",
+//     totalIncome: 450000,
+//     expenses: 150000,
+//     netIncome: 300000,
+//     profitPercentage: 67,
+//   },
+//   {
+//     name: "Sep",
+//     totalIncome: 500000,
+//     expenses: 100000,
+//     netIncome: 400000,
+//     profitPercentage: 80,
+//   },
+//   {
+//     name: "Oct",
+//     totalIncome: 600000,
+//     expenses: 150000,
+//     netIncome: 450000,
+//     profitPercentage: 75,
+//     isProjected: true,
+//   },
+//   {
+//     name: "Nov",
+//     totalIncome: 500000,
+//     expenses: 100000,
+//     netIncome: 400000,
+//     profitPercentage: 80,
+//     isProjected: true,
+//   },
+//   {
+//     name: "Dec",
+//     totalIncome: 450000,
+//     expenses: 150000,
+//     netIncome: 300000,
+//     profitPercentage: 67,
+//     isProjected: true,
+//   },
+// ];
 export default function ProfitLoss() {
-  const{data}=useKpi();
+  const year=2024;
+  const{data, isLoading:isKpiLoading,isError:isKpiError,error:kpiError}=useKpi();
+  const {data:projectionData, isLoading:isProfitLoading,isError:isProfitError,error:profitError}=useProfitLoss(year)
   const kpiData=data?.slice(0,3)
+
+  if(isKpiLoading || isProfitLoading) return <p>Loading....</p>;
+  if(isKpiError) return <p>{kpiError.message}</p>
+  if(isProfitError) return <p>{profitError.message}</p>
   return (
     <>
-    {kpiData && (
+    {kpiData && projectionData && (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <Card>
         <CardHeader className="flex-row justify-between items-center">

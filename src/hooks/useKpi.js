@@ -6,6 +6,8 @@ export const useKpi=()=>useQuery({
     queryKey:["kpi"],
     queryFn:getKpi,
     select:(data)=>{
+      const profitGrowth=data.total_profit_current_month-data.total_profit_previous_month;
+  
         return [
             {
                 title: "Total Revenue",
@@ -46,15 +48,15 @@ export const useKpi=()=>useQuery({
               },
               {
                 title: "Profit Growth",
-                value: 0,
-                change: 0,
+                value: profitGrowth,
+                change: data.percentage_change_in_profit,
                 period: "month",
                 icon: <DollarSign />,
               },
               {
                 title: "Expected Revenue",
-                value: 0,
-                period: "upcoming month",
+                value: data.total_expected_revenue.expected_revenue,
+                period: data.total_expected_revenue.upcoming_month,
                 icon: <Activity />,
             
                 isTrend: false,

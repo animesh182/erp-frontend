@@ -8,10 +8,12 @@ import { formatAmountToNOK } from "@/lib/utils";
 import { useState } from "react";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
 import { toast } from "sonner";
+import { useUpdateEmployee } from "@/sevices/useEmployeeServices";
+import { useEmployees } from "@/hooks/useEmployees";
 
 const EmployeeDetailsTab = ({ employeeDetails }) => {
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
-
+  const { mutate:editEmployee } = useUpdateEmployee();
   if (!employeeDetails) {
     return <div>Loading employee details...</div>;
   }
@@ -80,11 +82,45 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
     </div>
   );
 
+  const roles = [
+    { id: 1, title: "UIUX Developer" },
+    { id: 2, title: "Frontend Developer" },
+    { id: 3, title: "Backend Developer" },
+    { id: 4, title: "Human Resource" },
+    { id: 5, title: "Project Manager" },
+    { id: 6, title: "Data Analyst" },
+    { id: 7, title: "Executive Director" },
+    { id: 8, title: "React JS Developer" },
+    { id: 9, title: "QA Analyst" }
+  ];
+
+  
   const handleEditEmployee = (updatedData) => {
-    // Handle the updated employee data here
+    const selectedRole = roles.find(role => role.title === updatedData.jobTitle);
+    const transformedData = {
+      // id: updatedData.userId,
+      date_of_birth:updatedData.dateOfBirth,
+      gender:updatedData.gender.toLowerCase(),
+      marital_status:updatedData.maritalStatus.toLowerCase(),
+      country: updatedData.country,
+      phone_number: updatedData.phone,
+      full_name: updatedData.employeeName,
+      email: updatedData.email,
+      linkedin_name:updatedData.linkedInName,
+      linkedin_url:updatedData.linkedInUrl,
+      role: selectedRole ? selectedRole.id : null, 
+      level: updatedData.level ? updatedData.level.charAt(1) : "N/A",
+      employment_type: updatedData.employeeType.toLowerCase(),
+      salary: updatedData.salary,
+      PAN: updatedData.panNumber,
+      department:updatedData.department,
+      
+      employee_id: updatedData.employeeId,
+    };
+    editEmployee(transformedData)
+   
     toast.success("Employee edited successfully");
-    console.log("Updated employee data:", updatedData);
-    // You might want to update the state or send this data to an API
+
   };
 
   return (

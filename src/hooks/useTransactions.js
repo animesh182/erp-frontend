@@ -1,4 +1,6 @@
 
+//may need to modify..
+
 import { getTransactions } from "@/app/api/transactions/getTransactions";
 import { useQuery } from "@tanstack/react-query";
 
@@ -33,14 +35,13 @@ export const useTransactions = () => useQuery({
             year: 'numeric',
           })
         : "No payment Date", 
-        type: transaction.type,
+        type: transaction.payment_type===1?"Online Payment":"N/A",
         amount: transaction.amount,
         costType: transaction.transaction_type,
+        id:transaction.id
       
     };
 });
-
-// Return both the transformed data and the total revenue/expense
 return {
   transactionData,
   totalRevenue,

@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
-import {useEmployeeProjects, useEmployees } from "@/hooks/useEmployees";
+import { useEmployees } from "@/hooks/useEmployees";
 
 
 

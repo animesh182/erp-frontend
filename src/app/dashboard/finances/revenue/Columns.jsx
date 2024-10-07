@@ -4,6 +4,7 @@ import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
+import { useDeleteRevenue } from "@/sevices/useRevenueServices";
 
 export const columns = [
   {
@@ -77,9 +78,15 @@ export const columns = [
     cell: ({ row }) => {
       const rowData = row.original;
 
+
+
+      const { mutate: deleteRevenue } = useDeleteRevenue();
       const handleDelete = () => {
         console.log("Delete", row.original.id);
-        // Handle delete action
+        if (window.confirm("Are you sure you want to delete this revenue?")) {
+          deleteRevenue(row.original.id); // Call the delete function
+        }
+        
       };
 
       return (

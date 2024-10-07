@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ProgressTrackingCell } from "@/components/ui/ProgressTrackingCell";
 import { formatAmountToNOK } from "@/lib/utils";
 import { prettifyText } from "@/lib/utils";
+import { useDeleteProject } from "@/sevices/useProjectServices";
 
 export const projectColumns = [
   {
@@ -126,9 +127,15 @@ export const projectColumns = [
     header: "",
     cell: ({ row }) => {
       const rowData = row.original;
+
+
+
+      const{mutate:deleteProject}=useDeleteProject()
       const handleDelete = () => {
         console.log("Delete", row.original.id);
-        // Handle delete action
+        // if (window.confirm(`Are you sure you want to delete project of id ${row.original.id} ?`)) {
+        //   deleteProject(row.original.id); 
+        // }
       };
 
       return (

@@ -7,6 +7,7 @@ import KpiCard from "@/components/kpicard";
 import { Activity, CreditCard, DollarSign } from "lucide-react";
 import { subDays, format } from "date-fns";
 import { useTransactions } from "@/hooks/useTransactions";
+import { useKpi } from "@/hooks/useKpi";
 
 export default function Transactions() {
   const initialEndDate = new Date(); // Today's date
@@ -130,46 +131,48 @@ export default function Transactions() {
 
 
   const{data:transactionData,isError,isLoading,error}=useTransactions()
+  const{data:useKpiData}=useKpi()
+  const kpiData=useKpiData?.slice(0,3)
   if(isLoading) return <p>loading...</p>
   if(isError) return <p>{error.message}</p>
   const transactions=transactionData?.transactionData
-  const totalRevenue=transactionData?.totalRevenue;
-  const totalExpense=transactionData?.totalExpense;
-  const totalProfit=totalRevenue-totalExpense
+  // const totalRevenue=transactionData?.totalRevenue;
+  // const totalExpense=transactionData?.totalExpense;
+  // const totalProfit=totalRevenue-totalExpense
 
 
-  const kpiData = [
-    {
-      title: "Total Revenue",
-      // value: "$345,000",
-      value:`$${totalRevenue}`,
-      change: "+12.5%",
-      icon: <DollarSign className="h-4 w-4 text-muted-foreground" />,
-    },
-    {
-      title: "Total Expenses",
-      // value: "$225,000",
-      value:`$${totalExpense}`,
-      change: "+8.1%",
-      icon: <CreditCard className="h-4 w-4 text-muted-foreground" />,
-    },
-    {
-      title: "Total Profit",
-      // value: "$120,000",
-      value:`$${totalProfit}`,
-      change:"+15.3%",
-      icon: <Activity className="h-4 w-4 text-muted-foreground" />,
-    },
-  ];
+
+  // const kpiData = [
+  //   {
+  //     title: "Total Revenue",
+  //     // value: "$345,000",
+  //     value:`$${totalRevenue}`,
+  //     change: "+12.5%",
+  //     icon: <DollarSign className="h-4 w-4 text-muted-foreground" />,
+  //   },
+  //   {
+  //     title: "Total Expenses",
+  //     // value: "$225,000",
+  //     value:`$${totalExpense}`,
+  //     change: "+8.1%",
+  //     icon: <CreditCard className="h-4 w-4 text-muted-foreground" />,
+  //   },
+  //   {
+  //     title: "Total Profit",
+  //     // value: "$120,000",
+  //     value:`$${totalProfit}`,
+  //     change:"+15.3%",
+  //     icon: <Activity className="h-4 w-4 text-muted-foreground" />,
+  //   },
+  // ];
   const handleDateChange = (startDate, endDate) => {
     setStartDate(startDate);
     setEndDate(endDate);
   };
 
-
   return (
     <>
-    {transactions && (
+    {transactions && kpiData &&(
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <h2 className="text-lg font-semibold">Overview</h2>
 

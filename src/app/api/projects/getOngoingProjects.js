@@ -3,9 +3,9 @@ import Cookies from "js-cookie";
 
 const accessToken = Cookies.get("access_token");
 
-export const getPayrollKpi = async () => {
+export const getOngoingProjects = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/payroll_kpis/`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ongoing_projects/`, {
         headers: {
           "Authorization": `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -16,10 +16,9 @@ export const getPayrollKpi = async () => {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
   
-      return await res.json(); // Return the parsed JSON data
+      return await res.json(); 
     } catch (error) {
       console.error("Error fetching data:", error);
-      throw error; // Rethrow the error to be handled by React Query
+      throw error; 
     }
   };
-  

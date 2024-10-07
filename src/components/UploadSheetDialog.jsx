@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FileSpreadsheet, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { useGeneratePayroll } from "@/sevices/usePayrollServices";
 
 export function UploadSheetDialog() {
   const [file, setFile] = useState(null);
@@ -22,29 +23,58 @@ export function UploadSheetDialog() {
     setFile(event.target.files[0]);
   };
 
-  const handleUpload = async () => {
+
+  const { mutate: uploadPayroll } = useGeneratePayroll();
+  // const handleUpload = async () => {
+  //   if (file) {
+  //     setIsUploading(true);
+  //     try {
+  //       // Simulating file upload process
+  //       const formData = new FormData();
+  //       formData.append('file', file);
+  
+  //       // Call the upload function from the mutation
+  //        uploadPayroll(formData); 
+
+  //       // Process the file here
+  //       console.log("Processing file:", file.name);
+
+  //       // Show success message
+  //       toast.success("Payroll sheet uploaded successfully");
+
+  //       setIsOpen(false);
+  //     } catch (error) {
+  //       console.error("Upload failed:", error);
+  //       toast.error("Failed to upload payroll sheet");
+  //     } finally {
+  //       setIsUploading(false);
+  //     }
+  //   }
+  // };
+
+
+  const handleUpload = () => {
     if (file) {
       setIsUploading(true);
-      try {
-        // Simulating file upload process
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        // Process the file here
-        console.log("Processing file:", file.name);
-
-        // Show success message
-        toast.success("Payroll sheet uploaded successfully");
-
-        setIsOpen(false);
-      } catch (error) {
-        console.error("Upload failed:", error);
-        toast.error("Failed to upload payroll sheet");
-      } finally {
-        setIsUploading(false);
-      }
+      const formData = new FormData();
+      formData.append('file', file); // Make sure this key matches what the API expects
+  
+      // Call the upload function from the mutation
+      uploadPayroll(formData, {
+        onSuccess: (newData) => {
+          console.log("Upload successful:", newData);
+          setIsOpen(false);
+        },
+        onError: (error) => {
+          console.error("Upload failed:", error);
+          toast.error("Failed to upload payroll sheet");
+        },
+        onSettled: () => {
+          setIsUploading(false);
+        },
+      });
     }
   };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>

@@ -3,6 +3,7 @@
 import MultiLineNameCell from "@/components/MultiLineNameCell";
 import SimpleTableActionsDropdown from "@/components/SimpleTableActionsDropdown";
 import { formatAmountToNOK } from "@/lib/utils";
+import { useDeleteEmployee } from "@/sevices/useEmployeeServices";
 
 export const columns = [
   {
@@ -48,9 +49,14 @@ export const columns = [
         // Handle edit action
       };
 
+
+
+      const{mutate:deleteEmployee}=useDeleteEmployee()
       const handleDelete = () => {
         console.log("Delete", row.original.id);
-        // Handle delete action
+        if (window.confirm(`Are you sure you want to delete employee of id ${row.original.id} ?`)) {
+          deleteEmployee(row.original.id); 
+        }
       };
 
       return (

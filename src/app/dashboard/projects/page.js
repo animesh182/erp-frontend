@@ -11,11 +11,15 @@ import { useForm, FormProvider } from "react-hook-form";
 import { formInputs } from "./Inputs";
 import { EditProjectSheet } from "@/components/EditProjectSheet";
 import { toast } from "sonner";
-<<<<<<< HEAD
 import { useProjects } from "@/hooks/useProjects";
-=======
 import { AddClientDialog } from "@/components/AddClientDialog";
->>>>>>> e6e03a4bf34e999dce2cc45420ddb9c18e9f395b
+import { useUpdateProject } from "@/sevices/useProjectServices";
+import { formatDateApiFormat } from "@/lib/utils";
+
+
+
+
+
 
 export default function Projects () {
   const methods = useForm();
@@ -23,6 +27,7 @@ export default function Projects () {
 
   const [isCardLayout, setIsCardLayout] = useState(false);
 
+  const { mutate:editProject } = useUpdateProject();
   // handle toggle layout
   const handleToggleLayout = (value) => {
     if (value === "grid") {
@@ -337,9 +342,51 @@ export default function Projects () {
     setIsSheetOpen(true);
   };
 
-  const handleProjectUpdate = (updatedProject) => {
+
+  const statusMapping = {
+    Done: 1,
+    done:1,
+    Ongoing:3,
+    ongoing: 3,
+    "In Progress": 3, 
+    "Not-Started": 2,
+    "not-started": 2
+};
+
+const handleProjectUpdate = (updatedProject) => {
+   
+
+  const startDate = new Date(updatedProject.startDate);
+  const formattedStartDate = formatDateApiFormat(startDate);
+
+
+  const endDate = updatedProject.endDate ? new Date(updatedProject.endDate) : new Date(startDate);
+
+  const estimatedDuration = (endDate.getFullYear() - startDate.getFullYear()) * 12 + (endDate.getMonth() - startDate.getMonth());
+    const transformedData = {
+      id: updatedProject.id,
+      name: updatedProject.name,
+      project_health:updatedProject.health.replace(/-/g, '_'),
+      client_contact:{
+        name:updatedProject.clientName,
+        email:updatedProject.clientEmail,
+        id:updatedProject.clientId,
+        phone_number:updatedProject.clientPhone,
+        
+      },
+      
+      project_status: statusMapping[updatedProject.status] || 3 ,
+        completion:updatedProject.progress,
+        start_date: formattedStartDate,
+        estimated_duration: estimatedDuration ,
+        budget:updatedProject.budget,
+        description:updatedProject.projectDescription,
+        type:updatedProject.projectCategory,
+        platform:updatedProject.platform
+    }
+    editProject(transformedData)
     toast.success("Project updated successfully");
-    console.log("Updated Project:", updatedProject);
+
   };
 
   const onAddProject = (formData) => {
@@ -347,19 +394,16 @@ export default function Projects () {
     console.log(formData);
     setIsSheetOpen(false);
   };
-<<<<<<< HEAD
 const {data:projects,isError,isLoading,error}=useProjects();
 console.log(projects,"proporp")
 if(isLoading) return <p>loading....</p>
 if(isError) return error.message
-=======
 
   const handleClientAdd = (formData) => {
     toast.success("Client added successfully");
     console.log("Client added", formData);
   };
 
->>>>>>> e6e03a4bf34e999dce2cc45420ddb9c18e9f395b
   return (
     <>
    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">

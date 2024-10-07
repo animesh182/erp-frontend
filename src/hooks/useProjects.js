@@ -19,16 +19,18 @@ export const useProjects = () => useQuery({
         return{
           id:project.id,
           name:project.name,
-          projectCategory:project.name,
-          platform:project.description,
+          projectCategory:project.type,
+          platform:project.platform,
           clientImage:"/default-avatar.jpg",
           clientName:clientInfo.name,
           clientEmail:clientInfo.email,
+          clientId:clientInfo.id,
+          clientPhone:clientInfo.phone_number,
           teamMembersImage:["/default-avatar.jpg", "/default-avatar.jpg"],
           teamMembersCount:project.all_user_projects.length,
 
           status:project.project_status===1? 
-          "done" : project.project_status===2? "ongoing": "not-started",
+          "done" : project.project_status===3? "ongoing": "not-started",
 
           health: (project.project_health || "").replace(/_/g, '-').toLowerCase(),
          
@@ -44,52 +46,14 @@ export const useProjects = () => useQuery({
             year: 'numeric',
           }),
           budget:project.budget,
+          projectDescription:project.description || ""
         }
       })
     }
   })
 
 
-  export const useProjectInvoices=()=>useQuery({
-    queryKey:["projectInvoice"],
-    queryFn:getProjects,
-    select: (data) => {
-      return data.data.map((project) => {
-        // Initialize the expenses object
-        const expenses = {
-          direct: 0,
-          fixed: 0,
-          npa: 0,
-          recurring:0
-        };
-
-        // Accumulate expenses from invoices
-        project.invoices.forEach((invoice) => {
-          const amount = parseFloat(invoice.amount) || 0; // Ensure amount is a number
-          if (invoice.type === "Direct Cost") {
-            expenses.direct += amount;
-          } else if (invoice.type === "NPA Cost") {
-            expenses.npa += amount;
-          } else if (invoice.type === "fixed") {
-            expenses.fixed += amount;
-          }
-         else
-         expenses.recurring+=amount;
-        });
-
-        return {
-          project: project.name || "N/A",
-          totalIncome: project.total_revenue || "N/A",
-          expenses,
-          isRecurring: project.type==="fixed"?  false: true, 
-          completed: project.completed==="100.00"? true:false,
-        };
-      });
-    },
-  });
-
-  export const useProjectById = (projectIds) => {
-    console.log("useProjectz called with projectIds:", projectIds);
+  export const useProjectByIdForEmployees = (projectIds) => {
   
     // Ensure projectIds is always an array
     const safeProjectIds = Array.isArray(projectIds) ? projectIds : [];
@@ -123,3 +87,89 @@ export const useProjects = () => useQuery({
   };
   
  
+  export const useProjectsById = (id) => useQuery({
+    queryKey: ["projects",id],
+    queryFn: ()=>getProjectById(id),
+    select:(data)=>{
+   
+      if (!data) {
+        throw new Error("Project data not found");
+      }
+      const start=new Date(data.start_date);
+        const end=new Date(start);
+        const estimatedDuration = parseInt(data.estimated_duration, 10);
+        end.setMonth(end.getMonth() + estimatedDuration);
+      
+        return{
+          id:data.id,
+          name: data.name || "N/A",
+          health: (data.project_health || "").replace(/_/g, '-').toLowerCase(),
+          status:data.project_status===1? 
+          "done" : data.project_status===3? "ongoing": "not-started",
+          
+          
+          
+          daysLeft: data.estimated_duration*30,
+
+
+          projectCategory:data.type,
+          platform:data.platform,
+          startDate:new Date(data.start_date).toLocaleDateString('en-US', {
+            day: 'numeric',
+            month: 'short', 
+            year: 'numeric',
+          }),
+          endDate:end.toLocaleDateString('en-US', {
+            day: 'numeric',
+            month: 'short', 
+            year: 'numeric',
+          }),
+          progress:parseInt(data.completion),
+          devUtilization: data.all_user_projects
+          .reduce((total, project) => total + parseInt(project.utilization, 10), 0),
+          teamMembersCount: (data.all_user_projects && data.all_user_projects.length) || 0,
+        }
+     
+    }
+  })
+
+
+  export const useEmployeeUtilization = (id) => useQuery({
+    queryKey: ["projects", id],
+    queryFn: () => getProjectById(id),
+    select: (data) => {
+    
+      if (!data.all_user_projects || !Array.isArray(data.all_user_projects)) {
+        return null;
+      }
+  
+      return data.all_user_projects.map((employee) => {
+        return {
+          id: employee.user_id,
+          imageUrl: "/default-avatar.jpg",
+          employeeName: employee.user_name || "N/A",
+          email: employee.user_email || "N/A",
+          role: employee.project_role || "N/A",
+          timeAllocated: "40 hours/week",
+          startDate: employee.start_date || "N/A",
+          endDate: employee.end_date || "N/A",
+        };
+      });
+    },
+  });
+  
+
+
+  export const useProjectClient=(id)=>useQuery({
+    queryKey: ["projects", id],
+    queryFn: () => getProjectById(id),
+    select: (data) => {
+    return{
+      description:data.description || "N/A",
+      clientName:data.client_contact.name || "N/A",
+      clientEmail:data.client_contact.email || "N/A",
+      teamMembersCount: (data.all_user_projects && data.all_user_projects.length) || "N/A",
+      progress:Number(data.completion) || 0
+    }
+    }
+  })

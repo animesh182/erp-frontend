@@ -18,13 +18,13 @@ export const usePayrollKpi=()=> useQuery({
             },
             {
               title: "Upcoming Payment",
-              value: (data.upcoming_payroll.amount),
+              value: (data.upcoming_payroll.total_amount),
               subtitle: "Next payment due",
               icon: <CreditCard className="h-4 w-4" />,
             },
             {
               title: "Previous Payroll",
-              value: (data.previous_payroll.amount),
+              value: (data.previous_payroll.total_amount),
               subtitle: "Last payroll amount",
               icon: <DollarSign className="h-4 w-4" />,
             },

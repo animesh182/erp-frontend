@@ -18,8 +18,9 @@ import ProfitLossChart from "@/components/charts/ProfitLoss";
 import DateRangePicker from "@/components/DateRangePicker";
 import { useState, useEffect } from "react";
 import { useEmployeeUtilization } from "@/hooks/useEmployeeUtilization";
-import { useProjectInvoices } from "@/hooks/useProjects";
 import { useKpi } from "@/hooks/useKpi";
+import { useProfitLoss } from "@/hooks/useProfitLoss";
+import { useOngoingProjects } from "@/hooks/useOngoingProjects";
 
 
 
@@ -165,93 +166,93 @@ import { useKpi } from "@/hooks/useKpi";
 // ];
 
 
-export const profitLossData = [
-  {
-    name: "Jan",
-    totalIncome: 400000,
-    expenses: 100000,
-    netIncome: 300000, // Actual profit amount
-    profitPercentage: 79, // Profit as a percentage
-  },
-  {
-    name: "Feb",
-    totalIncome: 180000,
-    expenses: 120000,
-    netIncome: 60000,
-    profitPercentage: 33.33,
-  },
-  {
-    name: "Mar",
-    totalIncome: 200000,
-    expenses: 100000,
-    netIncome: 100000,
-    profitPercentage: 50,
-  },
-  {
-    name: "Apr",
-    totalIncome: 300000,
-    expenses: 150000,
-    netIncome: 150000,
-    profitPercentage: 50,
-  },
-  {
-    name: "May",
-    totalIncome: 350000,
-    expenses: 100000,
-    netIncome: 250000,
-    profitPercentage: 71,
-  },
-  {
-    name: "Jun",
-    totalIncome: 400000,
-    expenses: 150000,
-    netIncome: 250000,
-    profitPercentage: 63,
-  },
-  {
-    name: "Jul",
-    totalIncome: 500000,
-    expenses: 100000,
-    netIncome: 400000,
-    profitPercentage: 80,
-  },
-  {
-    name: "Aug",
-    totalIncome: 450000,
-    expenses: 150000,
-    netIncome: 300000,
-    profitPercentage: 67,
-  },
-  {
-    name: "Sep",
-    totalIncome: 500000,
-    expenses: 100000,
-    netIncome: 400000,
-    profitPercentage: 80,
-  },
-  {
-    name: "Oct",
-    totalIncome: 600000,
-    expenses: 150000,
-    netIncome: 450000,
-    profitPercentage: 75,
-    isProjected: true,
-  },
-  {
-    name: "Nov",
-    // totalIncome: 700000,
-    // expenses: 100000,
-    // netIncome: 600000,
-    // profitPercentage: 86,
-  },
-  {
-    name: "Dec",
-    // totalIncome: 550000,
-    // expenses: 150000,
-    // netIncome: 400000,
-    // profitPercentage: 73,
-  },
-];
+// export const profitLossData = [
+//   {
+//     name: "Jan",
+//     totalIncome: 400000,
+//     expenses: 100000,
+//     netIncome: 300000, // Actual profit amount
+//     profitPercentage: 79, // Profit as a percentage
+//   },
+//   {
+//     name: "Feb",
+//     totalIncome: 180000,
+//     expenses: 120000,
+//     netIncome: 60000,
+//     profitPercentage: 33.33,
+//   },
+//   {
+//     name: "Mar",
+//     totalIncome: 200000,
+//     expenses: 100000,
+//     netIncome: 100000,
+//     profitPercentage: 50,
+//   },
+//   {
+//     name: "Apr",
+//     totalIncome: 300000,
+//     expenses: 150000,
+//     netIncome: 150000,
+//     profitPercentage: 50,
+//   },
+//   {
+//     name: "May",
+//     totalIncome: 350000,
+//     expenses: 100000,
+//     netIncome: 250000,
+//     profitPercentage: 71,
+//   },
+//   {
+//     name: "Jun",
+//     totalIncome: 400000,
+//     expenses: 150000,
+//     netIncome: 250000,
+//     profitPercentage: 63,
+//   },
+//   {
+//     name: "Jul",
+//     totalIncome: 500000,
+//     expenses: 100000,
+//     netIncome: 400000,
+//     profitPercentage: 80,
+//   },
+//   {
+//     name: "Aug",
+//     totalIncome: 450000,
+//     expenses: 150000,
+//     netIncome: 300000,
+//     profitPercentage: 67,
+//   },
+//   {
+//     name: "Sep",
+//     totalIncome: 500000,
+//     expenses: 100000,
+//     netIncome: 400000,
+//     profitPercentage: 80,
+//   },
+//   {
+//     name: "Oct",
+//     totalIncome: 600000,
+//     expenses: 150000,
+//     netIncome: 450000,
+//     profitPercentage: 75,
+//     isProjected: true,
+//   },
+//   {
+//     name: "Nov",
+//     // totalIncome: 700000,
+//     // expenses: 100000,
+//     // netIncome: 600000,
+//     // profitPercentage: 86,
+//   },
+//   {
+//     name: "Dec",
+//     // totalIncome: 550000,
+//     // expenses: 150000,
+//     // netIncome: 400000,
+//     // profitPercentage: 73,
+//   },
+// ];
 
 // const ongoingProjects = projectBudget.filter((project) => !project.completed);
 // const completedProjects = projectBudget.filter((project) => project.completed);
@@ -263,7 +264,7 @@ export default function Dashboard() {
   const [startDate, setStartDate] = useState(initialStartDate);
   const [endDate, setEndDate] = useState(initialEndDate);
   const [data, setData] = useState([]); // State to hold the fetched data
-  
+  const year=2024;
   
   
   
@@ -289,20 +290,25 @@ export default function Dashboard() {
   
   const {data:employeeData,isLoading,isError,error}=useEmployeeUtilization();
   
-  const {data:projectBudget,isLoading:isInvoiceLoading,isError:isInvoiceError,error:invoiceError}=useProjectInvoices();
+  const {data:projectBudget,isLoading:isOngoingLoading,isError:isOngoingError,error:ongoingError}=useOngoingProjects();
 
   const{data:kpiData}=useKpi()
   const filteredKpiData = kpiData?.filter((data) => data.title !== "Total Expense");
 
-  if(!projectBudget|| isLoading || isInvoiceLoading ) return <p>loading....</p>
+  const{data:profitLossData,isLoading:isProfitLoading,isError:isProfitError,error:profitError}=useProfitLoss(year);
+
+
+  if(!projectBudget|| isLoading || isOngoingLoading|| isProfitLoading ) return <p>loading....</p>
   if(isError) return <p>{error.message}</p>
-  if(isInvoiceError) return <p>{invoiceError.message}</p>
+  if(isOngoingError) return <p>{ongoingError.message}</p>
+  if(isProfitError) return <p>{profitError.message}</p>
   const ongoingProjects = projectBudget.filter((project) => !project.completed);
 const completedProjects = projectBudget.filter((project) => project.completed);
 
+
   return (
     <>
-    {employeeData && projectBudget && kpiData &&(
+    {employeeData && projectBudget && kpiData && profitLossData &&(
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Home</h1>

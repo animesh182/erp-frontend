@@ -45,13 +45,4 @@ export const deleteRevenue = async(revenueId) => {
 };
 
 
-export const updateRevenue = async(revenue) => {
-  return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/revenue/${revenue.id}`, {
-    method: "PUT",
-    headers: {
-      "Authorization": `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(revenue),
-  }).then((res) => res.json());
-};
+

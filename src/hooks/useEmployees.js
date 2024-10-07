@@ -29,13 +29,13 @@ export const useEmployees = () => useQuery({
 
 
       employeeId: employee.employee_id,
-      dateOfBirth:"2002-12-03",
-      gender: "N/A",
-      maritalStatus: "N/A",
+      dateOfBirth:employee.date_of_birth || "2024-01-01",
+      gender: employee.gender || "N/A",
+      maritalStatus: employee.marital_status || "N/A",
       country: employee.country || "N/A",
       phone: employee.phone_number || "N/A",
    
-      linkedInName: employee.full_name || "N/A",
+      linkedInName: employee.linkedin_name || "N/A",
       linkedInUrl: "N/A",
       jobTitle:employee.role===1?"UIUX Developer":
       employee.role===2?"Frontend Developer":
@@ -46,10 +46,10 @@ export const useEmployees = () => useQuery({
       employee.role===7?"Executive Director":
       employee.role===8? "React JS Developer": "QA Analyst",
       level: "L"+employee.level || "N/A",
-      department: "N/A",
+      department: employee.department||"N/A",
       employeeType: employee.employment_type || "N/A",
       supervisor: "N/A",
-      panNumber: String(employee.PAN) || "N/A",
+      panNumber: employee.PAN || "N/A",
         }
       })
     }

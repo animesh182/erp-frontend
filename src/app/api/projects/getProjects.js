@@ -23,3 +23,32 @@ export const getProjects = async () => {
     }
   };
   
+
+  export const updateProjects = async (projectData) => {
+  
+  
+    if (!projectData || !projectData.id) {
+      throw new Error("Project ID is missing");
+    }
+  
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/project/${projectData.id}/`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(projectData),
+    }).then((res) => res.json());
+  };
+
+
+
+  export const deleteProject = async(projectId) => {
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/project/${projectId}/`, {
+      method: "DELETE",
+      headers:{
+        "Authorization": `Bearer ${accessToken}`,
+      },
+    }).then(() => projectId);
+  };
+  

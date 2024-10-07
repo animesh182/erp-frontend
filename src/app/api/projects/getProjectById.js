@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 const accessToken = Cookies.get("access_token");
 
 export const getProjectById = async (projectId) => {
+  console.log("Fetching project with ID:", projectId); 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/project/${projectId}/`, {
         headers: {
@@ -16,10 +17,10 @@ export const getProjectById = async (projectId) => {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
   
-      return await res.json(); // Return the parsed JSON data
+      return await res.json(); 
     } catch (error) {
       console.error("Error fetching data:", error);
-      throw error; // Rethrow the error to be handled by React Query
+      throw error;
     }
   };
   

@@ -114,16 +114,20 @@ const chartConfig = {
     label: "Santa",
   },
   "Ruslin Project": {
-    color: "#9370DB", // Medium Purple
+    color: "#9370DB", 
     label: "Ruslin Project",
   },
   Hyundai: {
-    color: "#9370DB", // Medium Purple
+    color: "#9370DB", 
     label: "Hyundai",
   },
   "SAusbifa Project": {
-    color: "#9370DB", // Medium Purple
+    color: "#9370DB",
     label: "SAusbifa Project",
+  },
+  Ebibaaha: {
+    color: "#FFFF00", 
+    label: "Ebibaaha",
   },
 };
 

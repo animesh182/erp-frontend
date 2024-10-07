@@ -72,3 +72,11 @@ export async function apiClient(url, options = {}) {
 
   return await response.json();
 }
+
+
+//Get YYYY-MM-DD format
+
+export const formatDateApiFormat = (dateString) => {
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0]; 
+};
