@@ -22,15 +22,15 @@ export const columns = [
     header: "Invoice",
     enableSorting: false,
   },
-  {
-    accessorKey: "invoiceIssuedDate",
-    header: "Invoice Issued Date",
-    enableSorting: false,
-    cell: ({ row }) => {
-      const { invoiceDate } = row.original;
-      return <span>{format(invoiceDate, "MMM d, yyyy")}</span>;
-    },
-  },
+  // {
+  //   accessorKey: "invoiceIssuedDate",
+  //   header: "Invoice Issued Date",
+  //   enableSorting: false,
+  //   cell: ({ row }) => {
+  //     const { invoiceDate } = row.original;
+  //     return <span>{format(invoiceDate, "MMM d, yyyy")}</span>;
+  //   },
+  // },
 
   {
     accessorKey: "status",

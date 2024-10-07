@@ -33,6 +33,10 @@ export async function login(formData) {
 
     return { status: 200, message: "Logged In Successfully" };
   } catch (error) {
+    // Clear the tokens if login fails (invalid credentials)
+    Cookies.remove("access_token", { path: "/" });
+    Cookies.remove("refresh_token", { path: "/" });
+
     return {
       status: 401,
       message: error.message || "Invalid credentials",

@@ -14,11 +14,11 @@ export const projectColumns = [
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => {
-      const { name, health } = row.original; // Access the full row data
+      const { name, project_health } = row.original; // Access the full row data
       return (
         <div>
           <p>{name}</p>
-          <ProjectHealth health={health} />
+          <ProjectHealth health={project_health} />
         </div>
       );
     },
@@ -28,11 +28,13 @@ export const projectColumns = [
     accessorKey: "type",
     header: "Type",
     cell: ({ row }) => {
-      const { projectCategory, platform } = row.original; // Access the full row data
+      const { project_category, platform } = row.original; // Access the full row data
       return (
         <div>
-          <p>{projectCategory}</p>
-          <p className="text-xs text-muted-foreground">{platform}</p>
+          <p>{project_category || "No Data"}</p>
+          <p className="text-xs text-muted-foreground">
+            {platform || "No Data"}
+          </p>
         </div>
       );
     },
@@ -42,12 +44,12 @@ export const projectColumns = [
     accessorKey: "client",
     header: "Client",
     cell: ({ row }) => {
-      const { clientImage, clientName, clientEmail } = row.original; // Access the full row data
+      const { name, email } = row.original.client_contact; // Access the full row data
       return (
         <MultiLineNameCell
-          imageUrl={clientImage}
-          title={clientName}
-          subtitle={clientEmail}
+          imageUrl={"/default-avatar.jpg"}
+          title={name}
+          subtitle={email}
         />
       );
     },
@@ -57,18 +59,24 @@ export const projectColumns = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const { status } = row.original; // Access the full row data
+      const { project_status } = row.original; // Access the full row data
       return (
         <Badge
           className={`${
-            status === "done"
+            project_status === "1"
               ? "bg-green-100 text-green-800"
-              : status === "not-started"
+              : project_status === "2"
               ? "bg-red-100 text-red-800"
               : "bg-yellow-100 text-yellow-800"
           }`}
         >
-          {prettifyText(status)}
+          {prettifyText(
+            project_status === "1"
+              ? "Done"
+              : project_status === "2"
+              ? "Not Started"
+              : "Ongoing"
+          )}
         </Badge>
       );
     },
@@ -78,11 +86,11 @@ export const projectColumns = [
     accessorKey: "team",
     header: "Team",
     cell: ({ row }) => {
-      const { teamMembersImage, teamMembersCount } = row.original; // Access the full row data
+      const { teamMembersImage, all_user_projects } = row.original; // Access the full row data
       return (
         <TeamAvatars
-          teamMembersImage={teamMembersImage}
-          teamMembersCount={teamMembersCount}
+          teamMembersImage={["/default-avatar.jpg", "/default-avatar.jpg"]}
+          teamMembersCount={all_user_projects.length}
           size="small"
         />
       );
@@ -93,8 +101,14 @@ export const projectColumns = [
     accessorKey: "progressTracking",
     header: "Progress Tracking",
     cell: ({ row }) => {
-      const rowData = row.original;
-      return <ProgressTrackingCell row={rowData} />;
+      const rowData = row.original.completion;
+      const projectName = row.original.name;
+      return (
+        <ProgressTrackingCell
+          row={Math.round(rowData)}
+          projectName={projectName}
+        />
+      );
     },
     enableSorting: false,
   },
@@ -102,11 +116,11 @@ export const projectColumns = [
     accessorKey: "timeline",
     header: "Timeline",
     cell: ({ row }) => {
-      const { startDate, endDate } = row.original; // Access the full row data
+      const { start_date, end_date } = row.original; // Access the full row data
       return (
         <div className="flex">
-          <p className="text-xs ">{startDate}</p>
-          <p className="text-xs "> - {endDate}</p>
+          <p className="text-xs ">{start_date}</p>
+          <p className="text-xs "> - {end_date}</p>
         </div>
       );
     },

@@ -29,15 +29,32 @@ export function EditProjectSheet({
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: projectData || {},
   });
 
+  // console.log(watch());
   React.useEffect(() => {
     if (isOpen) {
       if (projectData) {
-        reset(projectData);
+        const userInvolvedCount = projectData.all_user_projects.length;
+        reset({
+          name: projectData.name,
+          health: projectData.project_health,
+          projectCategory: projectData.project_category,
+          platform: projectData.platform,
+          clientName: projectData.client_contact.name,
+          clientEmail: projectData.client_contact.email,
+          status: String(projectData.project_status),
+          teamMembersCount: userInvolvedCount,
+          progress: projectData.completion,
+          startDate: projectData.start_date,
+          endDate: projectData.end_date,
+          budget: projectData.budget,
+          projectDescription: projectData.description,
+        });
       } else {
         reset({
           name: "",
@@ -170,8 +187,8 @@ export function EditProjectSheet({
               required: true,
               children: (
                 <>
-                  <SelectItem value="on-track">On Track</SelectItem>
-                  <SelectItem value="at-risk">At Risk</SelectItem>
+                  <SelectItem value="on_track">On Track</SelectItem>
+                  <SelectItem value="at_risk">At Risk</SelectItem>
                   <SelectItem value="critical">Critical</SelectItem>
                 </>
               ),
@@ -182,14 +199,15 @@ export function EditProjectSheet({
             {renderField("clientEmail", Input, {
               type: "email",
               required: true,
+              disabled: true,
             })}
             {renderField("status", Select, {
               required: true,
               children: (
                 <>
-                  <SelectItem value="not-started">Not Started</SelectItem>
-                  <SelectItem value="ongoing">In Progress</SelectItem>
-                  <SelectItem value="done">Done</SelectItem>
+                  <SelectItem value="2">Not Started</SelectItem>
+                  <SelectItem value="3">In Progress</SelectItem>
+                  <SelectItem value="1">Done</SelectItem>
                 </>
               ),
             })}
