@@ -22,14 +22,14 @@ export const useRevenue = () => useQuery({
               month: 'short', 
               year: 'numeric',
             })
-          : "No Issued Date", 
+          : "", 
         paidDate: invoiceDetails.payment_date 
           ? new Date(invoiceDetails.payment_date).toLocaleDateString('en-US', {
               day: 'numeric',
               month: 'short', 
               year: 'numeric',
             })
-          : "No Paid Date", 
+          : "", 
         status: invoiceDetails.payment_status === 1 ? "unpaid" :
                 invoiceDetails.payment_status === 2 ? "paid" : "cancelled",
         type: invoiceDetails.payment_type===1?"One-Time": invoiceDetails.payment_type===2?"Recurring":null, 

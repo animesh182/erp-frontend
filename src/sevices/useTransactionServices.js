@@ -1,20 +1,21 @@
 
-import { deleteTransaction, updateTransactions } from "@/app/api/transactions/getTransactions";
+import { updateInvoice } from "@/app/api/invoices/manageInvoices";
+import { deleteTransaction } from "@/app/api/transactions/getTransactions";
 import { useTransactions } from "@/hooks/useTransactions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const useUpdateProject = () => {
+export const useUpdateTransaction = () => {
     const queryClient = useQueryClient();
     const { refetch } = useTransactions(); 
 
     return useMutation({
-        mutationFn: updateTransactions,
+      mutationFn: updateInvoice,
         onSuccess: (updateTransaction) => {
           
             queryClient.setQueryData(["transactions"], (oldQueryData) => {
              
                 const newData = oldQueryData.map((transaction) =>
-                    transaction.id === updateTransaction.data.id ? updateTransaction.data : transaction
+                    transaction.id === updateTransaction.id ? updateTransaction : transaction
                 );
               
                 return newData;
@@ -24,6 +25,9 @@ export const useUpdateProject = () => {
         },
     });
 };
+
+
+
 
 
 export const useDeleteTransaction = () => {

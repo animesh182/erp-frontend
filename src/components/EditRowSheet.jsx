@@ -110,7 +110,8 @@ export function EditRowSheet({
               <DatePicker
                 {...field.component.props}
                 value={value ? new Date(value) : null}
-                onChange={(date) => onChange(date ? date.toISOString() : null)}
+                // onChange={(date) => onChange(date ? date.toISOString() : null)}
+                onChange={(date) => onChange(date ? date: null)}
                 className={cn(
                   field.component.props?.className,
                   hasError && "ring-2 ring-red-500"

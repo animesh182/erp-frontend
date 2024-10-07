@@ -26,16 +26,17 @@ export const useTransactions = () => useQuery({
             month: 'short', 
             year: 'numeric',
           })
-        : "No payment Date", 
-        status: transaction.payment_status===2 ?"paid": "pending",
+        : "", 
+        status: transaction.payment_status===2 ?"paid":
+        transaction.payment_status===1 ?"pending":  "cancelled",
         paidDate: transaction?.payment_date 
         ? new Date(transaction.payment_date).toLocaleDateString('en-US', {
             day: 'numeric',
             month: 'short', 
             year: 'numeric',
           })
-        : "No payment Date", 
-        type: transaction.payment_type===1?"Online Payment":"N/A",
+        : "", 
+        type:transaction?.payment_type===1?"One-Time": transaction?.payment_type===2?"Recurring":null,
         amount: transaction.amount,
         costType: transaction.transaction_type,
         id:transaction.id

@@ -8,6 +8,9 @@ import { Activity, CreditCard, DollarSign } from "lucide-react";
 import { subDays, format } from "date-fns";
 import { useTransactions } from "@/hooks/useTransactions";
 import { useKpi } from "@/hooks/useKpi";
+import { useUpdateTransaction } from "@/sevices/useTransactionServices";
+import { formatDateApiFormat } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function Transactions() {
   const initialEndDate = new Date(); // Today's date
@@ -132,6 +135,7 @@ export default function Transactions() {
 
   const{data:transactionData,isError,isLoading,error}=useTransactions()
   const{data:useKpiData}=useKpi()
+  const { mutate:editTransaction } = useUpdateTransaction();
   const kpiData=useKpiData?.slice(0,3)
   if(isLoading) return <p>loading...</p>
   if(isError) return <p>{error.message}</p>
@@ -170,6 +174,31 @@ export default function Transactions() {
     setEndDate(endDate);
   };
 
+
+  const onEditRow = (editedData) => {
+   
+
+    const transformedData = {
+    
+        id: editedData.invoice.replace(/^#/, ''), 
+        name: editedData.name, 
+        project_name: editedData.projectName, 
+        payment_date: formatDateApiFormat(editedData.paidDate)  || null, 
+        issued_date: formatDateApiFormat(editedData.invoiceIssuedDate), 
+        payment_status: editedData.status === "paid" ? 2 : editedData.status === "pending" ? 1 : 3,
+        payment_type: editedData.type === "One-Time" || editedData.type === "one-time" ? 1 : 2,
+        amount: editedData.amount, 
+        
+
+   
+      
+    };
+
+    editTransaction(transformedData);
+    toast.success("Row updated");
+  };
+
+
   return (
     <>
     {transactions && kpiData &&(
@@ -197,6 +226,11 @@ export default function Transactions() {
         onDateChange={handleDateChange}
         initialStartDate={startDate}
         initialEndDate={endDate}
+
+
+
+
+        onEditRow={onEditRow}
       />
     </main>)}
     </>

@@ -22,14 +22,14 @@ export const useExpense = () => useQuery({
               month: 'short', 
               year: 'numeric',
             })
-          : "No Issued Date",
+          : "",
         paidDate: invoiceDetails?.payment_date
           ? new Date(invoiceDetails.payment_date).toLocaleDateString('en-US', {
               day: 'numeric',
               month: 'short', 
               year: 'numeric',
             })
-          : "Not Paid",
+          : "",
           status: invoiceDetails?.payment_status === 1 ? "unpaid" :
           invoiceDetails?.payment_status === 2 ? "paid" : "cancelled",
         costType: expense.cost_type === 1 ? "direct-cost" :

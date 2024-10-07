@@ -26,22 +26,22 @@ export const getTransactions = async () => {
   
 
 
-  export const updateTransactions = async (transactionData) => {
-    console.log(transactionData, "naya ako data");
+  // export const updateTransactions = async (transactionData) => {
+ 
   
-    if (!transactionData || !transactionData.id) {
-      throw new Error("Transaction ID is missing");
-    }
+  //   if (!transactionData || !transactionData.id) {
+  //     throw new Error("Transaction ID is missing");
+  //   }
   
-    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${transactionData.id}/`, {
-      method: "PATCH",
-      headers: {
-        "Authorization": `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(transactionData),
-    }).then((res) => res.json());
-  };
+  //   return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/invoices/${transactionData.id}/`, {
+  //     method: "PATCH",
+  //     headers: {
+  //       "Authorization": `Bearer ${accessToken}`,
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(transactionData),
+  //   }).then((res) => res.json());
+  // };
 
 
   export const deleteTransaction = async(transactionId) => {
