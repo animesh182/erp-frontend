@@ -50,7 +50,6 @@ export default function Payroll() {
       }));
 
       setData(mappedData); // Store the fetched data in state
-      console.log(mappedData, "date");
       toast.success("Data fetched successfully");
     } catch (error) {
       toast.error("Failed to fetch data");
