@@ -6,7 +6,8 @@ import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
 import { useDeleteExpense } from "@/sevices/useExpenseServices";
 
-export const columns = [
+// export const columns = [
+export const columns =(deleteExpense)=> [
   {
     accessorKey: "name",
     header: "Name",
@@ -87,7 +88,7 @@ export const columns = [
 
 
 
-      const { mutate: deleteExpense } = useDeleteExpense();
+      // const { mutate: deleteExpense } = useDeleteExpense();
       const handleDelete = () => {
         console.log("Delete", row.original.id);
         if (window.confirm(`Are you sure you want to delete expense of id ${row.original.id} ?`)) {

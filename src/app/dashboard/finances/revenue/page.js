@@ -10,7 +10,7 @@ import { formInputs } from "./Inputs";
 import { toast } from "sonner";
 import { subDays, format } from "date-fns";
 import { useRevenue } from "@/hooks/useRevenue";
-import { useAddRevenue, useUpdateRevenue } from "@/sevices/useRevenueServices";
+import { useAddRevenue, useDeleteRevenue, useUpdateRevenue } from "@/sevices/useRevenueServices";
 import { formatDateApiFormat } from "@/lib/utils";
 
 export default function Revenue() {
@@ -61,112 +61,13 @@ export default function Revenue() {
     setStartDate(startDate);
     setEndDate(endDate);
   };
-  // const revenues = [
-  //   {
-  //     name: "ebibaaha Invoice",
-  //     projectName: "ebibaaha",
-  //     invoice: "#EBI001",
-  //     invoiceIssuedDate: "Jan 12, 2023",
-  //     paidDate: "Jan 20, 2023",
-  //     status: "paid",
-  //     type: "recurring",
-  //     amount: 10000,
-  //   },
-  //   {
-  //     name: "Cloud Storage Invoice",
-  //     projectName: "Cloud Storage",
-  //     invoice: "#CLS002",
-  //     invoiceIssuedDate: "Feb 15, 2023",
-  //     paidDate: "Feb 28, 2023",
-  //     status: "paid",
-  //     type: "one-time",
-  //     amount: 25000,
-  //   },
-  //   {
-  //     name: "Solar Panels Invoice",
-  //     projectName: "Solar Panels",
-  //     invoice: "#SOL003",
-  //     invoiceIssuedDate: "Mar 3, 2023",
-  //     paidDate: "Mar 18, 2023",
-  //     status: "paid",
-  //     type: "recurring",
-  //     amount: 50000,
-  //   },
-  //   {
-  //     name: "Membership Software Invoice",
-  //     projectName: "Membership Software",
-  //     invoice: "#MEM004",
-  //     invoiceIssuedDate: "Apr 1, 2023",
-  //     paidDate: null,
-  //     status: "pending",
-  //     type: "recurring",
-  //     amount: 7500,
-  //   },
-  //   {
-  //     name: "Online Course Platform Invoice",
-  //     projectName: "Online Course Platform",
-  //     invoice: "#OCP005",
-  //     invoiceIssuedDate: "May 5, 2023",
-  //     paidDate: "May 15, 2023",
-  //     status: "paid",
-  //     type: "one-time",
-  //     amount: 30000,
-  //   },
-  //   {
-  //     name: "Inventory Management System Invoice",
-  //     projectName: "Inventory Management System",
-  //     invoice: "#IMS006",
-  //     invoiceIssuedDate: "Jun 10, 2023",
-  //     paidDate: null,
-  //     status: "pending",
-  //     type: "recurring",
-  //     amount: 15000,
-  //   },
-  //   {
-  //     name: "Tracking Software Invoice",
-  //     projectName: "Tracking Software",
-  //     invoice: "#TRK007",
-  //     invoiceIssuedDate: "Jul 7, 2023",
-  //     paidDate: "Jul 21, 2023",
-  //     status: "paid",
-  //     type: "one-time",
-  //     amount: 20000,
-  //   },
-  //   {
-  //     name: "Graphic Design Tool Invoice",
-  //     projectName: "Graphic Design Tool",
-  //     invoice: "#GDT008",
-  //     invoiceIssuedDate: "Aug 15, 2023",
-  //     paidDate: "Aug 30, 2023",
-  //     status: "paid",
-  //     type: "recurring",
-  //     amount: 12000,
-  //   },
-  //   {
-  //     name: "Patient Management System Invoice",
-  //     projectName: "Patient Management System",
-  //     invoice: "#PMS009",
-  //     invoiceIssuedDate: "Sep 1, 2023",
-  //     paidDate: null,
-  //     status: "pending",
-  //     type: "one-time",
-  //     amount: 40000,
-  //   },
-  //   {
-  //     name: "Scheduling App Invoice",
-  //     projectName: "Scheduling App",
-  //     invoice: "#SCH010",
-  //     invoiceIssuedDate: "Oct 10, 2023",
-  //     paidDate: "Oct 25, 2023",
-  //     status: "paid",
-  //     type: "recurring",
-  //     amount: 8000,
-  //   },
-  // ];
 
-
-  // const {mutate}=useAddRevenue();
   const { mutate:editRevenue } = useUpdateRevenue();
+
+
+
+
+  const { mutate: deleteRevenue } = useDeleteRevenue();
   // const onAddRow = (newRowData) => {
   //   mutate(newRowData)
   //   toast.success("New row added");
@@ -231,7 +132,7 @@ export default function Revenue() {
         <DataTable
           title={"Revenue"}
           subtitle={"List of all revenue in the company"}
-          columns={columns}
+          columns={columns(deleteRevenue)}
           data={revenues}
           projectOptions={pjOptions}
           formInputs={formInputs}

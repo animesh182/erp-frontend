@@ -57,84 +57,39 @@ function RenderLegend() {
   );
 }
 
-// const chartConfig = {
-//   "Avinto ERP": {
-//     color: "#4A90E2",
-//     label: "Avinto ERP",
-//   },
-//   "Jambo Booking House": {
-//     color: "#E47CF5",
-//     label: "Jambo Booking House",
-//   },
-//   "Basic Booking App": {
-//     color: "#F5A623",
-//     label: "Basic Booking App",
-//   },
-//   Ebibaaha: {
-//     color: "#50C878", // Emerald green
-//     label: "Ebibaaha",
-//   },
-//   Changeride: {
-//     color: "#FF6347", // Tomato red
-//     label: "Changeride",
-//   },
-//   "Tutor App": {
-//     color: "#FFD700", // Gold
-//     label: "Tutor App",
-//   },
-//   Logistikk: {
-//     color: "#9370DB", // Medium Purple
-//     label: "Logistikk",
-//   },
-// };
+const colorArray = [
+  "#4A90E2", // Blue
+  "#E47CF5", // Purple
+  "#F5A623", // Orange
+  "#50C878", // Emerald green
+  "#FF6347", // Tomato red
+  "#FFD700", // Gold
+  "#9370DB", // Medium purple
+  "#FFFF00", // Yellow
+];
 
-const chartConfig = {
-  Hokkaido: {
-    color: "#4A90E2",
-    label: "Hokkaido",
-  },
-  "Avinto Test": {
-    color: "#E47CF5",
-    label: "Avinto Test",
-  },
-  "Jambo Travel House": {
-    color: "#F5A623",
-    label: "Jambo Travel House",
-  },
-  Changeride: {
-    color: "#50C878", // Emerald green
-    label: "Changeride",
-  },
-  Ebibaaha: {
-    color: "#FF6347", // Tomato red
-    label: "Ebibaaha",
-  },
-  Santa: {
-    color: "#FFD700", // Gold
-    label: "Santa",
-  },
-  "Ruslin Project": {
-    color: "#9370DB", 
-    label: "Ruslin Project",
-  },
-  Hyundai: {
-    color: "#9370DB", 
-    label: "Hyundai",
-  },
-  "SAusbifa Project": {
-    color: "#9370DB",
-    label: "SAusbifa Project",
-  },
-  Ebibaaha: {
-    color: "#FFFF00", 
-    label: "Ebibaaha",
-  },
-};
+function generateChartConfig(rawData) {
+  const chartConfig = {};
+  let colorIndex = 0;
 
+  rawData.forEach((project) => {
+    const projectName = project.project?.trim().toLowerCase(); 
+   
+    chartConfig[projectName] = {
+      color: colorArray[colorIndex % colorArray.length],
+      label: project.project, 
+    };
 
+    colorIndex++;
+  });
+  return chartConfig;
+}
 
 
 export default function ProjectBudgetChart({ rawData }) {
+
+
+  const chartConfig = generateChartConfig(rawData);
   const updatedChartData = calculateExpensePercentage(rawData);
   const recurringProjects = updatedChartData
     .filter((data) => data.isRecurring)
@@ -171,6 +126,9 @@ export default function ProjectBudgetChart({ rawData }) {
 
     return null;
   }
+
+
+
   return (
     <ResponsiveContainer height="100%">
       <ChartContainer config={chartConfig}>
@@ -233,7 +191,7 @@ export default function ProjectBudgetChart({ rawData }) {
             {updatedChartData.map((entry, index) => (
               <Cell
                 key={`cell-${index}`} // Provide a unique key
-                fill={chartConfig[entry.project].color}
+                fill={chartConfig[entry.project.trim().toLowerCase()]?.color || "#CCCCCC"}
               />
             ))}
             <LabelList
@@ -250,7 +208,8 @@ export default function ProjectBudgetChart({ rawData }) {
             {updatedChartData.map((entry, index) => (
               <Cell
                 key={`bg-cell-${index}`} // Provide a unique key for the background cells
-                fill={chartConfig[entry.project].color}
+                // fill={chartConfig[entry.project].color}
+                fill={chartConfig[entry.project.trim().toLowerCase()]?.color || "#CCCCCC"}
                 opacity={0.3}
               />
             ))}

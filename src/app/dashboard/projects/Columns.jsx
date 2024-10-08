@@ -10,7 +10,8 @@ import { formatAmountToNOK } from "@/lib/utils";
 import { prettifyText } from "@/lib/utils";
 import { useDeleteProject } from "@/sevices/useProjectServices";
 
-export const projectColumns = [
+// export const projectColumns = [
+export const projectColumns =(deleteProject)=> [
   {
     accessorKey: "name",
     header: "Name",
@@ -130,7 +131,7 @@ export const projectColumns = [
 
 
 
-      const{mutate:deleteProject}=useDeleteProject()
+      // const{mutate:deleteProject}=useDeleteProject()
       const handleDelete = () => {
         console.log("Delete", row.original.id);
         // if (window.confirm(`Are you sure you want to delete project of id ${row.original.id} ?`)) {

@@ -10,7 +10,7 @@ export const usePayroll = () => useQuery({
       return data
       .filter(item => item.invoice_issued_date) 
       .map(data => ({
-        name:  "N/A",
+        name:  data?.name || "N/A",
         projectName: "N/A",
         invoice: "#"+data?.id,
         invoiceIssuedDate: data?.invoice_issued_date 

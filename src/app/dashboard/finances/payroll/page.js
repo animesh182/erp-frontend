@@ -13,7 +13,7 @@ import { UploadSheetDialog } from "@/components/UploadSheetDialog";
 import { usePayroll } from "@/hooks/usePayroll";
 import {  getPayrollGenerate } from "@/app/api/payroll/getPayroll";
 import { usePayrollKpi } from "@/hooks/usePayrollKpi";
-import { useUpdatePayroll } from "@/sevices/usePayrollServices";
+import { useDeletePayroll, useUpdatePayroll } from "@/sevices/usePayrollServices";
 
 export default function Payroll() {
   const methods = useForm();
@@ -188,7 +188,7 @@ export default function Payroll() {
   const onEditRow = (editedData) => {
 
 
-
+    console.log(editedData,"datata")
 
     const transformedData = {
     
@@ -215,6 +215,10 @@ export default function Payroll() {
   const{data:kpivalues,isError:isKpiError,isLoading:isKpiLoading,error:kpiError}=usePayrollKpi();
 
     const{data:payroll,isError:isPayrollError,isLoading:isPayrollLoading,error:payrollError}=usePayroll()
+   
+   
+   
+    const { mutate: deletePayroll } = useDeletePayroll();
 
 
     if(isKpiLoading || isPayrollLoading) return <p>loading.....</p>
@@ -251,7 +255,7 @@ export default function Payroll() {
         <DataTable
           title={"Payroll"}
           subtitle="View and manage comprehensive salary details of all employees"
-          columns={columns}
+          columns={columns(deletePayroll)}
           data={payroll}
           isTableAddFormEnabled={false}
           onEditRow={onEditRow}

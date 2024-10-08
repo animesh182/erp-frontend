@@ -6,7 +6,8 @@ import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
 import { useDeleteRevenue } from "@/sevices/useRevenueServices";
 
-export const columns = [
+// export const columns = [
+export const columns =(deleteRevenue)=>[
   {
     //change values to invoice name instead of client name.
     accessorKey: "name",
@@ -80,7 +81,7 @@ export const columns = [
 
 
 
-      const { mutate: deleteRevenue } = useDeleteRevenue();
+      // const { mutate: deleteRevenue } = useDeleteRevenue();
       const handleDelete = () => {
         console.log("Delete", row.original.id);
         if (window.confirm("Are you sure you want to delete this revenue?")) {

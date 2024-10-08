@@ -13,8 +13,9 @@ import { EditProjectSheet } from "@/components/EditProjectSheet";
 import { toast } from "sonner";
 import { useProjects } from "@/hooks/useProjects";
 import { AddClientDialog } from "@/components/AddClientDialog";
-import { useUpdateProject } from "@/sevices/useProjectServices";
+import { useAddProject, useDeleteProject, useUpdateProject } from "@/sevices/useProjectServices";
 import { formatDateApiFormat } from "@/lib/utils";
+import { useAddClient } from "@/sevices/useClientServices";
 
 
 
@@ -28,6 +29,8 @@ export default function Projects () {
   const [isCardLayout, setIsCardLayout] = useState(false);
 
   const { mutate:editProject } = useUpdateProject();
+  const { mutate:addProject } = useAddProject();
+  const{mutate:addClient}=useAddClient();
   // handle toggle layout
   const handleToggleLayout = (value) => {
     if (value === "grid") {
@@ -338,6 +341,9 @@ export default function Projects () {
   //   },
   // ];
 
+
+
+
   const handleProjectAdd = () => {
     setIsSheetOpen(true);
   };
@@ -390,16 +396,58 @@ const handleProjectUpdate = (updatedProject) => {
   };
 
   const onAddProject = (formData) => {
+
+
+    const startDate = new Date(formData.startDate);
+    const formattedStartDate = formatDateApiFormat(startDate);
+  
+  
+    const endDate = formData.endDate ? new Date(formData.endDate) : new Date(startDate);
+  
+    const estimatedDuration = (endDate.getFullYear() - startDate.getFullYear()) * 12 + (endDate.getMonth() - startDate.getMonth());
+
+    const transformedData = {
+      name: formData.name  || "N/A",
+      start_date: formattedStartDate,
+      estimated_duration: estimatedDuration, 
+      budget: formData.budget,
+
+      description: formData.projectDescription || "",
+      client_contact: {
+          name: formData.clientName,
+          email: formData.clientEmail,
+      },
+      project_status: statusMapping[formData.status] || 3 ,
+      project_health:formData.health.replace(/-/g, '_'),
+      project_category: formData.projectCategory || null,
+      completion: formData.progress || "0",
+      platform: formData.platform || null,
+
+
+      client:1,
+      type:"fixed"
+ 
+  };
+
+  addProject(transformedData)
+
+
     toast.success("Project added successfully");
-    console.log(formData);
     setIsSheetOpen(false);
   };
 const {data:projects,isError,isLoading,error}=useProjects();
+const{mutate:deleteProject}=useDeleteProject()
 console.log(projects,"proporp")
 if(isLoading) return <p>loading....</p>
 if(isError) return error.message
 
   const handleClientAdd = (formData) => {
+    const transformedData = {
+      name: formData.name || "N/A",
+      email: formData.email || "N/A",
+      phone_number: formData.phone || "N/A"
+    }
+    addClient(transformedData)
     toast.success("Client added successfully");
     console.log("Client added", formData);
   };
@@ -448,7 +496,7 @@ if(isError) return error.message
         ) : ( 
           <FormProvider {...methods}>
             <DataTable
-              columns={projectColumns}
+              columns={projectColumns(deleteProject)}
               data={projects}
 
              

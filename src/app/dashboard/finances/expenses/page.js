@@ -13,7 +13,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useExpense } from "@/hooks/useExpense";
 import { useQuery } from "@tanstack/react-query";
 import { getExpenses } from "@/app/api/expense/getExpense";
-import { useAddExpense, useUpdateExpenses, useUpdateExpensesCostType } from "@/sevices/useExpenseServices";
+import { useAddExpense, useDeleteExpense, useUpdateExpenses, useUpdateExpensesCostType } from "@/sevices/useExpenseServices";
 import { formatDateApiFormat } from "@/lib/utils";
 
 
@@ -29,6 +29,11 @@ export default function Expenses() {
   // const {mutate}=useAddExpense();
   const { mutate:editExpense } = useUpdateExpenses();
   const{mutate:editCostType}=useUpdateExpensesCostType();
+
+
+
+  const { mutate: deleteExpense } = useDeleteExpense();
+
   const pjOptions = [
     { id: "1", name: "ebibaaha" },
     { id: "2", name: "Cloud Storage" },
@@ -244,7 +249,7 @@ if(isError) return <p>{error.message}</p>
         {expenses && <DataTable
           title={"Expenses"}
           subtitle={"List of all expenses in the company"}
-          columns={columns}
+          columns={columns(deleteExpense)}
           data={expenses}
           projectOptions={pjOptions}
           formInputs={formInputs}

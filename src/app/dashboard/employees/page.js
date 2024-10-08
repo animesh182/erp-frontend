@@ -15,6 +15,7 @@ import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
 import { useEmployees } from "@/hooks/useEmployees";
+import { useDeleteEmployee } from "@/sevices/useEmployeeServices";
 
 
 
@@ -84,6 +85,10 @@ export default function Employees() {
 
  
  
+  const{mutate:deleteEmployee}=useDeleteEmployee()
+
+
+
 
   const onAddEmployee = (formData) => {
     // Generate a new ID (you might want to use a more robust method in production)
@@ -125,7 +130,8 @@ export default function Employees() {
               totalItemCount={payments.length}
             />
             <SimpleDataTable
-              columns={columns}
+              // columns={columns}
+              columns={columns(deleteEmployee)}
               data={payments}
               onRowSelect={handleRowSelect}
             />

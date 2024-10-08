@@ -6,7 +6,8 @@ import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
 import { useDeleteTransaction } from "@/sevices/useTransactionServices";
 
-export const columns = [
+// export const columns = [
+export const columns = (deleteTransaction)=>[
   {
     //change values to invoice name instead of client name.
     accessorKey: "name",
@@ -79,7 +80,7 @@ export const columns = [
       const rowData = row.original;
 
   
-      const { mutate: deleteTransaction } = useDeleteTransaction();
+      // const { mutate: deleteTransaction } = useDeleteTransaction();
       const handleDelete = () => {
         console.log("Delete", row.original.id);
         if (window.confirm(`Are you sure you want to delete transaction of id ${row.original.id} ?`)) {

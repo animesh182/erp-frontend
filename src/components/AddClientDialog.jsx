@@ -77,7 +77,7 @@ export function AddClientDialog({ onAddClient }) {
                 <p className="text-sm text-red-500">{errors.email.message}</p>
               )}
             </div>
-            <div className="grid gap-2">
+            {/* <div className="grid gap-2">
               <label htmlFor="website">Website</label>
               <Input
                 id="website"
@@ -92,6 +92,22 @@ export function AddClientDialog({ onAddClient }) {
               />
               {errors.website && (
                 <p className="text-sm text-red-500">{errors.website.message}</p>
+              )}
+            </div> */}
+             <div className="grid gap-2">
+              <label htmlFor="phone">Phone Number</label>
+              <Input
+                  id="phone"
+                  {...register("phone", {
+                  required: "Phone number is required",
+                  validate: {
+                  isNumeric: value => /^\d+$/.test(value) || "Phone number must contain only numbers",
+                  },
+                  })}
+                className={cn(errors.phone && "ring-2 ring-red-500")}
+              />  
+              {errors.phone && (
+                <p className="text-sm text-red-500">{errors.phone.message}</p>
               )}
             </div>
           </div>

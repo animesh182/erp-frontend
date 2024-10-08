@@ -8,7 +8,7 @@ import { Activity, CreditCard, DollarSign } from "lucide-react";
 import { subDays, format } from "date-fns";
 import { useTransactions } from "@/hooks/useTransactions";
 import { useKpi } from "@/hooks/useKpi";
-import { useUpdateTransaction } from "@/sevices/useTransactionServices";
+import { useDeleteTransaction, useUpdateTransaction } from "@/sevices/useTransactionServices";
 import { formatDateApiFormat } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -136,6 +136,10 @@ export default function Transactions() {
   const{data:transactionData,isError,isLoading,error}=useTransactions()
   const{data:useKpiData}=useKpi()
   const { mutate:editTransaction } = useUpdateTransaction();
+
+
+  const { mutate: deleteTransaction } = useDeleteTransaction();
+
   const kpiData=useKpiData?.slice(0,3)
   if(isLoading) return <p>loading...</p>
   if(isError) return <p>{error.message}</p>
@@ -221,7 +225,7 @@ export default function Transactions() {
         subtitle={
           "The table captures all cost streams associated with the company"
         }
-        columns={columns}
+        columns={columns(deleteTransaction)}
         data={transactions}
         onDateChange={handleDateChange}
         initialStartDate={startDate}

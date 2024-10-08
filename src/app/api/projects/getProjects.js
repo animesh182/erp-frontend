@@ -52,3 +52,19 @@ export const getProjects = async () => {
     }).then(() => projectId);
   };
   
+
+
+  export const addProject = async(projectData) => {
+    if (!projectData) {
+      throw new Error("Project is missing");
+    }
+  
+    return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/project/`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(projectData),
+    }).then((res) => res.json());
+  };

@@ -6,7 +6,8 @@ import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { formInputs } from "./Inputs";
 import { useDeletePayroll } from "@/sevices/usePayrollServices";
 // import { formInputs } from "@/app/dashboard/payroll/Inputs";
-export const columns = [
+// export const columns = [
+export const columns = (deletePayroll)=>[
   {
     accessorKey: "name",
     header: "Name",
@@ -85,7 +86,7 @@ export const columns = [
       const rowData = row.original;
 
       
-      const { mutate: deletePayroll } = useDeletePayroll();
+      // const { mutate: deletePayroll } = useDeletePayroll();
       const handleDelete = () => {
         console.log("Delete", row.original);
         if (window.confirm(`Are you sure you want to delete payroll of id ${row.original.id} ?`)) {

@@ -5,7 +5,10 @@ import SimpleTableActionsDropdown from "@/components/SimpleTableActionsDropdown"
 import { formatAmountToNOK } from "@/lib/utils";
 import { useDeleteEmployee } from "@/sevices/useEmployeeServices";
 
-export const columns = [
+
+// export const columns = [
+  export const columns = (deleteEmployee) => [
+
   {
     accessorKey: "employeeName",
     header: "Employee Name",
@@ -51,7 +54,7 @@ export const columns = [
 
 
 
-      const{mutate:deleteEmployee}=useDeleteEmployee()
+      // const{mutate:deleteEmployee}=useDeleteEmployee()
       const handleDelete = () => {
         console.log("Delete", row.original.id);
         if (window.confirm(`Are you sure you want to delete employee of id ${row.original.id} ?`)) {

@@ -1,5 +1,5 @@
 
-import { deleteProject, updateProjects } from "@/app/api/projects/getProjects";
+import { addProject, deleteProject, updateProjects } from "@/app/api/projects/getProjects";
 import { useProjects } from "@/hooks/useProjects";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -40,4 +40,20 @@ export const useDeleteProject = () => {
   }
 
 
- 
+  export const useAddProject = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+      mutationFn: addProject,
+      onSuccess: (updatedProject) => {
+
+        queryClient.setQueryData(["projects"], (oldQueryData) => {
+          if (!oldQueryData) {
+            return [updatedProject];
+          }
+          console.log(oldQueryData);
+          return [...oldQueryData, updatedProject];
+        });
+      },
+    });
+  };
+  
