@@ -134,9 +134,9 @@ export const projectColumns =(deleteProject)=> [
       // const{mutate:deleteProject}=useDeleteProject()
       const handleDelete = () => {
         console.log("Delete", row.original.id);
-        // if (window.confirm(`Are you sure you want to delete project of id ${row.original.id} ?`)) {
-        //   deleteProject(row.original.id); 
-        // }
+        if (window.confirm(`Are you sure you want to delete project of id ${row.original.id} ?`)) {
+          deleteProject(row.original.id); 
+        }
       };
 
       return (
