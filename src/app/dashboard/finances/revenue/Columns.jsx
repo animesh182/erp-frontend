@@ -29,10 +29,18 @@ export const columns = [
     header: "Invoice Issued Date",
     enableSorting: false,
     cell: ({ row }) => {
-      const { invoiceIssuedDate } = row.original;
-      return <span>{format(invoiceIssuedDate, "MMM d, yyyy")}</span>;
+      const { invoiceIssuedDate } = row.original; // Correct field: `invoiceIssuedDate`
+
+      // Check if the issued date exists, if not return a fallback value
+      if (!invoiceIssuedDate) {
+        return <span>N/A</span>; // Fallback when invoice issued date is null or undefined
+      }
+
+      // If issued date exists, format it
+      return <span>{format(new Date(invoiceIssuedDate), "MMM d, yyyy")}</span>;
     },
   },
+
   {
     accessorKey: "status",
     header: "Status",
@@ -58,7 +66,14 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const { paidDate } = row.original;
-      return <span>{format(paidDate, "MMM d, yyyy")}</span>;
+
+      // Check if the date exists, if not return a fallback value
+      if (!paidDate) {
+        return <span>N/A</span>; // Fallback when date is null or undefined
+      }
+
+      // If date exists, format it
+      return <span>{format(new Date(paidDate), "MMM d, yyyy")}</span>;
     },
   },
 

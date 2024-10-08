@@ -29,26 +29,23 @@ export function EditProjectSheet({
     control,
     handleSubmit,
     reset,
-    watch,
     formState: { errors },
   } = useForm({
-    defaultValues: projectData || {},
+    defaultValues: projectData || {}, // If editing, set default values
   });
 
-  // console.log(watch());
   React.useEffect(() => {
     if (isOpen) {
       if (projectData) {
-        const userInvolvedCount = projectData.all_user_projects.length;
         reset({
           name: projectData.name,
           health: projectData.project_health,
           projectCategory: projectData.project_category,
           platform: projectData.platform,
-          clientName: projectData.client_contact.name,
-          clientEmail: projectData.client_contact.email,
+          clientName: projectData.client_contact?.name,
+          clientEmail: projectData.client_contact?.email,
           status: String(projectData.project_status),
-          teamMembersCount: userInvolvedCount,
+          teamMembersCount: projectData.all_user_projects?.length || 0,
           progress: projectData.completion,
           startDate: projectData.start_date,
           endDate: projectData.end_date,
@@ -56,6 +53,7 @@ export function EditProjectSheet({
           projectDescription: projectData.description,
         });
       } else {
+        // Reset to empty fields for adding a new project
         reset({
           name: "",
           health: "",
@@ -64,7 +62,7 @@ export function EditProjectSheet({
           clientName: "",
           clientEmail: "",
           status: "",
-          teamMembersCount: "",
+          teamMembersCount: 0,
           progress: 0,
           startDate: null,
           endDate: null,
@@ -77,12 +75,14 @@ export function EditProjectSheet({
 
   const onSubmit = (data) => {
     if (projectData) {
-      onEditProject(data);
+      // If editing, call onEditProject with the project ID
+      onEditProject(projectData.id, data);
     } else {
+      // If adding a new project, call onAddProject
       onAddProject(data);
     }
-    reset();
-    onClose();
+    reset(); // Reset the form after submission
+    onClose(); // Close the sheet
   };
 
   const onError = (errors) => {
@@ -193,13 +193,13 @@ export function EditProjectSheet({
                 </>
               ),
             })}
-            {renderField("projectCategory", Input, { required: true })}
-            {renderField("platform", Input, { required: true })}
+            {renderField("projectCategory", Input, { required: false })}
+            {renderField("platform", Input, { required: false })}
             {renderField("clientName", Input, { required: true })}
             {renderField("clientEmail", Input, {
               type: "email",
               required: true,
-              disabled: true,
+              disabled: !!projectData, // Disable clientEmail for editing
             })}
             {renderField("status", Select, {
               required: true,

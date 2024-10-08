@@ -1,45 +1,40 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams } from "next/navigation"; // Use `useParams` from `next/navigation`
 import ProjectDetailsMain from "./ProjectDetailsMain";
 import ProjectDetailsSidebar from "./ProjectDetailsSidebar";
 import TableTitle from "@/components/TableTitle";
 import SimpleDataTable from "@/components/ui/simple-data-table";
 import { columns } from "./Columns";
+import { getProjectById } from "@/app/api/getProjects"; // Import the API function to get project by ID
 
 export default function ProjectDetails() {
-  const [project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { id } = useParams();
+  const [project, setProject] = useState(null); // Project state
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
+  const { id } = useParams(); // Get the projectId from the dynamic route
 
   useEffect(() => {
-    const fetchProjectDetails = async () => {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const dummyProject = {
-          id,
-          name: "Project Alpha",
-          health: "on-track",
-          status: "In Progress",
-          daysLeft: 45,
-          projectCategory: "Automotive",
-          platform: "Web Development",
-          startDate: "2023-01-01",
-          endDate: "2023-12-31",
-          progress: 65,
-          devUtilization: 80,
-          teamMembersCount: 8,
-        };
-        setProject(dummyProject);
-      } catch (err) {
-        setError("Failed to fetch project details");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProjectDetails();
+    if (id) {
+      const fetchProjectDetails = async () => {
+        try {
+          const { status, data } = await getProjectById(id); // Fetch project details by ID
+
+          if (status === 200 && data) {
+            setProject(data); // Set the project state with the response data
+          } else {
+            setError(`Error: ${data.message}`);
+          }
+        } catch (err) {
+          setError("Failed to fetch project details");
+        } finally {
+          setLoading(false); // Set loading to false after fetch
+        }
+      };
+
+      fetchProjectDetails(); // Fetch the project details using projectId
+    }
   }, [id]);
 
   const dummyEmployeeData = [
@@ -53,66 +48,23 @@ export default function ProjectDetails() {
       startDate: "2023-01-15",
       endDate: "2023-12-15",
     },
-    {
-      id: "2",
-      imageUrl: "/default-avatar.jpg",
-      employeeName: "Jane Smith",
-      email: "jane.smith@example.com",
-      role: "Backend Developer",
-      timeAllocated: "35 hours/week",
-      startDate: "2023-02-01",
-      endDate: "2023-11-30",
-    },
-    {
-      id: "3",
-      imageUrl: "/default-avatar.jpg",
-      employeeName: "Alice Johnson",
-      email: "alice.johnson@example.com",
-      role: "UI/UX Designer",
-      timeAllocated: "30 hours/week",
-      startDate: "2023-01-20",
-      endDate: "2023-10-31",
-    },
-    {
-      id: "4",
-      imageUrl: "/default-avatar.jpg",
-      employeeName: "Bob Williams",
-      email: "bob.williams@example.com",
-      role: "Project Manager",
-      timeAllocated: "45 hours/week",
-      startDate: "2023-01-01",
-      endDate: "2023-12-31",
-    },
-    {
-      id: "5",
-      imageUrl: "/default-avatar.jpg",
-      employeeName: "Emma Brown",
-      email: "emma.brown@example.com",
-      role: "QA Tester",
-      timeAllocated: "35 hours/week",
-      startDate: "2023-03-01",
-      endDate: "2023-11-15",
-    },
-    {
-      id: "6",
-      imageUrl: "/default-avatar.jpg",
-      employeeName: "Michael Davis",
-      email: "michael.davis@example.com",
-      role: "DevOps Engineer",
-      timeAllocated: "40 hours/week",
-      startDate: "2023-02-15",
-      endDate: "2023-12-15",
-    },
+    // More employee data...
   ];
 
+  // Show loading while fetching data
   if (loading) return <div>Loading...</div>;
+
+  // Show error if fetching fails
   if (error) return <div>Error: {error}</div>;
+
+  // Show "No project found" if project is null or empty
   if (!project) return <div>No project found</div>;
 
+  // Render the project details
   return (
     <main className="p-6 min-h-screen space-y-4">
-      <div className="flex flex-col md:flex-row gap-4 w-full ">
-        <ProjectDetailsMain project={project} />
+      <div className="flex flex-col md:flex-row gap-4 w-full">
+        <ProjectDetailsMain project={project} /> {/* Pass the project data */}
         <ProjectDetailsSidebar />
       </div>
       <div>
