@@ -24,30 +24,46 @@ export function EditProjectSheet({
   projectData,
   onEditProject,
   onAddProject,
+  clients,
 }) {
+  // console.log(projectData, "data");
   const {
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm({
-    defaultValues: projectData || {},
+    defaultValues: projectData || {}, // If editing, set default values
   });
 
   React.useEffect(() => {
     if (isOpen) {
       if (projectData) {
-        reset(projectData);
+        reset({
+          name: projectData.name,
+          health: projectData.project_health,
+          projectCategory: projectData.project_category,
+          platform: projectData.platform,
+          client: String(projectData.client),
+          status: String(projectData.project_status),
+          // teamMembersCount: projectData?.all_user_projects?.length || 0, //because no attribute from the backend of number
+          progress: projectData.completion,
+          startDate: projectData.start_date,
+          endDate: projectData.end_date,
+          budget: projectData.budget,
+          projectDescription: projectData.description,
+        });
       } else {
+        // Reset to empty fields for adding a new project
         reset({
           name: "",
           health: "",
           projectCategory: "",
           platform: "",
-          clientName: "",
-          clientEmail: "",
+          client: "",
           status: "",
-          teamMembersCount: "",
+          // teamMembersCount: 0,
           progress: 0,
           startDate: null,
           endDate: null,
@@ -57,15 +73,16 @@ export function EditProjectSheet({
       }
     }
   }, [isOpen, projectData, reset]);
-
   const onSubmit = (data) => {
     if (projectData) {
-      onEditProject(data);
+      // If editing, call onEditProject with the project ID
+      onEditProject(projectData.id, data);
     } else {
+      // If adding a new project, call onAddProject
       onAddProject(data);
     }
-    reset();
-    onClose();
+    reset(); // Reset the form after submission
+    onClose(); // Close the sheet
   };
 
   const onError = (errors) => {
@@ -170,34 +187,45 @@ export function EditProjectSheet({
               required: true,
               children: (
                 <>
-                  <SelectItem value="on-track">On Track</SelectItem>
-                  <SelectItem value="at-risk">At Risk</SelectItem>
+                  <SelectItem value="on_track">On Track</SelectItem>
+                  <SelectItem value="at_risk">At Risk</SelectItem>
                   <SelectItem value="critical">Critical</SelectItem>
                 </>
               ),
             })}
-            {renderField("projectCategory", Input, { required: true })}
-            {renderField("platform", Input, { required: true })}
-            {renderField("clientName", Input, { required: true })}
-            {renderField("clientEmail", Input, {
-              type: "email",
+            {renderField("projectCategory", Input, { required: false })}
+            {renderField("platform", Input, { required: false })}
+            {renderField("client", Select, {
               required: true,
+              children: clients
+                ? clients.map((client, index) => {
+                    return (
+                      <SelectItem
+                        className="capitalize"
+                        key={index}
+                        value={String(client.id)}
+                      >
+                        {client.name}
+                      </SelectItem>
+                    );
+                  })
+                : null,
             })}
             {renderField("status", Select, {
               required: true,
               children: (
                 <>
-                  <SelectItem value="not-started">Not Started</SelectItem>
-                  <SelectItem value="ongoing">In Progress</SelectItem>
-                  <SelectItem value="done">Done</SelectItem>
+                  <SelectItem value="2">Not Started</SelectItem>
+                  <SelectItem value="3">In Progress</SelectItem>
+                  <SelectItem value="1">Done</SelectItem>
                 </>
               ),
             })}
-            {renderField("teamMembersCount", Input, {
+            {/* {renderField("teamMembersCount", Input, {
               type: "number",
               min: "0",
               required: true,
-            })}
+            })} */}
             {renderField("progress", Slider, {
               min: 0,
               max: 100,

@@ -6,8 +6,11 @@ import DataTable from "@/components/ui/data-table";
 import KpiCard from "@/components/kpicard";
 import { Activity, CreditCard, DollarSign } from "lucide-react";
 import { subDays, format } from "date-fns";
-
+import { useTheme } from "next-themes";
 export default function Transactions() {
+  const { theme } = useTheme();
+
+  console.log(theme);
   const initialEndDate = new Date(); // Today's date
   const initialStartDate = subDays(initialEndDate, 28); // 4 weeks ago
   const [startDate, setStartDate] = useState(initialStartDate);
@@ -176,6 +179,7 @@ export default function Transactions() {
         onDateChange={handleDateChange}
         initialStartDate={startDate}
         initialEndDate={endDate}
+        theme={theme}
       />
     </main>
   );

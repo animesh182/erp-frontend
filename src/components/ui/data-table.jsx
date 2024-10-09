@@ -48,6 +48,7 @@ function DataTable({
   initialStartDate,
   initialEndDate,
   projectOptions,
+  theme,
 }) {
   const [sorting, setSorting] = useState([]);
   const [selectedTab, setSelectedTab] = useState("All");
@@ -179,12 +180,20 @@ function DataTable({
                             data-state={row.getIsSelected() && "selected"}
                             className={
                               isProjectPage
-                                ? "cursor-pointer hover:bg-muted"
+                                ? `cursor-pointer hover:bg-muted ${
+                                    theme === "dark"
+                                      ? "bg-gray-700 text-white"
+                                      : ""
+                                  }`
                                 : isTransactionPage
                                 ? row.original.costType === "expense"
-                                  ? "bg-[#FEF2F2]"
+                                  ? theme === "dark"
+                                    ? "bg-[#fe5555]" // Darker shade for expense in dark mode
+                                    : "bg-[#FEF2F2]" // Light mode expense color
                                   : row.original.costType === "revenue"
-                                  ? "bg-[#f0fdf4]"
+                                  ? theme === "dark"
+                                    ? "bg-[#46954b]" // Darker shade for revenue in dark mode
+                                    : "bg-[#f0fdf4]" // Light mode revenue color
                                   : ""
                                 : ""
                             }

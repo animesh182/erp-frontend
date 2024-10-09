@@ -3,7 +3,8 @@
 import MultiLineNameCell from "@/components/MultiLineNameCell";
 import SimpleTableActionsDropdown from "@/components/SimpleTableActionsDropdown";
 import { formatAmountToNOK } from "@/lib/utils";
-
+import { deleteEmployeeById } from "@/app/api/employees/deleteEmployeeById";
+import { toast } from "sonner";
 export const columns = [
   {
     accessorKey: "employeeName",
@@ -23,12 +24,12 @@ export const columns = [
     enableSorting: false,
   },
   {
-    accessorKey: "role_title",
+    accessorKey: "role",
     header: "Role",
     enableSorting: false,
   },
   {
-    accessorKey: "employment_type",
+    accessorKey: "level",
     header: "Type",
     enableSorting: false,
   },
@@ -50,9 +51,21 @@ export const columns = [
         // Handle edit action
       };
 
-      const handleDelete = () => {
+      const handleDelete = async () => {
         console.log("Delete", row.original.id);
-        // Handle delete action
+        try {
+          const response = await deleteEmployeeById(row.original.id);
+          if (response.status === 200) {
+            toast.message("Employee deleted successfully");
+            // You can add any other logic here, like updating UI or showing a success message
+          } else {
+            toast.error("There was an error deleting the employee");
+            console.error(response.message);
+            // Handle error case
+          }
+        } catch (error) {
+          console.error("Error deleting employee:", error);
+        }
       };
 
       return (

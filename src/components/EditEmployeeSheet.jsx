@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
@@ -15,7 +15,7 @@ import {
 import { DatePicker } from "@/components/DatePicker";
 import { prettifyText, cn } from "@/lib/utils";
 import { toast } from "sonner";
-
+import { getRoles, getLevels } from "@/app/api/employees/getEmployees";
 export function EditEmployeeSheet({
   isOpen,
   onClose,
@@ -23,7 +23,11 @@ export function EditEmployeeSheet({
   onEditEmployee,
   onAddEmployee,
 }) {
+  const [roles, setRoles] = useState();
+  const [levels, setLevels] = useState();
   const {
+    getValues,
+    watch,
     control,
     handleSubmit,
     reset,
@@ -31,23 +35,85 @@ export function EditEmployeeSheet({
   } = useForm({
     defaultValues: employeeData || {},
   });
+  useEffect(() => {
+    const getRolesFromApi = async () => {
+      try {
+        const { status, data } = await getRoles();
+        if (status === 200) {
+          setRoles(data);
+        } else {
+          console.error("Failed to fetch employee data");
+        }
+      } catch (error) {
+        console.error("Error fetching employee details:", error);
+      }
+    };
 
+    getRolesFromApi();
+  }, []);
+  useEffect(() => {
+    const getLevelsFromApi = async () => {
+      try {
+        const { status, data } = await getLevels();
+        if (status === 200) {
+          setLevels(data);
+        } else {
+          console.error("Failed to fetch employee data");
+        }
+      } catch (error) {
+        console.error("Error fetching employee details:", error);
+      }
+    };
+
+    getLevelsFromApi();
+  }, []);
+  console.log(employeeData, "ed");
+
+  // useEffect(() => {
+  //   if (employeeData) {
+  //     console.log(watch(), "edit");
+  //   } else {
+  //     console.log(watch(), "add");
+  //   }
+  // }, [watch()]);
   React.useEffect(() => {
     if (isOpen) {
       if (employeeData) {
-        reset(employeeData);
+        reset({
+          employeeId: employeeData.employee_id,
+          dateOfBirth: employeeData.date_of_birth,
+          gender: employeeData.gender,
+          maritalStatus: employeeData.marital_status,
+          startDate: employeeData.start_date || null,
+          endDate: employeeData.end_date || null,
+          country: employeeData.country,
+          phone: employeeData.phone_number,
+          email: employeeData.email,
+          linkedInName: employeeData.linkedin_name,
+          linkedInUrl: employeeData.linkedin_url,
+          // jobTitle:  employeeData.,
+          role: employeeData.role,
+          level: employeeData.level,
+          department: employeeData.department,
+          employeeType: employeeData.employment_type,
+          supervisor: employeeData.supervisor || null,
+          salary: employeeData.salary,
+          panNumber: employeeData.PAN,
+        });
       } else {
         reset({
           employeeId: "",
           dateOfBirth: null,
           gender: "",
           maritalStatus: "",
+          startDate: null,
+          endDate: null,
           country: "",
           phone: "",
           email: "",
           linkedInName: "",
           linkedInUrl: "",
-          jobTitle: "",
+          // jobTitle: "",
           level: "",
           department: "",
           employeeType: "",
@@ -59,6 +125,7 @@ export function EditEmployeeSheet({
     }
   }, [isOpen, employeeData, reset]);
 
+  console.log(watch());
   const onSubmit = (data) => {
     if (employeeData) {
       onEditEmployee(data);
@@ -95,7 +162,10 @@ export function EditEmployeeSheet({
                   className={cn(hasError && "ring-2 ring-red-500")}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder={`Select ${prettifyText(name)}`} />
+                    <SelectValue className="capitalize">
+                      {field.value ? field.value : "Select Gender"}{" "}
+                      {/* Show the selected gender */}
+                    </SelectValue>{" "}
                   </SelectTrigger>
                   <SelectContent>{props.children}</SelectContent>
                 </Select>
@@ -172,6 +242,8 @@ export function EditEmployeeSheet({
                   </>
                 ),
               })}
+              {renderField("startDate", DatePicker, { required: true })}
+              {renderField("endDate", DatePicker, { required: false })}
             </div>
           </div>
 
@@ -189,8 +261,31 @@ export function EditEmployeeSheet({
           <div>
             <h3 className="font-semibold mb-2">Employment Details</h3>
             <div className="space-y-4">
-              {renderField("jobTitle", Input, { required: true })}
-              {renderField("level", Input, { required: true })}
+              {/* {renderField("jobTitle", Input, { required: true })} */}
+              {renderField("role", Select, {
+                required: true,
+
+                children: roles
+                  ? roles.map((role, index) => (
+                      <SelectItem key={index} value={role.id}>
+                        {role.title}
+                      </SelectItem>
+                    ))
+                  : null,
+              })}
+
+              {renderField("level", Select, {
+                required: true,
+                children: levels
+                  ? levels.map((level) => {
+                      return (
+                        <SelectItem key={level.id} value={String(level.id)}>
+                          {level.description}
+                        </SelectItem>
+                      );
+                    })
+                  : null,
+              })}
               {renderField("department", Input, { required: true })}
               {renderField("employeeType", Select, {
                 required: true,

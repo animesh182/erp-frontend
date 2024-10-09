@@ -21,6 +21,7 @@ export function AddClientDialog({ onAddClient }) {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm();
   const [open, setOpen] = useState(false);
@@ -30,6 +31,7 @@ export function AddClientDialog({ onAddClient }) {
     reset();
     setOpen(false);
   };
+  // console.log(watch());
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -94,6 +96,55 @@ export function AddClientDialog({ onAddClient }) {
                 <p className="text-sm text-red-500">{errors.website.message}</p>
               )}
             </div>
+            {/* <div className="flex flex-col">
+              <label htmlFor="website">Contact Number</label>
+              <div className="w-full flex gap-2 items-center">
+                <div className="w-1/4">
+                  <label htmlFor="countryCode" className="sr-only">
+                    Country Code
+                  </label>
+                  <Input
+                    id="countryCode"
+                    {...register("countryCode", {
+                      required: "Country code is required",
+                      pattern: {
+                        value: /^\+?[1-9]\d{1,4}$/, // A basic regex to validate country codes
+                        message: "Invalid code",
+                      },
+                    })}
+                    className={cn(errors.countryCode && "ring-2 ring-red-500")}
+                    placeholder="+977"
+                  />
+                  {errors.countryCode && (
+                    <p className="text-sm text-red-500">
+                      {errors.countryCode.message}
+                    </p>
+                  )}
+                </div> */}
+            <div className="flex-1">
+              <label htmlFor="contactNumber" className="">
+                Contact Number
+              </label>
+              <Input
+                id="contactNumber"
+                {...register("contactNumber", {
+                  required: "Phone number is required",
+                  pattern: {
+                    value: /^\d{7,15}$/, // A basic regex to validate phone numbers
+                    message: "Invalid phone number",
+                  },
+                })}
+                className={cn(errors.contactNumber && "ring-2 ring-red-500")}
+                placeholder=""
+              />
+              {errors.contactNumber && (
+                <p className="text-sm text-red-500">
+                  {errors.contactNumber.message}
+                </p>
+              )}
+            </div>
+            {/* </div>
+            </div> */}
           </div>
           <DialogFooter>
             <Button type="submit">Save Client</Button>

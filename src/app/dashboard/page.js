@@ -1,4 +1,5 @@
 "use client";
+import { fetchProfitLoss } from "../api/dashboard/fetchProfitLoss";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,7 +19,6 @@ import KpiCard from "@/components/kpicard";
 import ProfitLossChart from "@/components/charts/ProfitLoss";
 import DateRangePicker from "@/components/DateRangePicker";
 import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
 import fetchReourceUtil from "@/app/api/dashboard/fetchResourceUtil";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 const projectBudget = [
@@ -154,6 +154,7 @@ export const profitLossData = [
 const ongoingProjects = projectBudget.filter((project) => !project.completed);
 const completedProjects = projectBudget.filter((project) => project.completed);
 export default function Dashboard() {
+  const [profitLoss, setProfitLoss] = useState([]);
   const [resourceUtilData, setResourceUtilData] = useState();
   const [fetchedKpiData, setFetchedKpiData] = useState();
   const [kpiValues, setKpiValues] = useState();
@@ -165,7 +166,52 @@ export default function Dashboard() {
   const [endDate, setEndDate] = useState(
     format(startOfDay(initialEndDate), "yyyy-MM-dd")
   );
-  console.log(startDate, endDate, "frontends");
+  useEffect(() => {
+    const getProfitLoss = async () => {
+      const { status, data } = await fetchProfitLoss();
+      if (status === 200) {
+        // Transform the data into the required format
+        const transformedData = data.monthly_totals.map((monthData) => {
+          const { month, net_income, expenses, profit } = monthData;
+          // Calculate profit percentage
+          const profitPercentage =
+            net_income > 0 ? (profit / net_income) * 100 : 0;
+
+          // Map month names to abbreviations
+          const monthAbbreviations = {
+            January: "Jan",
+            February: "Feb",
+            March: "Mar",
+            April: "Apr",
+            May: "May",
+            June: "Jun",
+            July: "Jul",
+            August: "Aug",
+            September: "Sep",
+            October: "Oct",
+            November: "Nov",
+            December: "Dec",
+          };
+
+          return {
+            name: monthAbbreviations[month], // Abbreviated month names
+            totalIncome: net_income,
+            expenses,
+            profit,
+            profitPercentage, // This now properly reflects negative profit cases
+          };
+        });
+
+        setProfitLoss(transformedData); // Set the transformed data to state
+      } else {
+        console.error("Failed to fetch profit-loss data");
+      }
+    };
+
+    getProfitLoss();
+  }, []);
+
+  console.log(profitLoss);
   useEffect(() => {
     const getKpiData = async () => {
       const { status, data } = await fetchKpiData(startDate, endDate);
@@ -250,6 +296,22 @@ export default function Dashboard() {
           period: "month",
           icon: <CreditCard />,
         },
+        {
+          title: "Expected Cost",
+          value: "N/A",
+          change: "N/A",
+          period: "month",
+          icon: <CreditCard />,
+          isMoney: false,
+        },
+        {
+          title: "Expected Liquidity",
+          value: "N/A",
+          change: "N/A",
+          period: "month",
+          icon: <CreditCard />,
+          isMoney: false,
+        },
       ];
       setKpiValues(updatedKpiDatas); // Setting the new kpiDatas array
     }
@@ -312,7 +374,7 @@ export default function Dashboard() {
             <Button>View More</Button>
           </CardHeader>
           <CardContent className="p-0 w-full h-[400px]">
-            <ProfitLossChart data={profitLossData} />
+            <ProfitLossChart data={profitLoss} />
           </CardContent>
         </Card>
         <Card className="w-2/5 h-full">

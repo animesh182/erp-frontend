@@ -6,19 +6,19 @@ import ProjectTableActionsDropdown from "@/components/ProjectTableActionsDropdow
 import TeamAvatars from "@/components/TeamAvatars";
 import { Badge } from "@/components/ui/badge";
 import { ProgressTrackingCell } from "@/components/ui/ProgressTrackingCell";
-import { formatAmountToNOK } from "@/lib/utils";
+import { apiClient, formatAmountToNOK } from "@/lib/utils";
 import { prettifyText } from "@/lib/utils";
-
-export const projectColumns = [
+import { format } from "date-fns";
+export const projectColumns = (clients) => [
   {
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => {
-      const { name, health } = row.original; // Access the full row data
+      const { name, project_health } = row.original; // Access the full row data
       return (
         <div>
           <p>{name}</p>
-          <ProjectHealth health={health} />
+          <ProjectHealth health={project_health} />
         </div>
       );
     },
@@ -28,11 +28,13 @@ export const projectColumns = [
     accessorKey: "type",
     header: "Type",
     cell: ({ row }) => {
-      const { projectCategory, platform } = row.original; // Access the full row data
+      const { project_category, platform } = row.original; // Access the full row data
       return (
         <div>
-          <p>{projectCategory}</p>
-          <p className="text-xs text-muted-foreground">{platform}</p>
+          <p>{project_category || "No Data"}</p>
+          <p className="text-xs text-muted-foreground">
+            {platform || "No Data"}
+          </p>
         </div>
       );
     },
@@ -42,12 +44,12 @@ export const projectColumns = [
     accessorKey: "client",
     header: "Client",
     cell: ({ row }) => {
-      const { clientImage, clientName, clientEmail } = row.original; // Access the full row data
+      const { name, email } = row.original.client_contact; // Access the full row data
       return (
         <MultiLineNameCell
-          imageUrl={clientImage}
-          title={clientName}
-          subtitle={clientEmail}
+          imageUrl={"/default-avatar.jpg"}
+          title={name}
+          subtitle={email}
         />
       );
     },
@@ -57,18 +59,24 @@ export const projectColumns = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const { status } = row.original; // Access the full row data
+      const { project_status } = row.original; // Access the full row data
       return (
         <Badge
           className={`${
-            status === "done"
+            project_status === "1"
               ? "bg-green-100 text-green-800"
-              : status === "not-started"
+              : project_status === "2"
               ? "bg-red-100 text-red-800"
               : "bg-yellow-100 text-yellow-800"
           }`}
         >
-          {prettifyText(status)}
+          {prettifyText(
+            project_status === "1"
+              ? "Done"
+              : project_status === "2"
+              ? "Not Started"
+              : "Ongoing"
+          )}
         </Badge>
       );
     },
@@ -78,11 +86,16 @@ export const projectColumns = [
     accessorKey: "team",
     header: "Team",
     cell: ({ row }) => {
-      const { teamMembersImage, teamMembersCount } = row.original; // Access the full row data
+      console.log(row.original);
+      const { teamMembersImage, all_user_projects } = row.original; // Access the full row data
+      const teamMembers = all_user_projects.map((user) => ({
+        name: user.user_name,
+        image: null, // You can replace this with a proper avatar URL if available
+      }));
       return (
         <TeamAvatars
-          teamMembersImage={teamMembersImage}
-          teamMembersCount={teamMembersCount}
+          teamMembers={teamMembers}
+          teamMembersCount={all_user_projects.length}
           size="small"
         />
       );
@@ -93,8 +106,14 @@ export const projectColumns = [
     accessorKey: "progressTracking",
     header: "Progress Tracking",
     cell: ({ row }) => {
-      const rowData = row.original;
-      return <ProgressTrackingCell row={rowData} />;
+      const rowData = row.original.completion;
+      const projectName = row.original.name;
+      return (
+        <ProgressTrackingCell
+          row={Math.round(rowData)}
+          projectName={projectName}
+        />
+      );
     },
     enableSorting: false,
   },
@@ -102,11 +121,13 @@ export const projectColumns = [
     accessorKey: "timeline",
     header: "Timeline",
     cell: ({ row }) => {
-      const { startDate, endDate } = row.original; // Access the full row data
+      const { start_date, end_date } = row.original; // Access the full row data
       return (
         <div className="flex">
-          <p className="text-xs ">{startDate}</p>
-          <p className="text-xs "> - {endDate}</p>
+          <p className="text-xs ">{format(start_date, "MMM dd, yyyy")}</p>
+          <p className="text-xs ">
+            -{(end_date && format(end_date, "MMM dd, yyyy")) || "N/A"}
+          </p>
         </div>
       );
     },
@@ -128,6 +149,21 @@ export const projectColumns = [
       const rowData = row.original;
       const handleDelete = () => {
         console.log("Delete", row.original.id);
+
+        try {
+          const response = apiClient(
+            `${process.env.NEXT_PUBLIC_API_URL}api/project/${row.original.id}/`,
+            {
+              method: "DELETE",
+            }
+          );
+          if (response.ok) {
+            toast.success(`${row.original.project_name} deleted successfully.`);
+          }
+        } catch (error) {
+          toast.error("There was an error deleting the project");
+          console.error("There was an error deleting the project:", error);
+        }
         // Handle delete action
       };
 
@@ -136,6 +172,7 @@ export const projectColumns = [
           <ProjectTableActionsDropdown
             onDelete={handleDelete}
             rowData={rowData}
+            clients={clients}
           />
         </div>
       );

@@ -18,13 +18,13 @@ const HealthIcon = ({ width, height, fill }) => (
 const ProjectHealth = ({ health }) => {
   const getHealthInfo = () => {
     switch (health) {
-      case "on-track":
+      case "on_track":
         return {
           fillColor: "#22C55E",
           text: "On Track",
           color: "text-green-500",
         };
-      case "at-risk":
+      case "at_risk":
         return {
           fillColor: "#EAB308",
           text: "At Risk",
