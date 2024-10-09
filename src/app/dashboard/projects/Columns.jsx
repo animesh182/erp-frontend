@@ -6,7 +6,7 @@ import ProjectTableActionsDropdown from "@/components/ProjectTableActionsDropdow
 import TeamAvatars from "@/components/TeamAvatars";
 import { Badge } from "@/components/ui/badge";
 import { ProgressTrackingCell } from "@/components/ui/ProgressTrackingCell";
-import { formatAmountToNOK } from "@/lib/utils";
+import { apiClient, formatAmountToNOK } from "@/lib/utils";
 import { prettifyText } from "@/lib/utils";
 import { format } from "date-fns";
 export const projectColumns = (clients) => [
@@ -86,10 +86,15 @@ export const projectColumns = (clients) => [
     accessorKey: "team",
     header: "Team",
     cell: ({ row }) => {
+      console.log(row.original);
       const { teamMembersImage, all_user_projects } = row.original; // Access the full row data
+      const teamMembers = all_user_projects.map((user) => ({
+        name: user.user_name,
+        image: null, // You can replace this with a proper avatar URL if available
+      }));
       return (
         <TeamAvatars
-          teamMembersImage={["/default-avatar.jpg", "/default-avatar.jpg"]}
+          teamMembers={teamMembers}
           teamMembersCount={all_user_projects.length}
           size="small"
         />
@@ -144,6 +149,21 @@ export const projectColumns = (clients) => [
       const rowData = row.original;
       const handleDelete = () => {
         console.log("Delete", row.original.id);
+
+        try {
+          const response = apiClient(
+            `${process.env.NEXT_PUBLIC_API_URL}api/project/${row.original.id}/`,
+            {
+              method: "DELETE",
+            }
+          );
+          if (response.ok) {
+            toast.success(`${row.original.project_name} deleted successfully.`);
+          }
+        } catch (error) {
+          toast.error("There was an error deleting the project");
+          console.error("There was an error deleting the project:", error);
+        }
         // Handle delete action
       };
 

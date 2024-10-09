@@ -31,7 +31,7 @@ export function AddClientDialog({ onAddClient }) {
     reset();
     setOpen(false);
   };
-  console.log(watch());
+  // console.log(watch());
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

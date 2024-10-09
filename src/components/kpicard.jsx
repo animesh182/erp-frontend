@@ -10,6 +10,7 @@ export default function KpiCard({
   isMoney = true,
   isTrend = true,
   iconSize = "w-4 h-4", // Default size for icons
+  hasSubText = true,
 }) {
   return (
     <Card x-chunk="dashboard-01-chunk-0" className="w-full hover:bg-muted">
@@ -27,7 +28,7 @@ export default function KpiCard({
           {isMoney ? `${formatAmountToNOK(value)}` : value}
         </div>
         <p className="text-xs text-muted-foreground">
-          {isTrend ? `${change}% from last ${period}` : period}
+          {hasSubText && isTrend ? `${change}% from last ${period}` : period}
         </p>
       </CardContent>
     </Card>

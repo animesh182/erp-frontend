@@ -36,7 +36,7 @@ export default function ProjectDetails() {
       fetchProjectDetails(); // Fetch the project details using projectId
     }
   }, [id]);
-
+  console.log(project);
   const dummyEmployeeData = [
     {
       id: "1",
@@ -65,7 +65,7 @@ export default function ProjectDetails() {
     <main className="p-6 min-h-screen space-y-4">
       <div className="flex flex-col md:flex-row gap-4 w-full">
         <ProjectDetailsMain project={project} /> {/* Pass the project data */}
-        <ProjectDetailsSidebar />
+        <ProjectDetailsSidebar project={project} />
       </div>
       <div>
         <TableTitle
@@ -73,7 +73,7 @@ export default function ProjectDetails() {
           subtitle="List of all employees in the project"
           totalItemCount={dummyEmployeeData.length}
         />
-        <SimpleDataTable columns={columns} data={dummyEmployeeData} />
+        <SimpleDataTable columns={columns} data={project.all_user_projects} />
       </div>
     </main>
   );

@@ -19,16 +19,17 @@ export default function ProfitLossChart({ data }) {
 
   function CustomTooltip({ active, payload, label }) {
     if (active && payload && payload.length) {
-      const { totalIncome, expenses, netIncome } = payload[0].payload;
+      console.log(payload[0].payload);
+      const { totalIncome, expenses, profit } = payload[0].payload;
       return (
         <div className={`p-2 text-xs bg-primary-foreground rounded shadow-lg `}>
           <p className="font-semibold">{`Revenue: ${formatAmountDecimalToNOK(
             totalIncome
           )} kr`}</p>
           <p className="">{`Cost: ${formatAmountDecimalToNOK(expenses)} kr`}</p>
-          <p className="">{`Profit: ${formatAmountDecimalToNOK(
-            netIncome
-          )} kr`}</p>
+          <p className="">{`${
+            profit >= 0 ? "Profit" : "Loss"
+          }: ${formatAmountDecimalToNOK(Math.abs(profit))} kr`}</p>
         </div>
       );
     }

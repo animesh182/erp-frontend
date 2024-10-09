@@ -2,6 +2,7 @@
 
 import MultiLineNameCell from "@/components/MultiLineNameCell";
 import SimpleTableActionsDropdown from "@/components/SimpleTableActionsDropdown";
+import { apiClient } from "@/lib/utils";
 import { format } from "date-fns";
 
 export const columns = [
@@ -9,43 +10,44 @@ export const columns = [
     accessorKey: "employeeName",
     header: "Assigned To",
     cell: ({ row }) => {
-      const { imageUrl, employeeName, email } = row.original; // Access the full row data
+      console.log(row);
+      const { user_name, user_email } = row.original; // Access the full row data
       return (
         <MultiLineNameCell
-          imageUrl={imageUrl}
-          title={employeeName}
-          subtitle={email}
+          // imageUrl={imageUrl}
+          title={user_name}
+          subtitle={user_email}
         />
       );
     },
     enableSorting: false,
   },
   {
-    accessorKey: "role",
+    accessorKey: "project_role",
     header: "Role",
     enableSorting: false,
   },
   {
-    accessorKey: "timeAllocated",
+    accessorKey: "utilization",
     header: "Time Allocated",
     enableSorting: false,
   },
   {
-    accessorKey: "startDate",
+    accessorKey: "start_date",
     header: "Start Date",
     enableSorting: false,
     cell: ({ row }) => {
-      const { startDate } = row.original;
-      return <div>{format(startDate, "MMM d, yyyy")}</div>;
+      const { start_date } = row.original;
+      return <div>{format(start_date, "MMM d, yyyy")}</div>;
     },
   },
   {
-    accessorKey: "endDate",
+    accessorKey: "end_date",
     header: "End Date",
     enableSorting: false,
     cell: ({ row }) => {
-      const { endDate } = row.original;
-      return <div>{format(endDate, "MMM d, yyyy")}</div>;
+      const { end_date } = row.original;
+      return <div>{format(end_date, "MMM d, yyyy")}</div>;
     },
   },
   {
@@ -58,7 +60,23 @@ export const columns = [
       };
 
       const handleDelete = () => {
-        console.log("Delete", row.original.id);
+        const userId = row.original.id;
+        try {
+          const response = apiClient(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/user_projects/${userId}/${row.original.project_id}/delete/`,
+            {
+              method: "DELETE",
+            }
+          );
+          if (response.ok) {
+            toast.success(
+              `${row.original.user_name} deleted successfully from the project.`
+            );
+          }
+        } catch (error) {
+          toast.error("There was an error deleting the user");
+          console.error("There was an error deleting the user:", error);
+        }
         // Handle delete action
       };
 
