@@ -10,6 +10,9 @@ import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
 import { subDays, format } from "date-fns";
 
 import { useForm, FormProvider } from "react-hook-form";
+import { getExpense } from "@/app/api/expense/getExpense";
+import { createExpense } from "@/app/api/expense/createExpense";
+import { getProjects } from "@/app/api/projects/getProjects";
 
 export default function Expenses() {
   const methods = useForm();
@@ -20,32 +23,34 @@ export default function Expenses() {
   const [data, setData] = useState([]); // State to hold the fetched data
   const [projectOptions, setProjectOptions] = useState([]);
 
-  const pjOptions = [
-    { id: "1", name: "ebibaaha" },
-    { id: "2", name: "Cloud Storage" },
-    { id: "3", name: "Solar Panels" },
-    { id: "4", name: "Membership Software" },
-    { id: "5", name: "Online Course Platform" },
-    { id: "6", name: "Inventory Management System" },
-    { id: "7", name: "Tracking Software" },
-    { id: "8", name: "Graphic Design Tool" },
-    { id: "9", name: "Patient Management System" },
-    { id: "10", name: "Scheduling App" },
-  ];
-
   useEffect(() => {
     if (startDate && endDate) {
       fetchData(startDate, endDate);
     }
+    fetchProjects();
   }, [startDate, endDate]);
 
-  const fetchData = (startDate, endDate) => {
+  const fetchData = async (startDate, endDate) => {
     console.log("Fetching data from:", startDate, "to:", endDate);
+    try {
+      const fetchedData = await getExpense(
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd")
+      );
+      console.log(fetchedData, "data");
+      setData(fetchedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
-    const fetchedData = [
-      // Add your data here or fetch from your API
-    ];
-    setData(fetchedData);
+  const fetchProjects = async () => {
+    try {
+      const projects = await getProjects(true);
+      setProjectOptions(projects);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
   };
 
   const handleDateChange = (startDate, endDate) => {
@@ -165,9 +170,15 @@ export default function Expenses() {
       costType: "fixed-cost",
     },
   ];
-  const onAddRow = (newRowData) => {
-    toast.success("New row added");
-    console.log(newRowData, "in form");
+  const onAddRow = async (newRowData) => {
+    try {
+      await createExpense(newRowData);
+      toast.success("New row added");
+      // console.log(newRowData, "in form");
+    } catch (error) {
+      toast.error("Failed to add new row");
+      console.error("Error adding new row:", error);
+    }
   };
 
   const onEditRow = (editedData) => {
@@ -183,7 +194,7 @@ export default function Expenses() {
           subtitle={"List of all expenses in the company"}
           columns={columns}
           data={expenses}
-          projectOptions={pjOptions}
+          projectOptions={projectOptions}
           formInputs={formInputs}
           isTableAddFormEnabled={true}
           onAddRow={onAddRow}
