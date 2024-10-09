@@ -12,6 +12,7 @@ import { EditProjectSheet } from "@/components/EditProjectSheet";
 import { toast } from "sonner";
 import { AddClientDialog } from "@/components/AddClientDialog";
 import { getProjects } from "@/app/api/getProjects";
+import { getClients } from "@/app/api/projects/getClients";
 import {
   KpiSkeleton,
   RectangleSkeleton,
@@ -22,6 +23,7 @@ export default function Projects() {
   const methods = useForm();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [projects, setProjects] = useState([]);
+  const [clients, setClients] = useState([]);
   const [roles, setRoles] = useState([]);
   const [isCardLayout, setIsCardLayout] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
@@ -73,6 +75,22 @@ export default function Projects() {
 
     getProjectsFromApi();
   }, []);
+  useEffect(() => {
+    const getClientsFromApi = async () => {
+      try {
+        const { status, data } = await getClients();
+        if (status === 200) {
+          setClients(data);
+        } else {
+          console.error("Failed to fetch client data");
+        }
+      } catch (error) {
+        console.error("Error fetching client details:", error);
+      }
+    };
+
+    getClientsFromApi();
+  }, []);
 
   const handleProjectAdd = () => {
     setIsSheetOpen(true);
@@ -95,7 +113,7 @@ export default function Projects() {
             start_date: formData.startDate,
             budget: formData.budget,
             type: formData.projectCategory || "default_type", // Ensure `type` is not blank
-            client: formData.clientName, // Fix this field (see below)
+            client: formData.client, // Fix this field (see below)
             project_status: formData.status,
             completion: formData.progress,
             project_health: formData.health,
@@ -124,32 +142,35 @@ export default function Projects() {
     console.log(projectId, "client");
     try {
       // Use apiClient to make the PUT request
-      const response = await apiClient(`/api/project/${projectId}`, {
-        method: "PUT", // Use PUT for updating
-        body: JSON.stringify({
-          name: formData.name,
-          amount: formData.budget,
-          start_date: formData.startDate,
-          budget: formData.budget,
-          type: formData.projectCategory,
-          client: formData.clientName, // Ensure this is the client ID (PK), not the name
-          project_status: formData.status,
-          completion: formData.progress,
-          project_health: formData.health,
-          platform: formData.platform,
-          client_email: formData.clientEmail,
-          teamMembersCount: formData.teamMembersCount,
-          end_date: formData.endDate,
-          project_description: formData.projectDescription,
-        }),
-      });
+      const response = await apiClient(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/project/${projectId}/`,
+        {
+          method: "PATCH", // Use PUT for updating
+          body: JSON.stringify({
+            name: formData.name,
+            amount: formData.budget,
+            start_date: formData.startDate,
+            budget: formData.budget,
+            type: formData.projectCategory,
+            client: formData.clientName, // Ensure this is the client ID (PK), not the name
+            project_status: formData.status,
+            completion: formData.progress,
+            project_health: formData.health,
+            platform: formData.platform,
+            client_email: formData.clientEmail,
+            teamMembersCount: formData.teamMembersCount,
+            end_date: formData.endDate,
+            project_description: formData.projectDescription,
+          }),
+        }
+      );
 
       toast.success("Project updated successfully");
 
       // Update the projects state with the updated project
       setProjects((prevProjects) =>
         prevProjects.map((project) =>
-          project.id === projectId ? response : project
+          project.id === projectId ? response.data : project
         )
       );
 
@@ -161,8 +182,27 @@ export default function Projects() {
   };
 
   const handleClientAdd = (formData) => {
-    toast.success("Client added successfully");
-    console.log("Client added", formData);
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      website: formData.website,
+      // phone_number: `${formData.countryCode}-${formData.contactNumber}`, Use this when country code is added in the backend
+      phone_number: formData.contactNumber,
+    };
+    try {
+      const response = apiClient(
+        `${process.env.NEXT_PUBLIC_API_URL}api/client/`,
+        {
+          method: "POST",
+          body: JSON.stringify(payload),
+        }
+      );
+      // Add something like response.ok, its not working right now
+      toast.success("Client added successfully");
+    } catch (error) {
+      toast.error("There was an error adding the client");
+      console.error("There was error adding the client", error);
+    }
   };
   const handleProjectEdit = (project) => {
     setEditingProject(project); // Set the project to be edited
@@ -212,14 +252,14 @@ export default function Projects() {
           ) : (
             <FormProvider {...methods}>
               <DataTable
-                columns={projectColumns}
+                columns={projectColumns(clients)}
                 data={projects}
                 title={"Projects"}
                 subtitle={"View detailed information about all Projects"}
                 isTableAddFormEnabled={false}
                 formInputs={formInputs}
                 filterColumn={"status"}
-                onEditRow={handleProjectUpdate}
+                onEditRow={onEditProject}
               />
             </FormProvider>
           )
@@ -231,8 +271,8 @@ export default function Projects() {
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddProject={onAddProject}
-        onEditProject={onEditProject}
         editingProject={editingProject} // Pass the editing project
+        clients={clients}
       />
     </main>
   );

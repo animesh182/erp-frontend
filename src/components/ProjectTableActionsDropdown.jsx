@@ -14,10 +14,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EditProjectSheet } from "./EditProjectSheet";
 
-const ProjectTableActionsDropdown = ({ formInputs, onDelete, rowData }) => {
+const ProjectTableActionsDropdown = ({
+  formInputs,
+  onDelete,
+  rowData,
+  clients,
+}) => {
+  // console.log(rowData, "data");
   const [isOpen, setIsOpen] = useState(false);
-
   const { onEditRow } = useContext(EditRowContext);
+  // console.log(onEditRow, "asdfasdfas");
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -51,6 +57,7 @@ const ProjectTableActionsDropdown = ({ formInputs, onDelete, rowData }) => {
           onClose={handleClose}
           projectData={rowData}
           onEditProject={onEditRow}
+          clients={clients}
           //   formInputs={formInputs}
         />
       </FormProvider>

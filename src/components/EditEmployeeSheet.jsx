@@ -67,6 +67,8 @@ export function EditEmployeeSheet({
 
     getLevelsFromApi();
   }, []);
+  console.log(employeeData, "ed");
+
   // useEffect(() => {
   //   if (employeeData) {
   //     console.log(watch(), "edit");
@@ -123,6 +125,7 @@ export function EditEmployeeSheet({
     }
   }, [isOpen, employeeData, reset]);
 
+  console.log(watch());
   const onSubmit = (data) => {
     if (employeeData) {
       onEditEmployee(data);
@@ -264,7 +267,7 @@ export function EditEmployeeSheet({
 
                 children: roles
                   ? roles.map((role, index) => (
-                      <SelectItem key={index} value={role.title}>
+                      <SelectItem key={index} value={role.id}>
                         {role.title}
                       </SelectItem>
                     ))
@@ -276,7 +279,7 @@ export function EditEmployeeSheet({
                 children: levels
                   ? levels.map((level) => {
                       return (
-                        <SelectItem key={level.id} value={level.description}>
+                        <SelectItem key={level.id} value={String(level.id)}>
                           {level.description}
                         </SelectItem>
                       );

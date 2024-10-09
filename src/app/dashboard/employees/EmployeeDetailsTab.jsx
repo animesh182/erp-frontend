@@ -134,7 +134,7 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
   };
 
   return (
-    <div className="flex flex-col p-6 space-y-4">
+    <div className="flex flex-col p-6 space-y-4 capitalize">
       <div className="flex items-center justify-between">
         <div className="font-semibold text-xl">Employee Details</div>
 

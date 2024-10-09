@@ -24,11 +24,14 @@ export function EditProjectSheet({
   projectData,
   onEditProject,
   onAddProject,
+  clients,
 }) {
+  // console.log(projectData, "data");
   const {
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: projectData || {}, // If editing, set default values
@@ -42,10 +45,9 @@ export function EditProjectSheet({
           health: projectData.project_health,
           projectCategory: projectData.project_category,
           platform: projectData.platform,
-          clientName: projectData.client_contact?.name,
-          clientEmail: projectData.client_contact?.email,
+          client: String(projectData.client),
           status: String(projectData.project_status),
-          teamMembersCount: projectData.all_user_projects?.length || 0,
+          // teamMembersCount: projectData?.all_user_projects?.length || 0, //because no attribute from the backend of number
           progress: projectData.completion,
           startDate: projectData.start_date,
           endDate: projectData.end_date,
@@ -59,10 +61,9 @@ export function EditProjectSheet({
           health: "",
           projectCategory: "",
           platform: "",
-          clientName: "",
-          clientEmail: "",
+          client: "",
           status: "",
-          teamMembersCount: 0,
+          // teamMembersCount: 0,
           progress: 0,
           startDate: null,
           endDate: null,
@@ -72,7 +73,6 @@ export function EditProjectSheet({
       }
     }
   }, [isOpen, projectData, reset]);
-
   const onSubmit = (data) => {
     if (projectData) {
       // If editing, call onEditProject with the project ID
@@ -195,11 +195,21 @@ export function EditProjectSheet({
             })}
             {renderField("projectCategory", Input, { required: false })}
             {renderField("platform", Input, { required: false })}
-            {renderField("clientName", Input, { required: true })}
-            {renderField("clientEmail", Input, {
-              type: "email",
+            {renderField("client", Select, {
               required: true,
-              disabled: !!projectData, // Disable clientEmail for editing
+              children: clients
+                ? clients.map((client, index) => {
+                    return (
+                      <SelectItem
+                        className="capitalize"
+                        key={index}
+                        value={String(client.id)}
+                      >
+                        {client.name}
+                      </SelectItem>
+                    );
+                  })
+                : null,
             })}
             {renderField("status", Select, {
               required: true,
@@ -211,11 +221,11 @@ export function EditProjectSheet({
                 </>
               ),
             })}
-            {renderField("teamMembersCount", Input, {
+            {/* {renderField("teamMembersCount", Input, {
               type: "number",
               min: "0",
               required: true,
-            })}
+            })} */}
             {renderField("progress", Slider, {
               min: 0,
               max: 100,

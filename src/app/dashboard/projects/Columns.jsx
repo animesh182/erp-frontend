@@ -8,8 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { ProgressTrackingCell } from "@/components/ui/ProgressTrackingCell";
 import { formatAmountToNOK } from "@/lib/utils";
 import { prettifyText } from "@/lib/utils";
-
-export const projectColumns = [
+import { format } from "date-fns";
+export const projectColumns = (clients) => [
   {
     accessorKey: "name",
     header: "Name",
@@ -119,8 +119,10 @@ export const projectColumns = [
       const { start_date, end_date } = row.original; // Access the full row data
       return (
         <div className="flex">
-          <p className="text-xs ">{start_date}</p>
-          <p className="text-xs "> - {end_date}</p>
+          <p className="text-xs ">{format(start_date, "MMM dd, yyyy")}</p>
+          <p className="text-xs ">
+            -{(end_date && format(end_date, "MMM dd, yyyy")) || "N/A"}
+          </p>
         </div>
       );
     },
@@ -150,6 +152,7 @@ export const projectColumns = [
           <ProjectTableActionsDropdown
             onDelete={handleDelete}
             rowData={rowData}
+            clients={clients}
           />
         </div>
       );
