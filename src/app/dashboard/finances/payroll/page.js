@@ -202,23 +202,27 @@ export default function Payroll() {
         </Button>
         <UploadSheetDialog />
       </div>
-      <div className="flex gap-4 md:gap-6 lg:gap-6">
-        {kpiValues.map((card) =>
-          kpiValues && kpiValues.length > 0 ? (
-            <KpiCard
-              key={card.title}
-              title={card.title}
-              value={card.value}
-              subtitle={card.subtitle}
-              icon={card.icon}
-              isMoney={card.isMoney}
-              hasSubText={false}
-            />
-          ) : (
-            <KpiSkeleton />
-          )
-        )}
+      <div className="grid gap-4 md:grid-cols-3">
+        {kpiValues && kpiValues.length > 0
+          ? kpiValues.map((card, index) => (
+              <KpiCard
+                key={card.title}
+                title={card.title}
+                value={card.value}
+                subtitle={card.subtitle}
+                icon={card.icon}
+                isMoney={card.isMoney}
+                hasSubText={false}
+              />
+            ))
+          : // Render skeletons when kpiValues is empty or undefined
+            [...Array(3)].map((_, index) => (
+              <div key={index}>
+                <KpiSkeleton />
+              </div>
+            ))}
       </div>
+
       <FormProvider {...methods}>
         <DataTable
           title={"Payroll"}
