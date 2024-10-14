@@ -12,6 +12,9 @@ import { Button } from "@/components/ui/button";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
 import { fetchPayroll } from "@/app/api/payroll"; // Import the fetchSalaries function
 import { updatePayroll } from "@/app/api/update_payroll"; // Import the updateSalary function
+import { getPayrollKpi } from "@/app/api/finances/payroll/getPayrollKpi";
+import * as XLSX from "xlsx";
+import { KpiSkeleton } from "@/components/Skeletons";
 
 export default function Payroll() {
   const methods = useForm();
@@ -21,6 +24,7 @@ export default function Payroll() {
   const [endDate, setEndDate] = useState(initialEndDate);
   const [data, setData] = useState([]); // State to hold the fetched data
   const [loading, setLoading] = useState(true); // Add a loading state
+  const [kpiValues, setKpiValues] = useState(null); // State to hold KPI data
 
   useEffect(() => {
     if (startDate && endDate) {
@@ -28,6 +32,9 @@ export default function Payroll() {
     }
   }, [startDate, endDate]);
 
+  useEffect(() => {
+    fetchKpiData();
+  }, []);
   const fetchData = async (startDate, endDate) => {
     setLoading(true); // Set loading state before fetching data
     try {
@@ -58,11 +65,62 @@ export default function Payroll() {
       setLoading(false); // Stop loading after fetching data
     }
   };
+  const fetchKpiData = async () => {
+    try {
+      const response = await getPayrollKpi(); // Call the KPI API function
+      if (response.status === 200) {
+        const { total_outstanding, upcoming_payroll, previous_payroll } =
+          response.data;
 
+        // Map the API response to the KPI card data
+        const updatedKpiValues = [
+          {
+            title: "Total Outstanding",
+            value: total_outstanding,
+            subtitle: "Total outstanding invoices",
+            icon: <DollarSign className="h-4 w-4" />,
+            isMoney: true,
+          },
+          {
+            title: "Upcoming Payroll",
+            value: upcoming_payroll.earliest_date
+              ? format(new Date(upcoming_payroll.earliest_date), "MMM d, yyyy")
+              : "No Upcoming Payroll",
+            subtitle: "Next payroll due",
+            icon: <CreditCard className="h-4 w-4" />,
+            isMoney: false,
+          },
+          {
+            title: "Previous Payroll",
+            value: previous_payroll.total_amount
+              ? previous_payroll.total_amount
+              : "No Previous Payroll",
+            subtitle: previous_payroll.most_recent_date
+              ? `Paid on ${format(
+                  new Date(previous_payroll.most_recent_date),
+                  "MMM d, yyyy"
+                )}`
+              : "No Previous Date",
+            icon: <DollarSign className="h-4 w-4" />,
+            isMoney: false,
+          },
+        ];
+
+        setKpiValues(updatedKpiValues); // Update the state with KPI values
+      } else {
+        toast.error("Failed to fetch KPI data");
+        console.error(response.message);
+      }
+    } catch (error) {
+      toast.error("Failed to fetch KPI data");
+      console.error("Error fetching KPI data:", error);
+    }
+  };
   const handleDateChange = (startDate, endDate) => {
     setStartDate(startDate);
     setEndDate(endDate);
   };
+  console.log(kpiValues, "kpikpikpi");
 
   const kpivalues = [
     {
@@ -86,7 +144,25 @@ export default function Payroll() {
   ];
 
   const handleSheetDownload = () => {
-    console.log("Downloading payroll sheet");
+    // Prepare the data for Excel
+    const worksheetData = data.map((item) => ({
+      Name: item.name || "No Name",
+      "Project Name": item.projectName || "No Project",
+      Invoice: item.invoice,
+      "Invoice Issued Date": item.invoiceIssuedDate,
+      "Paid Date": item.paidDate || "Not Paid",
+      Status: item.status,
+      Type: item.type,
+      Amount: item.amount,
+    }));
+
+    // Create a new worksheet and workbook
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Payroll");
+
+    // Generate Excel file and trigger download
+    XLSX.writeFile(workbook, "payroll_sheet.xlsx");
   };
 
   const onEditRow = async (editedData) => {
@@ -94,7 +170,7 @@ export default function Payroll() {
       console.log("Edited data:", editedData); // Log the edited data
 
       // Send the edited data to the server
-      const updatedSalary = await updateSalary(editedData.id, {
+      const updatedSalary = await updatePayroll(editedData.id, {
         description: editedData.name,
         invoice_issued_date: editedData.invoiceIssuedDate,
         payment_date: editedData.paidDate,
@@ -127,15 +203,21 @@ export default function Payroll() {
         <UploadSheetDialog />
       </div>
       <div className="flex gap-4 md:gap-6 lg:gap-6">
-        {kpivalues.map((card) => (
-          <KpiCard
-            key={card.title}
-            title={card.title}
-            value={card.value}
-            subtitle={card.subtitle}
-            icon={card.icon}
-          />
-        ))}
+        {kpiValues.map((card) =>
+          kpiValues && kpiValues.length > 0 ? (
+            <KpiCard
+              key={card.title}
+              title={card.title}
+              value={card.value}
+              subtitle={card.subtitle}
+              icon={card.icon}
+              isMoney={card.isMoney}
+              hasSubText={false}
+            />
+          ) : (
+            <KpiSkeleton />
+          )
+        )}
       </div>
       <FormProvider {...methods}>
         <DataTable
@@ -148,7 +230,6 @@ export default function Payroll() {
           initialStartDate={startDate}
           initialEndDate={endDate}
           onDateChange={handleDateChange}
-          loading={loading} // Pass loading state to the DataTable component if necessary
         />
       </FormProvider>
     </main>

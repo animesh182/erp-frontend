@@ -1,6 +1,6 @@
 "use client";
 import { fetchProfitLoss } from "@/app/api/dashboard/fetchProfitLoss";
-import { fetchKpiData } from "@/app/api/dashboard/fetchKpiData";
+import { fetchKpiData } from "@/app/api/fetchKpiData";
 import {
   Card,
   CardContent,
