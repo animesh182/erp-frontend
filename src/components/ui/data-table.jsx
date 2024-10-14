@@ -58,6 +58,7 @@ function DataTable({
   const isProjectPage = pathname === "/dashboard/projects";
   const isTransactionPage = pathname === "/dashboard/finances/transactions";
 
+  // Memoize filtered data
   const filteredData = useMemo(() => {
     let filtered = data;
 
@@ -74,16 +75,25 @@ function DataTable({
     return filtered;
   }, [data, selectedTab, filterColumn, searchValue]);
 
+  // Initialize table instance with pagination
   const table = useReactTable({
     data: filteredData,
     columns,
     state: {
       sorting,
     },
+    pageCount: Math.ceil(filteredData.length / 10), // Adjust page size as needed
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    manualPagination: false, // You are not fetching data for each page separately
+    initialState: {
+      pagination: {
+        pageSize: 10, // Number of rows per page
+        pageIndex: 0, // Starting from the first page
+      },
+    },
   });
 
   const filterValues =
@@ -91,8 +101,6 @@ function DataTable({
     [];
 
   const handleRowClick = (id, event) => {
-    // event.stopPropagation();
-    // event.preventDefault();
     if (isProjectPage) {
       router.push(`/dashboard/projects/${id}`);
     }
@@ -186,11 +194,11 @@ function DataTable({
                                       : ""
                                   }`
                                 : isTransactionPage
-                                ? row.original.costType === "expense"
+                                ? row.original.isExpense === true
                                   ? theme === "dark"
                                     ? "bg-[#fe5555]" // Darker shade for expense in dark mode
                                     : "bg-[#FEF2F2]" // Light mode expense color
-                                  : row.original.costType === "revenue"
+                                  : row.original.isExpense === false
                                   ? theme === "dark"
                                     ? "bg-[#46954b]" // Darker shade for revenue in dark mode
                                     : "bg-[#f0fdf4]" // Light mode revenue color
@@ -241,19 +249,31 @@ function DataTable({
                   </TableBody>
                 </Table>
               </div>
+
+              {/* Pagination Controls */}
               <Pagination className="justify-end mt-4">
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious href="#" />
+                    <PaginationPrevious
+                      onClick={() => table.previousPage()}
+                      disabled={!table.getCanPreviousPage()}
+                    />
                   </PaginationItem>
+                  {Array.from({ length: table.getPageCount() }, (_, index) => (
+                    <PaginationItem key={index}>
+                      <PaginationLink
+                        onClick={() => table.setPageIndex(index)}
+                        active={table.getState().pagination.pageIndex === index}
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
                   <PaginationItem>
-                    <PaginationLink href="#">1</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationNext href="#" />
+                    <PaginationNext
+                      onClick={() => table.nextPage()}
+                      disabled={!table.getCanNextPage()}
+                    />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>

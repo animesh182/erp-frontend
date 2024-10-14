@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { subDays, format, startOfDay } from "date-fns";
 import { KpiSkeleton, RectangleSkeleton } from "@/components/Skeletons";
-import { fetchKpiData } from "@/app/api/dashboard/fetchKpiData";
+import { fetchKpiData } from "@/app/api/fetchKpiData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
 import ProjectBudgetChart from "@/components/charts/ProjectBudget";

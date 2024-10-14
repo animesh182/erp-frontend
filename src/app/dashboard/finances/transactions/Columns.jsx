@@ -8,63 +8,80 @@ import { format } from "date-fns";
 
 export const columns = [
   {
-    //change values to invoice name instead of client name.
     accessorKey: "name",
     header: "Name",
     enableSorting: true,
-  },
-  {
-    //change calue to actual project names intead of project type
-    accessorKey: "projectName",
-    header: "Project Name",
-    enableSorting: true,
-  },
-  {
-    accessorKey: "invoice",
-    header: "Invoice",
-    enableSorting: false,
-  },
-  {
-    accessorKey: "invoiceIssuedDate",
-    header: "Invoice Issued Date",
-    enableSorting: false,
     cell: ({ row }) => {
-      const { invoiceIssuedDate } = row.original;
-      return <span>{format(invoiceIssuedDate, "MMM d, yyyy")}</span>;
+      const { name } = row.original;
+      return name ? name : "No Data"; // Show "No Data" if the name is null or undefined
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "project",
+    header: "Project Name",
+    enableSorting: true,
+    cell: ({ row }) => {
+      const { project } = row.original;
+      return project ? project : "No Data"; // Show "No Data" if the project is null or undefined
+    },
+  },
+  {
+    accessorKey: "invoice_no",
+    header: "Invoice",
+    enableSorting: false,
+    cell: ({ row }) => {
+      const { invoice_no } = row.original;
+      return invoice_no ? invoice_no : "No Data"; // Show "No Data" if the invoice_no is null or undefined
+    },
+  },
+  {
+    accessorKey: "issued_date",
+    header: "Invoice Issued Date",
+    enableSorting: false,
+    cell: ({ row }) => {
+      const { issued_date } = row.original;
+      return issued_date ? format(issued_date, "MMM d, yyyy") : "No Data"; // Show "No Data" if the issued_date is null or undefined
+    },
+  },
+  {
+    accessorKey: "payment_status",
     header: "Status",
     cell: ({ row }) => {
-      const { status } = row.original; // Access the full row data
+      const { payment_status } = row.original;
       return (
         <Badge
           className={`${
-            status === "paid"
+            payment_status?.toLowerCase() === "paid"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
           }`}
         >
-          {status}
+          {payment_status ? payment_status : "No Data"} {/* Show "No Data" */}
         </Badge>
       );
     },
     enableSorting: false,
   },
   {
-    accessorKey: "paidDate",
+    accessorKey: "payment_date",
     header: "Paid Date",
     enableSorting: false,
+    cell: ({ row }) => {
+      const { payment_date } = row.original;
+      return payment_date ? payment_date : "No Data"; // Show "No Data" if the payment_date is null or undefined
+    },
   },
-
   {
-    accessorKey: "type",
+    accessorKey: "payment_type",
     header: "Type",
     enableSorting: false,
     cell: ({ row }) => {
-      const { type } = row.original;
-      return <span className="capitalize">{type}</span>;
+      const { payment_type } = row.original;
+      return payment_type ? (
+        <span className="capitalize">{payment_type}</span>
+      ) : (
+        "No Data"
+      ); // Show "No Data" if the payment_type is null or undefined
     },
   },
   {
@@ -73,7 +90,9 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const { amount } = row.original;
-      return formatAmountToNOK(amount);
+      return amount !== null && amount !== undefined
+        ? formatAmountToNOK(amount)
+        : "No Data"; // Show "No Data" if the amount is null or undefined
     },
   },
   {
