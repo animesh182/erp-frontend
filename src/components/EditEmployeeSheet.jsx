@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -15,13 +16,14 @@ import {
 import { DatePicker } from "@/components/DatePicker";
 import { prettifyText, cn } from "@/lib/utils";
 import { toast } from "sonner";
-
 export function EditEmployeeSheet({
   isOpen,
   onClose,
   employeeData,
   onEditEmployee,
   onAddEmployee,
+  roleOptions,
+  levelOptions,
 }) {
   const {
     control,
@@ -45,6 +47,8 @@ export function EditEmployeeSheet({
           country: "",
           phone: "",
           email: "",
+          startDate: "",
+          endDate: "",
           linkedInName: "",
           linkedInUrl: "",
           jobTitle: "",
@@ -150,6 +154,8 @@ export function EditEmployeeSheet({
             <h3 className="font-semibold mb-2">Basic Details</h3>
             <div className="space-y-4">
               {renderField("employeeId", Input, { required: true })}
+              {renderField("fullName", Input, { required: true })}
+
               {renderField("dateOfBirth", DatePicker, { required: true })}
               {renderField("gender", Select, {
                 required: true,
@@ -172,6 +178,8 @@ export function EditEmployeeSheet({
                   </>
                 ),
               })}
+              {renderField("startDate", DatePicker, { required: true })}
+              {renderField("endDate", DatePicker, { required: false })}
             </div>
           </div>
 
@@ -181,7 +189,6 @@ export function EditEmployeeSheet({
               {renderField("country", Input, { required: true })}
               {renderField("phone", Input, { required: true })}
               {renderField("email", Input, { required: true })}
-              {renderField("linkedInName", Input)}
               {renderField("linkedInUrl", Input)}
             </div>
           </div>
@@ -189,8 +196,30 @@ export function EditEmployeeSheet({
           <div>
             <h3 className="font-semibold mb-2">Employment Details</h3>
             <div className="space-y-4">
-              {renderField("jobTitle", Input, { required: true })}
-              {renderField("level", Input, { required: true })}
+              {renderField("jobTitle", Select, {
+                required: true,
+                children: (
+                  <>
+                    {roleOptions?.map((role) => (
+                      <SelectItem key={role.id} value={role.title}>
+                        {role.title}
+                      </SelectItem>
+                    ))}
+                  </>
+                ),
+              })}
+              {renderField("level", Select, {
+                required: true,
+                children: (
+                  <>
+                    {levelOptions?.map((level) => (
+                      <SelectItem key={level.id} value={level.description}>
+                        {level.description}
+                      </SelectItem>
+                    ))}
+                  </>
+                ),
+              })}
               {renderField("department", Input, { required: true })}
               {renderField("employeeType", Select, {
                 required: true,

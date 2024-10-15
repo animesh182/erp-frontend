@@ -14,12 +14,19 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
+import { createEmployee } from "@/app/api/employees/createEmployee";
+import { getRoles } from "@/app/api/role/getRoles";
+import { getLevels } from "@/app/api/level/getLevels";
+import { getProjects } from "@/app/api/projects/getProjects";
 
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeTab, setActiveTab] = useState("employeeDetails");
   const [employeeDetails, setEmployeeDetails] = useState(null);
+  const [roleOptions, setRoleOptions] = useState([]);
+  const [levelOptions, setLevelOptions] = useState([]);
+  const [projectOptions, setProjectOptions] = useState([]);
 
   const [payments, setPayments] = useState([
     {
@@ -97,11 +104,40 @@ export default function Employees() {
 
       setEmployeeDetails(mockResponse);
     };
-
+    fetchRoles();
+    fetchLevels();
+    fetchProjects();
     if (selectedEmployee) {
       fetchEmployeeDetails();
     }
   }, [selectedEmployee]);
+
+  const fetchRoles = async () => {
+    try {
+      const roles = await getRoles();
+      setRoleOptions(roles);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const projects = await getProjects(true);
+      setProjectOptions(projects);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
+  };
+
+  const fetchLevels = async () => {
+    try {
+      const levels = await getLevels();
+      setLevelOptions(levels);
+    } catch (error) {
+      console.error("Error fetching levels:", error);
+    }
+  };
 
   useEffect(() => {
     setActiveTab("employeeDetails");
@@ -111,18 +147,22 @@ export default function Employees() {
     setIsSheetOpen(true);
   };
 
-  const onAddEmployee = (formData) => {
-    // Generate a new ID (you might want to use a more robust method in production)
-    toast.success("Employee added successfully");
-    console.log(formData);
+  const onAddEmployee = async (formData) => {
+    try {
+      const response = await createEmployee(formData);
+      toast.success("Employee added successfully");
+      console.log(response);
 
-    const newId = `employee_${Date.now()}`;
-    const newEmployee = {
-      id: newId,
-      ...formData,
-    };
-    setPayments([...payments, newEmployee]);
-    setIsSheetOpen(false);
+      const newEmployee = {
+        id: response.id, // Assuming the API returns an id
+        ...formData,
+      };
+      setPayments([...payments, newEmployee]);
+      setIsSheetOpen(false);
+    } catch (error) {
+      toast.error(error.message || "Failed to add employee");
+      console.error("Error adding employee:", error);
+    }
   };
 
   const handleRowSelect = (row) => {
@@ -191,7 +231,11 @@ export default function Employees() {
                   <EmployeeDetailsTab employeeDetails={employeeDetails} />
                 </TabsContent>
                 <TabsContent value="projects">
-                  <ProjectsTab employeeId={selectedEmployee?.id} />
+                  <ProjectsTab
+                    employeeId={selectedEmployee?.id}
+                    projectOptions={projectOptions}
+                    roleOptions={roleOptions}
+                  />
                 </TabsContent>
                 <TabsContent value="payroll">
                   <PayrollTab employeeId={selectedEmployee?.id} />
@@ -205,6 +249,8 @@ export default function Employees() {
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddEmployee={onAddEmployee}
+        roleOptions={roleOptions}
+        levelOptions={levelOptions}
         //the edit employee is on the employee details tab
       />
     </main>

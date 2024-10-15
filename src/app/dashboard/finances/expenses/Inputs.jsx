@@ -36,7 +36,7 @@ export const formInputs = [
   {
     component: <ProjectSelect />,
     name: "projectName",
-    required: true,
+    required: false,
   },
   {
     component: <Input placeholder="Add" onChange={handleUppercaseChange} />,

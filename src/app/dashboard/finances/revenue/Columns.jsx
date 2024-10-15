@@ -4,6 +4,9 @@ import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
+import { deleteRevenue } from "@/app/api/revenue/deleteRevenue";
+import { toast } from "sonner";
+import { format } from "date-fns";
 
 export const columns = [
   {
@@ -27,6 +30,16 @@ export const columns = [
     accessorKey: "invoiceIssuedDate",
     header: "Invoice Issued Date",
     enableSorting: false,
+    cell: ({ row }) => {
+      const { invoiceIssuedDate } = row.original;
+      return (
+        <span>
+          {invoiceIssuedDate
+            ? format(new Date(invoiceIssuedDate), "MMM dd yyyy")
+            : "N/A"}
+        </span>
+      );
+    },
   },
   {
     accessorKey: "status",
@@ -50,6 +63,14 @@ export const columns = [
   {
     accessorKey: "paidDate",
     header: "Paid Date",
+    cell: ({ row }) => {
+      const { paidDate } = row.original;
+      return (
+        <span>
+          {paidDate ? format(new Date(paidDate), "MMM dd yyyy") : "N/A"}
+        </span>
+      );
+    },
     enableSorting: false,
   },
 
@@ -76,10 +97,14 @@ export const columns = [
     header: "",
     cell: ({ row }) => {
       const rowData = row.original;
-
-      const handleDelete = () => {
-        console.log("Delete", row.original.id);
-        // Handle delete action
+      const handleDelete = async () => {
+        try {
+          await deleteRevenue(row.original.id);
+          toast.success("Revenue deleted successfully");
+        } catch (error) {
+          console.error("Error deleting revenue:", error);
+          toast.error("Failed to delete revenue");
+        }
       };
 
       return (

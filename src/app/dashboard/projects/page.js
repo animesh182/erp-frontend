@@ -403,7 +403,7 @@ export default function Projects() {
           </FormProvider>
         )}
       </div>
-      <EditProjectSheet
+      <EditProjectSheet //this is for add
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddProject={onAddProject}

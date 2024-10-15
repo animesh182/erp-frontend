@@ -7,11 +7,27 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import AssignProjectForm from "./AssignProjectForm";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
 import { ProjectCard } from "@/components/ProjectCard";
+import { assignProject } from "@/app/api/employees/assignProject";
+import { toast } from "sonner";
 
-const ProjectsTab = ({ employeeProjects }) => {
+const ProjectsTab = ({ employeeId, projectOptions, roleOptions }) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const openSheet = () => setIsSheetOpen(true);
+
+  const onAssignProject = async (values) => {
+    try {
+      const response = await assignProject(employeeId, values);
+      console.log("Project assigned successfully:", response);
+      toast.success("Project assigned successfully");
+      setIsSheetOpen(false);
+      // You might want to update the UI or state here
+    } catch (error) {
+      console.error("Failed to assign project:", error);
+      toast.error(error.message || "Failed to assign project");
+      // Handle the error (e.g., show an error message to the user)
+    }
+  };
 
   return (
     <div>
@@ -22,7 +38,11 @@ const ProjectsTab = ({ employeeProjects }) => {
             subtitle="Make changes to your task here. Click save when you're done."
           />
 
-          <AssignProjectForm />
+          <AssignProjectForm
+            projectOptions={projectOptions}
+            roleOptions={roleOptions}
+            onAssignProject={onAssignProject}
+          />
         </SheetContent>
       </Sheet>
       <div className="flex flex-col gap-4 overflow-y-auto p-6 space-y-2">

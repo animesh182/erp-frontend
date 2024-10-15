@@ -4,6 +4,8 @@ import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
+import { format } from "date-fns";
+import { MoreHorizontal } from "lucide-react";
 
 export const columns = [
   {
@@ -26,6 +28,16 @@ export const columns = [
   {
     accessorKey: "invoiceIssuedDate",
     header: "Invoice Issued Date",
+    cell: ({ row }) => {
+      const { invoiceIssuedDate } = row.original;
+      return (
+        <span>
+          {invoiceIssuedDate
+            ? format(new Date(invoiceIssuedDate), "MMM dd yyyy")
+            : "N/A"}
+        </span>
+      );
+    },
     enableSorting: false,
   },
   {
@@ -50,6 +62,14 @@ export const columns = [
   {
     accessorKey: "paidDate",
     header: "Paid Date",
+    cell: ({ row }) => {
+      const { paidDate } = row.original;
+      return (
+        <span>
+          {paidDate ? format(new Date(paidDate), "MMM dd yyyy") : "N/A"}
+        </span>
+      );
+    },
     enableSorting: false,
   },
 
@@ -84,11 +104,7 @@ export const columns = [
 
       return (
         <div className="flex items-center">
-          <TableActionsDropdown
-            rowData={rowData}
-            onDelete={handleDelete}
-            formInputs={formInputs}
-          />
+          <MoreHorizontal className="cursor-pointer" />
         </div>
       );
     },
