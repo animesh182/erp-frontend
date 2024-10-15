@@ -37,8 +37,8 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
     { label: "Email", value: employeeDetails?.email },
     {
       label: "LinkedIn",
-      value: employeeDetails?.linkedin_name || "N/A",
-      link: employeeDetails?.linkedin_url || "",
+      value: employeeDetails?.fullName,
+      link: employeeDetails?.linkedInUrl,
     },
   ];
 

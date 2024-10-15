@@ -66,7 +66,7 @@ export function FormRow({ formInputs, onAddRow, projectOptions }) {
             rules={{ required: field.required }}
             render={({ field: { onChange, value } }) => (
               <ProjectSelect
-                value={value}
+                value={value || "None"}
                 onChange={onChange}
                 projectOptions={projectOptions}
               />

@@ -1,12 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { columns } from "./Columns";
 import DataTable from "@/components/ui/data-table";
 import KpiCard from "@/components/kpicard";
 import { Activity, CreditCard, DollarSign } from "lucide-react";
-import { subDays } from "date-fns";
-import { useTheme } from "next-themes";
-import { fetchAllTransactions } from "@/app/api/finances/transaction/transactions";
+import { subDays, format } from "date-fns";
+import { getTransactions } from "@/app/api/transactions/getTransactions";
 import { fetchTransactionKpi } from "@/app/api/finances/transaction/fetchTransactionKpi";
 export default function Transactions() {
   const { theme } = useTheme();
@@ -78,27 +78,44 @@ export default function Transactions() {
   // Fetch transaction data
   useEffect(() => {
     if (startDate && endDate) {
-      const getTransactions = async () => {
-        try {
-          const response = await fetchAllTransactions(startDate, endDate);
-
-          if (response.status === 200) {
-            setData(response.data);
-          } else {
-            console.error("Failed to fetch transaction data");
-            setError(response.message || "Error fetching data");
-          }
-        } catch (error) {
-          console.error("Error fetching transaction data:", error);
-          setError("An error occurred while fetching data");
-        }
-      };
-
-      getTransactions();
+      fetchData(startDate, endDate);
     }
-  }, [startDate, endDate]); // Re-run when date changes
+  }, [startDate, endDate]);
 
-  console.log(kpiData, "kpiData"); // Log the fetched KPI data
+  const fetchData = async (startDate, endDate) => {
+    console.log("Fetching data from:", startDate, "to:", endDate);
+    try {
+      const fetchedData = await getTransactions(
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd")
+      );
+      console.log(fetchedData, "transactions data");
+      setData(fetchedData);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
+  };
+
+  // const kpiData = [
+  //   {
+  //     title: "Total Revenue",
+  //     value: "$345,000",
+  //     change: "+12.5%",
+  //     icon: <DollarSign className="h-4 w-4 text-muted-foreground" />,
+  //   },
+  //   {
+  //     title: "Total Expenses",
+  //     value: "$225,000",
+  //     change: "+8.1%",
+  //     icon: <CreditCard className="h-4 w-4 text-muted-foreground" />,
+  //   },
+  //   {
+  //     title: "Total Profit",
+  //     value: "$120,000",
+  //     change: "+15.3%",
+  //     icon: <Activity className="h-4 w-4 text-muted-foreground" />,
+  //   },
+  // ];
 
   const handleDateChange = (startDate, endDate) => {
     setStartDate(startDate);

@@ -4,6 +4,8 @@ import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
+import { deleteExpense } from "@/app/api/expense/deleteExpense";
+import { toast } from "sonner";
 import { format } from "date-fns";
 
 export const columns = [
@@ -22,16 +24,21 @@ export const columns = [
     header: "Invoice",
     enableSorting: false,
   },
-  // {
-  //   accessorKey: "invoiceIssuedDate",
-  //   header: "Invoice Issued Date",
-  //   enableSorting: false,
-  //   cell: ({ row }) => {
-  //     const { invoiceDate } = row.original;
-  //     return <span>{format(invoiceDate, "MMM d, yyyy")}</span>;
-  //   },
-  // },
-
+  {
+    accessorKey: "invoiceIssuedDate",
+    header: "Invoice Issued Date",
+    cell: ({ row }) => {
+      const { invoiceIssuedDate } = row.original;
+      return (
+        <span>
+          {invoiceIssuedDate
+            ? format(new Date(invoiceIssuedDate), "MMM dd yyyy")
+            : "N/A"}
+        </span>
+      );
+    },
+    enableSorting: false,
+  },
   {
     accessorKey: "status",
     header: "Status",
@@ -54,6 +61,14 @@ export const columns = [
   {
     accessorKey: "paidDate",
     header: "Paid Date",
+    cell: ({ row }) => {
+      const { paidDate } = row.original;
+      return (
+        <span>
+          {paidDate ? format(new Date(paidDate), "MMM dd yyyy") : "N/A"}
+        </span>
+      );
+    },
     enableSorting: false,
   },
   {
@@ -90,9 +105,15 @@ export const columns = [
     cell: ({ row }) => {
       const rowData = row.original;
 
-      const handleDelete = () => {
-        console.log("Delete", row.original.id);
-        // Handle delete action
+      const handleDelete = async () => {
+        try {
+          console.log("Delete", row.original.id);
+          await deleteExpense(row.original.id);
+          toast.success("Expense deleted successfully");
+        } catch (error) {
+          console.error("Error deleting expense:", error);
+          toast.error("Failed to delete expense");
+        }
       };
 
       return (

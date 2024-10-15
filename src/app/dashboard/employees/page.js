@@ -14,6 +14,10 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
+import { createEmployee } from "@/app/api/employees/createEmployee";
+import { getRoles } from "@/app/api/role/getRoles";
+import { getLevels } from "@/app/api/level/getLevels";
+import { getProjects } from "@/app/api/projects/getProjects";
 // import getEmployees from "@/app/api/employees/getEmployees";
 import { RectangleSkeleton } from "@/components/Skeletons";
 import {
@@ -25,7 +29,59 @@ export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeTab, setActiveTab] = useState("employeeDetails");
-  const [employeeDetails, setEmployeeDetails] = useState([]);
+  const [employeeDetails, setEmployeeDetails] = useState(null);
+  const [roleOptions, setRoleOptions] = useState([]);
+  const [levelOptions, setLevelOptions] = useState([]);
+  const [projectOptions, setProjectOptions] = useState([]);
+
+  const [payments, setPayments] = useState([
+    {
+      id: "728ed52f",
+      employeeName: "John Doe",
+      imageUrl: "/default-avatar.jpg",
+      email: "john.doe@example.com",
+      role: "Software Engineer",
+      type: "Executive",
+      salary: 12000,
+    },
+    {
+      id: "489e1d42",
+      employeeName: "Jane Smith",
+      imageUrl: "/default-avatar.jpg",
+      email: "jane.smith@example.com",
+      role: "Product Manager",
+      type: "Full-time",
+      salary: 11000,
+    },
+    {
+      id: "153b3a2c",
+      employeeName: "Bob Johnson",
+      imageUrl: "/default-avatar.jpg",
+      email: "bob.johnson@example.com",
+      role: "UX Designer",
+      type: "Part-time",
+      salary: 8000,
+    },
+    {
+      id: "621f4e3b",
+      employeeName: "Alice Williams",
+      imageUrl: "/default-avatar.jpg",
+      email: "alice.williams@example.com",
+      role: "Data Analyst",
+      type: "Full-time",
+      salary: 9500,
+    },
+    {
+      id: "984c7d6a",
+      employeeName: "Charlie Brown",
+      imageUrl: "/default-avatar.jpg",
+      email: "charlie.brown@example.com",
+      role: "Marketing Specialist",
+      type: "Contract",
+      salary: 8500,
+    },
+  ]);
+
   useEffect(() => {
     const getEmployeeDetails = async () => {
       try {
@@ -51,52 +107,23 @@ export default function Employees() {
   const handleEmployeeAdd = () => {
     setIsSheetOpen(true);
   };
-  // console.log(selectedEmployee);
-  const onAddEmployee = async (formData) => {
-    // Generate a new ID (you might want to use a more robust method in production)
-    const payload = {
-      employee_id: formData.employeeId,
-      full_name: formData.linkedInName,
-      email: formData.email,
-      password: "avinto123",
-      employee_id: formData.employeeId,
-      salary: formData.salary,
-      employment_type: formData.employeeType,
-      role: formData.role,
-      country: formData.country,
-      phone_number: formData.phone,
-      PAN: formData.panNumber,
-      start_date: formData.startDate,
-      end_date: formData.endDate || null,
-      level: formData.level,
-      gender: formData.gender,
-      marital_status: formData.maritalStatus,
-      linkedin_name: formData.linkedInName,
-      linkedin_url: formData.linkedInUrl,
-      date_of_birth: formData.dateOfBirth,
-    };
-    try {
-      const response = await apiClient(
-        `${process.env.NEXT_PUBLIC_API_URL}api/users/register/`,
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        }
-      );
-      if (response.ok) {
-        toast.success("Employee added successfully");
-        // setIsSheetOpen(false);
-      }
-    } catch (error) {
-      toast.error("There was an error adding the employee");
-      console.error(error);
-    }
 
-    // const newId = `employee_${Date.now()}`;
-    // const newEmployee = {
-    //   formData,
-    // };
-    // setEmployeeDetails([...employeeDetails, newEmployee]);
+  const onAddEmployee = async (formData) => {
+    try {
+      const response = await createEmployee(formData);
+      toast.success("Employee added successfully");
+      console.log(response);
+
+      const newEmployee = {
+        id: response.id, // Assuming the API returns an id
+        ...formData,
+      };
+      setPayments([...payments, newEmployee]);
+      setIsSheetOpen(false);
+    } catch (error) {
+      toast.error(error.message || "Failed to add employee");
+      console.error("Error adding employee:", error);
+    }
   };
 
   const handleRowSelect = (row) => {
@@ -177,8 +204,9 @@ export default function Employees() {
                 </TabsContent>
                 <TabsContent value="projects">
                   <ProjectsTab
-                    employeeProjects={selectedEmployee?.user_projects}
-                    userId={selectedEmployee?.id}
+                    employeeId={selectedEmployee?.id}
+                    projectOptions={projectOptions}
+                    roleOptions={roleOptions}
                   />
                 </TabsContent>
                 <TabsContent value="payroll">
@@ -194,7 +222,8 @@ export default function Employees() {
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddEmployee={onAddEmployee}
-        // employeeData={selectedEmployee}
+        roleOptions={roleOptions}
+        levelOptions={levelOptions}
         //the edit employee is on the employee details tab
       />
     </main>

@@ -6,7 +6,17 @@ import { apiClient } from "@/lib/utils";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ProjectSelect } from "@/components/ProjectSelect";
 import {
   Select,
   SelectContent,
@@ -19,81 +29,34 @@ import { toast } from "sonner";
 
 // Zod schema with date preprocessing
 const formSchema = z.object({
-  projectId: z.string().min(1, "Project name is required"),
-  role: z.string().min(1, "Role is required").max(50),
-  timeAllocatedPerDay: z.string().min(1, "Time is required"),
-  startDate: z.preprocess(
-    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
-    z.date({ required_error: "Start date is required" })
-  ),
-  endDate: z.preprocess(
-    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
-    z.date({ required_error: "End date is required" })
-  ),
+  projectName: z.string().min(1, "Project is required"),
+  role: z.string().min(1, "Role is required"),
+  timeAllocatedPerDay: z.number().int().min(1).max(12).positive(),
+  startDate: z.string(),
+  endDate: z.string().optional(),
 });
 
-const AssignProjectForm = ({ projects, roles, userId }) => {
-  console.log(userId, "uiii");
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-  } = useForm({
+const AssignProjectForm = ({
+  projectOptions,
+  roleOptions,
+  onAssignProject,
+}) => {
+  // console.log(projectOptions, "proj");
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      projectId: "",
+      projectName: "",
       role: "",
-      timeAllocatedPerDay: "",
-      startDate: null,
-      endDate: null,
+      timeAllocatedPerDay: 0,
+      startDate: new Date(),
+      endDate: undefined,
     },
   });
 
-  const watchData = watch();
+  function onSubmit(values) {
+    onAssignProject(values);
+  }
 
-  useEffect(() => {
-    console.log(watchData); // Watch form data as it changes
-  }, [watchData]);
-
-  const formatDate = (date) => {
-    return date ? date.toISOString().split("T")[0] : null; // Format as YYYY-MM-DD
-  };
-
-  // Form submit handler
-  const onSubmit = async (formData) => {
-    const payload = {
-      project_id: formData.projectId,
-      utilization: formData.timeAllocatedPerDay,
-      project_role: formData.role,
-      start_date: formatDate(formData.startDate), // Format start date
-      end_date: formatDate(formData.endDate), // Format end date
-    };
-    try {
-      const response = await apiClient(
-        `${process.env.NEXT_PUBLIC_API_URL}api/user_projects/${userId}/`,
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        }
-      );
-      console.log(response, "response");
-
-      if (response.ok) {
-        toast.success("Project assigned successfully");
-      }
-    } catch (error) {
-      toast.error("There was an error assigning the project");
-      console.error(error);
-    }
-  };
-
-  const onError = (errors) => {
-    console.error(errors); // Log errors if validation fails
-    toast.error("Please fill in all required fields correctly.");
-  };
-  console.log(projects);
   return (
     <div className="mt-4 max-w-lg mx-auto">
       <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
@@ -130,85 +93,103 @@ const AssignProjectForm = ({ projects, roles, userId }) => {
             name="role"
             control={control}
             render={({ field }) => (
-              <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select Role" />
-                </SelectTrigger>
-                <SelectContent>
-                  {roles.map((role, index) => (
-                    <SelectItem key={index} value={role.title}>
-                      {role.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormItem>
+                <FormLabel>Project Name</FormLabel>
+                <FormControl>
+                  <ProjectSelect
+                    projectOptions={projectOptions}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
-          {errors.role && (
-            <p className="text-sm text-red-500">{errors.role.message}</p>
-          )}
-        </div>
 
-        {/* Time Allocated Field */}
-        <div className="space-y-1">
-          <label className="text-sm font-medium">
-            Time Allocated (per day)
-          </label>
-          <Controller
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Role</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {roleOptions.map((role) => (
+                      <SelectItem key={role.id} value={role.title}>
+                        {role.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="timeAllocatedPerDay"
-            control={control}
-            render={({ field }) => <Input {...field} placeholder="4 hours" />}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Time Allocated Per Day (hours)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    {...field}
+                    onChange={(e) =>
+                      field.onChange(parseInt(e.target.value, 10))
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          {errors.timeAllocatedPerDay && (
-            <p className="text-sm text-red-500">
-              {errors.timeAllocatedPerDay.message}
-            </p>
-          )}
-        </div>
 
-        {/* Start Date Field */}
-        <div className="space-y-1">
-          <label className="text-sm font-medium">Start Date</label>
-          <Controller
+          <FormField
+            control={form.control}
             name="startDate"
-            control={control}
             render={({ field }) => (
-              <DatePicker
-                selected={field.value}
-                onChange={(date) => field.onChange(date)}
-                placeholderText="Select start date"
-              />
+              <FormItem className="flex flex-col">
+                <FormLabel>Start Date</FormLabel>
+                <DatePicker
+                  selected={field.value}
+                  onSelect={field.onChange}
+                  onChange={(date) => field.onChange(date)}
+                />
+                <FormMessage />
+              </FormItem>
             )}
           />
-          {errors.startDate && (
-            <p className="text-sm text-red-500">{errors.startDate.message}</p>
-          )}
-        </div>
 
-        {/* End Date Field */}
-        <div className="space-y-1">
-          <label className="text-sm font-medium">End Date</label>
-          <Controller
+          <FormField
+            control={form.control}
             name="endDate"
-            control={control}
             render={({ field }) => (
-              <DatePicker
-                selected={field.value}
-                onChange={(date) => field.onChange(date)}
-                placeholderText="Select end date"
-              />
+              <FormItem className="flex flex-col">
+                <FormLabel>End Date (Optional)</FormLabel>
+                <DatePicker
+                  selected={field.value}
+                  onSelect={field.onChange}
+                  onChange={(date) => field.onChange(date)}
+                />
+                <FormMessage />
+              </FormItem>
             )}
           />
-          {errors.endDate && (
-            <p className="text-sm text-red-500">{errors.endDate.message}</p>
-          )}
-        </div>
 
-        {/* Submit Button */}
-        <Button type="submit" className="w-full">
-          Save Changes
-        </Button>
-      </form>
+          <Button type="submit">Assign Project</Button>
+        </form>
+      </Form>
     </div>
   );
 };

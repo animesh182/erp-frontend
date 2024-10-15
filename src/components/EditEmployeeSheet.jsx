@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -22,6 +23,8 @@ export function EditEmployeeSheet({
   employeeData,
   onEditEmployee,
   onAddEmployee,
+  roleOptions,
+  levelOptions,
 }) {
   const [roles, setRoles] = useState();
   const [levels, setLevels] = useState();
@@ -111,6 +114,8 @@ export function EditEmployeeSheet({
           country: "",
           phone: "",
           email: "",
+          startDate: "",
+          endDate: "",
           linkedInName: "",
           linkedInUrl: "",
           // jobTitle: "",
@@ -220,6 +225,8 @@ export function EditEmployeeSheet({
             <h3 className="font-semibold mb-2">Basic Details</h3>
             <div className="space-y-4">
               {renderField("employeeId", Input, { required: true })}
+              {renderField("fullName", Input, { required: true })}
+
               {renderField("dateOfBirth", DatePicker, { required: true })}
               {renderField("gender", Select, {
                 required: true,
@@ -253,7 +260,6 @@ export function EditEmployeeSheet({
               {renderField("country", Input, { required: true })}
               {renderField("phone", Input, { required: true })}
               {renderField("email", Input, { required: true })}
-              {renderField("linkedInName", Input)}
               {renderField("linkedInUrl", Input)}
             </div>
           </div>
@@ -261,30 +267,29 @@ export function EditEmployeeSheet({
           <div>
             <h3 className="font-semibold mb-2">Employment Details</h3>
             <div className="space-y-4">
-              {/* {renderField("jobTitle", Input, { required: true })} */}
-              {renderField("role", Select, {
+              {renderField("jobTitle", Select, {
                 required: true,
-
-                children: roles
-                  ? roles.map((role, index) => (
-                      <SelectItem key={index} value={role.id}>
+                children: (
+                  <>
+                    {roleOptions?.map((role) => (
+                      <SelectItem key={role.id} value={role.title}>
                         {role.title}
                       </SelectItem>
-                    ))
-                  : null,
+                    ))}
+                  </>
+                ),
               })}
-
               {renderField("level", Select, {
                 required: true,
-                children: levels
-                  ? levels.map((level) => {
-                      return (
-                        <SelectItem key={level.id} value={String(level.id)}>
-                          {level.description}
-                        </SelectItem>
-                      );
-                    })
-                  : null,
+                children: (
+                  <>
+                    {levelOptions?.map((level) => (
+                      <SelectItem key={level.id} value={level.description}>
+                        {level.description}
+                      </SelectItem>
+                    ))}
+                  </>
+                ),
               })}
               {renderField("department", Input, { required: true })}
               {renderField("employeeType", Select, {

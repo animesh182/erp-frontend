@@ -267,7 +267,7 @@ export default function Projects() {
           <div className="text-3xl font-semibold">Loading...</div>
         )}
       </div>
-      <EditProjectSheet
+      <EditProjectSheet //this is for add
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddProject={onAddProject}
