@@ -24,7 +24,6 @@ export default function Projects() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
-  const [roles, setRoles] = useState([]);
   const [isCardLayout, setIsCardLayout] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
 
@@ -64,6 +63,7 @@ export default function Projects() {
       try {
         const { status, data } = await getProjects();
         if (status === 200) {
+          console.log(data, "projects");
           setProjects(data);
         } else {
           console.error("Failed to fetch employee data");
@@ -258,7 +258,7 @@ export default function Projects() {
                 subtitle={"View detailed information about all Projects"}
                 isTableAddFormEnabled={false}
                 formInputs={formInputs}
-                filterColumn={"status"}
+                filterColumn={"project_status"}
                 onEditRow={onEditProject}
               />
             </FormProvider>

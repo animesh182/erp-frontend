@@ -4,6 +4,7 @@ import React from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const TabFilters = ({ filterValues, selectedTab, setSelectedTab }) => {
+  // console.log(filterValues);
   return (
     <Tabs value={selectedTab} onValueChange={setSelectedTab}>
       <TabsList className="flex space-x-4 w-max">

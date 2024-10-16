@@ -66,7 +66,7 @@ export const formInputs = [
     ),
     name: "status",
     required: true,
-    filterValues: ["All", "paid", "pending", "cancelled"],
+    filterValues: ["All", "Paid", "Pending", "Cancelled"],
   },
   {
     component: <DatePicker />,

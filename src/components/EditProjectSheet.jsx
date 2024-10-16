@@ -45,8 +45,8 @@ export function EditProjectSheet({
           health: projectData.project_health,
           projectCategory: projectData.project_category,
           platform: projectData.platform,
-          client: String(projectData.client),
-          status: String(projectData.project_status),
+          client: projectData.client,
+          status: projectData.project_status,
           // teamMembersCount: projectData?.all_user_projects?.length || 0, //because no attribute from the backend of number
           progress: projectData.completion,
           startDate: projectData.start_date,
@@ -203,7 +203,7 @@ export function EditProjectSheet({
                       <SelectItem
                         className="capitalize"
                         key={index}
-                        value={String(client.id)}
+                        value={client.name}
                       >
                         {client.name}
                       </SelectItem>
@@ -215,9 +215,9 @@ export function EditProjectSheet({
               required: true,
               children: (
                 <>
-                  <SelectItem value="2">Not Started</SelectItem>
-                  <SelectItem value="3">In Progress</SelectItem>
-                  <SelectItem value="1">Done</SelectItem>
+                  <SelectItem value="not started">Not Started</SelectItem>
+                  <SelectItem value="ongoing">Ongoing</SelectItem>
+                  <SelectItem value="done">Done</SelectItem>
                 </>
               ),
             })}
@@ -229,11 +229,11 @@ export function EditProjectSheet({
             {renderField("progress", Slider, {
               min: 0,
               max: 100,
-              step: 1,
+              step: 10,
               required: true,
             })}
             {renderField("startDate", DatePicker, { required: true })}
-            {renderField("endDate", DatePicker, { required: true })}
+            {renderField("endDate", DatePicker, { required: false })}
             {renderField("budget", Input, {
               type: "number",
               min: "0",

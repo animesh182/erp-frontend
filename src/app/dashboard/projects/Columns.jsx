@@ -56,27 +56,21 @@ export const projectColumns = (clients) => [
     enableSorting: false,
   },
   {
-    accessorKey: "status",
+    accessorKey: "project_status",
     header: "Status",
     cell: ({ row }) => {
       const { project_status } = row.original; // Access the full row data
       return (
         <Badge
           className={`${
-            project_status === "1"
+            project_status === "Done"
               ? "bg-green-100 text-green-800"
-              : project_status === "2"
+              : project_status === "Not Started"
               ? "bg-red-100 text-red-800"
               : "bg-yellow-100 text-yellow-800"
           }`}
         >
-          {prettifyText(
-            project_status === "1"
-              ? "Done"
-              : project_status === "2"
-              ? "Not Started"
-              : "Ongoing"
-          )}
+          {prettifyText(project_status)}
         </Badge>
       );
     },
@@ -86,7 +80,6 @@ export const projectColumns = (clients) => [
     accessorKey: "team",
     header: "Team",
     cell: ({ row }) => {
-      console.log(row.original);
       const { teamMembersImage, all_user_projects } = row.original; // Access the full row data
       const teamMembers = all_user_projects.map((user) => ({
         name: user.user_name,

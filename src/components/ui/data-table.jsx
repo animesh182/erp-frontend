@@ -63,6 +63,8 @@ function DataTable({
     let filtered = data;
 
     if (selectedTab !== "All") {
+      console.log(data, "data");
+      console.log(`Filtering by ${filterColumn}: ${selectedTab}`);
       filtered = filtered.filter((row) => row[filterColumn] === selectedTab);
     }
 
