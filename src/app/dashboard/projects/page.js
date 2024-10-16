@@ -112,11 +112,11 @@ export default function Projects() {
             amount: formData.budget,
             start_date: formData.startDate,
             budget: formData.budget,
-            type: formData.projectCategory || "default_type", // Ensure `type` is not blank
             client: formData.client, // Fix this field (see below)
             project_status: formData.status,
             completion: formData.progress,
             project_health: formData.health,
+            type: formData.type,
             platform: formData.platform,
             client_email: formData.clientEmail,
             teamMembersCount: formData.teamMembersCount,
@@ -155,6 +155,7 @@ export default function Projects() {
             client: formData.clientName, // Ensure this is the client ID (PK), not the name
             project_status: formData.status,
             completion: formData.progress,
+            type: formData.type,
             project_health: formData.health,
             platform: formData.platform,
             client_email: formData.clientEmail,

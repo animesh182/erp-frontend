@@ -48,6 +48,7 @@ export function EditProjectSheet({
           client: projectData.client,
           status: projectData.project_status,
           // teamMembersCount: projectData?.all_user_projects?.length || 0, //because no attribute from the backend of number
+          type: projectData.type,
           progress: projectData.completion,
           startDate: projectData.start_date,
           endDate: projectData.end_date,
@@ -195,6 +196,15 @@ export function EditProjectSheet({
             })}
             {renderField("projectCategory", Input, { required: false })}
             {renderField("platform", Input, { required: false })}
+            {renderField("type", Select, {
+              required: true,
+              children: (
+                <>
+                  <SelectItem value="fixed">Fixed</SelectItem>
+                  <SelectItem value="recurring">Recurring</SelectItem>
+                </>
+              ),
+            })}
             {renderField("client", Select, {
               required: true,
               children: clients
