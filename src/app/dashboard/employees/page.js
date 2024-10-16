@@ -109,8 +109,6 @@ export default function Employees() {
     }
   };
 
-
-
   useEffect(() => {
     // console.log('running')
     const getEmployeeDetails = async () => {
@@ -131,8 +129,6 @@ export default function Employees() {
     fetchLevels();
     fetchProjects();
   }, []);
-
-
 
   // useEffect(() => {
   //   setActiveTab("employeeDetails");
@@ -234,7 +230,11 @@ export default function Employees() {
               </TabsList>
               <div className="flex-1 overflow-y-auto">
                 <TabsContent value="employeeDetails">
-                  <EmployeeDetailsTab employeeDetails={selectedEmployee} />
+                  <EmployeeDetailsTab
+                    employeeDetails={selectedEmployee}
+                    levelOptions={levelOptions}
+                    roleOptions={roleOptions}
+                  />
                 </TabsContent>
                 <TabsContent value="projects">
                   <ProjectsTab

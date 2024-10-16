@@ -120,7 +120,7 @@ export default function Projects() {
             platform: formData.platform,
             client_email: formData.clientEmail,
             teamMembersCount: formData.teamMembersCount,
-            end_date: formData.endDate,
+            completion_date: formData.endDate,
             project_description: formData.projectDescription,
           }),
         }
@@ -160,7 +160,7 @@ export default function Projects() {
             platform: formData.platform,
             client_email: formData.clientEmail,
             teamMembersCount: formData.teamMembersCount,
-            end_date: formData.endDate,
+            completion_date: formData.endDate,
             project_description: formData.projectDescription,
           }),
         }

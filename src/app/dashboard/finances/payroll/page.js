@@ -46,7 +46,7 @@ export default function Payroll() {
 
       // Map the fetched data to match your table structure
       const mappedData = fetchedData.map((item) => ({
-        name: item.description,
+        name: item.name,
         projectName: null, // If no projectName is available
         invoice: `#${item.id}`,
         invoiceIssuedDate: item.invoice_issued_date,
