@@ -215,9 +215,9 @@ export function EditProjectSheet({
               required: true,
               children: (
                 <>
-                  <SelectItem value="not started">Not Started</SelectItem>
-                  <SelectItem value="ongoing">Ongoing</SelectItem>
-                  <SelectItem value="done">Done</SelectItem>
+                  <SelectItem value="Not Started">Not Started</SelectItem>
+                  <SelectItem value="Ongoing">Ongoing</SelectItem>
+                  <SelectItem value="Done">Done</SelectItem>
                 </>
               ),
             })}
