@@ -19,12 +19,12 @@ import { getRoles } from "@/app/api/role/getRoles";
 import { getLevels } from "@/app/api/level/getLevels";
 import { getProjects } from "@/app/api/projects/getProjects";
 // import getEmployees from "@/app/api/employees/getEmployees";
-import { RectangleSkeleton } from "@/components/Skeletons";
+// import { RectangleSkeleton } from "@/components/Skeletons";
 import {
   getEmployees,
-  getEmployeesWithRoles,
+  // getEmployeesWithRoles,
 } from "@/app/api/employees/getEmployees";
-import { apiClient } from "@/lib/utils";
+// import { apiClient } from "@/lib/utils";
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -82,7 +82,37 @@ export default function Employees() {
     },
   ]);
 
+  const fetchRoles = async () => {
+    try {
+      const roles = await getRoles();
+      setRoleOptions(roles);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const projects = await getProjects(true);
+      setProjectOptions(projects);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
+  };
+
+  const fetchLevels = async () => {
+    try {
+      const levels = await getLevels();
+      setLevelOptions(levels);
+    } catch (error) {
+      console.error("Error fetching levels:", error);
+    }
+  };
+
+
+
   useEffect(() => {
+    // console.log('running')
     const getEmployeeDetails = async () => {
       try {
         const { status, data } = await getEmployees();
@@ -97,12 +127,16 @@ export default function Employees() {
     };
 
     getEmployeeDetails();
+    fetchRoles();
+    fetchLevels();
+    fetchProjects();
   }, []);
-  // console.log(employeeDetails, "eD");
 
-  useEffect(() => {
-    setActiveTab("employeeDetails");
-  }, [selectedEmployee]);
+
+
+  // useEffect(() => {
+  //   setActiveTab("employeeDetails");
+  // }, [selectedEmployee]);
 
   const handleEmployeeAdd = () => {
     setIsSheetOpen(true);
@@ -207,6 +241,7 @@ export default function Employees() {
                     employeeId={selectedEmployee?.id}
                     projectOptions={projectOptions}
                     roleOptions={roleOptions}
+                    employeeProjects={selectedEmployee?.user_projects}
                   />
                 </TabsContent>
                 <TabsContent value="payroll">

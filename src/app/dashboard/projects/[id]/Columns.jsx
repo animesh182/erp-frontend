@@ -38,7 +38,9 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const { start_date } = row.original;
-      return <div>{format(start_date, "MMM d, yyyy")}</div>;
+      return    <div>      {start_date
+        ? format(new Date(start_date), "MMM dd yyyy")
+        : "N/A"}</div>;
     },
   },
   {
@@ -47,7 +49,9 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const { end_date } = row.original;
-      return <div>{format(end_date, "MMM d, yyyy")}</div>;
+      return    <div>      {end_date
+        ? format(new Date(end_date), "MMM dd yyyy")
+        : "Present"}</div>;
     },
   },
   {

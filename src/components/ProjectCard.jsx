@@ -43,7 +43,7 @@ export function ProjectCard({
         </Badge>
         <p className="text-xs mt-4">
           {format(new Date(startDate), "MMM dd, yyyy")} -{" "}
-          {format(new Date(endDate), "MMM dd, yyyy")}
+          {!endDate ? "Present" : format(new Date(endDate), "MMM dd, yyyy")}
         </p>
         <div className="mt-4 flex items-center">
           <Progress value={progress} className="h-1.5" />

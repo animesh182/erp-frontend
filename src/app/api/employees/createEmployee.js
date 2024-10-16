@@ -12,7 +12,7 @@ export async function createEmployee(employeeData) {
     password: "klololo",
     country: employeeData.country,
     start_date: employeeData.startDate,
-    end_date: employeeData.endDate,
+    ...(employeeData.endDate && { end_date: employeeData.endDate }),
     phone: employeeData.phone,
     email: employeeData.email,
     full_name: employeeData.fullName,

@@ -85,7 +85,7 @@ const ProjectDetailsMain = ({ project }) => {
               -{" "}
               {project.end_date
                 ? format(new Date(project.end_date), "MMM dd, yyyy")
-                : "N/A"}
+                : "Present"}
             </div>
           </div>
         </div>

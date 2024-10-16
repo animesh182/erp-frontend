@@ -8,13 +8,16 @@ import CustomSheetTitle from "@/components/CustomSheetTitle";
 import { ProjectCard } from "@/components/ProjectCard";
 import { assignProject } from "@/app/api/employees/assignProject";
 import { toast } from "sonner";
-import { getProjects } from "@/app/api/getProjects";
-import { getRoles } from "@/app/api/employees/getEmployees";
-const ProjectsTab = ({ employeeId, projectOptions, roleOptions, userId }) => {
+
+
+
+const ProjectsTab = ({ employeeId, projectOptions, roleOptions, userId, employeeProjects }) => {
   // console.log(employeeProjects, "emp");
+
+
+
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [projects, setProjects] = useState([]);
-  const [roles, setRoles] = useState([]);
+
 
   const openSheet = () => setIsSheetOpen(true);
 
@@ -31,6 +34,13 @@ const ProjectsTab = ({ employeeId, projectOptions, roleOptions, userId }) => {
       // Handle the error (e.g., show an error message to the user)
     }
   };
+
+
+
+  if(!employeeProjects) {
+    return <div>No Projects</div>
+  }
+
 
   return (
     <div>
