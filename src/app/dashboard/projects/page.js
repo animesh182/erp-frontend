@@ -121,7 +121,7 @@ export default function Projects() {
             client_email: formData.clientEmail,
             teamMembersCount: formData.teamMembersCount,
             end_date: formData.endDate,
-            project_description: formData.projectDescription,
+            description: formData.projectDescription,
           }),
         }
       );
@@ -161,7 +161,7 @@ export default function Projects() {
             client_email: formData.clientEmail,
             teamMembersCount: formData.teamMembersCount,
             end_date: formData.endDate,
-            project_description: formData.projectDescription,
+            description: formData.projectDescription,
           }),
         }
       );
