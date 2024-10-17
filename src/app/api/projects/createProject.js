@@ -13,6 +13,7 @@ export async function createProject(projectData) {
           budget: projectData.budget,
           client: projectData.client,
           project_status: projectData.status,
+          project_category: projectData.projectCategory,
           completion: projectData.progress,
           project_health: projectData.health,
           type: projectData.type,

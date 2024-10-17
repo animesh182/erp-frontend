@@ -11,6 +11,7 @@ export async function editProject(projectId, formData) {
           amount: formData.budget,
           start_date: formData.startDate,
           budget: formData.budget,
+          project_category: formData.projectCategory,
           type: formData.type,
           client: formData.clientName,
           project_status: formData.status,
