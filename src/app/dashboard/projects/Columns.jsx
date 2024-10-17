@@ -17,8 +17,8 @@ export const projectColumns = (clients) => [
       const { name, project_health } = row.original; // Access the full row data
       return (
         <div>
-          <p>{name}</p>
-          <ProjectHealth health={project_health} />
+          <p>{name || "N/A"}</p>
+          {project_health && <ProjectHealth health={project_health} />}
         </div>
       );
     },
