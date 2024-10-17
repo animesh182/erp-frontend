@@ -1,7 +1,7 @@
 "use client";
 import DataTable from "@/components/ui/data-table";
 import { LayoutGridIcon, List, MinusCircle, PlusCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { projectColumns } from "./Columns";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import CardLayout from "./CardLayout";
@@ -13,14 +13,11 @@ import { toast } from "sonner";
 import { AddClientDialog } from "@/components/AddClientDialog";
 import { getProjects } from "@/app/api/getProjects";
 import { getClients } from "@/app/api/projects/getClients";
-import {
-  KpiSkeleton,
-  RectangleSkeleton,
-  SkeletonCard,
-} from "@/components/Skeletons";
+
 import { apiClient } from "@/lib/utils";
 import { createProject } from "@/app/api/projects/createProject";
 import { editProject } from "@/app/api/projects/editProject";
+import { createClient } from "@/app/api/projects/createClient";
 export default function Projects() {
   const methods = useForm();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -28,6 +25,11 @@ export default function Projects() {
   const [clients, setClients] = useState([]);
   const [isCardLayout, setIsCardLayout] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshComponent = useCallback(() => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  }, []);
 
   // console.log(projects);
   // handle toggle layout
@@ -47,16 +49,13 @@ export default function Projects() {
           console.log(data, "projects");
           setProjects(data);
         } else {
-          console.error("Failed to fetch employee data");
+          console.error("Failed to fetch project data");
         }
       } catch (error) {
-        console.error("Error fetching employee details:", error);
+        console.error("Error fetching project details:", error);
       }
     };
 
-    getProjectsFromApi();
-  }, []);
-  useEffect(() => {
     const getClientsFromApi = async () => {
       try {
         const { status, data } = await getClients();
@@ -70,8 +69,9 @@ export default function Projects() {
       }
     };
 
+    getProjectsFromApi();
     getClientsFromApi();
-  }, []);
+  }, [refreshKey]); // Add refreshKey as a dependency
 
   const handleProjectAdd = () => {
     setIsSheetOpen(true);
@@ -86,8 +86,7 @@ export default function Projects() {
     try {
       const response = await createProject(formData);
       toast.success("Project added successfully");
-      // Update the projects state with the newly added project
-      setProjects((prevProjects) => [...prevProjects, response.data]);
+      refreshComponent(); // Refresh the component
       setIsSheetOpen(false);
     } catch (error) {
       toast.error("Failed to add project");
@@ -97,42 +96,25 @@ export default function Projects() {
 
   const onEditProject = async (projectId, formData) => {
     try {
-      const updatedProject = await editProject(projectId, formData);
+      await editProject(projectId, formData);
       toast.success("Project updated successfully");
-      // Update the projects state with the updated project
-      setProjects((prevProjects) =>
-        prevProjects.map((project) =>
-          project.id === projectId ? updatedProject : project
-        )
-      );
+      refreshComponent(); // Refresh the component
       setIsSheetOpen(false);
+      setEditingProject(null);
     } catch (error) {
       toast.error("Failed to update project");
       console.error("Error updating project:", error.message);
     }
   };
 
-  const handleClientAdd = (formData) => {
-    const payload = {
-      name: formData.name,
-      email: formData.email,
-      website: formData.website,
-      // phone_number: `${formData.countryCode}-${formData.contactNumber}`, Use this when country code is added in the backend
-      phone_number: formData.contactNumber,
-    };
+  const handleClientAdd = async (formData) => {
     try {
-      const response = apiClient(
-        `${process.env.NEXT_PUBLIC_API_URL}api/client/`,
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        }
-      );
-      // Add something like response.ok, its not working right now
+      await createClient(formData);
       toast.success("Client added successfully");
+      refreshComponent(); // Refresh the component
     } catch (error) {
       toast.error("There was an error adding the client");
-      console.error("There was error adding the client", error);
+      console.error("Error adding client:", error.message);
     }
   };
   const handleProjectEdit = (project) => {
