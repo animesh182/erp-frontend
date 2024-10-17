@@ -189,11 +189,7 @@ function DataTable({
                             data-state={row.getIsSelected() && "selected"}
                             className={
                               isProjectPage
-                                ? `cursor-pointer hover:bg-muted ${
-                                    theme === "dark"
-                                      ? "bg-gray-700 text-white"
-                                      : ""
-                                  }`
+                                ? "cursor-pointer hover:bg-muted"
                                 : isTransactionPage
                                 ? row.original.transactionType === "Expense"
                                   ? "bg-[#dc9d9c]" // Light red for expense
