@@ -48,7 +48,6 @@ function DataTable({
   initialStartDate,
   initialEndDate,
   projectOptions,
-  theme,
 }) {
   const [sorting, setSorting] = useState([]);
   const [selectedTab, setSelectedTab] = useState("All");
@@ -196,14 +195,10 @@ function DataTable({
                                       : ""
                                   }`
                                 : isTransactionPage
-                                ? row.original.isExpense === true
-                                  ? theme === "dark"
-                                    ? "bg-[#fe5555]" // Darker shade for expense in dark mode
-                                    : "bg-[#FEF2F2]" // Light mode expense color
-                                  : row.original.isExpense === false
-                                  ? theme === "dark"
-                                    ? "bg-[#46954b]" // Darker shade for revenue in dark mode
-                                    : "bg-[#f0fdf4]" // Light mode revenue color
+                                ? row.original.transactionType === "Expense"
+                                  ? "bg-[#dc9d9c]" // Light red for expense
+                                  : row.original.transactionType === "Revenue"
+                                  ? "bg-[#78ae78]" // Light green for revenue
                                   : ""
                                 : ""
                             }

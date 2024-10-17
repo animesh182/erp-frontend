@@ -92,7 +92,7 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const paymentType =
-        row.original.type === "one-time" ? "One-time" : "Recurring";
+        row.original.type === "One-Time" ? "One-Time" : "Recurring";
       return <span>{paymentType}</span>;
     },
   },

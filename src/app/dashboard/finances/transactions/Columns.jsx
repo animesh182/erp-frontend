@@ -1,9 +1,7 @@
 "use client";
 import React from "react";
-import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK, prettifyText } from "@/lib/utils";
-import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
 import { format } from "date-fns";
 import { MoreHorizontal } from "lucide-react";
 
@@ -105,14 +103,7 @@ export const columns = [
   {
     accessorKey: "actions",
     header: "",
-    cell: ({ row }) => {
-      const rowData = row.original;
-
-      const handleDelete = () => {
-        console.log("Delete", row.original.id);
-        // Handle delete action
-      };
-
+    cell: ({}) => {
       return (
         <div className="flex items-center">
           <MoreHorizontal className="cursor-pointer" />

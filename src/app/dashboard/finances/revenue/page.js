@@ -10,6 +10,7 @@ import { getRevenue } from "@/app/api/revenue/getRevenue";
 import { createRevenue } from "@/app/api/revenue/createRevenue";
 import { getProjects } from "@/app/api/projects/getProjects";
 import { formInputs } from "./Inputs";
+import { editRevenue } from "@/app/api/revenue/editRevenue";
 export default function Revenue() {
   const methods = useForm();
   const initialEndDate = new Date();
@@ -67,10 +68,15 @@ export default function Revenue() {
     }
   };
 
-  const onEditRow = (editedData) => {
-    toast.success("Row updated");
-    console.log(editedData, "edited data");
-    // Implement edit functionality if needed
+  const onEditRow = async (editedData) => {
+    try {
+      await editRevenue(editedData.id, editedData);
+      toast.success("Revenue updated successfully");
+      fetchData(startDate, endDate); // Refresh the data
+    } catch (error) {
+      console.error("Error updating revenue:", error);
+      toast.error("Failed to update revenue");
+    }
   };
 
   return (
