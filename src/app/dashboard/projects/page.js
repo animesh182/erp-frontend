@@ -19,12 +19,13 @@ import {
   SkeletonCard,
 } from "@/components/Skeletons";
 import { apiClient } from "@/lib/utils";
+import { createProject } from "@/app/api/projects/createProject";
+import { editProject } from "@/app/api/projects/editProject";
 export default function Projects() {
   const methods = useForm();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
-  const [roles, setRoles] = useState([]);
   const [isCardLayout, setIsCardLayout] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
 
@@ -38,32 +39,12 @@ export default function Projects() {
     }
   };
 
-  const projectsExample = [
-    {
-      id: 1,
-      name: "eBibaaha",
-      projectCategory: "eBibaaha",
-      platform: "Web Development",
-      clientImage: "/default-avatar.jpg",
-      clientName: "John Doe",
-      clientEmail: "ss@gmail.com",
-      teamMembersImage: ["/default-avatar.jpg", "/default-avatar.jpg"],
-      teamMembersCount: 2,
-      status: "ongoing",
-      health: "on-track",
-      progress: 50,
-      startDate: "Jan 12, 2024",
-      endDate: "Aug 20, 2024",
-      budget: 100000,
-    },
-  ];
-
-  const openSheet = () => setIsSheetOpen(true);
   useEffect(() => {
     const getProjectsFromApi = async () => {
       try {
         const { status, data } = await getProjects();
         if (status === 200) {
+          console.log(data, "projects");
           setProjects(data);
         } else {
           console.error("Failed to fetch employee data");
@@ -103,34 +84,10 @@ export default function Projects() {
 
   const onAddProject = async (formData) => {
     try {
-      const response = await apiClient(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/project/`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            name: formData.name,
-            amount: formData.budget,
-            start_date: formData.startDate,
-            budget: formData.budget,
-            type: formData.projectCategory || "default_type", // Ensure `type` is not blank
-            client: formData.client, // Fix this field (see below)
-            project_status: formData.status,
-            completion: formData.progress,
-            project_health: formData.health,
-            platform: formData.platform,
-            client_email: formData.clientEmail,
-            teamMembersCount: formData.teamMembersCount,
-            end_date: formData.endDate,
-            project_description: formData.projectDescription,
-          }),
-        }
-      );
-
+      const response = await createProject(formData);
       toast.success("Project added successfully");
-
       // Update the projects state with the newly added project
-      setProjects((prevProjects) => [...prevProjects, response]);
-
+      setProjects((prevProjects) => [...prevProjects, response.data]);
       setIsSheetOpen(false);
     } catch (error) {
       toast.error("Failed to add project");
@@ -139,41 +96,15 @@ export default function Projects() {
   };
 
   const onEditProject = async (projectId, formData) => {
-    console.log(projectId, "client");
     try {
-      // Use apiClient to make the PUT request
-      const response = await apiClient(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/project/${projectId}/`,
-        {
-          method: "PATCH", // Use PUT for updating
-          body: JSON.stringify({
-            name: formData.name,
-            amount: formData.budget,
-            start_date: formData.startDate,
-            budget: formData.budget,
-            type: formData.projectCategory,
-            client: formData.clientName, // Ensure this is the client ID (PK), not the name
-            project_status: formData.status,
-            completion: formData.progress,
-            project_health: formData.health,
-            platform: formData.platform,
-            client_email: formData.clientEmail,
-            teamMembersCount: formData.teamMembersCount,
-            end_date: formData.endDate,
-            project_description: formData.projectDescription,
-          }),
-        }
-      );
-
+      const updatedProject = await editProject(projectId, formData);
       toast.success("Project updated successfully");
-
       // Update the projects state with the updated project
       setProjects((prevProjects) =>
         prevProjects.map((project) =>
-          project.id === projectId ? response.data : project
+          project.id === projectId ? updatedProject : project
         )
       );
-
       setIsSheetOpen(false);
     } catch (error) {
       toast.error("Failed to update project");
@@ -258,7 +189,7 @@ export default function Projects() {
                 subtitle={"View detailed information about all Projects"}
                 isTableAddFormEnabled={false}
                 formInputs={formInputs}
-                filterColumn={"status"}
+                filterColumn={"project_status"}
                 onEditRow={onEditProject}
               />
             </FormProvider>
@@ -267,7 +198,7 @@ export default function Projects() {
           <div className="text-3xl font-semibold">Loading...</div>
         )}
       </div>
-      <EditProjectSheet
+      <EditProjectSheet //this is for add
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddProject={onAddProject}

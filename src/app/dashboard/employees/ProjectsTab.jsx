@@ -6,47 +6,42 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import AssignProjectForm from "./AssignProjectForm";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
 import { ProjectCard } from "@/components/ProjectCard";
-import { getProjects } from "@/app/api/getProjects";
-import { getRoles } from "@/app/api/employees/getEmployees";
-const ProjectsTab = ({ employeeProjects, userId }) => {
+import { assignProject } from "@/app/api/employees/assignProject";
+import { toast } from "sonner";
+
+
+
+const ProjectsTab = ({ employeeId, projectOptions, roleOptions, userId, employeeProjects }) => {
   // console.log(employeeProjects, "emp");
+
+
+
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [projects, setProjects] = useState([]);
-  const [roles, setRoles] = useState([]);
+
 
   const openSheet = () => setIsSheetOpen(true);
-  useEffect(() => {
-    const getProjectsFromApi = async () => {
-      try {
-        const { status, data } = await getProjects();
-        if (status === 200) {
-          setProjects(data);
-        } else {
-          console.error("Failed to fetch employee data");
-        }
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      }
-    };
 
-    getProjectsFromApi();
-  }, []);
-  useEffect(() => {
-    const getRolesFromApi = async () => {
-      try {
-        const { status, data } = await getRoles();
-        if (status === 200) {
-          setRoles(data);
-        } else {
-          console.error("Failed to fetch employee data");
-        }
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      }
-    };
+  const onAssignProject = async (values) => {
+    try {
+      const response = await assignProject(employeeId, values);
+      console.log("Project assigned successfully:", response);
+      toast.success("Project assigned successfully");
+      setIsSheetOpen(false);
+      // You might want to update the UI or state here
+    } catch (error) {
+      console.error("Failed to assign project:", error);
+      toast.error(error.message || "Failed to assign project");
+      // Handle the error (e.g., show an error message to the user)
+    }
+  };
 
-    getRolesFromApi();
-  }, []);
+
+
+  if(!employeeProjects) {
+    return <div>No Projects</div>
+  }
+
+
   return (
     <div>
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -57,9 +52,9 @@ const ProjectsTab = ({ employeeProjects, userId }) => {
           />
 
           <AssignProjectForm
-            projects={projects}
-            roles={roles}
-            userId={userId}
+            projectOptions={projectOptions}
+            roleOptions={roleOptions}
+            onAssignProject={onAssignProject}
           />
         </SheetContent>
       </Sheet>

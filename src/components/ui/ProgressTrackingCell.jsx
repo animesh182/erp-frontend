@@ -22,7 +22,6 @@ export const ProgressTrackingCell = ({ row, projectName }) => {
         max={100}
         step={10}
         className="mr-2"
-        disabled //disabled because no API
       />
       <span className="min-w-[40px] text-right">{progress}%</span>
     </div>

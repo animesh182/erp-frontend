@@ -9,7 +9,7 @@ import { useState } from "react";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/utils";
-const EmployeeDetailsTab = ({ employeeDetails }) => {
+const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions }) => {
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
 
   if (!employeeDetails) {
@@ -37,8 +37,8 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
     { label: "Email", value: employeeDetails?.email },
     {
       label: "LinkedIn",
-      value: employeeDetails?.linkedin_name || "N/A",
-      link: employeeDetails?.linkedin_url || "",
+      value: employeeDetails?.fullName,
+      link: employeeDetails?.linkedInUrl,
     },
   ];
 
@@ -85,7 +85,6 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
   // console.log(employeeDetails, "ed");
   const handleEditEmployee = async (formData) => {
     const employeeId = employeeDetails.id; // Extract employee ID from employeeData
-    console.log(formData, "formData");
     // Generate a new ID (you might want to use a more robust method in production)
     const payload = {
       employee_id: formData.employeeId,
@@ -95,7 +94,7 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
       employee_id: formData.employeeId,
       salary: formData.salary,
       employment_type: formData.employeeType,
-      role: formData.role,
+      role: formData.jobTitle,
       country: formData.country,
       phone_number: formData.phone,
       PAN: formData.panNumber,
@@ -118,7 +117,7 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
       );
       console.log(response, "response");
       if (response.ok) {
-        toast.success("Employee added successfully");
+        toast.success("Employee edited successfully");
         // setIsSheetOpen(false);
       }
     } catch (error) {
@@ -191,6 +190,8 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
         onClose={() => setIsEditSheetOpen(false)}
         employeeData={employeeDetails}
         onEditEmployee={handleEditEmployee}
+        levelOptions={levelOptions}
+        roleOptions={roleOptions}
       />
     </div>
   );

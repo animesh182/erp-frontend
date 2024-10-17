@@ -130,3 +130,60 @@ export async function apiClient(url, options = {}) {
     );
   }
 }
+
+export async function deleteApiClient(url, options = {}) {
+  let token = Cookies.get("access_token"); // Get the access token from cookies
+
+  const defaultHeaders = {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }), // Add Authorization header if token exists
+  };
+
+  try {
+    // Attempt to make the DELETE request
+    let response = await fetch(url, {
+      ...options,
+      method: "DELETE",
+      headers: {
+        ...defaultHeaders,
+        ...options.headers, // Merge additional headers if provided
+      },
+    });
+
+    // If the token is invalid or expired, try to refresh it
+    if (response.status === 401) {
+      const errorData = await response.json();
+      if (errorData.code === "token_not_valid") {
+        // Try refreshing the token
+        token = await refreshToken();
+        // Retry the DELETE request with the new token
+        response = await fetch(url, {
+          ...options,
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    }
+
+    // Check for 204 status code (No Content)
+    if (response.status === 204) {
+      return true; // Successful deletion
+    }
+
+    // If the response is not 204, throw an error
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "An error occurred");
+    }
+
+    return false; // Should not reach here for successful deletion
+  } catch (error) {
+    console.error("API Delete Request Failed:", error.message);
+    throw new Error(
+      error.message || "An error occurred while processing the delete request"
+    );
+  }
+}

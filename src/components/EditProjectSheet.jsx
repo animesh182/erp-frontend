@@ -45,9 +45,10 @@ export function EditProjectSheet({
           health: projectData.project_health,
           projectCategory: projectData.project_category,
           platform: projectData.platform,
-          client: String(projectData.client),
-          status: String(projectData.project_status),
+          client: projectData.client,
+          status: projectData.project_status,
           // teamMembersCount: projectData?.all_user_projects?.length || 0, //because no attribute from the backend of number
+          type: projectData.type,
           progress: projectData.completion,
           startDate: projectData.start_date,
           endDate: projectData.end_date,
@@ -64,6 +65,7 @@ export function EditProjectSheet({
           client: "",
           status: "",
           // teamMembersCount: 0,
+          type: "",
           progress: 0,
           startDate: null,
           endDate: null,
@@ -195,6 +197,15 @@ export function EditProjectSheet({
             })}
             {renderField("projectCategory", Input, { required: false })}
             {renderField("platform", Input, { required: false })}
+            {renderField("type", Select, {
+              required: true,
+              children: (
+                <>
+                  <SelectItem value="fixed">Fixed</SelectItem>
+                  <SelectItem value="recurring">Recurring</SelectItem>
+                </>
+              ),
+            })}
             {renderField("client", Select, {
               required: true,
               children: clients
@@ -203,7 +214,7 @@ export function EditProjectSheet({
                       <SelectItem
                         className="capitalize"
                         key={index}
-                        value={String(client.id)}
+                        value={client.name}
                       >
                         {client.name}
                       </SelectItem>
@@ -215,9 +226,9 @@ export function EditProjectSheet({
               required: true,
               children: (
                 <>
-                  <SelectItem value="2">Not Started</SelectItem>
-                  <SelectItem value="3">In Progress</SelectItem>
-                  <SelectItem value="1">Done</SelectItem>
+                  <SelectItem value="Not Started">Not Started</SelectItem>
+                  <SelectItem value="Ongoing">Ongoing</SelectItem>
+                  <SelectItem value="Done">Done</SelectItem>
                 </>
               ),
             })}
@@ -229,11 +240,11 @@ export function EditProjectSheet({
             {renderField("progress", Slider, {
               min: 0,
               max: 100,
-              step: 1,
+              step: 10,
               required: true,
             })}
             {renderField("startDate", DatePicker, { required: true })}
-            {renderField("endDate", DatePicker, { required: true })}
+            {renderField("endDate", DatePicker, { required: false })}
             {renderField("budget", Input, {
               type: "number",
               min: "0",

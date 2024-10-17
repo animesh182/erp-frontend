@@ -4,6 +4,8 @@ import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
+import { deleteRevenue } from "@/app/api/revenue/deleteRevenue";
+import { toast } from "sonner";
 import { format } from "date-fns";
 
 export const columns = [
@@ -29,15 +31,14 @@ export const columns = [
     header: "Invoice Issued Date",
     enableSorting: false,
     cell: ({ row }) => {
-      const { invoiceIssuedDate } = row.original; // Correct field: `invoiceIssuedDate`
-
-      // Check if the issued date exists, if not return a fallback value
-      if (!invoiceIssuedDate) {
-        return <span>N/A</span>; // Fallback when invoice issued date is null or undefined
-      }
-
-      // If issued date exists, format it
-      return <span>{format(new Date(invoiceIssuedDate), "MMM d, yyyy")}</span>;
+      const { invoiceIssuedDate } = row.original;
+      return (
+        <span>
+          {invoiceIssuedDate
+            ? format(new Date(invoiceIssuedDate), "MMM dd yyyy")
+            : "N/A"}
+        </span>
+      );
     },
   },
 
@@ -63,6 +64,14 @@ export const columns = [
   {
     accessorKey: "paidDate",
     header: "Paid Date",
+    cell: ({ row }) => {
+      const { paidDate } = row.original;
+      return (
+        <span>
+          {paidDate ? format(new Date(paidDate), "MMM dd yyyy") : "N/A"}
+        </span>
+      );
+    },
     enableSorting: false,
     cell: ({ row }) => {
       const { paidDate } = row.original;
@@ -83,7 +92,7 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const paymentType =
-        row.original.type === "one-time" ? "One-time" : "Recurring";
+        row.original.type === "One-Time" ? "One-Time" : "Recurring";
       return <span>{paymentType}</span>;
     },
   },
@@ -101,10 +110,14 @@ export const columns = [
     header: "",
     cell: ({ row }) => {
       const rowData = row.original;
-
-      const handleDelete = () => {
-        console.log("Delete", row.original.id);
-        // Handle delete action
+      const handleDelete = async () => {
+        try {
+          await deleteRevenue(row.original.id);
+          toast.success("Revenue deleted successfully");
+        } catch (error) {
+          console.error("Error deleting revenue:", error);
+          toast.error("Failed to delete revenue");
+        }
       };
 
       return (
