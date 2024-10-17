@@ -225,13 +225,6 @@ function DataTable({
                             ))}
                           </TableRow>
                         ))}
-                        {isTableAddFormEnabled && (
-                          <FormRow
-                            onAddRow={onAddRow}
-                            formInputs={formInputs}
-                            projectOptions={projectOptions}
-                          />
-                        )}
                       </>
                     ) : (
                       <TableRow>
@@ -242,6 +235,13 @@ function DataTable({
                           No results.
                         </TableCell>
                       </TableRow>
+                    )}
+                    {isTableAddFormEnabled && (
+                      <FormRow
+                        onAddRow={onAddRow}
+                        formInputs={formInputs}
+                        projectOptions={projectOptions}
+                      />
                     )}
                   </TableBody>
                 </Table>

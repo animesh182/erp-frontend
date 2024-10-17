@@ -1,19 +1,24 @@
-import { apiClient } from "@/lib/utils";
+import { deleteApiClient } from "@/lib/utils";
 
 export async function deleteEmployeeById(userId) {
   try {
-    const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}api/users/${userId}/`,
+    const result = await deleteApiClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}`,
       {
         method: "DELETE",
       }
     );
-    console.log(response);
-    return { status: 200, data: response.data };
+
+    if (result === true) {
+      return { success: true, message: "Employee deleted successfully" };
+    } else {
+      throw new Error("Unexpected response from server");
+    }
   } catch (error) {
+    console.error("Error deleting employee:", error);
     return {
-      status: error.status || 500,
-      message: error.message || "Failed to delete the employee details",
+      success: false,
+      message: error.message || "Failed to delete employee",
     };
   }
 }
