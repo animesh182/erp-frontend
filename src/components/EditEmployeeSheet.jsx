@@ -94,7 +94,7 @@ export function EditEmployeeSheet({
     }
   }, [isOpen, employeeData, reset]);
 
-  console.log(watch());
+  // console.log(watch());
   const onSubmit = (data) => {
     if (employeeData) {
       onEditEmployee(data);
@@ -132,9 +132,10 @@ export function EditEmployeeSheet({
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue className="capitalize">
-                      {field.value ? field.value : "Select Gender"}{" "}
-                      {/* Show the selected gender */}
-                    </SelectValue>{" "}
+                      {field.value
+                        ? field.value
+                        : `Select ${prettifyText(name)}`}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>{props.children}</SelectContent>
                 </Select>
@@ -267,7 +268,7 @@ export function EditEmployeeSheet({
                   </>
                 ),
               })}
-              {renderField("supervisor", Input, { required: true })}
+              {renderField("supervisor", Input, { required: false })}
             </div>
           </div>
 

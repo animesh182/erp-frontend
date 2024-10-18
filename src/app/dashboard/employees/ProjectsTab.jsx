@@ -9,15 +9,17 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { assignProject } from "@/app/api/employees/assignProject";
 import { toast } from "sonner";
 
-
-
-const ProjectsTab = ({ employeeId, projectOptions, roleOptions, userId, employeeProjects }) => {
-  // console.log(employeeProjects, "emp");
-
-
-
+const ProjectsTab = ({
+  employeeId,
+  projectOptions,
+  roleOptions,
+  userId,
+  employeeProjects: initialEmployeeProjects,
+}) => {
+  const [employeeProjects, setEmployeeProjects] = useState(
+    initialEmployeeProjects
+  );
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-
 
   const openSheet = () => setIsSheetOpen(true);
 
@@ -27,20 +29,32 @@ const ProjectsTab = ({ employeeId, projectOptions, roleOptions, userId, employee
       console.log("Project assigned successfully:", response);
       toast.success("Project assigned successfully");
       setIsSheetOpen(false);
-      // You might want to update the UI or state here
+
+      // Refresh the component by updating the employeeProjects state
+      // You might need to fetch the updated projects list from the server here
+      // For now, we'll just add the new project to the existing list
+      setEmployeeProjects((prevProjects) => [
+        ...prevProjects,
+        {
+          project_title: values.projectTitle,
+          project_name: values.projectName,
+          project_status: "Ongoing", // Assuming a default status
+          start_date: values.startDate,
+          end_date: values.endDate,
+          completion: 0, // Assuming a starting completion of 0%
+          utilization: values.utilization,
+          days_involved: 0, // This might need to be calculated
+        },
+      ]);
     } catch (error) {
       console.error("Failed to assign project:", error);
       toast.error(error.message || "Failed to assign project");
-      // Handle the error (e.g., show an error message to the user)
     }
   };
 
-
-
-  if(!employeeProjects) {
-    return <div>No Projects</div>
+  if (!employeeProjects) {
+    return <div>No Projects</div>;
   }
-
 
   return (
     <div>
