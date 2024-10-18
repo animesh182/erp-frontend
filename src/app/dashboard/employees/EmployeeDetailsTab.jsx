@@ -61,7 +61,7 @@ const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions }) => {
       label: "Salary",
       value: `${formatAmountToNOK(employeeDetails?.salary)} per month`,
     },
-    { label: "PAN Number", value: employeeDetails?.PAN },
+    { label: "PAN Number", value: employeeDetails?.pan_number },
   ];
 
   const renderDetailItem = ({ label, value, link }) => (
