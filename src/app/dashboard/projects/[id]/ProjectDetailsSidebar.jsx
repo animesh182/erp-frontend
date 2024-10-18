@@ -10,7 +10,6 @@ const ProjectDetailsSidebar = ({ project }) => {
     name: user.user_name,
     image: null, // You can replace this with a proper avatar URL if available
   }));
-  console.log(teamMembers);
 
   return (
     <div className="rounded-md border w-full md:w-1/3 p-6 h-full space-y-6">

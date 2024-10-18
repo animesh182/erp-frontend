@@ -1,17 +1,38 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
+import { editProject } from "@/app/api/projects/editProject";
 
-export const ProgressTrackingCell = ({ row, projectName }) => {
+export const ProgressTrackingCell = ({ row, projectName, projectId }) => {
   const [progress, setProgress] = useState(row);
+  const debouncedEditProjectRef = useRef(null);
+
+  const debouncedEditProject = useCallback(
+    (newProgress) => {
+      if (debouncedEditProjectRef.current) {
+        clearTimeout(debouncedEditProjectRef.current);
+      }
+
+      debouncedEditProjectRef.current = setTimeout(async () => {
+        try {
+          await editProject(projectId, { progress: newProgress });
+          toast.success(
+            `Updated progress for ${projectName} to ${newProgress}%`
+          );
+        } catch (error) {
+          toast.error(`Failed to update progress: ${error.message}`);
+          console.error(`Failed to update progress for ${projectName}:`, error);
+        }
+      }, 1000);
+    },
+    [projectId, projectName]
+  );
 
   const handleProgressChange = (newValue) => {
-    setProgress(newValue[0]);
-
-    //add api call to update the progress
-    toast.success(`Updated progress for ${projectName} to ${newValue[0]}%`);
-    console.log(`Updated progress for ${projectName} to ${newValue[0]}%`);
+    const newProgress = newValue[0];
+    setProgress(newProgress);
+    debouncedEditProject(newProgress);
   };
 
   return (
