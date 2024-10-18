@@ -57,10 +57,13 @@ function DataTable({
   const isProjectPage = pathname === "/dashboard/projects";
   const isTransactionPage = pathname === "/dashboard/finances/transactions";
 
+  // Memoize filtered data
   const filteredData = useMemo(() => {
     let filtered = data;
 
     if (selectedTab !== "All") {
+      console.log(data, "data");
+      console.log(`Filtering by ${filterColumn}: ${selectedTab}`);
       filtered = filtered.filter((row) => row[filterColumn] === selectedTab);
     }
 
@@ -73,16 +76,25 @@ function DataTable({
     return filtered;
   }, [data, selectedTab, filterColumn, searchValue]);
 
+  // Initialize table instance with pagination
   const table = useReactTable({
     data: filteredData,
     columns,
     state: {
       sorting,
     },
+    pageCount: Math.ceil(filteredData.length / 10), // Adjust page size as needed
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    manualPagination: false, // You are not fetching data for each page separately
+    initialState: {
+      pagination: {
+        pageSize: 10, // Number of rows per page
+        pageIndex: 0, // Starting from the first page
+      },
+    },
   });
 
   const filterValues =
@@ -90,8 +102,6 @@ function DataTable({
     [];
 
   const handleRowClick = (id, event) => {
-    // event.stopPropagation();
-    // event.preventDefault();
     if (isProjectPage) {
       router.push(`/dashboard/projects/${id}`);
     }
@@ -181,10 +191,10 @@ function DataTable({
                               isProjectPage
                                 ? "cursor-pointer hover:bg-muted"
                                 : isTransactionPage
-                                ? row.original.costType === "expense"
-                                  ? "bg-[#FEF2F2]"
-                                  : row.original.costType === "revenue"
-                                  ? "bg-[#f0fdf4]"
+                                ? row.original.transactionType === "Expense"
+                                  ? "bg-[#dc9d9c]" // Light red for expense
+                                  : row.original.transactionType === "Revenue"
+                                  ? "bg-[#78ae78]" // Light green for revenue
                                   : ""
                                 : ""
                             }
@@ -211,13 +221,6 @@ function DataTable({
                             ))}
                           </TableRow>
                         ))}
-                        {isTableAddFormEnabled && (
-                          <FormRow
-                            onAddRow={onAddRow}
-                            formInputs={formInputs}
-                            projectOptions={projectOptions}
-                          />
-                        )}
                       </>
                     ) : (
                       <TableRow>
@@ -229,22 +232,41 @@ function DataTable({
                         </TableCell>
                       </TableRow>
                     )}
+                    {isTableAddFormEnabled && (
+                      <FormRow
+                        onAddRow={onAddRow}
+                        formInputs={formInputs}
+                        projectOptions={projectOptions}
+                      />
+                    )}
                   </TableBody>
                 </Table>
               </div>
+
+              {/* Pagination Controls */}
               <Pagination className="justify-end mt-4">
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious href="#" />
+                    <PaginationPrevious
+                      onClick={() => table.previousPage()}
+                      disabled={!table.getCanPreviousPage()}
+                    />
                   </PaginationItem>
+                  {Array.from({ length: table.getPageCount() }, (_, index) => (
+                    <PaginationItem key={index}>
+                      <PaginationLink
+                        onClick={() => table.setPageIndex(index)}
+                        active={table.getState().pagination.pageIndex === index}
+                      >
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
                   <PaginationItem>
-                    <PaginationLink href="#">1</PaginationLink>
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                  <PaginationItem>
-                    <PaginationNext href="#" />
+                    <PaginationNext
+                      onClick={() => table.nextPage()}
+                      disabled={!table.getCanNextPage()}
+                    />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>

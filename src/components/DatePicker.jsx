@@ -2,7 +2,11 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import {
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -12,13 +16,31 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function DatePicker({ value, onChange, minDate, disabled }) {
-  const [date, setDate] = React.useState(value);
+  const [date, setDate] = React.useState(value ? new Date(value) : null);
+  const [year, setYear] = React.useState(
+    date ? date.getFullYear() : new Date().getFullYear()
+  );
+  const [month, setMonth] = React.useState(
+    date ? date.getMonth() : new Date().getMonth()
+  );
 
   // Sync internal state with the value prop when it changes (e.g., after a reset)
   React.useEffect(() => {
-    setDate(value ? new Date(value) : null);
+    const newDate = value ? new Date(value) : null;
+    setDate(newDate);
+    if (newDate) {
+      setYear(newDate.getFullYear());
+      setMonth(newDate.getMonth());
+    }
   }, [value]);
 
   const handleDateChange = (selectedDate) => {
@@ -30,14 +52,34 @@ export function DatePicker({ value, onChange, minDate, disabled }) {
     if (minDate && adjustedDate < new Date(minDate).setHours(12, 0, 0, 0)) {
       const minDateAdjusted = new Date(minDate).setHours(12, 0, 0, 0);
       formattedDate = format(minDateAdjusted, "yyyy-MM-dd");
-      setDate(minDateAdjusted);
+      setDate(new Date(minDateAdjusted));
     } else {
       formattedDate = format(adjustedDate, "yyyy-MM-dd");
       setDate(adjustedDate);
     }
 
+    setYear(adjustedDate.getFullYear());
+    setMonth(adjustedDate.getMonth());
     onChange(formattedDate); // Pass the formatted date string to onChange
   };
+
+  const handleYearChange = (increment) => {
+    const newYear = year + increment;
+    setYear(newYear);
+    if (date) {
+      const newDate = new Date(date.setFullYear(newYear));
+      handleDateChange(newDate);
+    }
+  };
+
+  const handleYearChangeSelect = (value) => {
+    handleYearChange(parseInt(value) - year);
+  };
+
+  const years = Array.from(
+    { length: 100 },
+    (_, i) => new Date().getFullYear() - i
+  );
 
   return (
     <Popover>
@@ -56,13 +98,48 @@ export function DatePicker({ value, onChange, minDate, disabled }) {
         </Button>
       </PopoverTrigger>
       {!disabled && (
-        <PopoverContent className="w-auto p-0">
+        <PopoverContent className="w-auto p-0" align="start">
+          <div className="flex items-center justify-between p-2">
+            <Button
+              variant="outline"
+              className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+              onClick={() => handleYearChange(-1)}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Select
+              value={year.toString()}
+              onValueChange={handleYearChangeSelect}
+            >
+              <SelectTrigger className="h-7 w-[120px]">
+                <SelectValue placeholder={year} />
+              </SelectTrigger>
+              <SelectContent>
+                {years.map((y) => (
+                  <SelectItem key={y} value={y.toString()}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+              onClick={() => handleYearChange(1)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
           <Calendar
             mode="single"
             selected={date}
             onSelect={handleDateChange}
+            month={new Date(year, month)}
+            onMonthChange={(newMonth) => {
+              setMonth(newMonth.getMonth());
+              setYear(newMonth.getFullYear());
+            }}
             initialFocus
-            defaultMonth={date || undefined}
             disabled={(date) =>
               minDate && date < new Date(minDate).setHours(12, 0, 0, 0)
             }

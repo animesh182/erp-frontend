@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import TableTitle from "@/components/TableTitle";
 import ProjectHealth from "@/components/ProjectHealth";
 import { useRouter } from "next/navigation";
+import { format } from "date-fns";
 
 export default function CardLayout({ projects }) {
   console.log(projects);
@@ -38,40 +39,65 @@ export default function CardLayout({ projects }) {
           >
             <CardHeader className="p-0">
               <CardTitle className="text-lg p-0">
-                {project["name"]}
-                <ProjectHealth health={project["health"]} />
+                {project.name}
+                <ProjectHealth health={project.project_health} />
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0 mt-4">
-              <p className="text-xs">{project["projectCategory"]}</p>
-              <p className="text-gray-400 text-xs">{project["platform"]}</p>
+              <p className="text-xs">{project.project_category}</p>
+
+              <p className="text-gray-400 text-xs">
+                {project.platform || "No data"}
+              </p>
               <Badge
                 variant="subtle"
                 className={`${
-                  project["status"] === "Done"
+                  project.project_status === "1"
                     ? "bg-green-100 text-green-800"
-                    : project["status"] === "Not Started"
+                    : project.project_status === "2"
                     ? "bg-red-100 text-red-800"
                     : "bg-yellow-100 text-yellow-800"
                 } my-4`}
               >
-                {project["status"]}
+                {project.project_status === "1"
+                  ? "Done"
+                  : project.project_status === "2"
+                  ? "Not Started"
+                  : "Ongoing"}
               </Badge>
               <div>
                 <p className="text-xs mb-2">Team Members</p>
                 <TeamAvatars
-                  teamMembersImage={project["teamMembersImage"]}
-                  teamMembersCount={project["teamMembersCount"]}
+                  teamMembersImage={[
+                    "/default-avatar.jpg",
+                    "/default-avatar.jpg",
+                  ]}
+                  teamMembersCount={project.all_user_projects?.length}
                   size="medium"
                 />
               </div>
               <div className="text-xs mt-4">
-                {project["startDate"]} - {project["endDate"]}
+                {project.start_date && project.end_date
+                  ? `${format(
+                      new Date(project.start_date),
+                      "MMM d, yyyy"
+                    )} - ${format(new Date(project.end_date), "MMM d, yyyy")}`
+                  : project.start_date
+                  ? `${format(
+                      new Date(project.start_date),
+                      "MMM d, yyyy"
+                    )} - No end date`
+                  : project.end_date
+                  ? `No start date - ${format(
+                      new Date(project.end_date),
+                      "MMM d, yyyy"
+                    )}`
+                  : "No dates available"}
               </div>
             </CardContent>
             <CardFooter className="p-0 mt-2">
-              <Progress value={project["progress"]} className="h-1.5" />
-              <span className="ml-2 text-xs">{project["progress"]}%</span>
+              <Progress value={project.completion} className="h-1.5" />
+              <span className="ml-2 text-xs">{project.completion}%</span>
             </CardFooter>
           </Card>
         ))}

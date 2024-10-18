@@ -1,4 +1,5 @@
 "use client";
+import { fetchProfitLoss } from "../api/dashboard/fetchProfitLoss";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,8 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { subDays, format } from "date-fns";
-
+import { subDays, format, startOfDay } from "date-fns";
+import { KpiSkeleton, RectangleSkeleton } from "@/components/Skeletons";
+import { fetchKpiData } from "@/app/api/fetchKpiData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
 import ProjectBudgetChart from "@/components/charts/ProjectBudget";
@@ -17,40 +19,8 @@ import KpiCard from "@/components/kpicard";
 import ProfitLossChart from "@/components/charts/ProfitLoss";
 import DateRangePicker from "@/components/DateRangePicker";
 import { useState, useEffect } from "react";
-const rawData = [
-  {
-    name: "Olivia Smith",
-    "Basic Booking App": 1,
-    Ebibaaha: 7,
-  },
-  {
-    name: "Ethan Smith",
-    "Avinto ERP": 2,
-
-    Ebibaaha: 6,
-  },
-  {
-    name: "Ryan Reynolds",
-    "Avinto ERP": 2.5,
-    "Jambo Booking House": 2.5,
-    Ebibaaha: 3,
-  },
-  {
-    name: "Emily Johnson",
-    "Avinto ERP": 3,
-    "Jambo Booking House": 2,
-    "Basic Booking App": 3,
-  },
-  {
-    name: "Nathan Sullivan",
-    "Avinto ERP": 8,
-  },
-  {
-    name: "Isabella Rodriguez",
-    Ebibaaha: 8,
-  },
-];
-
+import fetchReourceUtil from "@/app/api/dashboard/fetchResourceUtil";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 const projectBudget = [
   {
     project: "Basic Booking App",
@@ -93,67 +63,7 @@ const projectBudget = [
     completed: true,
   },
 ];
-const kpiData = [
-  {
-    title: "Total Revenue",
-    value: 750000,
-    change: 20.1,
-    period: "month",
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-  {
-    title: "Total Profit",
-    value: 12234,
-    change: 19,
-    period: "month",
-    icon: <Activity />,
-  },
-  {
-    title: "Projects",
-    value: "+109",
-    change: 180.1,
-    period: "month",
-    icon: <Users />,
-    isMoney: false,
-  },
-  {
-    title: "Employees",
-    value: 19,
-    change: 10,
-    period: "month",
-    icon: <CreditCard />,
-    isMoney: false,
-  },
-  {
-    title: "Profit Growth",
-    value: 750000,
-    change: 30,
-    period: "month",
-    icon: <DollarSign />,
-  },
-  {
-    title: "Expected Revenue",
-    value: 3700,
-    period: "upcoming month",
-    icon: <Activity />,
 
-    isTrend: false,
-  },
-  {
-    title: "Expected Cost",
-    value: 2000,
-    period: "upcoming month",
-    icon: <Users />,
-    isTrend: false,
-  },
-  {
-    title: "Expected Liquidity",
-    value: 2000,
-    period: "upcoming month",
-    icon: <CreditCard />,
-    isTrend: false,
-  },
-];
 export const profitLossData = [
   {
     name: "Jan",
@@ -244,30 +154,174 @@ export const profitLossData = [
 const ongoingProjects = projectBudget.filter((project) => !project.completed);
 const completedProjects = projectBudget.filter((project) => project.completed);
 export default function Dashboard() {
-  const initialEndDate = new Date(); // Today's date
-  const initialStartDate = subDays(initialEndDate, 28); // 4 weeks ago
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
-  const [data, setData] = useState([]); // State to hold the fetched data
+  const [profitLoss, setProfitLoss] = useState([]);
+  const [resourceUtilData, setResourceUtilData] = useState();
+  const [fetchedKpiData, setFetchedKpiData] = useState();
+  const [kpiValues, setKpiValues] = useState();
+  const initialEndDate = startOfDay(new Date()); // Today's date
+  const initialStartDate = startOfDay(subDays(initialEndDate, 28)); // 4 weeks ago
+  const [startDate, setStartDate] = useState(
+    format(startOfDay(initialStartDate), "yyyy-MM-dd")
+  );
+  const [endDate, setEndDate] = useState(
+    format(startOfDay(initialEndDate), "yyyy-MM-dd")
+  );
   useEffect(() => {
-    if (startDate && endDate) {
-      fetchData(startDate, endDate);
-    }
+    const getProfitLoss = async () => {
+      const { status, data } = await fetchProfitLoss();
+      if (status === 200) {
+        // Transform the data into the required format
+        const transformedData = data.monthly_totals.map((monthData) => {
+          const { month, net_income, expenses, profit } = monthData;
+          // Calculate profit percentage
+          const profitPercentage =
+            net_income > 0 ? (profit / net_income) * 100 : 0;
+
+          // Map month names to abbreviations
+          const monthAbbreviations = {
+            January: "Jan",
+            February: "Feb",
+            March: "Mar",
+            April: "Apr",
+            May: "May",
+            June: "Jun",
+            July: "Jul",
+            August: "Aug",
+            September: "Sep",
+            October: "Oct",
+            November: "Nov",
+            December: "Dec",
+          };
+
+          return {
+            name: monthAbbreviations[month], // Abbreviated month names
+            totalIncome: net_income,
+            expenses,
+            profit,
+            profitPercentage, // This now properly reflects negative profit cases
+          };
+        });
+
+        setProfitLoss(transformedData); // Set the transformed data to state
+      } else {
+        console.error("Failed to fetch profit-loss data");
+      }
+    };
+
+    getProfitLoss();
+  }, []);
+
+  console.log(profitLoss);
+  useEffect(() => {
+    const getKpiData = async () => {
+      const { status, data } = await fetchKpiData(startDate, endDate);
+      if (status === 200) {
+        setFetchedKpiData(data);
+      } else {
+        console.error("Failed to fetch KPI data");
+      }
+    };
+
+    getKpiData();
   }, [startDate, endDate]);
+  useEffect(() => {
+    const getResourceUtilData = async () => {
+      const { status, data } = await fetchReourceUtil(startDate, endDate);
 
-  const fetchData = (startDate, endDate) => {
-    console.log("Fetching data from:", startDate, "to:", endDate);
+      if (status === 200) {
+        const transformedData = data.map((user) => {
+          const userProjects = {};
+          user.projects.forEach((project) => {
+            userProjects[project.project_name] = project.utilization;
+          });
+          return {
+            name: user.user_name || "Unknown",
+            ...userProjects,
+          };
+        });
+        setResourceUtilData(transformedData);
+      } else {
+        console.error("Failed to fetch KPI data");
+      }
+    };
 
-    const fetchedData = [
-      // Add your data here or fetch from your API
-    ];
-    setData(fetchedData);
-  };
+    getResourceUtilData();
+  }, [startDate, endDate]);
+  useEffect(() => {
+    if (fetchedKpiData) {
+      const updatedKpiDatas = [
+        {
+          title: "Total Revenue",
+          value: parseFloat(fetchedKpiData.total_revenue_current_month),
+          change: parseFloat(fetchedKpiData.percentage_change_in_revenue),
+          period: "month",
+          icon: <DollarSign className="w-4 h-4" />,
+        },
+        {
+          title: "Total Profit",
+          value: parseFloat(fetchedKpiData.total_profit_current_month),
+          change: parseFloat(fetchedKpiData.percentage_change_in_profit),
+          period: "month",
+          icon: <Activity />,
+        },
+        {
+          title: "Projects",
+          value: fetchedKpiData.num_projects_current_month,
+          change: parseFloat(fetchedKpiData.percentage_change_in_num_projects),
+          period: "month",
+          icon: <Users />,
+          isMoney: false,
+        },
+        {
+          title: "Employees",
+          value: fetchedKpiData.num_employees,
+          change: parseFloat(fetchedKpiData.employees_percentage_change),
+          period: "month",
+          icon: <CreditCard />,
+          isMoney: false,
+        },
+        {
+          title: "Invoiced Revenue",
+          value: parseFloat(
+            fetchedKpiData.total_invoiced_revenue_current_month
+          ),
+          change: parseFloat(fetchedKpiData.invoiced_revenue_percentage_change),
+          period: "month",
+          icon: <DollarSign />,
+        },
+        {
+          title: "Total Expense",
+          value: fetchedKpiData.total_expenses_current_month,
+          change: parseFloat(fetchedKpiData.percentage_change_in_expenses),
+          period: "month",
+          icon: <CreditCard />,
+        },
+        {
+          title: "Expected Cost",
+          value: "N/A",
+          change: "N/A",
+          period: "month",
+          icon: <CreditCard />,
+          isMoney: false,
+        },
+        {
+          title: "Expected Liquidity",
+          value: "N/A",
+          change: "N/A",
+          period: "month",
+          icon: <CreditCard />,
+          isMoney: false,
+        },
+      ];
+      setKpiValues(updatedKpiDatas); // Setting the new kpiDatas array
+    }
+  }, [fetchedKpiData]); // This will trigger whenever kpiData is fetched
 
   const handleDateChange = (startDate, endDate) => {
-    setStartDate(startDate);
-    setEndDate(endDate);
+    setStartDate(format(startDate, "yyyy-MM-dd"));
+    setEndDate(format(endDate, "yyyy-MM-dd"));
   };
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
@@ -285,19 +339,26 @@ export default function Dashboard() {
       > */}
       <div className="flex flex-1 flex-col gap-4 md:gap-8 ">
         <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
-          {kpiData.map((data, index) => (
-            <div key={index}>
-              <KpiCard
-                title={data.title}
-                value={data.value}
-                change={data.change}
-                period={data.period}
-                icon={data.icon}
-                isMoney={data.isMoney}
-                isTrend={data.isTrend}
-              />
-            </div>
-          ))}
+          {kpiValues && kpiValues.length > 0
+            ? kpiValues.map((data, index) => (
+                <div key={index}>
+                  <KpiCard
+                    title={data.title}
+                    value={data.value}
+                    change={data.change}
+                    period={data.period}
+                    icon={data.icon}
+                    isMoney={data.isMoney}
+                    isTrend={data.isTrend}
+                  />
+                </div>
+              ))
+            : // Render skeletons based on expected number of KPI cards
+              [...Array(6)].map((_, index) => (
+                <div key={index}>
+                  <KpiSkeleton />
+                </div>
+              ))}
         </div>
       </div>
       <div className="flex items-center justify-center gap-x-6 w-full select-none">
@@ -313,7 +374,7 @@ export default function Dashboard() {
             <Button>View More</Button>
           </CardHeader>
           <CardContent className="p-0 w-full h-[400px]">
-            <ProfitLossChart data={profitLossData} />
+            <ProfitLossChart data={profitLoss} />
           </CardContent>
         </Card>
         <Card className="w-2/5 h-full">
@@ -359,8 +420,14 @@ export default function Dashboard() {
           </CardTitle>
           <Button>View More</Button>
         </CardHeader>
-        <CardContent>
-          <EmployeeMonthlyHours rawData={rawData} />
+        <CardContent className="w-full h-full">
+          {resourceUtilData && resourceUtilData.length > 0 ? (
+            <EmployeeMonthlyHours rawData={resourceUtilData} />
+          ) : resourceUtilData && resourceUtilData.length === 0 ? (
+            <div className="text-3xl font-semibold">No Data Available</div>
+          ) : (
+            <RectangleSkeleton />
+          )}
         </CardContent>
       </Card>
       {/* </div> */}

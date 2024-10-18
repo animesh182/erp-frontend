@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -15,15 +16,18 @@ import {
 import { DatePicker } from "@/components/DatePicker";
 import { prettifyText, cn } from "@/lib/utils";
 import { toast } from "sonner";
-
 export function EditEmployeeSheet({
   isOpen,
   onClose,
   employeeData,
   onEditEmployee,
   onAddEmployee,
+  roleOptions,
+  levelOptions,
 }) {
   const {
+    getValues,
+    watch,
     control,
     handleSubmit,
     reset,
@@ -32,22 +36,53 @@ export function EditEmployeeSheet({
     defaultValues: employeeData || {},
   });
 
+  // useEffect(() => {
+  //   if (employeeData) {
+  //     console.log(watch(), "edit");
+  //   } else {
+  //     console.log(watch(), "add");
+  //   }
+  // }, [watch()]);
   React.useEffect(() => {
     if (isOpen) {
       if (employeeData) {
-        reset(employeeData);
+        reset({
+          employeeId: employeeData.employee_id,
+          dateOfBirth: employeeData.date_of_birth,
+          gender: employeeData.gender,
+          maritalStatus: employeeData.marital_status,
+          startDate: employeeData.start_date || null,
+          endDate: employeeData.end_date || null,
+          country: employeeData.country,
+          phone: employeeData.phone_number,
+          email: employeeData.email,
+          linkedInName: employeeData.linkedin_name,
+          linkedInUrl: employeeData.linkedin_url,
+          // jobTitle:  employeeData.,
+          role: employeeData.role,
+          level: employeeData.level,
+          department: employeeData.department,
+          employeeType: employeeData.employment_type,
+          supervisor: employeeData.supervisor || null,
+          salary: employeeData.salary,
+          panNumber: employeeData.PAN,
+        });
       } else {
         reset({
           employeeId: "",
           dateOfBirth: null,
           gender: "",
           maritalStatus: "",
+          startDate: null,
+          endDate: null,
           country: "",
           phone: "",
           email: "",
+          startDate: "",
+          endDate: "",
           linkedInName: "",
           linkedInUrl: "",
-          jobTitle: "",
+          // jobTitle: "",
           level: "",
           department: "",
           employeeType: "",
@@ -59,6 +94,7 @@ export function EditEmployeeSheet({
     }
   }, [isOpen, employeeData, reset]);
 
+  // console.log(watch());
   const onSubmit = (data) => {
     if (employeeData) {
       onEditEmployee(data);
@@ -95,7 +131,11 @@ export function EditEmployeeSheet({
                   className={cn(hasError && "ring-2 ring-red-500")}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder={`Select ${prettifyText(name)}`} />
+                    <SelectValue className="capitalize">
+                      {field.value
+                        ? field.value
+                        : `Select ${prettifyText(name)}`}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>{props.children}</SelectContent>
                 </Select>
@@ -150,6 +190,8 @@ export function EditEmployeeSheet({
             <h3 className="font-semibold mb-2">Basic Details</h3>
             <div className="space-y-4">
               {renderField("employeeId", Input, { required: true })}
+              {renderField("fullName", Input, { required: true })}
+
               {renderField("dateOfBirth", DatePicker, { required: true })}
               {renderField("gender", Select, {
                 required: true,
@@ -172,6 +214,8 @@ export function EditEmployeeSheet({
                   </>
                 ),
               })}
+              {renderField("startDate", DatePicker, { required: true })}
+              {renderField("endDate", DatePicker, { required: false })}
             </div>
           </div>
 
@@ -181,7 +225,6 @@ export function EditEmployeeSheet({
               {renderField("country", Input, { required: true })}
               {renderField("phone", Input, { required: true })}
               {renderField("email", Input, { required: true })}
-              {renderField("linkedInName", Input)}
               {renderField("linkedInUrl", Input)}
             </div>
           </div>
@@ -189,8 +232,30 @@ export function EditEmployeeSheet({
           <div>
             <h3 className="font-semibold mb-2">Employment Details</h3>
             <div className="space-y-4">
-              {renderField("jobTitle", Input, { required: true })}
-              {renderField("level", Input, { required: true })}
+              {renderField("jobTitle", Select, {
+                required: true,
+                children: (
+                  <>
+                    {roleOptions?.map((role) => (
+                      <SelectItem key={role.id} value={role.title}>
+                        {role.title}
+                      </SelectItem>
+                    ))}
+                  </>
+                ),
+              })}
+              {renderField("level", Select, {
+                required: true,
+                children: (
+                  <>
+                    {levelOptions?.map((level) => (
+                      <SelectItem key={level.id} value={level.description}>
+                        {level.description}
+                      </SelectItem>
+                    ))}
+                  </>
+                ),
+              })}
               {renderField("department", Input, { required: true })}
               {renderField("employeeType", Select, {
                 required: true,
@@ -203,7 +268,7 @@ export function EditEmployeeSheet({
                   </>
                 ),
               })}
-              {renderField("supervisor", Input, { required: true })}
+              {renderField("supervisor", Input, { required: false })}
             </div>
           </div>
 

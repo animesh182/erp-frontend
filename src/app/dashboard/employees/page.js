@@ -14,12 +14,25 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
-
+import { createEmployee } from "@/app/api/employees/createEmployee";
+import { getRoles } from "@/app/api/role/getRoles";
+import { getLevels } from "@/app/api/level/getLevels";
+import { getProjects } from "@/app/api/projects/getProjects";
+// import getEmployees from "@/app/api/employees/getEmployees";
+// import { RectangleSkeleton } from "@/components/Skeletons";
+import {
+  getEmployees,
+  // getEmployeesWithRoles,
+} from "@/app/api/employees/getEmployees";
+// import { apiClient } from "@/lib/utils";
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeTab, setActiveTab] = useState("employeeDetails");
   const [employeeDetails, setEmployeeDetails] = useState(null);
+  const [roleOptions, setRoleOptions] = useState([]);
+  const [levelOptions, setLevelOptions] = useState([]);
+  const [projectOptions, setProjectOptions] = useState([]);
 
   const [payments, setPayments] = useState([
     {
@@ -69,63 +82,82 @@ export default function Employees() {
     },
   ]);
 
+  const fetchRoles = async () => {
+    try {
+      const roles = await getRoles();
+      setRoleOptions(roles);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const projects = await getProjects(true);
+      setProjectOptions(projects);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
+  };
+
+  const fetchLevels = async () => {
+    try {
+      const levels = await getLevels();
+      setLevelOptions(levels);
+    } catch (error) {
+      console.error("Error fetching levels:", error);
+    }
+  };
+
   useEffect(() => {
-    // Simulating a fetch request for employee details
-    const fetchEmployeeDetails = async () => {
-      // Replace this with actual API call later
-      const mockResponse = {
-        employeeId: "EMP002",
-        dateOfBirth: "2002-12-03",
-        gender: "Female",
-        maritalStatus: "Married",
-        country: "United States",
-        phone: "+1 (555) 123-8567",
-        email: "janedoe@example.com",
-        linkedInName: "Jane Doe",
-        linkedInUrl: "https://www.linkedin.com/in/janedoe",
-        jobTitle: "Software Engineer",
-        level: "L3",
-        department: "Engineering",
-        employeeType: "Full-time",
-        supervisor: "John Doe",
-        salary: 90000,
-        panNumber: "ABCDE1224F",
-      };
-
-      // Simulate API delay
-      // await new Promise((resolve) => setTimeout(resolve, 500));
-
-      setEmployeeDetails(mockResponse);
+    // console.log('running')
+    const getEmployeeDetails = async () => {
+      try {
+        const { status, data } = await getEmployees();
+        if (status === 200) {
+          setEmployeeDetails(data);
+        } else {
+          console.error("Failed to fetch employee data");
+        }
+      } catch (error) {
+        console.error("Error fetching employee details:", error);
+      }
     };
 
-    if (selectedEmployee) {
-      fetchEmployeeDetails();
-    }
-  }, [selectedEmployee]);
+    getEmployeeDetails();
+    fetchRoles();
+    fetchLevels();
+    fetchProjects();
+  }, []);
 
-  useEffect(() => {
-    setActiveTab("employeeDetails");
-  }, [selectedEmployee]);
+  // useEffect(() => {
+  //   setActiveTab("employeeDetails");
+  // }, [selectedEmployee]);
 
   const handleEmployeeAdd = () => {
     setIsSheetOpen(true);
   };
 
-  const onAddEmployee = (formData) => {
-    // Generate a new ID (you might want to use a more robust method in production)
-    toast.success("Employee added successfully");
-    console.log(formData);
+  const onAddEmployee = async (formData) => {
+    try {
+      const response = await createEmployee(formData);
+      toast.success("Employee added successfully");
+      console.log(response);
 
-    const newId = `employee_${Date.now()}`;
-    const newEmployee = {
-      id: newId,
-      ...formData,
-    };
-    setPayments([...payments, newEmployee]);
-    setIsSheetOpen(false);
+      const newEmployee = {
+        id: response.id, // Assuming the API returns an id
+        ...formData,
+      };
+      setPayments([...payments, newEmployee]);
+      setIsSheetOpen(false);
+    } catch (error) {
+      toast.error(error.message || "Failed to add employee");
+      console.error("Error adding employee:", error);
+    }
   };
 
   const handleRowSelect = (row) => {
+    // console.log(row);
     setSelectedEmployee(row);
   };
 
@@ -138,17 +170,27 @@ export default function Employees() {
           </Button>
         </div>
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 py-4 px-0">
-          <div className="flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
-            <TableTitle
-              title="List of Employees"
-              subtitle="List of all employees in the company"
-              totalItemCount={payments.length}
-            />
-            <SimpleDataTable
-              columns={columns}
-              data={payments}
-              onRowSelect={handleRowSelect}
-            />
+          <div className="h-full flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
+            {
+              employeeDetails && employeeDetails.length > 0 && (
+                <>
+                  <TableTitle
+                    title="List of Employees"
+                    subtitle="List of all employees in the company"
+                    totalItemCount={employeeDetails.length}
+                  />
+                  <SimpleDataTable
+                    columns={columns}
+                    data={employeeDetails}
+                    onRowSelect={handleRowSelect}
+                  />
+                </>
+              )
+              // : (
+              //   <div className=" ">
+              //     <RectangleSkeleton height={"745"} />
+              //   </div>
+            }
           </div>
           <div className="flex flex-col items-center gap-1 text-center border rounded-md">
             <div className="h-24 w-full flex items-center bg-muted px-5 min-h-24">
@@ -166,7 +208,7 @@ export default function Employees() {
                 </Avatar>
                 <div className="flex flex-col items-start">
                   <div className="text-lg font-medium">
-                    {selectedEmployee?.employeeName || "John Doe"}
+                    {selectedEmployee?.full_name || "John Doe"}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {selectedEmployee?.role || "Product Manager"}
@@ -188,23 +230,36 @@ export default function Employees() {
               </TabsList>
               <div className="flex-1 overflow-y-auto">
                 <TabsContent value="employeeDetails">
-                  <EmployeeDetailsTab employeeDetails={employeeDetails} />
+                  <EmployeeDetailsTab
+                    employeeDetails={selectedEmployee}
+                    levelOptions={levelOptions}
+                    roleOptions={roleOptions}
+                  />
                 </TabsContent>
                 <TabsContent value="projects">
-                  <ProjectsTab employeeId={selectedEmployee?.id} />
+                  <ProjectsTab
+                    employeeId={selectedEmployee?.id}
+                    projectOptions={projectOptions}
+                    roleOptions={roleOptions}
+                    employeeProjects={selectedEmployee?.user_projects}
+                  />
                 </TabsContent>
                 <TabsContent value="payroll">
-                  <PayrollTab employeeId={selectedEmployee?.id} />
+                  <PayrollTab payrollData={selectedEmployee?.payroll || []} />
                 </TabsContent>
               </div>
             </Tabs>
           </div>
         </div>
+        {/* {console.log(selectedEmployee)} */}
       </div>
       <EditEmployeeSheet
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddEmployee={onAddEmployee}
+        roleOptions={roleOptions}
+        levelOptions={levelOptions}
+        //the edit employee is on the employee details tab
       />
     </main>
   );

@@ -13,20 +13,23 @@ import {
   Cell,
 } from "recharts";
 import { formatAmountDecimalToNOK } from "@/lib/utils";
-
+import { useTheme } from "next-themes";
 export default function ProfitLossChart({ data }) {
+  const { theme } = useTheme();
+
   function CustomTooltip({ active, payload, label }) {
     if (active && payload && payload.length) {
-      const { totalIncome, expenses, netIncome } = payload[0].payload;
+      console.log(payload[0].payload);
+      const { totalIncome, expenses, profit } = payload[0].payload;
       return (
         <div className={`p-2 text-xs bg-primary-foreground rounded shadow-lg `}>
           <p className="font-semibold">{`Revenue: ${formatAmountDecimalToNOK(
             totalIncome
           )} kr`}</p>
           <p className="">{`Cost: ${formatAmountDecimalToNOK(expenses)} kr`}</p>
-          <p className="">{`Profit: ${formatAmountDecimalToNOK(
-            netIncome
-          )} kr`}</p>
+          <p className="">{`${
+            profit >= 0 ? "Profit" : "Loss"
+          }: ${formatAmountDecimalToNOK(Math.abs(profit))} kr`}</p>
         </div>
       );
     }
@@ -49,7 +52,14 @@ export default function ProfitLossChart({ data }) {
       >
         <CartesianGrid stroke="#f5f5f5" vertical={false} />
         <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-        <YAxis yAxisId="left" tick={{ fontSize: 12 }} tickCount={6} />
+        <YAxis
+          yAxisId="left"
+          tick={{
+            fontSize: 12,
+            fill: theme === "dark" ? "#FFFFFF" : "#808080", // Adjust color based on theme
+          }}
+          tickCount={6}
+        />
         <YAxis
           yAxisId="right"
           orientation="right"
@@ -103,7 +113,10 @@ export default function ProfitLossChart({ data }) {
             dataKey="profitPercentage"
             position="top"
             formatter={(value) => (value % 1 !== 0 ? value.toFixed(1) : value)}
-            style={{ fontSize: "14px", fill: "#000" }}
+            style={{
+              fontSize: "14px",
+              fill: theme === "dark" ? "#FFFFFF" : "#808080", // Adjust color based on theme
+            }}
           />
         </Line>
       </ComposedChart>

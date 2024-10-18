@@ -38,8 +38,14 @@ export function EditRowSheet({
   }, [isOpen, rowData, formInputs, reset]);
 
   const onSubmit = (data) => {
+    // Assuming `rowData` contains the current row being edited
+    const editedDataWithId = {
+      ...data,
+      id: rowData.id, // Ensure the invoice ID is included in the edited data
+    };
+
     if (typeof onEditRow === "function") {
-      onEditRow(data);
+      onEditRow(editedDataWithId); // Pass the data with the ID to onEditRow
     } else {
       console.error("onEditRow is not a function");
       toast.error("Failed to update row. Please try again.");

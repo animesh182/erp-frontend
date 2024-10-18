@@ -61,10 +61,14 @@ export const formInputs = [
     required: true,
   },
   {
-    component: <Input placeholder="Client Email" type="email" />,
+    component: (
+      <Input placeholder="Client Email" type="email" disabled={false} />
+    ),
+
     name: "clientEmail",
     required: true,
   },
+
   {
     component: (
       <Select>
@@ -74,16 +78,16 @@ export const formInputs = [
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Status</SelectLabel>
-            <SelectItem value="not-started">Not Started</SelectItem>
-            <SelectItem value="ongoing">Ongoing</SelectItem>
-            <SelectItem value="done">Done</SelectItem>
+            <SelectItem value="Not Started">Not Started</SelectItem>
+            <SelectItem value="Ongoing">Ongoing</SelectItem>
+            <SelectItem value="Done">Done</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
     ),
-    name: "status",
+    name: "project_status",
     required: true,
-    filterValues: ["All", "not-started", "ongoing", "done"],
+    filterValues: ["All", "Not Started", "Ongoing", "Done"],
   },
   {
     component: (

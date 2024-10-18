@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import Cookies from "js-cookie";
-
+import { differenceInDays } from "date-fns";
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
@@ -15,7 +15,9 @@ export function formatAmountToNOK(amount) {
     maximumFractionDigits: 0,
   }).format(amount);
 }
-
+export function getDifferenceInDays(startDate, endDate) {
+  return differenceInDays(endDate, startDate);
+}
 export function formatAmountDecimalToNOK(amount) {
   if (!amount) return "-";
   return new Intl.NumberFormat("nb-NO", {
@@ -49,26 +51,139 @@ export function debounce(func, wait) {
   };
 }
 
+// Function to refresh the access token using the refresh token
+async function refreshToken() {
+  try {
+    const refreshToken = Cookies.get("refresh_token"); // Retrieve refresh token from cookies
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/token/refresh/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh: refreshToken }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to refresh token");
+    }
+
+    const data = await response.json();
+    // Set the new access token in cookies
+    Cookies.set("access_token", data.access, { expires: 1 }); // Set the new token with expiration
+    return data.access;
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    throw error;
+  }
+}
+
 export async function apiClient(url, options = {}) {
-  const token = Cookies.get("access_token");
+  let token = Cookies.get("access_token"); // Get the access token from cookies
 
   const defaultHeaders = {
     "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
+    ...(token && { Authorization: `Bearer ${token}` }), // Add Authorization header if token exists
   };
 
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      ...defaultHeaders,
-      ...options.headers,
-    },
-  });
+  try {
+    // Attempt to make the API request
+    let response = await fetch(url, {
+      ...options,
+      headers: {
+        ...defaultHeaders,
+        ...options.headers, // Merge additional headers if provided
+      },
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message);
+    // If the token is invalid or expired, try to refresh it
+    if (response.status === 401) {
+      const errorData = await response.json();
+      if (errorData.code === "token_not_valid") {
+        // Try refreshing the token
+        token = await refreshToken();
+        // Retry the API request with the new token
+        response = await fetch(url, {
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    }
+
+    // If the response is still not OK after refreshing, throw an error
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "An error occurred");
+    }
+
+    return await response.json(); // Return the parsed response
+  } catch (error) {
+    console.error("API Request Failed:", error.message);
+    throw new Error(
+      error.message || "An error occurred while processing the request"
+    );
   }
+}
 
-  return await response.json();
+export async function deleteApiClient(url, options = {}) {
+  let token = Cookies.get("access_token"); // Get the access token from cookies
+
+  const defaultHeaders = {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }), // Add Authorization header if token exists
+  };
+
+  try {
+    // Attempt to make the DELETE request
+    let response = await fetch(url, {
+      ...options,
+      method: "DELETE",
+      headers: {
+        ...defaultHeaders,
+        ...options.headers, // Merge additional headers if provided
+      },
+    });
+
+    // If the token is invalid or expired, try to refresh it
+    if (response.status === 401) {
+      const errorData = await response.json();
+      if (errorData.code === "token_not_valid") {
+        // Try refreshing the token
+        token = await refreshToken();
+        // Retry the DELETE request with the new token
+        response = await fetch(url, {
+          ...options,
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+      }
+    }
+
+    // Check for 204 status code (No Content)
+    if (response.status === 204) {
+      return true; // Successful deletion
+    }
+
+    // If the response is not 204, throw an error
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "An error occurred");
+    }
+
+    return false; // Should not reach here for successful deletion
+  } catch (error) {
+    console.error("API Delete Request Failed:", error.message);
+    throw new Error(
+      error.message || "An error occurred while processing the delete request"
+    );
+  }
 }
