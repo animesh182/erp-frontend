@@ -33,6 +33,16 @@ export const columns = [
   {
     accessorKey: "invoiceIssuedDate",
     header: "Invoice Issued Date",
+    cell: ({ row }) => {
+      const { invoiceIssuedDate } = row.original;
+      return (
+        <span>
+          {invoiceIssuedDate
+            ? format(new Date(invoiceIssuedDate), "MMM dd yyyy")
+            : "N/A"}
+        </span>
+      );
+    },
     enableSorting: false,
   },
   {
@@ -60,7 +70,11 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const { paidDate } = row.original;
-      return <span>{format(paidDate, "MMM d, yyyy")}</span>;
+      return (
+        <span>
+          {paidDate ? format(new Date(paidDate), "MMM dd yyyy") : "N/A"}
+        </span>
+      );
     },
   },
 

@@ -16,7 +16,6 @@ import {
 import { DatePicker } from "@/components/DatePicker";
 import { prettifyText, cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { getRoles, getLevels } from "@/app/api/employees/getEmployees";
 export function EditEmployeeSheet({
   isOpen,
   onClose,
@@ -26,8 +25,6 @@ export function EditEmployeeSheet({
   roleOptions,
   levelOptions,
 }) {
-  const [roles, setRoles] = useState();
-  const [levels, setLevels] = useState();
   const {
     getValues,
     watch,
@@ -38,39 +35,6 @@ export function EditEmployeeSheet({
   } = useForm({
     defaultValues: employeeData || {},
   });
-  useEffect(() => {
-    const getRolesFromApi = async () => {
-      try {
-        const { status, data } = await getRoles();
-        if (status === 200) {
-          setRoles(data);
-        } else {
-          console.error("Failed to fetch employee data");
-        }
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      }
-    };
-
-    getRolesFromApi();
-  }, []);
-  useEffect(() => {
-    const getLevelsFromApi = async () => {
-      try {
-        const { status, data } = await getLevels();
-        if (status === 200) {
-          setLevels(data);
-        } else {
-          console.error("Failed to fetch employee data");
-        }
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      }
-    };
-
-    getLevelsFromApi();
-  }, []);
-  console.log(employeeData, "ed");
 
   // useEffect(() => {
   //   if (employeeData) {

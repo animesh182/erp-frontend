@@ -48,7 +48,6 @@ function DataTable({
   initialStartDate,
   initialEndDate,
   projectOptions,
-  theme,
 }) {
   const [sorting, setSorting] = useState([]);
   const [selectedTab, setSelectedTab] = useState("All");
@@ -190,20 +189,12 @@ function DataTable({
                             data-state={row.getIsSelected() && "selected"}
                             className={
                               isProjectPage
-                                ? `cursor-pointer hover:bg-muted ${
-                                    theme === "dark"
-                                      ? "bg-gray-700 text-white"
-                                      : ""
-                                  }`
+                                ? "cursor-pointer hover:bg-muted"
                                 : isTransactionPage
-                                ? row.original.isExpense === true
-                                  ? theme === "dark"
-                                    ? "bg-[#fe5555]" // Darker shade for expense in dark mode
-                                    : "bg-[#FEF2F2]" // Light mode expense color
-                                  : row.original.isExpense === false
-                                  ? theme === "dark"
-                                    ? "bg-[#46954b]" // Darker shade for revenue in dark mode
-                                    : "bg-[#f0fdf4]" // Light mode revenue color
+                                ? row.original.transactionType === "Expense"
+                                  ? "bg-[#dc9d9c]" // Light red for expense
+                                  : row.original.transactionType === "Revenue"
+                                  ? "bg-[#78ae78]" // Light green for revenue
                                   : ""
                                 : ""
                             }
@@ -230,13 +221,6 @@ function DataTable({
                             ))}
                           </TableRow>
                         ))}
-                        {isTableAddFormEnabled && (
-                          <FormRow
-                            onAddRow={onAddRow}
-                            formInputs={formInputs}
-                            projectOptions={projectOptions}
-                          />
-                        )}
                       </>
                     ) : (
                       <TableRow>
@@ -247,6 +231,13 @@ function DataTable({
                           No results.
                         </TableCell>
                       </TableRow>
+                    )}
+                    {isTableAddFormEnabled && (
+                      <FormRow
+                        onAddRow={onAddRow}
+                        formInputs={formInputs}
+                        projectOptions={projectOptions}
+                      />
                     )}
                   </TableBody>
                 </Table>

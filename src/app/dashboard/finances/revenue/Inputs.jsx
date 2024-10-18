@@ -57,9 +57,9 @@ export const formInputs = [
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Status</SelectLabel>
-            <SelectItem value="paid">Paid</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="Paid">Paid</SelectItem>
+            <SelectItem value="Pending">Pending</SelectItem>
+            <SelectItem value="Cancelled">Cancelled</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
@@ -82,8 +82,8 @@ export const formInputs = [
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Payment Type</SelectLabel>
-            <SelectItem value="one-time">One-Time</SelectItem>
-            <SelectItem value="recurring">Recurring</SelectItem>
+            <SelectItem value="One-Time">One-Time</SelectItem>
+            <SelectItem value="Recurring">Recurring</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

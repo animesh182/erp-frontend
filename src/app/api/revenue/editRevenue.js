@@ -1,13 +1,15 @@
 import { apiClient } from "@/lib/utils";
 
-export async function createRevenue(revenueData) {
+export async function editRevenue(revenueId, revenueData) {
   // Transform the revenueData structure
   const transformedData = {
     invoice: {
       name: revenueData.name,
       amount: parseFloat(revenueData.amount),
       ...(revenueData.paidDate && { payment_date: revenueData.paidDate }),
-      ...(revenueData.projectName && { project: revenueData.projectName }),
+      ...(revenueData.projectName && revenueData.projectName !== "N/A"
+        ? { project: revenueData.projectName }
+        : {}),
       payment_status: revenueData.status,
       payment_type: revenueData.type,
       transaction_type: "Revenue",
@@ -19,9 +21,9 @@ export async function createRevenue(revenueData) {
 
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/revenue/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/revenue/${revenueId}/`,
       {
-        method: "POST",
+        method: "PATCH",
         body: JSON.stringify(transformedData),
       }
     );
@@ -29,6 +31,6 @@ export async function createRevenue(revenueData) {
     // Return the response data
     return response;
   } catch (error) {
-    throw new Error(error.message || "Failed to create revenue");
+    throw new Error(error.message || "Failed to edit revenue");
   }
 }

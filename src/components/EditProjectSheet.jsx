@@ -65,6 +65,7 @@ export function EditProjectSheet({
           client: "",
           status: "",
           // teamMembersCount: 0,
+          type: "",
           progress: 0,
           startDate: null,
           endDate: null,
