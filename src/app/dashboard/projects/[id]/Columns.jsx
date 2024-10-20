@@ -2,15 +2,15 @@
 
 import MultiLineNameCell from "@/components/MultiLineNameCell";
 import SimpleTableActionsDropdown from "@/components/SimpleTableActionsDropdown";
-import { apiClient } from "@/lib/utils";
+import { deleteResourceUtilization } from "@/app/api/projects/deleteResourceUtilization";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 export const columns = [
   {
     accessorKey: "employeeName",
     header: "Assigned To",
     cell: ({ row }) => {
-      console.log(row);
       const { user_name, user_email } = row.original; // Access the full row data
       return (
         <MultiLineNameCell
@@ -38,9 +38,11 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const { start_date } = row.original;
-      return    <div>      {start_date
-        ? format(new Date(start_date), "MMM dd yyyy")
-        : "N/A"}</div>;
+      return (
+        <div>
+          {start_date ? format(new Date(start_date), "MMM dd yyyy") : "N/A"}
+        </div>
+      );
     },
   },
   {
@@ -49,39 +51,34 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const { end_date } = row.original;
-      return    <div>      {end_date
-        ? format(new Date(end_date), "MMM dd yyyy")
-        : "Present"}</div>;
+      return (
+        <div>
+          {end_date ? format(new Date(end_date), "MMM dd yyyy") : "Present"}
+        </div>
+      );
     },
   },
   {
     accessorKey: "actions",
     header: "",
     cell: ({ row }) => {
-      const handleEdit = () => {
-        console.log("Edit", row.original.id);
-        // Handle edit action
-      };
-
-      const handleDelete = () => {
-        const userId = row.original.id;
+      const handleDelete = async () => {
+        // console.log(row.original, "row.original");
+        const userId = row.original.user_id;
+        const projectId = row.original.project_id;
         try {
-          const response = apiClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/user_projects/${userId}/${row.original.project_id}/delete/`,
-            {
-              method: "DELETE",
-            }
-          );
-          if (response.ok) {
+          const result = await deleteResourceUtilization(userId, projectId);
+          if (result.success) {
             toast.success(
               `${row.original.user_name} deleted successfully from the project.`
             );
+          } else {
+            throw new Error(result.message);
           }
         } catch (error) {
           toast.error("There was an error deleting the user");
           console.error("There was an error deleting the user:", error);
         }
-        // Handle delete action
       };
 
       return (

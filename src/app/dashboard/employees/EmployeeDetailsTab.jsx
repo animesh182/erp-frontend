@@ -88,7 +88,7 @@ const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions }) => {
     // Generate a new ID (you might want to use a more robust method in production)
     const payload = {
       employee_id: formData.employeeId,
-      full_name: formData.linkedInName,
+      full_name: formData.fullName,
       email: formData.email,
       password: "avinto123",
       employee_id: formData.employeeId,
