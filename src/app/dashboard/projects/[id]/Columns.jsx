@@ -63,7 +63,7 @@ export const columns = [
     header: "",
     cell: ({ row }) => {
       const handleDelete = async () => {
-        console.log(row.original, "row.original");
+        // console.log(row.original, "row.original");
         const userId = row.original.user_id;
         const projectId = row.original.project_id;
         try {
