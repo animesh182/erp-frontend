@@ -25,6 +25,7 @@ import {
   // getEmployeesWithRoles,
 } from "@/app/api/employees/getEmployees";
 // import { apiClient } from "@/lib/utils";
+
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -161,6 +162,17 @@ export default function Employees() {
     setSelectedEmployee(row);
   };
 
+  const getInitials = (name) => {
+    if (!name || typeof name !== "string") {
+      return "";
+    }
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="items-center">
@@ -197,13 +209,16 @@ export default function Employees() {
               <div className="flex items-center gap-3">
                 <Avatar className="w-12 h-12">
                   <AvatarImage
-                    src={selectedEmployee?.imageUrl || "/default-avatar.jpg"}
+                    src={selectedEmployee?.imageUrl}
                     className="object-cover"
                   />
-                  <AvatarFallback className="text-lg font-semibold">
-                    <span>
-                      {selectedEmployee?.employeeName?.charAt(0) || "JD"}
-                    </span>
+
+                  <AvatarFallback>
+                    {selectedEmployee?.imageUrl ? (
+                      <span>{selectedEmployee?.full_name}</span>
+                    ) : (
+                      getInitials(selectedEmployee?.full_name)
+                    )}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col items-start">
@@ -211,7 +226,7 @@ export default function Employees() {
                     {selectedEmployee?.full_name || "John Doe"}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {selectedEmployee?.role || "Product Manager"}
+                    {selectedEmployee?.role}
                   </div>
                 </div>
               </div>
