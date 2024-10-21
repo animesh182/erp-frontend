@@ -31,6 +31,7 @@ import { Input } from "./input";
 import DateRangePicker from "../DateRangePicker";
 import TabFilters from "../TabFilters";
 import { usePathname, useRouter } from "next/navigation";
+import { Badge } from "./badge";
 
 export const EditRowContext = createContext(null); //creating context for the edit row function
 
