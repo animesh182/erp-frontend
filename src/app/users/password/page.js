@@ -3,13 +3,11 @@ import { CompanyIcon } from '@/components/companyicon';
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
 import Link from 'next/link'
 import React from 'react'
-import google from "../../../public/google.svg";
 import Image from 'next/image';
 import EmployeeLoginFooter from '@/components/EmployeeLoginFooter';
-const EmployeeLogin = () => {
+const EmployeePassword = () => {
   return (
     <div className="h-screen w-full flex flex-col justify-center items-center ">   
        <Card className="w-7/12  pt-14 pb-2 h-11/12">
@@ -17,13 +15,14 @@ const EmployeeLogin = () => {
     <div className=" grid grid-cols-2">
       
       <div className="flex flex-col justify-center space-y-2 px-20  pb-6">
-        <div className="text-sm text-[#020617] font-medium tracking-tight"> Email</div>
-        <Input className="" placeholder="Enter your work email address"/>
-        <Button className="w-full text-sm">Sign in with Email</Button>
-       <br/>
-      <div className="flex text-[#64748B] justify-center text-xs ">OR CONTINUE WITH</div>
-      <br/>
-      <Button className="w-full shadow-md text-sm" variant="outline"><Image src={google} alt="google"/> Sign in with Google</Button>
+        <div className="text-sm text-[#020617] font-medium tracking-tight"> Enter Password</div>
+        <Input className="" placeholder="Enter a new password"/>
+        <div className="text-sm text-[#020617] font-medium tracking-tight"> Confirm Password</div>
+        <Input className="" placeholder="Enter a new password"/>
+        <Button className="w-full text-sm">Confirm</Button>
+  
+    
+      
    
       </div>
       <div className="flex flex-col justify-center space-y-2 pr-20 pb-6 pt-20">
@@ -65,4 +64,4 @@ emails. Find out more about how we use data in our  <Link href="/"><u>privacy po
   )
 }
 
-export default EmployeeLogin
+export default EmployeePassword
