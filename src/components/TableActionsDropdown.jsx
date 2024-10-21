@@ -23,10 +23,6 @@ const TableActionsDropdown = ({ formInputs, onDelete, rowData }) => {
     setIsOpen(true);
   };
 
-  const handleClose = () => {
-    setIsOpen(false);
-  };
-
   const methods = useForm();
   return (
     <DropdownMenu>
@@ -47,7 +43,7 @@ const TableActionsDropdown = ({ formInputs, onDelete, rowData }) => {
       <FormProvider {...methods}>
         <EditRowSheet
           isOpen={isOpen}
-          onClose={handleClose}
+          onClose={() => setIsOpen(false)}
           rowData={rowData}
           formInputs={formInputs}
           onEditRow={onEditRow}

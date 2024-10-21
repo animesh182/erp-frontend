@@ -256,7 +256,9 @@ function DataTable({
                     <PaginationItem key={index}>
                       <PaginationLink
                         onClick={() => table.setPageIndex(index)}
-                        active={table.getState().pagination.pageIndex === index}
+                        isActive={
+                          table.getState().pagination.pageIndex === index
+                        }
                       >
                         {index + 1}
                       </PaginationLink>

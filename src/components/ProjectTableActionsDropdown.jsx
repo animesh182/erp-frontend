@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useCallback, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EditRowContext } from "./ui/data-table";
@@ -25,6 +25,10 @@ const ProjectTableActionsDropdown = ({
   const { onEditRow } = useContext(EditRowContext);
   // console.log(onEditRow, "asdfasdfas");
 
+  useEffect(() => {
+    console.log("start-stop", isOpen);
+  }, [isOpen]);
+
   const handleOpen = () => {
     setIsOpen(true);
   };
@@ -32,6 +36,14 @@ const ProjectTableActionsDropdown = ({
   const handleClose = () => {
     setIsOpen(false);
   };
+
+  const handleEditProject = useCallback(
+    (projectId, data) => {
+      onEditRow(projectId, data);
+      handleClose();
+    },
+    [onEditRow]
+  );
 
   const methods = useForm();
 
@@ -56,9 +68,8 @@ const ProjectTableActionsDropdown = ({
           isOpen={isOpen}
           onClose={handleClose}
           projectData={rowData}
-          onEditProject={onEditRow}
+          onEditProject={handleEditProject}
           clients={clients}
-          //   formInputs={formInputs}
         />
       </FormProvider>
     </DropdownMenu>
