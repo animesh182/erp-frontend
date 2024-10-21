@@ -20,7 +20,6 @@ import ProfitLossChart from "@/components/charts/ProfitLoss";
 import DateRangePicker from "@/components/DateRangePicker";
 import { useState, useEffect } from "react";
 import fetchReourceUtil from "@/app/api/dashboard/fetchResourceUtil";
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 const projectBudget = [
   {
     project: "Basic Booking App",
@@ -211,7 +210,7 @@ export default function Dashboard() {
     getProfitLoss();
   }, []);
 
-  console.log(profitLoss);
+  // console.log(profitLoss);
   useEffect(() => {
     const getKpiData = async () => {
       const { status, data } = await fetchKpiData(startDate, endDate);

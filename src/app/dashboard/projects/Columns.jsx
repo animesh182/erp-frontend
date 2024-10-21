@@ -123,7 +123,7 @@ export const projectColumns = (clients) => [
           <p className="text-xs ">
             -
             {(completion_date && format(completion_date, "MMM dd, yyyy")) ||
-              "N/A"}
+              "Present"}
           </p>
         </div>
       );
@@ -145,7 +145,7 @@ export const projectColumns = (clients) => [
     cell: ({ row }) => {
       const rowData = row.original;
       const handleDelete = () => {
-        console.log("Delete", row.original.id);
+        // console.log("Delete", row.original.id);
 
         try {
           const response = apiClient(

@@ -182,7 +182,7 @@ export default function Employees() {
           </Button>
         </div>
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 py-4 px-0">
-          <div className="h-full flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
+          <div className="h-screen flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
             {
               employeeDetails && employeeDetails.length > 0 && (
                 <>
@@ -234,7 +234,7 @@ export default function Employees() {
             <Tabs
               value={activeTab}
               onValueChange={setActiveTab}
-              className="w-full mt-4 justify-start text-left h-[calc(100%-7.2rem)] flex flex-col"
+              className="w-full mt-4 justify-start text-left max-h-[calc(100vh-7.2rem)] h-[calc(100%-7.2rem)] flex flex-col"
             >
               <TabsList className="mx-6 w-max">
                 <TabsTrigger value="projects">Projects</TabsTrigger>
@@ -266,7 +266,6 @@ export default function Employees() {
             </Tabs>
           </div>
         </div>
-        {/* {console.log(selectedEmployee)} */}
       </div>
       <EditEmployeeSheet
         isOpen={isSheetOpen}

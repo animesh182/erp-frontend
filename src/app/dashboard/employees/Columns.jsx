@@ -46,11 +46,6 @@ export const columns = [
     accessorKey: "actions",
     header: "",
     cell: ({ row }) => {
-      const handleEdit = () => {
-        console.log("Edit", row.original.id);
-        // Handle edit action
-      };
-
       const handleDelete = async () => {
         console.log("Delete", row.original.id);
         try {

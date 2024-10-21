@@ -114,7 +114,7 @@ export function DatePicker({ value, onChange, minDate, disabled }) {
               <SelectTrigger className="h-7 w-[120px]">
                 <SelectValue placeholder={year} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-10">
                 {years.map((y) => (
                   <SelectItem key={y} value={y.toString()}>
                     {y}
