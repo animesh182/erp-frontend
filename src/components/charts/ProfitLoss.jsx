@@ -15,6 +15,7 @@ import {
 import { formatAmountDecimalToNOK } from "@/lib/utils";
 import { useTheme } from "next-themes";
 export default function ProfitLossChart({ data }) {
+  console.log(data, "data");
   const { theme } = useTheme();
 
   function CustomTooltip({ active, payload, label }) {
@@ -72,7 +73,7 @@ export default function ProfitLossChart({ data }) {
         <Legend
           wrapperStyle={{ fontSize: "12px", paddingTop: "12px" }}
           formatter={(value) => {
-            if (value === "netIncome") return "Net Income";
+            if (value === "profit") return "Net Income";
 
             if (value === "expenses") return "Expenses";
             if (value === "profitPercentage") return "Profit Percentage";
@@ -90,7 +91,7 @@ export default function ProfitLossChart({ data }) {
 
         <Bar
           stackId="a"
-          dataKey="netIncome"
+          dataKey="profit"
           fill="#2563EB"
           yAxisId="left"
           radius={[5, 5, 0, 0]}

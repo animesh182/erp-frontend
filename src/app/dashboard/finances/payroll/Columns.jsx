@@ -3,7 +3,6 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK } from "@/lib/utils";
 import TableActionsDropdown from "@/components/TableActionsDropdown";
-import { formInputs } from "@/app/dashboard/payroll/Inputs";
 import { format } from "date-fns";
 
 export const columns = [

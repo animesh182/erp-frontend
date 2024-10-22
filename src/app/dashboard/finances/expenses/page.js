@@ -35,13 +35,13 @@ export default function Expenses() {
   }, [startDate, endDate, refreshKey]);
 
   const fetchData = async (startDate, endDate) => {
-    console.log("Fetching data from:", startDate, "to:", endDate);
+    // console.log("Fetching data from:", startDate, "to:", endDate);
     try {
       const fetchedData = await getExpense(
         format(startDate, "yyyy-MM-dd"),
         format(endDate, "yyyy-MM-dd")
       );
-      console.log(fetchedData, "data");
+      // console.log(fetchedData, "data");
       setData(fetchedData);
       setLoading(false);
     } catch (error) {

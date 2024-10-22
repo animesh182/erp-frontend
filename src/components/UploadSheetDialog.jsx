@@ -63,7 +63,7 @@ export function UploadSheetDialog() {
               type="file"
               onChange={handleFileChange}
               accept=".xlsx, .xls"
-              className="cursor-pointer bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="cursor-pointer bg-gray-100 hover:bg-gray-200 transition-colors text-black"
             />
             <Button
               onClick={handleUpload}

@@ -21,6 +21,7 @@ import ProfitLossChart from "@/components/charts/ProfitLoss";
 import DateRangePicker from "@/components/DateRangePicker";
 import { useState, useEffect } from "react";
 import fetchReourceUtil from "@/app/api/dashboard/fetchResourceUtil";
+import { useRouter } from "next/navigation";
 
 export const profitLossData = [
   {
@@ -125,6 +126,8 @@ export default function Dashboard() {
   const [endDate, setEndDate] = useState(
     format(startOfDay(initialEndDate), "yyyy-MM-dd")
   );
+
+  const router = useRouter();
   useEffect(() => {
     const getProfitLoss = async () => {
       const { status, data } = await fetchProfitLoss();
@@ -328,7 +331,7 @@ export default function Dashboard() {
                 </div>
               ))
             : // Render skeletons based on expected number of KPI cards
-              [...Array(6)].map((_, index) => (
+              [...Array(8)].map((_, index) => (
                 <div key={index}>
                   <KpiSkeleton />
                 </div>

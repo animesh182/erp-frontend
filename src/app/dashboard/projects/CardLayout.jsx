@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 
 export default function CardLayout({ projects }) {
-  // console.log(projects);
+  console.log(projects, "projects");
   const router = useRouter();
 
   const handleCardClick = (projectId) => {
@@ -72,7 +72,7 @@ export default function CardLayout({ projects }) {
                     "/default-avatar.jpg",
                     "/default-avatar.jpg",
                   ]}
-                  teamMembersCount={project.all_user_projects?.length}
+                  teamMembersCount={project.all_user_projects.length}
                   size="medium"
                 />
               </div>
@@ -97,7 +97,9 @@ export default function CardLayout({ projects }) {
             </CardContent>
             <CardFooter className="p-0 mt-2">
               <Progress value={project.completion} className="h-1.5" />
-              <span className="ml-2 text-xs">{project.completion}%</span>
+              <span className="ml-2 text-xs">
+                {project.completion?.toFixed(0)}%
+              </span>
             </CardFooter>
           </Card>
         ))}
