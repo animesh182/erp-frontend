@@ -25,24 +25,27 @@ const ProjectTableActionsDropdown = ({
   const { onEditRow } = useContext(EditRowContext);
   // console.log(onEditRow, "asdfasdfas");
 
-  useEffect(() => {
-    console.log("start-stop", isOpen);
-  }, [isOpen]);
+  // useEffect(() => {
+  //   console.log("start-stop", isOpen);
+  // }, [isOpen]);
 
   const handleOpen = () => {
     setIsOpen(true);
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsOpen(false);
-  };
+    setTimeout(() => {
+      document.body.style.pointerEvents = "";
+    }, 0);
+  }, []);
 
   const handleEditProject = useCallback(
     (projectId, data) => {
       onEditRow(projectId, data);
       handleClose();
     },
-    [onEditRow]
+    [onEditRow, handleClose]
   );
 
   const methods = useForm();
