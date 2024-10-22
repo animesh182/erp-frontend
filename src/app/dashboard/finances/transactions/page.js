@@ -38,7 +38,10 @@ export default function Transactions() {
       const getKpiData = async () => {
         try {
           // Fetch KPI data
-          const kpiResponse = await fetchTransactionKpi(startDate, endDate);
+          const kpiResponse = await fetchTransactionKpi(
+            format(startDate, "yyyy-MM-dd"),
+            format(endDate, "yyyy-MM-dd")
+          );
 
           if (kpiResponse.status === 200) {
             // Set KPI data from the response

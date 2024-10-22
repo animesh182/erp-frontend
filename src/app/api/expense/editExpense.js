@@ -6,11 +6,12 @@ export async function editExpense(expenseId, expenseData) {
     invoice: {
       name: expenseData.name,
       amount: parseFloat(expenseData.amount),
-      payment_date: expenseData.invoiceIssuedDate,
+      issued_date: expenseData.invoiceIssuedDate,
       ...(expenseData.projectName && expenseData.projectName !== "N/A"
         ? { project: expenseData.projectName }
         : {}),
       payment_status: expenseData.status,
+      ...(expenseData.paidDate && { payment_date: expenseData.paidDate }),
       payment_type: expenseData.type,
       transaction_type: "Expense",
       invoice_no: expenseData.invoice,

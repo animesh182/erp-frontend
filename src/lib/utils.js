@@ -82,47 +82,47 @@ async function refreshToken() {
 }
 
 export async function apiClient(url, options = {}) {
-  let token = Cookies.get("access_token"); // Get the access token from cookies
+  let token = Cookies.get("access_token");
 
   const defaultHeaders = {
-    "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }), // Add Authorization header if token exists
+    ...(token && { Authorization: `Bearer ${token}` }),
   };
 
+  // Only set Content-Type if the body is not FormData
+  if (!(options.body instanceof FormData)) {
+    defaultHeaders["Content-Type"] = "application/json";
+  }
+
   try {
-    // Attempt to make the API request
     let response = await fetch(url, {
       ...options,
       headers: {
         ...defaultHeaders,
-        ...options.headers, // Merge additional headers if provided
+        ...options.headers,
       },
     });
 
-    // If the token is invalid or expired, try to refresh it
     if (response.status === 401) {
       const errorData = await response.json();
       if (errorData.code === "token_not_valid") {
-        // Try refreshing the token
         token = await refreshToken();
-        // Retry the API request with the new token
         response = await fetch(url, {
           ...options,
           headers: {
-            "Content-Type": "application/json",
+            ...defaultHeaders,
             Authorization: `Bearer ${token}`,
+            ...options.headers,
           },
         });
       }
     }
 
-    // If the response is still not OK after refreshing, throw an error
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "An error occurred");
     }
 
-    return await response.json(); // Return the parsed response
+    return await response.json();
   } catch (error) {
     console.error("API Request Failed:", error.message);
     throw new Error(

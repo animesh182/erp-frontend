@@ -366,8 +366,7 @@ export default function Dashboard() {
             <CardTitle>
               Profit & Loss
               <div className="text-sm font-normal text-muted-foreground">
-                This table caputures all cost streams associated with each
-                project
+                This table provides a financial overview of the company
               </div>
             </CardTitle>
             <Button
@@ -385,8 +384,7 @@ export default function Dashboard() {
             <CardTitle>
               Project Financial Status
               <div className="text-sm font-normal text-muted-foreground">
-                This table caputures all cost streams associated with each
-                project
+                This table provides a financial health of specific projects
               </div>
             </CardTitle>
           </CardHeader>
