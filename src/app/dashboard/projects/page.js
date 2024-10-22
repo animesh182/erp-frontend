@@ -17,6 +17,7 @@ import { getClients } from "@/app/api/projects/getClients";
 import { createProject } from "@/app/api/projects/createProject";
 import { editProject } from "@/app/api/projects/editProject";
 import { createClient } from "@/app/api/projects/createClient";
+import { deleteProject } from "@/app/api/projects/deleteProject";
 
 export default function Projects() {
   const methods = useForm();
@@ -103,6 +104,19 @@ export default function Projects() {
     }
   };
 
+  const onDeleteProject = async (projectId) => {
+    try {
+      const response = await deleteProject(projectId);
+      if (response && response.message) {
+        toast.success(response.message);
+        refreshComponent(); // Refresh the component
+      }
+    } catch (error) {
+      toast.error("There was an error deleting the project");
+      console.error("There was an error deleting the project:", error);
+    }
+  };
+
   const handleClientAdd = async (formData) => {
     try {
       await createClient(formData);
@@ -162,6 +176,7 @@ export default function Projects() {
                 formInputs={formInputs}
                 filterColumn={"project_status"}
                 onEditRow={onEditProject}
+                onDeleteRow={onDeleteProject}
               />
             </FormProvider>
           )

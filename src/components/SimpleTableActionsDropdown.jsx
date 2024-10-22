@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
+import React, { useContext, useState } from "react";
 import { MoreHorizontal } from "lucide-react";
+import { SimpleDataTableContext } from "./ui/simple-data-table";
 
 import {
   DropdownMenu,
@@ -10,8 +11,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import DeleteDialog from "./DeleteDialog";
 
-const SimpleTableActionsDropdown = ({ onDelete }) => {
+const SimpleTableActionsDropdown = ({ rowData }) => {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { onDeleteRow } = useContext(SimpleDataTableContext);
+
+  const handleDelete = () => {
+    onDeleteRow(rowData.user_id, rowData.project_id);
+    setIsDeleteDialogOpen(false);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -23,10 +33,19 @@ const SimpleTableActionsDropdown = ({ onDelete }) => {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onDelete} className="hover:cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => setIsDeleteDialogOpen(true)}
+          className="hover:cursor-pointer text-destructive"
+        >
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
+      <DeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        itemName={rowData?.name}
+        onDelete={handleDelete}
+      />
     </DropdownMenu>
   );
 };

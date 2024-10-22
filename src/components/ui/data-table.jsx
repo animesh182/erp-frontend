@@ -48,6 +48,7 @@ function DataTable({
   initialStartDate,
   initialEndDate,
   projectOptions,
+  onDeleteRow,
 }) {
   const [sorting, setSorting] = useState([]);
   const [selectedTab, setSelectedTab] = useState("All");
@@ -108,7 +109,7 @@ function DataTable({
   };
 
   return (
-    <EditRowContext.Provider value={{ onEditRow }}>
+    <EditRowContext.Provider value={{ onEditRow, onDeleteRow }}>
       <div className="w-full">
         <div className="space-y-5">
           {filterValues.length > 0 && (

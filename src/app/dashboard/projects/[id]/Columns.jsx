@@ -12,13 +12,7 @@ export const columns = [
     header: "Assigned To",
     cell: ({ row }) => {
       const { user_name, user_email } = row.original; // Access the full row data
-      return (
-        <MultiLineNameCell
-          // imageUrl={imageUrl}
-          title={user_name}
-          subtitle={user_email}
-        />
-      );
+      return <MultiLineNameCell title={user_name} subtitle={user_email} />;
     },
     enableSorting: false,
   },
@@ -62,28 +56,9 @@ export const columns = [
     accessorKey: "actions",
     header: "",
     cell: ({ row }) => {
-      const handleDelete = async () => {
-        // console.log(row.original, "row.original");
-        const userId = row.original.user_id;
-        const projectId = row.original.project_id;
-        try {
-          const result = await deleteResourceUtilization(userId, projectId);
-          if (result.success) {
-            toast.success(
-              `${row.original.user_name} deleted successfully from the project.`
-            );
-          } else {
-            throw new Error(result.message);
-          }
-        } catch (error) {
-          toast.error("There was an error deleting the user");
-          console.error("There was an error deleting the user:", error);
-        }
-      };
-
       return (
         <div className="flex items-center">
-          <SimpleTableActionsDropdown onDelete={handleDelete} />
+          <SimpleTableActionsDropdown rowData={row.original} />
         </div>
       );
     },
