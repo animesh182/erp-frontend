@@ -370,7 +370,11 @@ export default function Dashboard() {
                 project
               </div>
             </CardTitle>
-            <Button>View More</Button>
+            <Button
+              onClick={() => router.push("/dashboard/finances/projection")}
+            >
+              View More
+            </Button>
           </CardHeader>
           <CardContent className="p-0 w-full h-[400px]">
             <ProfitLossChart data={profitLoss} />
@@ -414,10 +418,9 @@ export default function Dashboard() {
           <CardTitle>
             Resource Utilization
             <div className="text-sm font-normal text-muted-foreground">
-              This table caputures all cost streams associated with each project
+              This graph shows an overview of all resources in the project
             </div>
           </CardTitle>
-          <Button>View More</Button>
         </CardHeader>
         <CardContent className="w-full h-full">
           {resourceUtilData && resourceUtilData.length > 0 ? (

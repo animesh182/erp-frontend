@@ -1,6 +1,6 @@
 "use client"; // Ensure this is at the top of the file
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { columns } from "./Columns";
 
 import TableTitle from "@/components/TableTitle";
@@ -18,13 +18,8 @@ import { createEmployee } from "@/app/api/employees/createEmployee";
 import { getRoles } from "@/app/api/role/getRoles";
 import { getLevels } from "@/app/api/level/getLevels";
 import { getProjects } from "@/app/api/projects/getProjects";
-// import getEmployees from "@/app/api/employees/getEmployees";
-// import { RectangleSkeleton } from "@/components/Skeletons";
-import {
-  getEmployees,
-  // getEmployeesWithRoles,
-} from "@/app/api/employees/getEmployees";
-// import { apiClient } from "@/lib/utils";
+import { getEmployees } from "@/app/api/employees/getEmployees";
+import { deleteEmployeeById } from "@/app/api/employees/deleteEmployeeById";
 
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -34,6 +29,11 @@ export default function Employees() {
   const [roleOptions, setRoleOptions] = useState([]);
   const [levelOptions, setLevelOptions] = useState([]);
   const [projectOptions, setProjectOptions] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshComponent = useCallback(() => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  }, []);
 
   const [payments, setPayments] = useState([
     {
@@ -111,7 +111,6 @@ export default function Employees() {
   };
 
   useEffect(() => {
-    // console.log('running')
     const getEmployeeDetails = async () => {
       try {
         const { status, data } = await getEmployees();
@@ -129,11 +128,7 @@ export default function Employees() {
     fetchRoles();
     fetchLevels();
     fetchProjects();
-  }, []);
-
-  // useEffect(() => {
-  //   setActiveTab("employeeDetails");
-  // }, [selectedEmployee]);
+  }, [refreshKey]);
 
   const handleEmployeeAdd = () => {
     setIsSheetOpen(true);
@@ -146,19 +141,30 @@ export default function Employees() {
       console.log(response);
 
       const newEmployee = {
-        id: response.id, // Assuming the API returns an id
+        id: response.id,
         ...formData,
       };
       setPayments([...payments, newEmployee]);
       setIsSheetOpen(false);
+      refreshComponent();
     } catch (error) {
       toast.error(error.message || "Failed to add employee");
       console.error("Error adding employee:", error);
     }
   };
 
+  const onDeleteEmployee = async (id) => {
+    try {
+      const response = await deleteEmployeeById(id);
+      toast.success("Employee deleted successfully");
+      refreshComponent();
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      toast.error("Failed to delete employee");
+    }
+  };
+
   const handleRowSelect = (row) => {
-    // console.log(row);
     setSelectedEmployee(row);
   };
 
@@ -183,26 +189,21 @@ export default function Employees() {
         </div>
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 py-4 px-0">
           <div className="h-screen flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
-            {
-              employeeDetails && employeeDetails.length > 0 && (
-                <>
-                  <TableTitle
-                    title="List of Employees"
-                    subtitle="List of all employees in the company"
-                    totalItemCount={employeeDetails.length}
-                  />
-                  <SimpleDataTable
-                    columns={columns}
-                    data={employeeDetails}
-                    onRowSelect={handleRowSelect}
-                  />
-                </>
-              )
-              // : (
-              //   <div className=" ">
-              //     <RectangleSkeleton height={"745"} />
-              //   </div>
-            }
+            {employeeDetails && employeeDetails.length > 0 && (
+              <>
+                <TableTitle
+                  title="List of Employees"
+                  subtitle="List of all employees in the company"
+                  totalItemCount={employeeDetails.length}
+                />
+                <SimpleDataTable
+                  columns={columns}
+                  data={employeeDetails}
+                  onRowSelect={handleRowSelect}
+                  onDeleteRow={onDeleteEmployee}
+                />
+              </>
+            )}
           </div>
           <div className="flex flex-col items-center gap-1 text-center border rounded-md">
             <div className="h-24 w-full flex items-center bg-muted px-5 min-h-24">
@@ -273,7 +274,6 @@ export default function Employees() {
         onAddEmployee={onAddEmployee}
         roleOptions={roleOptions}
         levelOptions={levelOptions}
-        //the edit employee is on the employee details tab
       />
     </main>
   );

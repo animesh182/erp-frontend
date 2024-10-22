@@ -1,8 +1,7 @@
 "use client";
 import React, { useContext, useState } from "react";
 import { MoreHorizontal } from "lucide-react";
-import { FormProvider, useForm } from "react-hook-form";
-import { EditRowContext } from "./ui/data-table";
+import { SimpleDataTableContext } from "./ui/simple-data-table";
 
 import {
   DropdownMenu,
@@ -12,25 +11,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EditRowSheet } from "./EditRowSheet";
 import DeleteDialog from "./DeleteDialog";
 
-const TableActionsDropdown = ({ formInputs, rowData }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const EmployeeTableActionsDropdown = ({ rowData }) => {
+  console.log(rowData, "rowData");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const { onEditRow, onDeleteRow } = useContext(EditRowContext);
-
-  const handleOpen = () => {
-    setIsOpen(true);
-  };
+  const { onDeleteRow } = useContext(SimpleDataTableContext);
 
   const handleDelete = () => {
     onDeleteRow(rowData.id);
     setIsDeleteDialogOpen(false);
   };
 
-  const methods = useForm();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -42,7 +34,6 @@ const TableActionsDropdown = ({ formInputs, rowData }) => {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleOpen}>Edit</DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setIsDeleteDialogOpen(true)}
           className="hover:cursor-pointer text-destructive"
@@ -50,23 +41,14 @@ const TableActionsDropdown = ({ formInputs, rowData }) => {
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
-      <FormProvider {...methods}>
-        <EditRowSheet
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          rowData={rowData}
-          formInputs={formInputs}
-          onEditRow={onEditRow}
-        />
-      </FormProvider>
       <DeleteDialog
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
-        itemName={rowData.name}
+        itemName={rowData?.full_name}
         onDelete={handleDelete}
       />
     </DropdownMenu>
   );
 };
 
-export default TableActionsDropdown;
+export default EmployeeTableActionsDropdown;
