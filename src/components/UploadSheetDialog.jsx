@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FileSpreadsheet, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { createPayroll } from "@/app/api/finances/payroll/createPayroll";
 
 export function UploadSheetDialog() {
   const [file, setFile] = useState(null);
@@ -24,18 +25,12 @@ export function UploadSheetDialog() {
 
   const handleUpload = async () => {
     if (file) {
+      // console.log(file, "file");
       setIsUploading(true);
       try {
-        // Simulating file upload process
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        const response = await createPayroll(file);
 
-        // Process the file here
-        console.log("Processing file:", file.name);
-
-        // Show success message
         toast.success("Payroll sheet uploaded successfully");
-
-        setIsOpen(false);
       } catch (error) {
         console.error("Upload failed:", error);
         toast.error("Failed to upload payroll sheet");

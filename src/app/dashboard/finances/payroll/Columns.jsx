@@ -102,18 +102,9 @@ export const columns = [
     cell: ({ row }) => {
       const rowData = row.original;
 
-      const handleDelete = () => {
-        console.log("Delete", row.original.id);
-        // Handle delete action
-      };
-
       return (
         <div className="flex items-center">
-          <TableActionsDropdown
-            rowData={rowData}
-            onDelete={handleDelete}
-            formInputs={formInputs}
-          />
+          <TableActionsDropdown rowData={rowData} />
         </div>
       );
     },

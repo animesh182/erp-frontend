@@ -6,9 +6,10 @@ export async function createExpense(expenseData) {
     invoice: {
       name: expenseData.name,
       amount: parseFloat(expenseData.amount),
-      payment_date: expenseData.invoiceIssuedDate,
+      issued_date: expenseData.invoiceIssuedDate,
       ...(expenseData.projectName && { project: expenseData.projectName }),
       payment_status: expenseData.status,
+      ...(expenseData.paidDate && { payment_date: expenseData.paidDate }),
       payment_type: expenseData.type, // Assuming 1 for one-time, 2 for recurring
       transaction_type: "Expense",
       invoice_no: expenseData.invoice,
