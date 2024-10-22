@@ -1,5 +1,6 @@
 "use client";
 import { fetchProfitLoss } from "../api/dashboard/fetchProfitLoss";
+import { fetchOngoingProjects } from "../api/dashboard/getFinancialStatus";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,48 +21,7 @@ import ProfitLossChart from "@/components/charts/ProfitLoss";
 import DateRangePicker from "@/components/DateRangePicker";
 import { useState, useEffect } from "react";
 import fetchReourceUtil from "@/app/api/dashboard/fetchResourceUtil";
-const projectBudget = [
-  {
-    project: "Basic Booking App",
-    totalIncome: 100000,
-    expenses: { direct: 2000, fixed: 5000, npa: 50000 },
-    isRecurring: true,
-  },
-  {
-    project: "Jambo Booking House",
-    totalIncome: 200000,
-    expenses: { direct: 3000, fixed: 15000, npa: 170000 },
-    isRecurring: true,
-  },
-  {
-    project: "Avinto ERP",
-    totalIncome: 1000000,
-    expenses: { direct: 3000, fixed: 20000, npa: 500000 },
-  },
-  {
-    project: "Ebibaaha",
-    totalIncome: 500000,
-    expenses: { direct: 20000, fixed: 100000, npa: 150000 },
-  },
-  {
-    project: "Changeride",
-    totalIncome: 500000,
-    expenses: { direct: 20000, fixed: 100000, npa: 150000 },
-    completed: true,
-  },
-  {
-    project: "Tutor App",
-    totalIncome: 500000,
-    expenses: { direct: 20000, fixed: 100000, npa: 150000 },
-    completed: true,
-  },
-  {
-    project: "Logistikk",
-    totalIncome: 500000,
-    expenses: { direct: 20000, fixed: 100000, npa: 150000 },
-    completed: true,
-  },
-];
+import { useRouter } from "next/navigation";
 
 export const profitLossData = [
   {
@@ -150,13 +110,14 @@ export const profitLossData = [
     // profitPercentage: 73,
   },
 ];
-const ongoingProjects = projectBudget.filter((project) => !project.completed);
-const completedProjects = projectBudget.filter((project) => project.completed);
+
 export default function Dashboard() {
   const [profitLoss, setProfitLoss] = useState([]);
   const [resourceUtilData, setResourceUtilData] = useState();
   const [fetchedKpiData, setFetchedKpiData] = useState();
   const [kpiValues, setKpiValues] = useState();
+  const [ongoingProjects, setOngoingProjects] = useState([]);
+  const [completedProjects, setCompletedProjects] = useState([]);
   const initialEndDate = startOfDay(new Date()); // Today's date
   const initialStartDate = startOfDay(subDays(initialEndDate, 28)); // 4 weeks ago
   const [startDate, setStartDate] = useState(
@@ -165,6 +126,8 @@ export default function Dashboard() {
   const [endDate, setEndDate] = useState(
     format(startOfDay(initialEndDate), "yyyy-MM-dd")
   );
+
+  const router = useRouter();
   useEffect(() => {
     const getProfitLoss = async () => {
       const { status, data } = await fetchProfitLoss();
@@ -246,6 +209,21 @@ export default function Dashboard() {
 
     getResourceUtilData();
   }, [startDate, endDate]);
+
+  useEffect(() => {
+    const getOngoingProjects = async () => {
+      const { status, data } = await fetchOngoingProjects();
+      if (status === 200) {
+        setOngoingProjects(data.ongoing_projects);
+        setCompletedProjects(data.completed_projects);
+      } else {
+        console.error("Failed to fetch ongoing projects data");
+      }
+    };
+
+    getOngoingProjects();
+  }, []);
+
   useEffect(() => {
     if (fetchedKpiData) {
       const updatedKpiDatas = [
@@ -353,7 +331,7 @@ export default function Dashboard() {
                 </div>
               ))
             : // Render skeletons based on expected number of KPI cards
-              [...Array(6)].map((_, index) => (
+              [...Array(8)].map((_, index) => (
                 <div key={index}>
                   <KpiSkeleton />
                 </div>
@@ -402,10 +380,10 @@ export default function Dashboard() {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="ongoing" className="h-full">
-                <ProjectBudgetChart rawData={ongoingProjects} />
+                {/* <ProjectBudgetChart rawData={ongoingProjects} /> */}
               </TabsContent>
               <TabsContent value="completed" className="h-full">
-                <ProjectBudgetChart rawData={completedProjects} />
+                {/* <ProjectBudgetChart rawData={completedProjects} /> */}
               </TabsContent>
             </Tabs>
           </CardContent>

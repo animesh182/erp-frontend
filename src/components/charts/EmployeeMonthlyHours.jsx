@@ -76,7 +76,7 @@ export default function EmployeeMonthlyHours({ rawData }) {
 
   if (!rawData) return <>Loading...</>;
   const CustomYAxisTick = ({ x, y, payload }) => {
-    console.log(payload, "payload");
+    // console.log(payload, "payload");
     const remainingHours = calculateRemainingHours(rawData[payload.index]);
     const truncatedName = payload.value.split(" ").slice(0, 2).join(" ");
     return (

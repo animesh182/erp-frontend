@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/chart";
 
 import { formatAmountDecimalToNOK } from "@/lib/utils";
-import { useTheme } from "next-themes";
 
 // Function to calculate the total expense percentage for each project
 function calculateExpensePercentage(data) {
@@ -50,9 +49,9 @@ function RenderLegend() {
   return (
     <div className="flex justify-center">
       <div className="flex items-center text-[#2563EB] mr-4 font-semibold">
-        Dynamic Revenue (Recurring)
+        Dynamic Revenue
       </div>
-      <div className="flex items-center font-semibold">Fixed Costs</div>
+      <div className="flex items-center font-semibold">Fixed Revenue</div>
     </div>
   );
 }
@@ -93,7 +92,6 @@ export default function ProjectBudgetChart({ rawData }) {
   const recurringProjects = updatedChartData
     .filter((data) => data.isRecurring)
     .map((filterData) => filterData.project);
-  const { theme } = useTheme();
 
   function CustomTooltip({ active, payload, label }) {
     if (active && payload && payload.length) {
