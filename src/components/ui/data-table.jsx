@@ -69,8 +69,11 @@ function DataTable({
     }
 
     if (searchValue) {
-      filtered = filtered.filter((row) =>
-        row.name.toLowerCase().includes(searchValue.toLowerCase())
+      filtered = filtered.filter(
+        (row) =>
+          row.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          (row.projectName &&
+            row.projectName.toLowerCase().includes(searchValue.toLowerCase()))
       );
     }
 
