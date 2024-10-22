@@ -422,7 +422,7 @@ export default function Dashboard() {
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="w-full h-full">
+        <CardContent className="w-full h-full min-h-[800px]">
           {resourceUtilData && resourceUtilData.length > 0 ? (
             <EmployeeMonthlyHours rawData={resourceUtilData} />
           ) : resourceUtilData && resourceUtilData.length === 0 ? (
