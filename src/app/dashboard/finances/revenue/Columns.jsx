@@ -50,7 +50,7 @@ export const columns = [
       return (
         <Badge
           className={`${
-            status === "paid"
+            status === "Paid"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
           }`}
