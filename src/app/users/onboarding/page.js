@@ -1,86 +1,122 @@
 "use client";
-import { CompanyIcon } from '@/components/companyicon';
-import { Button } from '@/components/ui/button'
+
 import { Card, CardContent, CardDescription, CardFooter } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
-import Link from 'next/link'
-import React from 'react'
-import Image from 'next/image';
+
+import React, { useState } from 'react'
+
 import EmployeeLoginFooter from '@/components/EmployeeLoginFooter';
-import TeamAvatars from '@/components/TeamAvatars';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import imageUrl from '../../../../public/default-avatar.jpg'
-import { Upload } from 'lucide-react';
-const Onboarding = () => {
-  return (
-    <div className="h-screen w-full flex flex-col justify-center items-center ">   
-       <Card className="w-7/12  pt-5 pb-10 h-11/12">
-        <CardContent  className="">
-    <div className=" grid grid-cols-2">
+
+import BasicDetails from '@/components/EmployeeDetails/BasicDetails';
+import PersonalDetails from '@/components/EmployeeDetails/PersonalDetails';
+import ProfessionalDetails from '@/components/EmployeeDetails/ProfessionalDetails';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft } from 'lucide-react';
+// const Onboarding = () => {
+
+//   return (
+//     <div className="h-screen w-full flex flex-col justify-center items-center ">   
+//        <Card className="w-7/12  pt-5 pb-10">
+//         <CardContent  className="grid grid-cols-2 p-0">
+ 
       
-      <div className="flex flex-col justify-center space-y-2 px-16  py-14">
-        <div className="text-[#020617] tracking-tight text-xl font-semibold">Enter your basic details</div>
-        <br/>
-        <div className="flex gap-4 items-center">
-        <Avatar >
-        <AvatarImage src="/default-avatar.jpg"  className="object-cover  " />
-      </Avatar>
-      <div className="space-y-3">
-        <div className="text-[#020617] font-semibold text-sm">Profile picture</div>
-        <div className="flex items-center gap-3 text-[#020617] font-medium  text-sm">
-          <Button variant="outline" className="gap-2"><Upload className="" size="15"/>Replace Image</Button>
-          <Button variant="outline" className="">Remove</Button>
-        </div>
-        <div className="text-[#64748B] font-medium text-xs">*.png, *.jpeg files up to 10MB at least 400px by 400px</div>
-
-      </div>
-        </div>
-    <br/>
-        <div className="text-sm text-[#020617] font-medium tracking-tight"> First  Name</div>
-        <Input className="" placeholder="Noah"/>
-        <br/>
-    
-        <div className="text-sm text-[#020617] font-medium tracking-tight"> Last  Name</div>
-        <Input className="" placeholder="Williams"/>
-      <br/>
-        <div className="text-sm text-[#020617] font-medium tracking-tight"> Email</div>
-        <Input className="" placeholder="noah@avinto.no"/>
-        <br/>
-        <Button className="w-full text-sm">Continue</Button>
+//       <div className="flex flex-col justify-center space-y-2 px-20  py-14">
+//       {/* <BasicDetails/> */}
+//       {/* <PersonalDetails/> */}
+//       <ProfessionalDetails/>
    
-      </div>
-      <div className="flex flex-col justify-center space-y-2 pr-20 pb-6 pt-20">
+//       </div>
+//       <div className="flex flex-col items-end space-y-2 pb-6 pt-20 pl-10  ">
         
-    
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <CompanyIcon size={40} color="#1169C4" />
-            <span className="text-[#2563EB] text-xl">Avinto AS</span>
-          </Link>
-    
-        <div className="text-[#020617]  text-2xl font-semibold">Welcome to Avinto ERP.</div>
-        <div className="text-[#64748B] text-sm leading-5">
-        Avinto ERP is a software dedicated to Avinto and their employees. It is a radically new type of CRM. Built on an entirely new
-<br/>type of data architecture, you&apos;ll have profiles and records <br/>of
-every interaction within your network in minutes, always
-updated in real-time.
-<br/>
-<br/>
-You&apos;ll be able to track your performance and attendance in
-the company.
-<br/>
-<br/>
-Let&apos;s begin.
-        </div>
-      </div>
+//     <img  src="/employeeInformationPreview.png" alt="information preview" className="shadow-lg rounded-2xl"/>
+//       </div>
+   
+//     </CardContent>
+
+//     </Card>
+// <EmployeeLoginFooter/>
+//     </div>
+
+//   )
+// }
+
+// export default Onboarding
+
+
+const Onboarding = () => {
+
+  const [step, setStep] = useState(1);
+
+  
+  const handleNextStep = () => {
+    setStep((prevStep) => prevStep + 1);
+  };
+
+
+  const [formData, setFormData] = useState({
+    basicDetails: {},
+    personalDetails: {},
+    professionalDetails: {},
+  });
+
+
+  const handleSubmitBasicDetails = (data) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      basicDetails: data,
+    }));
+    handleNextStep(); 
+  };
+
+  const handleSubmitPersonalDetails = (data) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      personalDetails: data,
+    }));
+    handleNextStep(); 
+  };
+
+  const handleSubmitProfessionalDetails = (data) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      professionalDetails: data,
+    }));
+  
+  };
+
+  const handlePrevStep = () => {
+    setStep((prevStep) => Math.max(prevStep - 1, 1)); 
+  };
+console.log(formData,"the forma data")
+  return (
+    <div className="h-screen w-full flex flex-col justify-center items-center">
+      <Card className="lg:w-7/12 w-10/12 pt-5 lg:pb-10 pb-5 ">
+        <CardContent className="lg:grid grid-cols-2 p-0">
+          <div className="flex flex-col justify-center space-y-1 lg:px-20 px-5 py-14">
+            <div className=' '>
+              {step > 1 && (
+                <div onClick={handlePrevStep} className=''>
+                <ChevronLeft className='text-[#020617] size-5 cursor-pointer'/>
+                </div>
+              )}
+          <div className="text-xs font-medium text-[#64748B]">
+                {step}/3
+              </div>
+              </div>
+            {step === 1 && <BasicDetails onSubmission={handleSubmitBasicDetails}
+            defaultValues={formData.basicDetails} />}
+            {step === 2 && <PersonalDetails onSubmission={handleSubmitPersonalDetails}
+            defaultValues={formData.personalDetails} />}
+            {step === 3 && <ProfessionalDetails onSubmission={handleSubmitProfessionalDetails} 
+            defaultValues={formData.professionalDetails}/>}
+          </div>
+          <div className="lg:flex flex-col items-end space-y-2 pb-6 pt-20 pl-10 hidden md:hidden">
+            <img src="/employeeInformationPreview.png" alt="information preview" className="shadow-lg rounded-2xl" />
+          </div>
+        </CardContent>
+      </Card>
+      <EmployeeLoginFooter />
     </div>
-    </CardContent>
+  );
+};
 
-    </Card>
-<EmployeeLoginFooter/>
-    </div>
-
-  )
-}
-
-export default Onboarding
+export default Onboarding;

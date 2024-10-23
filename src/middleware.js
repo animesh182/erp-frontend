@@ -17,10 +17,10 @@ export function middleware(request) {
   const token = request.cookies.get("access_token");
   //   console.log(token, "token");
 
-  // if (!token) {
-  //   // Redirect to '/' if not authenticated
-  //   return NextResponse.redirect(new URL("/", request.url));
-  // }
+  if (!token) {
+    // Redirect to '/' if not authenticated
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
   // Proceed if authenticated
   return NextResponse.next();

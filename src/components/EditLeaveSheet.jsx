@@ -47,8 +47,9 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit }) {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-[480px]">
-        <SheetHeader>
+      {/* <SheetContent className="w-[480px]"> */}
+      <SheetContent className="">
+        <SheetHeader className="text-left">
           <SheetTitle>Request for Leave</SheetTitle>
           <SheetDescription>
             Here you can request for leave by filling the form below.
@@ -79,7 +80,7 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit }) {
           </div>
 
           {/* Date Range (From - To) */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 z-0">
             <div>
               <label className="text-sm font-medium">From</label>
               <Controller

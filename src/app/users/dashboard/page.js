@@ -48,28 +48,31 @@ const dummyKPIInfo = [
 // Define project data
 const data = [
   {
-    project: "Website Redesign",
+    name: "Website Redesign",
     timeAllocated: 8,
     status: "Completed",
     utilization: "85",
     startDate: "2024-01-10",
     endDate: "2024-01-20",
+project_health:"on_track"
   },
   {
-    project: "App Development",
+    name: "App Development",
     timeAllocated: 7.5,
     status: "On Going",
     utilization: "70",
     startDate: "2024-02-01",
     endDate: "2024-06-01",
+    project_health:"on_track"
   },
   {
-    project: "Marketing Campaign",
+    name: "Marketing Campaign",
     timeAllocated: 6,
     status: "Completed",
     utilization: "90",
     startDate: "2024-03-15",
     endDate: "2024-03-25",
+    project_health:"critical"
   },
 ];
 
@@ -101,11 +104,11 @@ const UsersHome = () => {
         ))}
       </div>
       <div className="w-full grid grid-cols-1 lg:grid-cols-6 gap-8 py-4 px-0  max-h-[320px]">
-        <div className="col-span-2 justify-center w-full">
+        <div className="col-span-2 justify-center w-full h-full">
           <DoughnutChart chartData={chartData} />
         </div>
         <div className="grid col-span-4 h-full">
-          <div className="flex space-x-4 mb-4">
+          <div className="flex space-x-4 mb-4 ">
             {tabs.map((tab) => (
               <button
                 key={tab}

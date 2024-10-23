@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, createContext } from "react";
+import React, { useState, useMemo, createContext, useEffect } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -58,6 +58,9 @@ function DataTable({
   const isProjectPage = pathname === "/dashboard/projects";
   const isTransactionPage = pathname === "/dashboard/finances/transactions";
 
+
+  const [isMobile, setIsMobile] = useState(false);
+
   // Memoize filtered data
   const filteredData = useMemo(() => {
     let filtered = data;
@@ -108,6 +111,26 @@ function DataTable({
     }
   };
 
+
+
+    // useEffect(() => {
+    //   const handleResize = () => {
+    //     setIsMobile(window.innerWidth <= 768); // Set mobile breakpoint
+    //   };
+    //   window.addEventListener("resize", handleResize);
+    //   handleResize(); // Initial check
+
+    //   return () => window.removeEventListener("resize", handleResize);
+    // }, []);
+
+    // // Filter columns based on screen size
+    // const visibleColumns = useMemo(() => {
+    //   if (isMobile) {
+    //     return columns.filter((col) => col.hideOnMobile !== true); // Only hide columns where hideOnMobile is explicitly true
+    //   }
+    //   return columns; // On larger screens, show all columns
+    // }, [isMobile, columns]);
+
   return (
     <EditRowContext.Provider value={{ onEditRow }}>
       <div className="w-full">
@@ -120,12 +143,14 @@ function DataTable({
             />
           )}
           <div className="p-5 text-left border rounded-md">
-            <div className="w-full flex items-start justify-between">
+            {/* <div className="w-full flex items-start justify-between"> */}
+            <div className="w-full lg:flex md:flex   items-start justify-between">
               <TableTitle
                 title={title}
                 subtitle={subtitle}
                 totalItemCount={isProjectPage && table.getRowCount()}
               />
+              {!pathname.includes("/leave-request") &&
               <div className="relative w-full mr-4">
                 <Search className="absolute top-1/2 left-3 transform -translate-y-1/2" />
                 <Input
@@ -135,7 +160,7 @@ function DataTable({
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                 />
-              </div>
+              </div>}
               {initialStartDate && initialEndDate && onDateChange && (
                 <div>
                   <DateRangePicker
@@ -149,7 +174,7 @@ function DataTable({
 
             <div className="w-full">
               <div className="rounded-md">
-                <Table>
+                {/* <Table>
                   <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
                       <TableRow key={headerGroup.id}>
@@ -241,7 +266,113 @@ function DataTable({
                       />
                     )}
                   </TableBody>
-                </Table>
+                </Table> */}
+
+
+
+
+
+
+
+
+
+
+<Table>
+  <TableHeader>
+    {table.getHeaderGroups().map((headerGroup) => (
+      <TableRow key={headerGroup.id}>
+        {headerGroup.headers.map((header) => (
+          <TableHead
+            key={header.id}
+            onClick={
+              header.column.getCanSort()
+                ? header.column.getToggleSortingHandler()
+                : undefined
+            }
+            className={`${
+              header.column.getCanSort() ? "cursor-pointer" : ""
+            } ${header.column.columnDef.hideOnMobile ? "hidden md:table-cell" : ""}`} // Conditionally hide on mobile
+          >
+            <div className="flex items-center gap-2">
+              {flexRender(
+                header.column.columnDef.header,
+                header.getContext()
+              )}
+              {header.column.getCanSort() && (
+                <span>
+                  <ArrowUpDown className="h-4 w-4" />
+                </span>
+              )}
+            </div>
+          </TableHead>
+        ))}
+      </TableRow>
+    ))}
+  </TableHeader>
+  <TableBody>
+    {table.getRowModel().rows?.length ? (
+      <>
+        {table.getRowModel().rows.map((row) => (
+          <TableRow
+            key={row.id}
+            data-state={row.getIsSelected() && "selected"}
+            className={
+              isProjectPage
+                ? "cursor-pointer hover:bg-muted"
+                : isTransactionPage
+                ? row.original.transactionType === "Expense"
+                  ? "bg-[#dc9d9c]" // Light red for expense
+                  : row.original.transactionType === "Revenue"
+                  ? "bg-[#78ae78]" // Light green for revenue
+                  : ""
+                : ""
+            }
+          >
+            {row.getVisibleCells().map((cell, index) => (
+              <TableCell
+                key={cell.id}
+                className={`${
+                  cell.column.columnDef.hideOnMobile ? "hidden md:table-cell" : ""
+                }`} // Conditionally hide on mobile
+                onClick={
+                  index !== row.getVisibleCells().length - 1 &&
+                  !(
+                    isProjectPage &&
+                    cell.column.id === "progressTracking"
+                  )
+                    ? (event) => handleRowClick(row.original.id, event)
+                    : undefined
+                }
+              >
+                {flexRender(
+                  cell.column.columnDef.cell,
+                  cell.getContext()
+                )}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </>
+    ) : (
+      <TableRow>
+        <TableCell
+          colSpan={columns.length}
+          className="h-24 text-center"
+        >
+          No results.
+        </TableCell>
+      </TableRow>
+    )}
+    {isTableAddFormEnabled && (
+      <FormRow
+        onAddRow={onAddRow}
+        formInputs={formInputs}
+        projectOptions={projectOptions}
+      />
+    )}
+  </TableBody>
+</Table>
+
               </div>
 
               {/* Pagination Controls */}

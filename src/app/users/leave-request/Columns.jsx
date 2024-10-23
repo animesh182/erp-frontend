@@ -8,13 +8,13 @@ import { Progress } from "@/components/ui/progress";
 import { util } from "zod";
 
 
-export const ProgressBar = ({value}) => {
-  return (
-    <div className="flex items-center w-full gap-2">
-      <Progress value={value} className="h-2 w-2/3"/><span className="font-semibold">{value}%</span>
-    </div>
-  )
-}
+// export const ProgressBar = ({value}) => {
+//   return (
+//     <div className="flex items-center w-full gap-2">
+//       <Progress value={value} className="h-2 w-2/3"/><span className="font-semibold">{value}%</span>
+//     </div>
+//   )
+// }
 
 export const columns = [
   {
@@ -40,6 +40,7 @@ export const columns = [
       );
     },
     enableSorting: false,  
+    hideOnMobile: true,
   },
   {
     accessorKey: "endedLeaveDate",
@@ -54,12 +55,14 @@ export const columns = [
         </span>
       );
     },
-    enableSorting: false,  
+    enableSorting: false,
+    hideOnMobile: true,  
   },
   {
     accessorKey: "numberOfLeaveDays",
     header: "Days",
     enableSorting: false,
+    hideOnMobile: true,
     cell: ({ row }) => {
       const { numberOfLeaveDays } = row.original;
       return numberOfLeaveDays ? <span className="font-medium">{numberOfLeaveDays}</span> : "No Data"; // Show "No Data" if the project is null or undefined
@@ -69,6 +72,7 @@ export const columns = [
     accessorKey: "typeOfLeave",
     header: "Type",
     enableSorting: false,
+    hideOnMobile: true,
     cell: ({ row }) => {
       const { typeOfLeave } = row.original;
       return typeOfLeave ? <span className="font-medium">{typeOfLeave}</span> : "No Data"; // Show "No Data" if the project is null or undefined
@@ -97,6 +101,7 @@ export const columns = [
     accessorKey: "detailedExplanation",
     header: "Detailed Explanation",
     enableSorting: false,
+    hideOnMobile: true,
     cell: ({ row }) => {
       const { detailedExplanation } = row.original;
       return detailedExplanation ? (

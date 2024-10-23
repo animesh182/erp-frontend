@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { MoreHorizontal } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { util } from "zod";
+import ProjectHealth from "@/components/ProjectHealth";
 
 
 export const ProgressBar = ({value}) => {
@@ -21,13 +22,18 @@ export const ProgressBar = ({value}) => {
 
 export const columns = [
   {
-    accessorKey: "project",
-    header: "Project Name",
-    enableSorting: true,
+    accessorKey: "name",
+    header: "Name",
     cell: ({ row }) => {
-      const { project } = row.original;
-      return project ? <span className="font-medium">{project}</span> : "No Data"; // Show "No Data" if the project is null or undefined
+      const { name, project_health } = row.original; // Access the full row data
+      return (
+        <div>
+          <p>{name || "N/A"}</p>
+          {project_health && <ProjectHealth health={project_health} />}
+        </div>
+      );
     },
+    enableSorting: true,
   },
   {
     accessorKey: "timeAllocated",
