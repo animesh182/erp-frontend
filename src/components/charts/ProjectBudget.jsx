@@ -109,25 +109,20 @@ export default function ProjectBudgetChart({ rawData }) {
           type="category"
           tick={({ x, y, payload }) => {
             const label = payload.value;
-            const lines =
-              label.length > 15
-                ? [label.slice(0, 15), label.slice(15)]
-                : [label];
+            const truncatedLabel = label.split(" ").slice(0, 2).join(" ");
             return (
               <text
                 x={x}
-                y={y - (lines.length - 1) * 5}
+                y={y}
                 stroke={chartConfig[label].color}
                 strokeWidth={0.6}
                 fontSize={12}
                 fontWeight={500}
                 textAnchor="end"
               >
-                {lines.map((line, index) => (
-                  <tspan x={x} dy={index === 0 ? 0 : 15} key={index}>
-                    {line}
-                  </tspan>
-                ))}
+                <tspan x={x} dy={0}>
+                  {truncatedLabel}
+                </tspan>
               </text>
             );
           }}
@@ -152,11 +147,11 @@ export default function ProjectBudgetChart({ rawData }) {
               fill={chartConfig[entry.project_name].color}
             />
           ))}
-          <LabelList
+          {/* <LabelList
             dataKey="costExhaustedPercentage"
             position="insideRight"
             style={{ fill: "black", fontWeight: 500 }}
-          />
+          /> */}
         </Bar>
         <Bar dataKey={() => 100} stackId="a" radius={[0, 5, 5, 0]}>
           {updatedChartData.map((entry, index) => (

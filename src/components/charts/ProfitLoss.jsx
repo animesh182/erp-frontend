@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
   LabelList,
   Cell,
+  ReferenceLine,
 } from "recharts";
 import { formatAmountDecimalToNOK } from "@/lib/utils";
 import { useTheme } from "next-themes";
@@ -20,7 +21,7 @@ export default function ProfitLossChart({ data }) {
 
   function CustomTooltip({ active, payload, label }) {
     if (active && payload && payload.length) {
-      console.log(payload[0].payload);
+      // console.log(payload[0].payload);
       const { totalIncome, expenses, profit } = payload[0].payload;
       return (
         <div className={`p-2 text-xs bg-primary-foreground rounded shadow-lg `}>
@@ -120,6 +121,13 @@ export default function ProfitLossChart({ data }) {
             }}
           />
         </Line>
+        <ReferenceLine
+          y={0}
+          yAxisId="right"
+          stroke="#68D391"
+          strokeWidth={1}
+          strokeDasharray="3 3"
+        />
       </ComposedChart>
     </ResponsiveContainer>
   );
