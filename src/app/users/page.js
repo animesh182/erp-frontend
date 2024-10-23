@@ -1,143 +1,115 @@
 "use client";
 
-import DoughnutChart from "@/components/charts/PieChart";
-import KpiCard from "@/components/kpicard";
-import DataTable from "@/components/ui/data-table";
-import { DollarSign } from "lucide-react";
-import { columns } from "./Columns";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import React, { useState } from "react";
+import google from "../../../public/google.svg";
+import Image from "next/image";
+import EmployeeLoginFooter from "@/components/EmployeeLoginFooter";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import LoginTextHeader, {
+  LoginTextFooter,
+} from "@/components/EmployeeDetails/LoginText";
 
-// Define dummy KPI data
-const dummyKPIInfo = [
-  {
-    title: "Total Projects Assigned",
-    value: "3",
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-  {
-    title: "Time Allocated",
-    value: (
-      <div className="text-2xl">
-        8 <span className="text-muted-foreground text-base">/8 hours</span>
-      </div>
-    ),
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-  {
-    title: "Total Sick Leave",
-    value: (
-      <div className="text-2xl">
-        4 <span className="text-muted-foreground text-base">/14 days</span>
-      </div>
-    ),
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-  {
-    title: "Total Vacation Leave",
-    value: (
-      <div className="text-2xl">
-        6 <span className="text-muted-foreground text-base">/12 days</span>
-      </div>
-    ),
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-];
+const formSchema = z.object({
+  email: z.string().email(),
+});
+const EmployeeLogin = () => {
+  const [existingUser, setExistingUser] = useState(true);
 
-// Define project data
-const data = [
-  {
-    id: 1,
-    name: "Website Redesign",
-    project_health: "on_track",
-    timeAllocated: 8,
-    status: "Completed",
-    utilization: "85",
-    startDate: "2024-01-10",
-    endDate: "2024-01-20",
-  },
-  {
-    id: 2,
-    name: "App Development",
-    project_health: "at_risk",
-    timeAllocated: 7.5,
-    status: "On Going",
-    utilization: "70",
-    startDate: "2024-02-01",
-    endDate: "2024-06-01",
-  },
-  {
-    id: 3,
-    name: "Marketing Campaign",
-    project_health: "critical",
-    timeAllocated: 6,
-    status: "Completed",
-    utilization: "90",
-    startDate: "2024-03-15",
-    endDate: "2024-03-25",
-  },
-];
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
 
-const tabs = ["Current Projects", "Previous Projects"];
+  function onEmailSubmit(values) {
+    console.log(values, "values");
 
-// Define chart data and config
-const chartData = [
-  { name: "Jambo Travel House", value: 62, color: "#6875F5" }, // Blue
-  { name: "Avinto Test", value: 28, color: "#34D399" }, // Green
-  { name: "Changeride", value: 10, color: "#F59E0B" }, // Orange
-];
+    if (existingUser) window.location.href = "/users/login-password";
+    else window.location.href = "/users/email-verify";
+  }
 
-const UsersHome = () => {
-  // State to manage selected tab
-  const [selectedTab, setSelectedTab] = useState("Current Projects");
+  function onGoogleEmailSubmit() {
+    form.clearErrors();
+    if (existingUser) window.location.href = "/users/login-password";
+    else window.location.href = "/users/email-verify";
+  }
 
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="flex flex-row space-x-4">
-        {dummyKPIInfo.map((dummyKPICard) => (
-          <KpiCard
-            key={dummyKPICard.title}
-            title={dummyKPICard.title}
-            value={dummyKPICard.value}
-            icon={dummyKPICard.icon}
-            hasSubText={false}
-            isMoney={false}
-          />
-        ))}
-      </div>
-      <div className="w-full grid grid-cols-1 lg:grid-cols-6 gap-8 py-4 px-0 max-h-[320px]">
-        <div className="  col-span-2 justify-center w-full ">
-          <DoughnutChart chartData={chartData} />
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onEmailSubmit)}>
+        <div className="h-screen w-full flex flex-col justify-center items-center ">
+          <Card className="lg:w-7/12 w-10/12  pt-14 pb-2 h-11/12">
+            <CardContent className="">
+              <div className=" lg:grid grid-cols-2">
+                <div className="flex flex-col justify-center space-y-2 lg:px-20  pb-6">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm text-[#020617] font-medium tracking-tight">
+                          Email
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter your work email address"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button className="w-full text-sm" type="submit">
+                    Sign in with Email
+                  </Button>
+                  <br />
+                  <div className="flex text-[#64748B] justify-center text-xs ">
+                    OR CONTINUE WITH
+                  </div>
+                  <br />
+                  <Button
+                    className="w-full shadow-md text-sm"
+                    variant="outline"
+                    type="button"
+                    onClick={onGoogleEmailSubmit}
+                  >
+                    <Image src={google} alt="google" /> Sign in with Google
+                  </Button>
+                </div>
+                <LoginTextHeader />
+              </div>
+            </CardContent>
+            <CardFooter className="w-1/2 pt-20 pl-24 flex items-end justify-end text-justify">
+              <CardDescription className="text-xs leading-4 hidden lg:block">
+                <LoginTextFooter />
+              </CardDescription>
+            </CardFooter>
+          </Card>
+          <EmployeeLoginFooter />
         </div>
-        <div className="grid col-span-4 h-full">
-          <div className="flex space-x-4 mb-4">
-            {tabs.map((tab) => (
-              <Button
-                variant="employeePageBtn"
-                key={tab}
-                className={`px-4 py-2 text-sm font-medium rounded-lg ${
-                  selectedTab === tab
-                    ? "bg-blue-50 text-blue-600 "
-                    : "text-gray-500 hover:bg-gray-50"
-                }`}
-                onClick={() => setSelectedTab(tab)}
-              >
-                {tab}
-              </Button>
-            ))}
-          </div>
-          <div className="flex items-start h-full min-h-[400px]">
-            <DataTable
-              title={"Project Assigned"}
-              subtitle={"View and analyze projects assigned to you."}
-              columns={columns}
-              data={data}
-            />
-          </div>
-        </div>
-      </div>
-    </main>
+      </form>
+    </Form>
   );
 };
 
-export default UsersHome;
+export default EmployeeLogin;

@@ -29,7 +29,8 @@ export const columns = [
         </span>
       );
     },
-    enableSorting: true,  
+    enableSorting: false,  
+    hideOnMobile: true,
   },
   {
     accessorKey: "endedLeaveDate",
@@ -44,12 +45,14 @@ export const columns = [
         </span>
       );
     },
-    enableSorting: true,  
+    enableSorting: false,
+    hideOnMobile: true,  
   },
   {
     accessorKey: "numberOfLeaveDays",
     header: "Days",
     enableSorting: false,
+    hideOnMobile: true,
     cell: ({ row }) => {
       const { numberOfLeaveDays } = row.original;
       return numberOfLeaveDays ? <span className="font-medium">{numberOfLeaveDays}</span> : "No Data"; // Show "No Data" if the project is null or undefined
@@ -59,6 +62,7 @@ export const columns = [
     accessorKey: "typeOfLeave",
     header: "Type",
     enableSorting: false,
+    hideOnMobile: true,
     cell: ({ row }) => {
       const { typeOfLeave } = row.original;
       return typeOfLeave ? <span className="font-medium">{typeOfLeave}</span> : "No Data"; // Show "No Data" if the project is null or undefined
@@ -87,6 +91,7 @@ export const columns = [
     accessorKey: "detailedExplanation",
     header: "Detailed Explanation",
     enableSorting: false,
+    hideOnMobile: true,
     cell: ({ row }) => {
       const { detailedExplanation } = row.original;
       return detailedExplanation ? (

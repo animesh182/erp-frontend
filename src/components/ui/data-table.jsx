@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, createContext } from "react";
+import React, { useState, useMemo, createContext, useEffect } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -31,7 +31,6 @@ import { Input } from "./input";
 import DateRangePicker from "../DateRangePicker";
 import TabFilters from "../TabFilters";
 import { usePathname, useRouter } from "next/navigation";
-import { Badge } from "./badge";
 
 export const EditRowContext = createContext(null); //creating context for the edit row function
 
@@ -57,10 +56,13 @@ function DataTable({
   const pathname = usePathname();
   const router = useRouter();
   const isProjectPage = pathname === "/dashboard/projects";
-  const isUsersPage = pathname === "/users";
+  const isUsersPage = pathname === "/users/dashboard";
   const isLeavePage = pathname === "/users/leave-request";
   const isTransactionPage = pathname === "/dashboard/finances/transactions";
 
+
+
+ 
 
   // Memoize filtered data
   const filteredData = useMemo(() => {
@@ -123,6 +125,10 @@ function DataTable({
 
   
 
+  
+
+
+
   return (
     <EditRowContext.Provider value={{ onEditRow, onDeleteRow }}>
       <div className="w-full">
@@ -135,7 +141,8 @@ function DataTable({
             />
           )}
           <div className="p-5 text-left border rounded-md">
-            <div className="w-full flex items-start justify-between">
+            {/* <div className="w-full flex items-start justify-between"> */}
+            <div className="w-full lg:flex md:flex   items-start justify-between">
               <TableTitle
                 title={title}
                 subtitle={subtitle}
@@ -165,99 +172,111 @@ function DataTable({
 
             <div className="w-full">
               <div className="rounded-md">
-                <Table>
-                  <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => (
-                          <TableHead
-                            key={header.id}
-                            onClick={
-                              header.column.getCanSort()
-                                ? header.column.getToggleSortingHandler()
-                                : undefined
-                            }
-                            className={
-                              header.column.getCanSort() ? "cursor-pointer" : ""
-                            }
-                          >
-                            <div className="flex items-center gap-2">
-                              {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                              {header.column.getCanSort() && (
-                                <span>
-                                  <ArrowUpDown className="h-4 w-4" />
-                                </span>
-                              )}
-                            </div>
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHeader>
-                  <TableBody>
-                    {table.getRowModel().rows?.length ? (
-                      <>
-                        {table.getRowModel().rows.map((row) => (
-                          <TableRow
-                            key={row.id}
-                            data-state={row.getIsSelected() && "selected"}
-                            className={
-                              isProjectPage
-                                ? "cursor-pointer hover:bg-muted"
-                                : isTransactionPage
-                                ? row.original.transactionType === "Expense"
-                                  ? "bg-[#dc9d9c]" // Light red for expense
-                                  : row.original.transactionType === "Revenue"
-                                  ? "bg-[#78ae78]" // Light green for revenue
-                                  : ""
-                                : ""
-                            }
-                          >
-                            {row.getVisibleCells().map((cell, index) => (
-                              <TableCell
-                                key={cell.id}
-                                onClick={
-                                  index !== row.getVisibleCells().length - 1 &&
-                                  !(
-                                    isProjectPage &&
-                                    cell.column.id === "progressTracking"
-                                  )
-                                    ? (event) =>
-                                        handleRowClick(row.original.id, event)
-                                    : undefined
-                                }
-                              >
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext()
-                                )}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        ))}
-                      </>
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={columns.length}
-                          className="h-24 text-center"
-                        >
-                          No results.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                    {isTableAddFormEnabled && (
-                      <FormRow
-                        onAddRow={onAddRow}
-                        formInputs={formInputs}
-                        projectOptions={projectOptions}
-                      />
-                    )}
-                  </TableBody>
-                </Table>
+        
+
+
+
+
+
+
+
+
+<Table>
+  <TableHeader>
+    {table.getHeaderGroups().map((headerGroup) => (
+      <TableRow key={headerGroup.id}>
+        {headerGroup.headers.map((header) => (
+          <TableHead
+            key={header.id}
+            onClick={
+              header.column.getCanSort()
+                ? header.column.getToggleSortingHandler()
+                : undefined
+            }
+            className={`${
+              header.column.getCanSort() ? "cursor-pointer" : ""
+            } ${header.column.columnDef.hideOnMobile ? "hidden md:table-cell" : ""}`} // Conditionally hide on mobile
+          >
+            <div className="flex items-center gap-2">
+              {flexRender(
+                header.column.columnDef.header,
+                header.getContext()
+              )}
+              {header.column.getCanSort() && (
+                <span>
+                  <ArrowUpDown className="h-4 w-4" />
+                </span>
+              )}
+            </div>
+          </TableHead>
+        ))}
+      </TableRow>
+    ))}
+  </TableHeader>
+  <TableBody>
+    {table.getRowModel().rows?.length ? (
+      <>
+        {table.getRowModel().rows.map((row) => (
+          <TableRow
+            key={row.id}
+            data-state={row.getIsSelected() && "selected"}
+            className={
+              isProjectPage
+                ? "cursor-pointer hover:bg-muted"
+                : isTransactionPage
+                ? row.original.transactionType === "Expense"
+                  ? "bg-[#dc9d9c]" // Light red for expense
+                  : row.original.transactionType === "Revenue"
+                  ? "bg-[#78ae78]" // Light green for revenue
+                  : ""
+                : ""
+            }
+          >
+            {row.getVisibleCells().map((cell, index) => (
+              <TableCell
+                key={cell.id}
+                className={`${
+                  cell.column.columnDef.hideOnMobile ? "hidden md:table-cell" : ""
+                }`} // Conditionally hide on mobile
+                onClick={
+                  index !== row.getVisibleCells().length - 1 &&
+                  !(
+                    isProjectPage &&
+                    cell.column.id === "progressTracking"
+                  )
+                    ? (event) => handleRowClick(row.original.id, event)
+                    : undefined
+                }
+              >
+                {flexRender(
+                  cell.column.columnDef.cell,
+                  cell.getContext()
+                )}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </>
+    ) : (
+      <TableRow>
+        <TableCell
+          colSpan={columns.length}
+          className="h-24 text-center"
+        >
+          No results.
+        </TableCell>
+      </TableRow>
+    )}
+    {isTableAddFormEnabled && (
+      <FormRow
+        onAddRow={onAddRow}
+        formInputs={formInputs}
+        projectOptions={projectOptions}
+      />
+    )}
+  </TableBody>
+</Table>
+
               </div>
 
               {/* Pagination Controls */}

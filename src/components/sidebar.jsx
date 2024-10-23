@@ -15,6 +15,7 @@ import {
   TrendingUp,
   TrendingDown,
   DollarSign,
+  Clock,
 } from "lucide-react";
 import {
   Card,
@@ -75,6 +76,7 @@ export const navItems = [
     icon: <Users className="h-4 w-4" />,
   },
 ];
+
 
 export default function Sidebar() {
   const pathname = usePathname();

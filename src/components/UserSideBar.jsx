@@ -31,7 +31,7 @@ import { CompanyIcon } from "./companyicon";
 export const navItems = [
   {
     label: "Dashboard",
-    href: "/users",
+    href: "/users/dashboard",
     icon: <Home className="h-4 w-4" />,
   },
   {
