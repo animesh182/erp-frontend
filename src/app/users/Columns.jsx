@@ -6,6 +6,8 @@ import { format } from "date-fns";
 import { MoreHorizontal } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { util } from "zod";
+import ProjectHealth from "@/components/ProjectHealth";
+import TeamAvatars from "@/components/TeamAvatars";
 
 
 export const ProgressBar = ({value}) => {
@@ -16,17 +18,19 @@ export const ProgressBar = ({value}) => {
   )
 }
 
-
-
-
 export const columns = [
   {
-    accessorKey: "project",
+    accessorKey: "name",
     header: "Project Name",
     enableSorting: true,
     cell: ({ row }) => {
-      const { project } = row.original;
-      return project ? <span className="font-medium">{project}</span> : "No Data"; // Show "No Data" if the project is null or undefined
+      const { name, project_health } = row.original;
+      console.log(row, "TestTest")
+      return (<div>
+      <p className="font-medium">{name}</p>
+      <ProjectHealth health={project_health} />
+    </div>
+      );
     },
   },
   {
@@ -62,7 +66,7 @@ export const columns = [
     header: "Utilization Percentage",
     cell: ({ row }) => {
       const { utilization } = row.original;
-      console.log(utilization,"Test");
+      // console.log(utilization,"Test");
       return (
       
         <>

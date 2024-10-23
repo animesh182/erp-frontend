@@ -57,7 +57,10 @@ function DataTable({
   const pathname = usePathname();
   const router = useRouter();
   const isProjectPage = pathname === "/dashboard/projects";
+  const isUsersPage = pathname === "/users";
+  const isLeavePage = pathname === "/users/leave-request";
   const isTransactionPage = pathname === "/dashboard/finances/transactions";
+
 
   // Memoize filtered data
   const filteredData = useMemo(() => {
@@ -109,6 +112,8 @@ function DataTable({
     }
   };
 
+  
+
   return (
     <EditRowContext.Provider value={{ onEditRow }}>
       <div className="w-full">
@@ -125,8 +130,9 @@ function DataTable({
               <TableTitle
                 title={title}
                 subtitle={subtitle}
-                totalItemCount={isProjectPage && table.getRowCount()}
+                totalItemCount={(isUsersPage | isProjectPage | isLeavePage) && table.getRowCount()}
               />
+              {!pathname.includes("/leave-request") &&
               <div className="relative w-full mr-4">
                 <Search className="absolute top-1/2 left-3 transform -translate-y-1/2" />
                 <Input
@@ -136,7 +142,7 @@ function DataTable({
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                 />
-              </div>
+              </div>}
               {initialStartDate && initialEndDate && onDateChange && (
                 <div>
                   <DateRangePicker

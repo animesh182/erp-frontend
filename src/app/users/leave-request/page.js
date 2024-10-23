@@ -5,6 +5,7 @@ import DataTable from "@/components/ui/data-table";
 import { columns } from "./Columns";
 import { Button } from "@/components/ui/button";
 import { Filter, PlusCircle } from "lucide-react";
+import { toast } from "sonner";
 import { RequestForLeaveSheet } from "@/components/EditLeaveSheet"; // Import the form component
 
 const LeaveRequest = () => {
@@ -58,6 +59,7 @@ const LeaveRequest = () => {
         }
         columns={columns}
         data={data} // Pass the updated data to the table
+        // showSearch={false}
       />
 
       {/* Render the RequestForLeaveSheet when isSheetOpen is true */}

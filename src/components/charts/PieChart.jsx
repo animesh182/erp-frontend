@@ -40,7 +40,7 @@ const renderCustomizedLabel = ({ name, value, percent, x, y, cx, cy }) => {
     <text
       x={x}
       y={y}
-      fill="black"
+      // fill={entry.color}
       textAnchor={x > cx ? "start" : "end"}
       dominantBaseline="central"
       fontSize={14}
