@@ -98,6 +98,12 @@ function DataTable({
         pageSize: 10, // Number of rows per page
         pageIndex: 0, // Starting from the first page
       },
+      sorting: [
+        {
+          id: "invoicedIssuedDate",
+          desc: true,
+        },
+      ],
     },
   });
 
