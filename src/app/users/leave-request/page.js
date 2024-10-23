@@ -58,6 +58,7 @@ const LeaveRequest = () => {
         }
         columns={columns}
         data={data} // Pass the updated data to the table
+        // showSearch={false}
       />
 
       {/* Render the RequestForLeaveSheet when isSheetOpen is true */}

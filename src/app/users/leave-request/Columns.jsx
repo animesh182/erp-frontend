@@ -1,20 +1,10 @@
 "use client";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { format } from "date-fns";
-import { MoreHorizontal } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { util } from "zod";
+import { toast } from "sonner";
+import LeaveTableActionsDropdown from "@/components/LeaveTableActionsDropdown";
 
-
-// export const ProgressBar = ({value}) => {
-//   return (
-//     <div className="flex items-center w-full gap-2">
-//       <Progress value={value} className="h-2 w-2/3"/><span className="font-semibold">{value}%</span>
-//     </div>
-//   )
-// }
 
 export const columns = [
   {
@@ -112,5 +102,26 @@ export const columns = [
         "No Data"
       );
     },
-  }
+  },
+  {
+    accessorKey: "actions",
+    header: "",
+    cell: ({ row }) => {
+      const rowData = row.original;
+
+      const handleDelete = () => {
+        // Delete the row by filtering out the selected row from the data
+        setData((prevData) => prevData.filter((item) => item.leaveReason !== rowData.leaveReason));
+
+        toast.success(`${rowData.leaveReason} deleted successfully.`);
+      };
+
+      return (
+        <div className="flex items-center">
+          <LeaveTableActionsDropdown onDelete={handleDelete} rowData={rowData} />
+        </div>
+      );
+    },
+    enableSorting: false,
+  },
 ];

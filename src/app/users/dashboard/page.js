@@ -6,8 +6,7 @@ import DataTable from "@/components/ui/data-table";
 import { DollarSign } from "lucide-react";
 import { columns } from "./Columns";
 import { useState } from "react";
-
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 // Define dummy KPI data
 const dummyKPIInfo = [
@@ -48,31 +47,34 @@ const dummyKPIInfo = [
 // Define project data
 const data = [
   {
+    id: 1,
     name: "Website Redesign",
+    project_health: "on_track",
     timeAllocated: 8,
     status: "Completed",
     utilization: "85",
     startDate: "2024-01-10",
     endDate: "2024-01-20",
-project_health:"on_track"
   },
   {
+    id: 2,
     name: "App Development",
+    project_health: "at_risk",
     timeAllocated: 7.5,
     status: "On Going",
     utilization: "70",
     startDate: "2024-02-01",
     endDate: "2024-06-01",
-    project_health:"on_track"
   },
   {
+    id: 3,
     name: "Marketing Campaign",
+    project_health: "critical",
     timeAllocated: 6,
     status: "Completed",
     utilization: "90",
     startDate: "2024-03-15",
     endDate: "2024-03-25",
-    project_health:"critical"
   },
 ];
 
@@ -103,14 +105,14 @@ const UsersHome = () => {
           />
         ))}
       </div>
-      <div className="w-full grid grid-cols-1 lg:grid-cols-6 gap-8 py-4 px-0  max-h-[320px]">
-        <div className="col-span-2 justify-center w-full h-full">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-6 gap-8 py-4 px-0 max-h-[320px]">
+        <div className="  col-span-2 justify-center w-full ">
           <DoughnutChart chartData={chartData} />
         </div>
         <div className="grid col-span-4 h-full">
-          <div className="flex space-x-4 mb-4 ">
+          <div className="flex space-x-4 mb-4">
             {tabs.map((tab) => (
-              <button
+              <Button
                 key={tab}
                 className={`px-4 py-2 text-sm font-medium rounded-lg ${
                   selectedTab === tab
@@ -120,15 +122,17 @@ const UsersHome = () => {
                 onClick={() => setSelectedTab(tab)}
               >
                 {tab}
-              </button>
+              </Button>
             ))}
           </div>
-          <DataTable
-            title={"Project Assigned"}
-            subtitle={"View and analyze projects assigned to you."}
-            columns={columns}
-            data={data}
-          />
+          <div className="flex items-start h-full min-h-[400px]">
+            <DataTable
+              title={"Project Assigned"}
+              subtitle={"View and analyze projects assigned to you."}
+              columns={columns}
+              data={data}
+            />
+          </div>
         </div>
       </div>
     </main>

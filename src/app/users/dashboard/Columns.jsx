@@ -7,6 +7,7 @@ import { MoreHorizontal } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { util } from "zod";
 import ProjectHealth from "@/components/ProjectHealth";
+import TeamAvatars from "@/components/TeamAvatars";
 
 
 export const ProgressBar = ({value}) => {
@@ -17,23 +18,20 @@ export const ProgressBar = ({value}) => {
   )
 }
 
-
-
-
 export const columns = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: "Project Name",
+    enableSorting: true,
     cell: ({ row }) => {
-      const { name, project_health } = row.original; // Access the full row data
-      return (
-        <div>
-          <p>{name || "N/A"}</p>
-          {project_health && <ProjectHealth health={project_health} />}
-        </div>
+      const { name, project_health } = row.original;
+      console.log(row, "TestTest")
+      return (<div>
+      <p className="font-medium">{name}</p>
+      <ProjectHealth health={project_health} />
+    </div>
       );
     },
-    enableSorting: true,
   },
   {
     accessorKey: "timeAllocated",
@@ -68,7 +66,7 @@ export const columns = [
     header: "Utilization Percentage",
     cell: ({ row }) => {
       const { utilization } = row.original;
-      console.log(utilization,"Test");
+      // console.log(utilization,"Test");
       return (
       
         <>

@@ -31,7 +31,6 @@ import { Input } from "./input";
 import DateRangePicker from "../DateRangePicker";
 import TabFilters from "../TabFilters";
 import { usePathname, useRouter } from "next/navigation";
-import { Badge } from "./badge";
 
 export const EditRowContext = createContext(null); //creating context for the edit row function
 
@@ -56,10 +55,13 @@ function DataTable({
   const pathname = usePathname();
   const router = useRouter();
   const isProjectPage = pathname === "/dashboard/projects";
+  const isUsersPage = pathname === "/users/dashboard";
+  const isLeavePage = pathname === "/users/leave-request";
   const isTransactionPage = pathname === "/dashboard/finances/transactions";
 
 
-  const [isMobile, setIsMobile] = useState(false);
+
+ 
 
   // Memoize filtered data
   const filteredData = useMemo(() => {
@@ -111,25 +113,11 @@ function DataTable({
     }
   };
 
+  
+
+  
 
 
-    // useEffect(() => {
-    //   const handleResize = () => {
-    //     setIsMobile(window.innerWidth <= 768); // Set mobile breakpoint
-    //   };
-    //   window.addEventListener("resize", handleResize);
-    //   handleResize(); // Initial check
-
-    //   return () => window.removeEventListener("resize", handleResize);
-    // }, []);
-
-    // // Filter columns based on screen size
-    // const visibleColumns = useMemo(() => {
-    //   if (isMobile) {
-    //     return columns.filter((col) => col.hideOnMobile !== true); // Only hide columns where hideOnMobile is explicitly true
-    //   }
-    //   return columns; // On larger screens, show all columns
-    // }, [isMobile, columns]);
 
   return (
     <EditRowContext.Provider value={{ onEditRow }}>
@@ -148,7 +136,7 @@ function DataTable({
               <TableTitle
                 title={title}
                 subtitle={subtitle}
-                totalItemCount={isProjectPage && table.getRowCount()}
+                totalItemCount={(isUsersPage | isProjectPage | isLeavePage) && table.getRowCount()}
               />
               {!pathname.includes("/leave-request") &&
               <div className="relative w-full mr-4">
@@ -174,101 +162,7 @@ function DataTable({
 
             <div className="w-full">
               <div className="rounded-md">
-                {/* <Table>
-                  <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => (
-                          <TableHead
-                            key={header.id}
-                            onClick={
-                              header.column.getCanSort()
-                                ? header.column.getToggleSortingHandler()
-                                : undefined
-                            }
-                            className={
-                              header.column.getCanSort() ? "cursor-pointer" : ""
-                            }
-                          >
-                            <div className="flex items-center gap-2">
-                              {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                              {header.column.getCanSort() && (
-                                <span>
-                                  <ArrowUpDown className="h-4 w-4" />
-                                </span>
-                              )}
-                            </div>
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHeader>
-                  <TableBody>
-                    {table.getRowModel().rows?.length ? (
-                      <>
-                        {table.getRowModel().rows.map((row) => (
-                          <TableRow
-                            key={row.id}
-                            data-state={row.getIsSelected() && "selected"}
-                            className={
-                              isProjectPage
-                                ? "cursor-pointer hover:bg-muted"
-                                : isTransactionPage
-                                ? row.original.transactionType === "Expense"
-                                  ? "bg-[#dc9d9c]" // Light red for expense
-                                  : row.original.transactionType === "Revenue"
-                                  ? "bg-[#78ae78]" // Light green for revenue
-                                  : ""
-                                : ""
-                            }
-                          >
-                            {row.getVisibleCells().map((cell, index) => (
-                              <TableCell
-                                key={cell.id}
-                                onClick={
-                                  index !== row.getVisibleCells().length - 1 &&
-                                  !(
-                                    isProjectPage &&
-                                    cell.column.id === "progressTracking"
-                                  )
-                                    ? (event) =>
-                                        handleRowClick(row.original.id, event)
-                                    : undefined
-                                }
-                              >
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext()
-                                )}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        ))}
-                      </>
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={columns.length}
-                          className="h-24 text-center"
-                        >
-                          No results.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                    {isTableAddFormEnabled && (
-                      <FormRow
-                        onAddRow={onAddRow}
-                        formInputs={formInputs}
-                        projectOptions={projectOptions}
-                      />
-                    )}
-                  </TableBody>
-                </Table> */}
-
-
+        
 
 
 
