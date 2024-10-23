@@ -35,7 +35,7 @@ export const columns = [
         </span>
       );
     },
-    enableSorting: false,
+    enableSorting: true,
   },
   {
     accessorKey: "status",

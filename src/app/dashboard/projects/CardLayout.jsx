@@ -97,9 +97,7 @@ export default function CardLayout({ projects }) {
             </CardContent>
             <CardFooter className="p-0 mt-2">
               <Progress value={project.completion} className="h-1.5" />
-              <span className="ml-2 text-xs">
-                {project.completion?.toFixed(0)}%
-              </span>
+              <span className="ml-2 text-xs">{project.completion}%</span>
             </CardFooter>
           </Card>
         ))}
