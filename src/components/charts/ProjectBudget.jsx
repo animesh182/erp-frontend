@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/chart";
 
 import { formatAmountDecimalToNOK } from "@/lib/utils";
+import { useTheme } from "next-themes";
 
 // Function to calculate the cost exhausted percentage for each project
 function calculateCostExhaustedPercentage(data) {
