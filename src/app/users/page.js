@@ -113,10 +113,11 @@ const UsersHome = () => {
           <div className="flex space-x-4 mb-4">
             {tabs.map((tab) => (
               <Button
+                variant="employeePageBtn"
                 key={tab}
                 className={`px-4 py-2 text-sm font-medium rounded-lg ${
                   selectedTab === tab
-                    ? "bg-blue-50 text-blue-600 border border-blue-500"
+                    ? "bg-blue-50 text-blue-600 "
                     : "text-gray-500 hover:bg-gray-50"
                 }`}
                 onClick={() => setSelectedTab(tab)}
