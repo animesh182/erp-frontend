@@ -101,7 +101,7 @@ function DataTable({
       sorting: [
         {
           id: "invoicedIssuedDate",
-          desc: true,
+          desc: false,
         },
       ],
     },
