@@ -216,6 +216,7 @@ export default function Dashboard() {
       if (status === 200) {
         setOngoingProjects(data.ongoing_projects);
         setCompletedProjects(data.completed_projects);
+        // console.log(data, "data");
       } else {
         console.error("Failed to fetch ongoing projects data");
       }
@@ -339,12 +340,12 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="flex items-center justify-center gap-x-6 w-full select-none">
-        <Card className="w-3/5">
+        <Card className="w-3/5 h-full">
           <CardHeader className="flex-row justify-between items-center">
             <CardTitle>
               Profit & Loss
               <div className="text-sm font-normal text-muted-foreground">
-                This table provides a financial overview of the company
+                This chart provides a financial overview of the company
               </div>
             </CardTitle>
             <Button
@@ -353,7 +354,7 @@ export default function Dashboard() {
               View More
             </Button>
           </CardHeader>
-          <CardContent className="p-0 w-full h-[400px]">
+          <CardContent className="p-0 w-full h-[600px]">
             <ProfitLossChart data={profitLoss} />
           </CardContent>
         </Card>
@@ -362,7 +363,7 @@ export default function Dashboard() {
             <CardTitle>
               Project Financial Status
               <div className="text-sm font-normal text-muted-foreground">
-                This table provides a financial health of specific projects
+                This chart provides a financial health of specific projects
               </div>
             </CardTitle>
           </CardHeader>
@@ -380,10 +381,10 @@ export default function Dashboard() {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="ongoing" className="h-full">
-                {/* <ProjectBudgetChart rawData={ongoingProjects} /> */}
+                <ProjectBudgetChart rawData={ongoingProjects} />
               </TabsContent>
               <TabsContent value="completed" className="h-full">
-                {/* <ProjectBudgetChart rawData={completedProjects} /> */}
+                <ProjectBudgetChart rawData={completedProjects} />
               </TabsContent>
             </Tabs>
           </CardContent>

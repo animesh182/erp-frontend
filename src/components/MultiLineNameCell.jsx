@@ -6,7 +6,7 @@ const MultiLineNameCell = ({
   title,
   subtitle,
   designation,
-  isActive,
+  isActive = true,
 }) => {
   const getInitials = (name) => {
     return name

@@ -38,10 +38,10 @@ export default function ProfitLossChart({ data }) {
     return null;
   }
   return (
-    <ResponsiveContainer height="100%">
+    <ResponsiveContainer height={600}>
       <ComposedChart
         width={600}
-        height={200}
+        height={600}
         data={data}
         margin={{
           top: 20,
@@ -57,7 +57,7 @@ export default function ProfitLossChart({ data }) {
           yAxisId="left"
           tick={{
             fontSize: 12,
-            fill: theme === "dark" ? "#FFFFFF" : "#808080", // Adjust color based on theme
+            fill: theme === "dark" ? "#FFFFFF" : "#000000", // Adjust color based on theme
           }}
           tickCount={6}
         />
@@ -116,7 +116,7 @@ export default function ProfitLossChart({ data }) {
             formatter={(value) => (value % 1 !== 0 ? value.toFixed(1) : value)}
             style={{
               fontSize: "14px",
-              fill: theme === "dark" ? "#FFFFFF" : "#808080", // Adjust color based on theme
+              fill: theme === "dark" ? "#FFFFFF" : "#000000", // Adjust color based on theme
             }}
           />
         </Line>
