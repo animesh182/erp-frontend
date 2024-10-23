@@ -1,6 +1,6 @@
 "use client";
 import DataTable from "@/components/ui/data-table";
-import { LayoutGridIcon, List, MinusCircle, PlusCircle } from "lucide-react";
+import { LayoutGridIcon, List, PlusCircle } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { projectColumns } from "./Columns";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -14,25 +14,23 @@ import { AddClientDialog } from "@/components/AddClientDialog";
 import { getProjects } from "@/app/api/getProjects";
 import { getClients } from "@/app/api/projects/getClients";
 
-import { apiClient } from "@/lib/utils";
 import { createProject } from "@/app/api/projects/createProject";
 import { editProject } from "@/app/api/projects/editProject";
 import { createClient } from "@/app/api/projects/createClient";
+import { deleteProject } from "@/app/api/projects/deleteProject";
+
 export default function Projects() {
   const methods = useForm();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
   const [isCardLayout, setIsCardLayout] = useState(false);
-  const [editingProject, setEditingProject] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
   }, []);
 
-  // console.log(projects);
-  // handle toggle layout
   const handleToggleLayout = (value) => {
     if (value === "grid") {
       setIsCardLayout(true);
@@ -40,6 +38,10 @@ export default function Projects() {
       setIsCardLayout(false);
     }
   };
+
+  // useEffect(() => {
+  //   console.log("start-stop", isSheetOpen);
+  // }, [isSheetOpen]);
 
   useEffect(() => {
     const getProjectsFromApi = async () => {
@@ -77,11 +79,6 @@ export default function Projects() {
     setIsSheetOpen(true);
   };
 
-  const handleProjectUpdate = (updatedProject) => {
-    toast.success("Project updated successfully");
-    console.log("Updated Project:", updatedProject);
-  };
-
   const onAddProject = async (formData) => {
     try {
       const response = await createProject(formData);
@@ -100,10 +97,23 @@ export default function Projects() {
       toast.success("Project updated successfully");
       refreshComponent(); // Refresh the component
       setIsSheetOpen(false);
-      setEditingProject(null);
+      // setEditingProject(null);
     } catch (error) {
       toast.error("Failed to update project");
       console.error("Error updating project:", error.message);
+    }
+  };
+
+  const onDeleteProject = async (projectId) => {
+    try {
+      const response = await deleteProject(projectId);
+      if (response && response.message) {
+        toast.success(response.message);
+        refreshComponent(); // Refresh the component
+      }
+    } catch (error) {
+      toast.error("There was an error deleting the project");
+      console.error("There was an error deleting the project:", error);
     }
   };
 
@@ -116,10 +126,6 @@ export default function Projects() {
       toast.error("There was an error adding the client");
       console.error("Error adding client:", error.message);
     }
-  };
-  const handleProjectEdit = (project) => {
-    setEditingProject(project); // Set the project to be edited
-    setIsSheetOpen(true); // Open the sheet
   };
 
   return (
@@ -158,10 +164,7 @@ export default function Projects() {
       <div className="flex flex-col items-center gap-1 text-left w-full ">
         {projects && projects.length > 0 ? (
           isCardLayout ? (
-            <CardLayout
-              projects={projects}
-              onProjectUpdate={handleProjectUpdate}
-            />
+            <CardLayout projects={projects} />
           ) : (
             <FormProvider {...methods}>
               <DataTable
@@ -173,6 +176,7 @@ export default function Projects() {
                 formInputs={formInputs}
                 filterColumn={"project_status"}
                 onEditRow={onEditProject}
+                onDeleteRow={onDeleteProject}
               />
             </FormProvider>
           )
@@ -184,7 +188,6 @@ export default function Projects() {
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddProject={onAddProject}
-        editingProject={editingProject} // Pass the editing project
         clients={clients}
       />
     </main>

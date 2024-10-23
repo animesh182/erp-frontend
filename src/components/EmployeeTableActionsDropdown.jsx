@@ -13,12 +13,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import DeleteDialog from "./DeleteDialog";
 
-const SimpleTableActionsDropdown = ({ rowData }) => {
+const EmployeeTableActionsDropdown = ({ rowData }) => {
+  console.log(rowData, "rowData");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { onDeleteRow } = useContext(SimpleDataTableContext);
 
   const handleDelete = () => {
-    onDeleteRow(rowData.user_id, rowData.project_id);
+    onDeleteRow(rowData.id);
     setIsDeleteDialogOpen(false);
   };
 
@@ -43,11 +44,11 @@ const SimpleTableActionsDropdown = ({ rowData }) => {
       <DeleteDialog
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
-        itemName={rowData?.name}
+        itemName={rowData?.full_name}
         onDelete={handleDelete}
       />
     </DropdownMenu>
   );
 };
 
-export default SimpleTableActionsDropdown;
+export default EmployeeTableActionsDropdown;

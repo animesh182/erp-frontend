@@ -9,6 +9,7 @@ import { ProgressTrackingCell } from "@/components/ui/ProgressTrackingCell";
 import { apiClient, formatAmountToNOK } from "@/lib/utils";
 import { prettifyText } from "@/lib/utils";
 import { format } from "date-fns";
+import { toast } from "sonner";
 export const projectColumns = (clients) => [
   {
     accessorKey: "name",
@@ -123,7 +124,7 @@ export const projectColumns = (clients) => [
           <p className="text-xs ">
             -
             {(completion_date && format(completion_date, "MMM dd, yyyy")) ||
-              "N/A"}
+              "Present"}
           </p>
         </div>
       );
@@ -144,33 +145,10 @@ export const projectColumns = (clients) => [
     header: "",
     cell: ({ row }) => {
       const rowData = row.original;
-      const handleDelete = () => {
-        console.log("Delete", row.original.id);
-
-        try {
-          const response = apiClient(
-            `${process.env.NEXT_PUBLIC_API_URL}api/project/${row.original.id}/`,
-            {
-              method: "DELETE",
-            }
-          );
-          if (response.ok) {
-            toast.success(`${row.original.project_name} deleted successfully.`);
-          }
-        } catch (error) {
-          toast.error("There was an error deleting the project");
-          console.error("There was an error deleting the project:", error);
-        }
-        // Handle delete action
-      };
 
       return (
         <div className="flex items-center">
-          <ProjectTableActionsDropdown
-            onDelete={handleDelete}
-            rowData={rowData}
-            clients={clients}
-          />
+          <ProjectTableActionsDropdown rowData={rowData} clients={clients} />
         </div>
       );
     },

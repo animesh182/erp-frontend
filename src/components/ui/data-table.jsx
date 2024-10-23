@@ -48,6 +48,7 @@ function DataTable({
   initialStartDate,
   initialEndDate,
   projectOptions,
+  onDeleteRow,
 }) {
   const [sorting, setSorting] = useState([]);
   const [selectedTab, setSelectedTab] = useState("All");
@@ -68,14 +69,17 @@ function DataTable({
     let filtered = data;
 
     if (selectedTab !== "All") {
-      console.log(data, "data");
-      console.log(`Filtering by ${filterColumn}: ${selectedTab}`);
+      // console.log(data, "data");
+      // console.log(`Filtering by ${filterColumn}: ${selectedTab}`);
       filtered = filtered.filter((row) => row[filterColumn] === selectedTab);
     }
 
     if (searchValue) {
-      filtered = filtered.filter((row) =>
-        row.name.toLowerCase().includes(searchValue.toLowerCase())
+      filtered = filtered.filter(
+        (row) =>
+          row.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          (row.projectName &&
+            row.projectName.toLowerCase().includes(searchValue.toLowerCase()))
       );
     }
 
@@ -100,6 +104,12 @@ function DataTable({
         pageSize: 10, // Number of rows per page
         pageIndex: 0, // Starting from the first page
       },
+      sorting: [
+        {
+          id: "invoicedIssuedDate",
+          desc: false,
+        },
+      ],
     },
   });
 
@@ -120,7 +130,7 @@ function DataTable({
 
 
   return (
-    <EditRowContext.Provider value={{ onEditRow }}>
+    <EditRowContext.Provider value={{ onEditRow, onDeleteRow }}>
       <div className="w-full">
         <div className="space-y-5">
           {filterValues.length > 0 && (
@@ -282,7 +292,9 @@ function DataTable({
                     <PaginationItem key={index}>
                       <PaginationLink
                         onClick={() => table.setPageIndex(index)}
-                        active={table.getState().pagination.pageIndex === index}
+                        isActive={
+                          table.getState().pagination.pageIndex === index
+                        }
                       >
                         {index + 1}
                       </PaginationLink>
