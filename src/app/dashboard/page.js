@@ -311,10 +311,7 @@ export default function Dashboard() {
           initialEndDate={endDate}
         />
       </div>
-      {/* <div
-        className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm"
-        x-chunk="dashboard-02-chunk-1"
-      > */}
+
       <div className="flex flex-1 flex-col gap-4 md:gap-8 ">
         <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
           {kpiValues && kpiValues.length > 0
@@ -339,8 +336,8 @@ export default function Dashboard() {
               ))}
         </div>
       </div>
-      <div className="flex items-center justify-center gap-x-6 w-full select-none">
-        <Card className="w-3/5 h-full">
+      <div className="grid grid-cols-5 gap-x-6 select-none">
+        <Card className="col-span-5 lg:col-span-3 h-full">
           <CardHeader className="flex-row justify-between items-center">
             <CardTitle>
               Profit & Loss
@@ -358,7 +355,7 @@ export default function Dashboard() {
             <ProfitLossChart data={profitLoss} />
           </CardContent>
         </Card>
-        <Card className="w-2/5 h-full">
+        <Card className="col-span-5 lg:col-span-2 h-full">
           <CardHeader className="flex-row justify-between items-center pb-0 ">
             <CardTitle>
               Project Financial Status
@@ -390,26 +387,27 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-      <Card className="select-none">
-        <CardHeader className="flex-row justify-between items-center">
-          <CardTitle>
-            Resource Utilization
-            <div className="text-sm font-normal text-muted-foreground">
-              This graph shows an overview of all resources in the project
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="w-full h-full min-h-[800px]">
-          {resourceUtilData && resourceUtilData.length > 0 ? (
-            <EmployeeMonthlyHours rawData={resourceUtilData} />
-          ) : resourceUtilData && resourceUtilData.length === 0 ? (
-            <div className="text-3xl font-semibold">No Data Available</div>
-          ) : (
-            <RectangleSkeleton />
-          )}
-        </CardContent>
-      </Card>
-      {/* </div> */}
+      <div className="grid grid-cols-5 gap-x-6 select-none">
+        <Card className="col-span-5 select-none w-full overflow-hidden">
+          <CardHeader className="flex-row justify-between items-center">
+            <CardTitle>
+              Resource Utilization
+              <div className="text-sm font-normal text-muted-foreground">
+                This graph shows an overview of all resources in the project
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="w-full h-full min-h-[800px]">
+            {resourceUtilData && resourceUtilData.length > 0 ? (
+              <EmployeeMonthlyHours rawData={resourceUtilData} />
+            ) : resourceUtilData && resourceUtilData.length === 0 ? (
+              <div className="text-3xl font-semibold">No Data Available</div>
+            ) : (
+              <RectangleSkeleton />
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </main>
   );
 }

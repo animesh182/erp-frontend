@@ -107,7 +107,6 @@ export default function EmployeeMonthlyHours({ rawData }) {
   };
   return (
     <ChartContainer className="h-[800px] w-full" config={chartConfig}>
-      {/* <ResponsiveContainer width="100%" height="100%"> */}
       <BarChart
         layout="vertical"
         data={data}

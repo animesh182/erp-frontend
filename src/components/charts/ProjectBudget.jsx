@@ -68,6 +68,7 @@ function RenderLegend() {
 }
 
 export default function ProjectBudgetChart({ rawData }) {
+  console.log(rawData, "rawData");
   const updatedChartData = calculateCostExhaustedPercentage(rawData);
 
   // Dynamically generate chart config
