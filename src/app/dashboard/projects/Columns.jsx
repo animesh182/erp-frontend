@@ -9,6 +9,7 @@ import { ProgressTrackingCell } from "@/components/ui/ProgressTrackingCell";
 import { apiClient, formatAmountToNOK } from "@/lib/utils";
 import { prettifyText } from "@/lib/utils";
 import { format } from "date-fns";
+import { toast } from "sonner";
 export const projectColumns = (clients) => [
   {
     accessorKey: "name",
@@ -17,8 +18,8 @@ export const projectColumns = (clients) => [
       const { name, project_health } = row.original; // Access the full row data
       return (
         <div>
-          <p>{name}</p>
-          <ProjectHealth health={project_health} />
+          <p>{name || "N/A"}</p>
+          {project_health && <ProjectHealth health={project_health} />}
         </div>
       );
     },
@@ -47,7 +48,7 @@ export const projectColumns = (clients) => [
       const { name, email } = row.original.client_contact; // Access the full row data
       return (
         <MultiLineNameCell
-          imageUrl={"/default-avatar.jpg"}
+          // imageUrl={"/default-avatar.jpg"}
           title={name}
           subtitle={email}
         />
@@ -101,10 +102,12 @@ export const projectColumns = (clients) => [
     cell: ({ row }) => {
       const rowData = row.original.completion;
       const projectName = row.original.name;
+      const projectId = row.original.id;
       return (
         <ProgressTrackingCell
           row={Math.round(rowData)}
           projectName={projectName}
+          projectId={projectId}
         />
       );
     },
@@ -114,12 +117,14 @@ export const projectColumns = (clients) => [
     accessorKey: "timeline",
     header: "Timeline",
     cell: ({ row }) => {
-      const { start_date, end_date } = row.original; // Access the full row data
+      const { start_date, completion_date } = row.original; // Access the full row data
       return (
         <div className="flex">
           <p className="text-xs ">{format(start_date, "MMM dd, yyyy")}</p>
           <p className="text-xs ">
-            -{(end_date && format(end_date, "MMM dd, yyyy")) || "N/A"}
+            -
+            {(completion_date && format(completion_date, "MMM dd, yyyy")) ||
+              "Present"}
           </p>
         </div>
       );
@@ -140,33 +145,10 @@ export const projectColumns = (clients) => [
     header: "",
     cell: ({ row }) => {
       const rowData = row.original;
-      const handleDelete = () => {
-        console.log("Delete", row.original.id);
-
-        try {
-          const response = apiClient(
-            `${process.env.NEXT_PUBLIC_API_URL}api/project/${row.original.id}/`,
-            {
-              method: "DELETE",
-            }
-          );
-          if (response.ok) {
-            toast.success(`${row.original.project_name} deleted successfully.`);
-          }
-        } catch (error) {
-          toast.error("There was an error deleting the project");
-          console.error("There was an error deleting the project:", error);
-        }
-        // Handle delete action
-      };
 
       return (
         <div className="flex items-center">
-          <ProjectTableActionsDropdown
-            onDelete={handleDelete}
-            rowData={rowData}
-            clients={clients}
-          />
+          <ProjectTableActionsDropdown rowData={rowData} clients={clients} />
         </div>
       );
     },

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createContext } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -23,7 +23,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-function SimpleDataTable({ columns, data, onRowSelect }) {
+export const SimpleDataTableContext = createContext(null);
+
+function SimpleDataTable({ columns, data, onRowSelect, onDeleteRow }) {
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const [userSelected, setUserSelected] = useState(false);
 
@@ -50,84 +52,88 @@ function SimpleDataTable({ columns, data, onRowSelect }) {
   };
 
   return (
-    <div className="w-full">
-      <div className="rounded-md">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row, index) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  onClick={() => handleRowClick(row, index)}
-                  className={`${onRowSelect ? "cursor-pointer" : ""} ${
-                    index === selectedRowIndex && onRowSelect ? "bg-muted" : ""
-                  }`}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+    <SimpleDataTableContext.Provider value={{ onDeleteRow }}>
+      <div className="w-full">
+        <div className="rounded-md">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
                       {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
+                        header.column.columnDef.header,
+                        header.getContext()
                       )}
-                    </TableCell>
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <Pagination className="justify-end mt-4">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            />
-          </PaginationItem>
-          {table.getPageOptions().map((page) => (
-            <PaginationItem key={page}>
-              <PaginationLink
-                onClick={() => table.setPageIndex(page)}
-                isActive={table.getState().pagination.pageIndex === page}
-              >
-                {page + 1}
-              </PaginationLink>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row, index) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    onClick={() => handleRowClick(row, index)}
+                    className={`${onRowSelect ? "cursor-pointer" : ""} ${
+                      index === selectedRowIndex && onRowSelect
+                        ? "bg-muted"
+                        : ""
+                    }`}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <Pagination className="justify-end mt-4">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              />
             </PaginationItem>
-          ))}
-          <PaginationItem>
-            <PaginationNext
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-    </div>
+            {table.getPageOptions().map((page) => (
+              <PaginationItem key={page}>
+                <PaginationLink
+                  onClick={() => table.setPageIndex(page)}
+                  isActive={table.getState().pagination.pageIndex === page}
+                >
+                  {page + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
+    </SimpleDataTableContext.Provider>
   );
 }
 

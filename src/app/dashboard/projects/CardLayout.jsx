@@ -13,9 +13,10 @@ import { Badge } from "@/components/ui/badge";
 import TableTitle from "@/components/TableTitle";
 import ProjectHealth from "@/components/ProjectHealth";
 import { useRouter } from "next/navigation";
+import { format } from "date-fns";
 
 export default function CardLayout({ projects }) {
-  console.log(projects);
+  console.log(projects, "projects");
   const router = useRouter();
 
   const handleCardClick = (projectId) => {
@@ -71,17 +72,34 @@ export default function CardLayout({ projects }) {
                     "/default-avatar.jpg",
                     "/default-avatar.jpg",
                   ]}
-                  teamMembersCount={project.all_user_projects?.length}
+                  teamMembersCount={project.all_user_projects.length}
                   size="medium"
                 />
               </div>
               <div className="text-xs mt-4">
-                {project.start_date} - {project.end_date}
+                {project.start_date && project.end_date
+                  ? `${format(
+                      new Date(project.start_date),
+                      "MMM d, yyyy"
+                    )} - ${format(new Date(project.end_date), "MMM d, yyyy")}`
+                  : project.start_date
+                  ? `${format(
+                      new Date(project.start_date),
+                      "MMM d, yyyy"
+                    )} - No end date`
+                  : project.end_date
+                  ? `No start date - ${format(
+                      new Date(project.end_date),
+                      "MMM d, yyyy"
+                    )}`
+                  : "No dates available"}
               </div>
             </CardContent>
             <CardFooter className="p-0 mt-2">
               <Progress value={project.completion} className="h-1.5" />
-              <span className="ml-2 text-xs">{project.completion}%</span>
+              <span className="ml-2 text-xs">
+                {project.completion?.toFixed(0)}%
+              </span>
             </CardFooter>
           </Card>
         ))}

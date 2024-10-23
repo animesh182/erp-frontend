@@ -9,15 +9,20 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { assignProject } from "@/app/api/employees/assignProject";
 import { toast } from "sonner";
 
-
-
-const ProjectsTab = ({ employeeId, projectOptions, roleOptions, userId, employeeProjects }) => {
-  // console.log(employeeProjects, "emp");
-
-
-
+const ProjectsTab = ({
+  employeeId,
+  projectOptions,
+  roleOptions,
+  employeeProjects,
+}) => {
+  const [localEmployeeProjects, setLocalEmployeeProjects] = useState(
+    employeeProjects || []
+  );
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
+  useEffect(() => {
+    setLocalEmployeeProjects(employeeProjects || []);
+  }, [employeeProjects]);
 
   const openSheet = () => setIsSheetOpen(true);
 
@@ -27,20 +32,30 @@ const ProjectsTab = ({ employeeId, projectOptions, roleOptions, userId, employee
       console.log("Project assigned successfully:", response);
       toast.success("Project assigned successfully");
       setIsSheetOpen(false);
-      // You might want to update the UI or state here
+
+      // Update the local state with the new project
+      setLocalEmployeeProjects((prevProjects) => [
+        ...prevProjects,
+        {
+          project_title: values.projectTitle,
+          project_name: values.projectName,
+          project_status: "Ongoing",
+          start_date: values.startDate,
+          end_date: values.endDate,
+          completion: 0,
+          utilization: values.utilization,
+          days_involved: 0,
+        },
+      ]);
     } catch (error) {
       console.error("Failed to assign project:", error);
       toast.error(error.message || "Failed to assign project");
-      // Handle the error (e.g., show an error message to the user)
     }
   };
 
-
-
-  if(!employeeProjects) {
-    return <div>No Projects</div>
+  if (!localEmployeeProjects) {
+    return <div>No Projects</div>;
   }
-
 
   return (
     <div>
@@ -61,7 +76,7 @@ const ProjectsTab = ({ employeeId, projectOptions, roleOptions, userId, employee
       <div className="flex flex-col gap-4 overflow-y-auto p-6 space-y-2">
         <div className="flex items-center justify-between ">
           <div className="font-semibold text-xl">
-            Current projects ({employeeProjects?.length})
+            Current projects ({localEmployeeProjects.length})
           </div>
           <Button
             variant="secondary"
@@ -72,23 +87,21 @@ const ProjectsTab = ({ employeeId, projectOptions, roleOptions, userId, employee
             <PlusCircle className="h-4 w-4" /> Assign Project
           </Button>
         </div>
-        {employeeProjects?.map((empProject, index) => {
-          return (
-            <div key={index}>
-              <ProjectCard
-                title={empProject.project_title}
-                projectName={empProject.project_name}
-                category="Category N/A"
-                status={empProject.project_status}
-                startDate={empProject.start_date}
-                endDate={empProject.end_date}
-                progress={empProject.completion}
-                timeInvolved={empProject.utilization}
-                totalDaysInvolved={empProject.days_involved}
-              />
-            </div>
-          );
-        })}
+        {localEmployeeProjects.map((empProject, index) => (
+          <div key={index}>
+            <ProjectCard
+              title={empProject.project_title}
+              projectName={empProject.project_name}
+              category="Category N/A"
+              status={empProject.project_status}
+              startDate={empProject.start_date}
+              endDate={empProject.end_date}
+              progress={empProject.completion}
+              timeInvolved={empProject.utilization}
+              totalDaysInvolved={empProject.days_involved}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );

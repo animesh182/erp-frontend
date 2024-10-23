@@ -82,6 +82,56 @@ async function refreshToken() {
 }
 
 export async function apiClient(url, options = {}) {
+  let token = Cookies.get("access_token");
+
+  const defaultHeaders = {
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
+
+  // Only set Content-Type if the body is not FormData
+  if (!(options.body instanceof FormData)) {
+    defaultHeaders["Content-Type"] = "application/json";
+  }
+
+  try {
+    let response = await fetch(url, {
+      ...options,
+      headers: {
+        ...defaultHeaders,
+        ...options.headers,
+      },
+    });
+
+    if (response.status === 401) {
+      const errorData = await response.json();
+      if (errorData.code === "token_not_valid") {
+        token = await refreshToken();
+        response = await fetch(url, {
+          ...options,
+          headers: {
+            ...defaultHeaders,
+            Authorization: `Bearer ${token}`,
+            ...options.headers,
+          },
+        });
+      }
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "An error occurred");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("API Request Failed:", error.message);
+    throw new Error(
+      error.message || "An error occurred while processing the request"
+    );
+  }
+}
+
+export async function deleteApiClient(url, options = {}) {
   let token = Cookies.get("access_token"); // Get the access token from cookies
 
   const defaultHeaders = {
@@ -90,9 +140,10 @@ export async function apiClient(url, options = {}) {
   };
 
   try {
-    // Attempt to make the API request
+    // Attempt to make the DELETE request
     let response = await fetch(url, {
       ...options,
+      method: "DELETE",
       headers: {
         ...defaultHeaders,
         ...options.headers, // Merge additional headers if provided
@@ -105,9 +156,10 @@ export async function apiClient(url, options = {}) {
       if (errorData.code === "token_not_valid") {
         // Try refreshing the token
         token = await refreshToken();
-        // Retry the API request with the new token
+        // Retry the DELETE request with the new token
         response = await fetch(url, {
           ...options,
+          method: "DELETE",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -116,17 +168,22 @@ export async function apiClient(url, options = {}) {
       }
     }
 
-    // If the response is still not OK after refreshing, throw an error
+    // Check for 204 status code (No Content)
+    if (response.status === 204) {
+      return true; // Successful deletion
+    }
+
+    // If the response is not 204, throw an error
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "An error occurred");
     }
 
-    return await response.json(); // Return the parsed response
+    return false; // Should not reach here for successful deletion
   } catch (error) {
-    console.error("API Request Failed:", error.message);
+    console.error("API Delete Request Failed:", error.message);
     throw new Error(
-      error.message || "An error occurred while processing the request"
+      error.message || "An error occurred while processing the delete request"
     );
   }
 }

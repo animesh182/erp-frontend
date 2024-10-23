@@ -101,7 +101,10 @@ export default function Sidebar() {
     <aside className="hidden md:fixed md:top-0 md:left-0 md:h-full md:w-[220px] lg:w-[280px] md:border-r md:bg-muted/40 md:block md:overflow-y-auto">
       <div className="flex h-full max-h-screen flex-col gap-2">
         <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 font-semibold"
+          >
             <CompanyIcon size={24} color="#1169C4" />
             <span className="">Avinto AS</span>
           </Link>

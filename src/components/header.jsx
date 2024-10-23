@@ -50,9 +50,9 @@ export default function Header() {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <Link href="/settings">
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-          </Link>
+          {/* <Link href="/settings"> */}
+          <DropdownMenuItem>Settings</DropdownMenuItem>
+          {/* </Link> */}
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>

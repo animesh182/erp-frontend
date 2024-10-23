@@ -6,15 +6,15 @@ import { Dot } from "lucide-react";
 import { format } from "date-fns";
 
 export function ProjectCard({
-  title = "Jambo Travel House",
-  projectName = "Itinerary App",
-  category = "Web Development",
-  status = "Ongoing",
-  startDate = "2024-01-01",
-  endDate = "2024-01-01",
-  progress = 70,
-  timeInvolved = 4,
-  totalDaysInvolved = 32,
+  title,
+  projectName,
+  category,
+  status,
+  startDate,
+  endDate,
+  progress,
+  timeInvolved,
+  totalDaysInvolved,
 }) {
   return (
     <Card className="w-full p-6">

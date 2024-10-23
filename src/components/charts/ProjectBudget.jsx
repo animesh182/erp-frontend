@@ -21,203 +21,158 @@ import {
 import { formatAmountDecimalToNOK } from "@/lib/utils";
 import { useTheme } from "next-themes";
 
-// Function to calculate the total expense percentage for each project
-function calculateExpensePercentage(data) {
-  return data.map((item) => {
-    const totalExpenses = Object.values(item.expenses).reduce(
-      (sum, expense) => sum + expense,
-      0
-    );
-    const expensePercentage = (
-      (totalExpenses / item.totalIncome) *
-      100
-    ).toFixed(1);
-    const profitPercentage = 100 - expensePercentage;
-    return { ...item, totalExpenses, expensePercentage, profitPercentage }; // Add expensePercentage to the item
+// Function to calculate the cost exhausted percentage for each project
+function calculateCostExhaustedPercentage(data) {
+  return data?.map((item) => {
+    const costExhaustedPercentage =
+      item.total_income > 0
+        ? ((item.total_cost / item.total_income) * 100).toFixed(1)
+        : "0.0";
+    const profitPercentage = 100 - parseFloat(costExhaustedPercentage);
+    return {
+      ...item,
+      costExhaustedPercentage,
+      profitPercentage: profitPercentage.toFixed(1),
+    };
   });
 }
-function parseToolTipLabel(value) {
-  if (value === "direct") {
-    return "Direct Cost";
-  } else if (value === "fixed") {
-    return "Fixed Cost";
-  } else if (value === "npa") {
-    return "NPA";
+
+function CustomTooltip({ active, payload, label }) {
+  if (active && payload && payload.length) {
+    const { project_name, total_income, total_cost, costExhaustedPercentage } =
+      payload[0].payload;
+    return (
+      <div className={`p-2 bg-primary-foreground rounded-md shadow-lg`}>
+        <p className="font-semibold">{`${project_name}`}</p>
+        <p className="">{`Total Income: ${formatAmountDecimalToNOK(
+          total_income
+        )} kr`}</p>
+        <p className="">{`Total Cost: ${formatAmountDecimalToNOK(
+          total_cost
+        )} kr (${costExhaustedPercentage}%)`}</p>
+      </div>
+    );
   }
+  return null;
 }
 
 function RenderLegend() {
   return (
     <div className="flex justify-center">
       <div className="flex items-center text-[#2563EB] mr-4 font-semibold">
-        Dynamic Revenue (Recurring)
+        Ongoing Projects
       </div>
-      <div className="flex items-center font-semibold">Fixed Costs</div>
+      <div className="flex items-center font-semibold">Completed Projects</div>
     </div>
   );
 }
 
-const chartConfig = {
-  "Avinto ERP": {
-    color: "#4A90E2",
-    label: "Avinto ERP",
-  },
-  "Jambo Booking House": {
-    color: "#E47CF5",
-    label: "Jambo Booking House",
-  },
-  "Basic Booking App": {
-    color: "#F5A623",
-    label: "Basic Booking App",
-  },
-  Ebibaaha: {
-    color: "#50C878", // Emerald green
-    label: "Ebibaaha",
-  },
-  Changeride: {
-    color: "#FF6347", // Tomato red
-    label: "Changeride",
-  },
-  "Tutor App": {
-    color: "#FFD700", // Gold
-    label: "Tutor App",
-  },
-  Logistikk: {
-    color: "#9370DB", // Medium Purple
-    label: "Logistikk",
-  },
-};
-
 export default function ProjectBudgetChart({ rawData }) {
-  const updatedChartData = calculateExpensePercentage(rawData);
-  const recurringProjects = updatedChartData
-    .filter((data) => data.isRecurring)
-    .map((filterData) => filterData.project);
-  const { theme } = useTheme();
+  console.log(rawData, "rawData");
+  const updatedChartData = calculateCostExhaustedPercentage(rawData);
 
-  function CustomTooltip({ active, payload, label }) {
-    if (active && payload && payload.length) {
-      const {
-        project,
-        totalIncome,
-        expenses,
-        totalExpenses,
-        expensePercentage,
-      } = payload[0].payload;
-      return (
-        <div className={`p-2 bg-primary-foreground rounded-md shadow-lg`}>
-          <p className="font-semibold">{`${project}`}</p>
-          <p className="">{`Total Income: ${formatAmountDecimalToNOK(
-            totalIncome
-          )} kr`}</p>
-          <p className="">{`Total Expenses: ${formatAmountDecimalToNOK(
-            totalExpenses
-          )} kr (${expensePercentage}%)`}</p>
-          <p className="mt-2 font-semibold">Breakdown of Expenses:</p>
-          {Object.entries(expenses).map(([key, value]) => (
-            <p key={key} className="expense-item">{`${parseToolTipLabel(
-              key
-            )}: ${formatAmountDecimalToNOK(value)} kr`}</p>
-          ))}
-        </div>
-      );
-    }
+  // Dynamically generate chart config
+  const chartConfig = updatedChartData.reduce((config, item, index) => {
+    const colors = [
+      "#4A90E2",
+      "#E47CF5",
+      "#F5A623",
+      "#50C878",
+      "#FF6347",
+      "#FFD700",
+      "#9370DB",
+    ];
+    config[item.project_name] = {
+      color: colors[index % colors.length],
+      label: item.project_name,
+    };
+    return config;
+  }, {});
 
-    return null;
-  }
   return (
-    <ResponsiveContainer height="100%">
-      <ChartContainer config={chartConfig}>
-        <BarChart
-          accessibilityLayer
-          data={updatedChartData} // Use the updated data
-          layout="vertical"
-          className="w-full"
-        >
-          <XAxis
-            type="number"
-            dataKey="expensePercentage" // Display expense percentage on the XAxis
-            ticks={[0, 20, 40, 60, 80, 100]} // Custom ticks
-            orientation="top"
-            tickLine={false}
-          />
-          <YAxis
-            dataKey="project"
-            type="category"
-            tick={({ x, y, payload }) => {
-              const label = payload.value;
-              const lines =
-                label.length > 15
-                  ? [label.slice(0, 15), label.slice(15)]
-                  : [label];
+    <ChartContainer className="min-h-[600px] w-full" config={chartConfig}>
+      <BarChart
+        accessibilityLayer
+        data={updatedChartData}
+        layout="vertical"
+        className="w-full"
+      >
+        <XAxis
+          type="number"
+          dataKey="costExhaustedPercentage"
+          ticks={[0, 20, 40, 60, 80, 100]}
+          orientation="top"
+          tickLine={false}
+        />
+        <YAxis
+          dataKey="project_name"
+          type="category"
+          tick={({ x, y, payload }) => {
+            const label = payload.value;
+            const lines =
+              label.length > 15
+                ? [label.slice(0, 15), label.slice(15)]
+                : [label];
+            return (
+              <text
+                x={x}
+                y={y - (lines.length - 1) * 5}
+                stroke={chartConfig[label].color}
+                strokeWidth={0.6}
+                fontSize={12}
+                fontWeight={500}
+                textAnchor="end"
+              >
+                {lines.map((line, index) => (
+                  <tspan x={x} dy={index === 0 ? 0 : 15} key={index}>
+                    {line}
+                  </tspan>
+                ))}
+              </text>
+            );
+          }}
+          tickLine={false}
+          axisLine={false}
+          width={100}
+        />
 
-              return (
-                <text
-                  x={x}
-                  y={y - (lines.length - 1) * 5} // Adjust y position for multiple lines
-                  stroke={
-                    recurringProjects.includes(label) ? "#2563EB" : "#000000"
-                  } // Blue if recurring, black otherwise
-                  strokeWidth={0.6}
-                  fontSize={12}
-                  fontWeight={500}
-                  textAnchor="end"
-                >
-                  {lines.map((line, index) => (
-                    <tspan x={x} dy={index === 0 ? 0 : 15} key={index}>
-                      {line}
-                    </tspan>
-                  ))}
-                </text>
-              );
-            }}
-            tickLine={false}
-            axisLine={false}
-            width={100} // Increase width for long labels if needed
-          />
+        <ChartTooltip cursor={false} content={<CustomTooltip />} />
+        <Legend
+          content={RenderLegend}
+          verticalAlign="bottom"
+          align="center"
+          layout="horizontal"
+        />
 
-          <ChartTooltip cursor={false} content={<CustomTooltip />} />
-          <Legend
-            content={RenderLegend}
-            verticalAlign="bottom"
-            align="center"
-            layout="horizontal"
-          />
-
-          {/* Main bar */}
-          <Bar dataKey="expensePercentage" stackId="a">
-            {updatedChartData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`} // Provide a unique key
-                fill={chartConfig[entry.project].color}
-              />
-            ))}
-            <LabelList
-              dataKey="expensePercentage"
-              position="insideRight"
-              style={{ fill: "black", fontWeight: 500 }} // Set the label color to black
+        {/* Main bar */}
+        <Bar dataKey="costExhaustedPercentage" stackId="a">
+          {updatedChartData.map((entry, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={chartConfig[entry.project_name].color}
             />
-          </Bar>
-          <Bar
-            dataKey={() => 100} // Full width bar for background
-            stackId="a"
-            radius={[0, 5, 5, 0]}
-          >
-            {updatedChartData.map((entry, index) => (
-              <Cell
-                key={`bg-cell-${index}`} // Provide a unique key for the background cells
-                fill={chartConfig[entry.project].color}
-                opacity={0.3}
-              />
-            ))}
-            <LabelList
-              dataKey="profitPercentage"
-              position="center"
-              style={{ fill: "black", fontWeight: 600 }} // Set the label color to black
+          ))}
+          <LabelList
+            dataKey="costExhaustedPercentage"
+            position="insideRight"
+            style={{ fill: "black", fontWeight: 500 }}
+          />
+        </Bar>
+        <Bar dataKey={() => 100} stackId="a" radius={[0, 5, 5, 0]}>
+          {updatedChartData.map((entry, index) => (
+            <Cell
+              key={`bg-cell-${index}`}
+              fill={chartConfig[entry.project_name].color}
+              opacity={0.3}
             />
-          </Bar>
-        </BarChart>
-      </ChartContainer>
-    </ResponsiveContainer>
+          ))}
+          <LabelList
+            dataKey="profitPercentage"
+            position="center"
+            style={{ fill: "#000000", fontWeight: 600 }}
+          />
+        </Bar>
+      </BarChart>
+    </ChartContainer>
   );
 }

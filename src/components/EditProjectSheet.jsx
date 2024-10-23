@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
@@ -26,7 +26,8 @@ export function EditProjectSheet({
   onAddProject,
   clients,
 }) {
-  // console.log(projectData, "data");
+  // console.log("in edit project sheet");
+  // console.log(projectData);
   const {
     control,
     handleSubmit,
@@ -37,8 +38,11 @@ export function EditProjectSheet({
     defaultValues: projectData || {}, // If editing, set default values
   });
 
-  React.useEffect(() => {
+  const projectType = watch("type");
+
+  useEffect(() => {
     if (isOpen) {
+      // console.log("khule ma");
       if (projectData) {
         reset({
           name: projectData.name,
@@ -48,9 +52,10 @@ export function EditProjectSheet({
           client: projectData.client,
           status: projectData.project_status,
           // teamMembersCount: projectData?.all_user_projects?.length || 0, //because no attribute from the backend of number
+          type: projectData.type,
           progress: projectData.completion,
           startDate: projectData.start_date,
-          endDate: projectData.end_date,
+          endDate: projectData.completion_date,
           budget: projectData.budget,
           projectDescription: projectData.description,
         });
@@ -64,6 +69,7 @@ export function EditProjectSheet({
           client: "",
           status: "",
           // teamMembersCount: 0,
+          type: "",
           progress: 0,
           startDate: null,
           endDate: null,
@@ -175,6 +181,7 @@ export function EditProjectSheet({
         <CustomSheetTitle
           title={projectData ? "Edit Project" : "Add Project"}
         />
+
         <form
           onSubmit={handleSubmit(onSubmit, onError)}
           className="space-y-6 mt-4"
@@ -195,6 +202,15 @@ export function EditProjectSheet({
             })}
             {renderField("projectCategory", Input, { required: false })}
             {renderField("platform", Input, { required: false })}
+            {renderField("type", Select, {
+              required: true,
+              children: (
+                <>
+                  <SelectItem value="fixed">Fixed</SelectItem>
+                  <SelectItem value="recurring">Recurring</SelectItem>
+                </>
+              ),
+            })}
             {renderField("client", Select, {
               required: true,
               children: clients
@@ -233,7 +249,9 @@ export function EditProjectSheet({
               required: true,
             })}
             {renderField("startDate", DatePicker, { required: true })}
-            {renderField("endDate", DatePicker, { required: false })}
+            {renderField("endDate", DatePicker, {
+              required: projectType === "fixed",
+            })}
             {renderField("budget", Input, {
               type: "number",
               min: "0",

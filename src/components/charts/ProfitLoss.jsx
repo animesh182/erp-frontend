@@ -15,6 +15,7 @@ import {
 import { formatAmountDecimalToNOK } from "@/lib/utils";
 import { useTheme } from "next-themes";
 export default function ProfitLossChart({ data }) {
+  console.log(data, "data");
   const { theme } = useTheme();
 
   function CustomTooltip({ active, payload, label }) {
@@ -37,10 +38,10 @@ export default function ProfitLossChart({ data }) {
     return null;
   }
   return (
-    <ResponsiveContainer height="100%">
+    <ResponsiveContainer height={600}>
       <ComposedChart
         width={600}
-        height={200}
+        height={600}
         data={data}
         margin={{
           top: 20,
@@ -56,7 +57,7 @@ export default function ProfitLossChart({ data }) {
           yAxisId="left"
           tick={{
             fontSize: 12,
-            fill: theme === "dark" ? "#FFFFFF" : "#808080", // Adjust color based on theme
+            fill: theme === "dark" ? "#FFFFFF" : "#000000", // Adjust color based on theme
           }}
           tickCount={6}
         />
@@ -72,7 +73,7 @@ export default function ProfitLossChart({ data }) {
         <Legend
           wrapperStyle={{ fontSize: "12px", paddingTop: "12px" }}
           formatter={(value) => {
-            if (value === "netIncome") return "Net Income";
+            if (value === "profit") return "Net Income";
 
             if (value === "expenses") return "Expenses";
             if (value === "profitPercentage") return "Profit Percentage";
@@ -90,7 +91,7 @@ export default function ProfitLossChart({ data }) {
 
         <Bar
           stackId="a"
-          dataKey="netIncome"
+          dataKey="profit"
           fill="#2563EB"
           yAxisId="left"
           radius={[5, 5, 0, 0]}
@@ -115,7 +116,7 @@ export default function ProfitLossChart({ data }) {
             formatter={(value) => (value % 1 !== 0 ? value.toFixed(1) : value)}
             style={{
               fontSize: "14px",
-              fill: theme === "dark" ? "#FFFFFF" : "#808080", // Adjust color based on theme
+              fill: theme === "dark" ? "#FFFFFF" : "#000000", // Adjust color based on theme
             }}
           />
         </Line>

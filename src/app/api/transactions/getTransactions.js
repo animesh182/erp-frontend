@@ -8,13 +8,13 @@ export async function getTransactions(startDate, endDate) {
         method: "GET",
       }
     );
-    console.log(response, "transactions");
+    // console.log(response, "transactions");
     // Format the fetched data to match the required format
     const formattedData = response.map((transaction) => ({
       id: transaction.id,
       name: transaction.name || "N/A",
       projectName: transaction.project || "N/A",
-      invoice: transaction.invoice_no || "N/A",
+      invoice_no: transaction.invoice_no || "N/A",
       invoiceIssuedDate: transaction.issued_date || null,
       paidDate: transaction.payment_date || null,
       status: transaction.payment_status || "N/A",

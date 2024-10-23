@@ -1,16 +1,18 @@
 import { apiClient } from "@/lib/utils";
 
-export async function createExpense(expenseData) {
+export async function editExpense(expenseId, expenseData) {
   // Transform the expenseData structure
   const transformedData = {
     invoice: {
       name: expenseData.name,
       amount: parseFloat(expenseData.amount),
       issued_date: expenseData.invoiceIssuedDate,
-      ...(expenseData.projectName && { project: expenseData.projectName }),
+      ...(expenseData.projectName && expenseData.projectName !== "N/A"
+        ? { project: expenseData.projectName }
+        : {}),
       payment_status: expenseData.status,
       ...(expenseData.paidDate && { payment_date: expenseData.paidDate }),
-      payment_type: expenseData.type, // Assuming 1 for one-time, 2 for recurring
+      payment_type: expenseData.type,
       transaction_type: "Expense",
       invoice_no: expenseData.invoice,
     },
@@ -19,9 +21,9 @@ export async function createExpense(expenseData) {
 
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/expense/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/expense/${expenseId}/`,
       {
-        method: "POST",
+        method: "PATCH",
         body: JSON.stringify(transformedData),
       }
     );
@@ -29,6 +31,7 @@ export async function createExpense(expenseData) {
     // Return the response data
     return response;
   } catch (error) {
-    throw new Error(error.message || "Failed to create expense");
+    console.error("Error editing expense:", error);
+    throw new Error(error.message || "Failed to edit expense");
   }
 }

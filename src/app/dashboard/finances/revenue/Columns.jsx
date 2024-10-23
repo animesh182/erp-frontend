@@ -4,8 +4,6 @@ import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
-import { deleteRevenue } from "@/app/api/revenue/deleteRevenue";
-import { toast } from "sonner";
 import { format } from "date-fns";
 
 export const columns = [
@@ -50,7 +48,7 @@ export const columns = [
       return (
         <Badge
           className={`${
-            status === "paid"
+            status === "Paid"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
           }`}
@@ -92,7 +90,7 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const paymentType =
-        row.original.type === "one-time" ? "One-time" : "Recurring";
+        row.original.type === "One-Time" ? "One-Time" : "Recurring";
       return <span>{paymentType}</span>;
     },
   },
@@ -110,23 +108,10 @@ export const columns = [
     header: "",
     cell: ({ row }) => {
       const rowData = row.original;
-      const handleDelete = async () => {
-        try {
-          await deleteRevenue(row.original.id);
-          toast.success("Revenue deleted successfully");
-        } catch (error) {
-          console.error("Error deleting revenue:", error);
-          toast.error("Failed to delete revenue");
-        }
-      };
 
       return (
         <div className="flex items-center">
-          <TableActionsDropdown
-            rowData={rowData}
-            onDelete={handleDelete}
-            formInputs={formInputs}
-          />
+          <TableActionsDropdown rowData={rowData} formInputs={formInputs} />
         </div>
       );
     },
