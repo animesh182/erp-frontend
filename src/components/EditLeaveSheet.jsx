@@ -71,7 +71,7 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit }) {
                   <SelectContent>
                     <SelectItem value="Sick leave (Illness or Injury)">Sick leave (Illness or Injury)</SelectItem>
                     <SelectItem value="Bereavement leave">Bereavement leave</SelectItem>
-                    <SelectItem value="Vacation Leave">Vacation Leave</SelectItem>
+                    <SelectItem value="Vacation leave">Vacation leave</SelectItem>
                     <SelectItem value="Leave without pay">Leave without pay</SelectItem>
                   </SelectContent>
                 </Select>

@@ -8,7 +8,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import google from "../../../public/google.svg";
 import Image from "next/image";
 import EmployeeLoginFooter from "@/components/EmployeeLoginFooter";
@@ -26,13 +26,14 @@ import {
 import LoginTextHeader, {
   LoginTextFooter,
 } from "@/components/EmployeeDetails/LoginText";
+import { getEmployees } from "../api/employees/getEmployees";
 
 const formSchema = z.object({
   email: z.string().email(),
 });
 const EmployeeLogin = () => {
   const [existingUser, setExistingUser] = useState(true);
-
+  const [employeeDetails, setEmployeeDetails] = useState([]);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,11 +41,48 @@ const EmployeeLogin = () => {
     },
   });
 
+  useEffect(() => {
+    const getEmployeeDetails = async () => {
+      try {
+        const { status, data } = await getEmployees();
+        if (status === 200) {
+          setEmployeeDetails(data);
+        } else {
+          console.error("Failed to fetch employee data");
+        }
+      } catch (error) {
+        console.error("Error fetching employee details:", error);
+      }
+    };
+
+    getEmployeeDetails();
+  }, []);
+  console.log(employeeDetails, "employeedetails");
+
   function onEmailSubmit(values) {
     console.log(values, "values");
 
-    if (existingUser) window.location.href = "/users/login-password";
-    else window.location.href = "/users/email-verify";
+    const userExists = employeeDetails.some(
+      (employee) => employee.email === values.email
+    );
+
+    setExistingUser(userExists);
+
+    const matchedEmployee = employeeDetails.find(
+      (employee) => employee.email === values.email
+    );
+    if (matchedEmployee) {
+      const userId = matchedEmployee.id;
+      const email = encodeURIComponent(values.email);
+
+      if (userExists && matchedEmployee) {
+        window.location.href = `/users/login-password?email=${email}&userId=${userId}`;
+      } else {
+        window.location.href = `/users/email-verify?email=${email}`;
+      }
+    } else {
+      console.log("employee not found");
+    }
   }
 
   function onGoogleEmailSubmit() {

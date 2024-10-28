@@ -1,13 +1,9 @@
 "use client";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { format } from "date-fns";
-import { MoreHorizontal } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { util } from "zod";
 import ProjectHealth from "@/components/ProjectHealth";
-import TeamAvatars from "@/components/TeamAvatars";
 
 
 export const ProgressBar = ({value}) => {
@@ -102,9 +98,13 @@ export const columns = [
       const { endDate } = row.original;
       return (
         <span className="font-medium">
-          {endDate
+          {endDate==="N/A" || !endDate
+            ? "N/A":format(new Date(endDate), "MMM dd yyyy")
+            }
+          {/* {endDate
             ? format(new Date(endDate), "MMM dd yyyy")
-            : "N/A"}
+            : "N/A"} */}
+           
         </span>
       );
     },
