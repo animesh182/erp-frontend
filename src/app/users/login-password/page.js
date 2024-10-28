@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
-import React from 'react'
+import React, { Suspense } from 'react'
 import EmployeeLoginFooter from '@/components/EmployeeLoginFooter';
 import { useForm } from "react-hook-form";
 import {
@@ -17,11 +17,34 @@ import {
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import LoginTextHeader, { LoginTextFooter } from '@/components/EmployeeDetails/LoginText';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
+import { login } from '@/app/api/auth/login';
+
+
+export default function EmployeeLoginPasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EmployeeLoginPassword />
+    </Suspense>
+  );
+}
+
+
 
   const formSchema = z.object({
     password:z.string().min(7,"Password must be at least 7 characters long")
   })
 const EmployeeLoginPassword = () => {
+
+  const searchParams = useSearchParams(); 
+  const rawEmail = searchParams.get('email');
+
+  const email = rawEmail ? decodeURIComponent(rawEmail) : "";
+
+  const userId=searchParams.get('userId')
+
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -30,16 +53,38 @@ const EmployeeLoginPassword = () => {
     },
   });
 
-  function onSubmit(values) {
-    console.log(values,"values")
+
+  console.log(email,"emaksfiubaosfihaiusfb")
+
+  async function onSubmit(values) {
+    const formData = {
+      email: email || "", 
+      password: values.password,
+  };
+
+  console.log(formData, "formData");
+
+    try {
+      const response = await login(formData);
+      if (response.status === 200) {
+        toast.success("Login successful!");
+        // router.push(`/users/dashboard?userId=${userId}`);
+        router.push(`/users/dashboard?userId=${userId}`);
+      } else {
+        toast.error(response.message || "An error occurred. Please try again.");
+        console.log(error,"error")
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+      console.log(error,"error")
+    }
 
 
     //here the condition to check password lies
 
-
-    window.location.href="/users/dashboard"
   }
   return (
+    // <Suspense fallback={<div>Loading...</div>}>
     <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
     <div className="h-screen w-full flex flex-col justify-center items-center ">   
@@ -85,8 +130,9 @@ const EmployeeLoginPassword = () => {
     </div>
     </form>
 </Form>
-
+// </Suspense>
   )
 }
 
-export default EmployeeLoginPassword
+// export default EmployeeLoginPassword
+

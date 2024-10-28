@@ -1,9 +1,15 @@
 "use client";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
+import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { format } from "date-fns";
-import { toast } from "sonner";
-import LeaveTableActionsDropdown from "@/components/LeaveTableActionsDropdown";
+import { MoreHorizontal } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { util } from "zod";
+import ProjectTableActionsDropdown from "@/components/ProjectTableActionsDropdown";
+import LeaveRequestDropDown from "@/components/LeaveRequestDropDown";
+
+
 
 
 export const columns = [
@@ -103,22 +109,16 @@ export const columns = [
       );
     },
   },
+
+
   {
     accessorKey: "actions",
     header: "",
     cell: ({ row }) => {
       const rowData = row.original;
-
-      const handleDelete = () => {
-        // Delete the row by filtering out the selected row from the data
-        setData((prevData) => prevData.filter((item) => item.leaveReason !== rowData.leaveReason));
-
-        toast.success(`${rowData.leaveReason} deleted successfully.`);
-      };
-
       return (
         <div className="flex items-center">
-          <LeaveTableActionsDropdown onDelete={handleDelete} rowData={rowData} />
+          <LeaveRequestDropDown rowData={rowData} />
         </div>
       );
     },

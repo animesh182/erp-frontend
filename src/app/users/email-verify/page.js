@@ -4,12 +4,37 @@ import EmployeeLoginFooter from '@/components/EmployeeLoginFooter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription } from '@/components/ui/card';
 import Link from 'next/link';
-import React from 'react'
+import { useSearchParams } from 'next/navigation';
+import React, { Suspense } from 'react'
+
+
+
+export default function EmailVerifyPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EmployeeEmailVerify />
+    </Suspense>
+  );
+}
+function maskEmail(email) {
+  const [localPart, domain] = email.split("@");
+  
+  const maskedLocalPart = localPart.slice(0, 2) + "****";
+  
+  return `${maskedLocalPart}@${domain}`;
+}
+
+
+
 
 
 function EmployeeEmailVerify() {
 
+  const searchParams = useSearchParams(); 
+  const rawEmail = searchParams.get('email');
 
+  const email = rawEmail ? maskEmail(decodeURIComponent(rawEmail)) : "";
+  
   function onSubmit(){
     //if the email is verified forward to next page
 
@@ -19,6 +44,7 @@ function EmployeeEmailVerify() {
 
   }
   return (
+
     <div className="h-screen w-full flex flex-col justify-center items-center px-2 ">   
     <Card className="lg:w-[37.7%] w-10/12   lg:pt-32 pt-20 lg:pb-44 pb-20  lg:px-7 ">
 
@@ -28,7 +54,7 @@ function EmployeeEmailVerify() {
             <span className="text-[#2563EB] text-xl">Avinto AS</span>
           </Link>
           <div className="text-[#020617] font-semibold text-2xl tracking-tight text-center">Please Verify your email</div>
-          <CardDescription className="text-center leading-5">You&apos;re almost there! We sent an email to n***@avinto.no <br/><br/>
+          <CardDescription className="text-center leading-5">You&apos;re almost there! We sent an email to <b>{email}</b> <br/><br/>
 
 Just click on the link in that email to complete you signup. If you don&apos;t see it, you may need to check your spam folder.</CardDescription>
             <Button className="w-full" onClick={onSubmit}>Verify your email</Button>
@@ -37,7 +63,9 @@ Just click on the link in that email to complete you signup. If you don&apos;t s
           </Card>
           <EmployeeLoginFooter/>
     </div>
+
   )
 }
 
-export default EmployeeEmailVerify
+// export default EmployeeEmailVerify
+

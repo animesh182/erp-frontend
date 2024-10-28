@@ -1,33 +1,12 @@
 "use client";
-
 import Link from "next/link";
 import React, { useState } from "react";
 import { Button } from "./ui/button";
-import {
-  Home,
-  LineChart,
-  Package,
-  ShoppingCart,
-  ClipboardList,
-  Users,
-  ChevronDown,
-  ChevronRight,
-  CreditCard,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Clock,
-} from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { Home, Clock, ChevronDown, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { CompanyIcon } from "./companyicon";
 
+// Navigation items
 export const navItems = [
   {
     label: "Dashboard",
@@ -38,10 +17,11 @@ export const navItems = [
     label: "Leave Request",
     href: "/users/leave-request",
     icon: <Clock className="h-4 w-4" />,
-  }
+  },
 ];
 
-export default function Sidebar() {
+
+export default function Sidebar({ userId }) {
   const pathname = usePathname();
   const [expandedItem, setExpandedItem] = useState(null);
 
@@ -76,7 +56,7 @@ export default function Sidebar() {
             {navItems.map((navItem) => (
               <div key={navItem.label}>
                 <Link
-                  href={navItem.href}
+                  href={`${navItem.href}?userId=${userId}`}  // Append userId here
                   className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted/80 
                     ${
                       isActive(navItem.href) || isParentActive(navItem)
@@ -104,7 +84,7 @@ export default function Sidebar() {
                     {navItem.subItems.map((subItem) => (
                       <Link
                         key={subItem.label}
-                        href={subItem.href}
+                        href={`${subItem.href}?userId=${userId}`}  // Append userId here
                         className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted/80 
                           ${
                             isActive(subItem.href)
@@ -123,20 +103,7 @@ export default function Sidebar() {
           </nav>
         </div>
         <div className="mt-auto p-4">
-          {/* <Card>
-            <CardHeader className="p-2 pt-0 md:p-4">
-              <CardTitle>Upgrade to Pro</CardTitle>
-              <CardDescription>
-                Unlock all features and get unlimited access to our support
-                team.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
-              <Button size="sm" className="w-full">
-                Upgrade
-              </Button>
-            </CardContent>
-          </Card> */}
+          {/* Your other components like upgrade options can go here */}
         </div>
       </div>
     </aside>

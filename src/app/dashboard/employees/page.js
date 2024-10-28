@@ -116,12 +116,13 @@ export default function Employees() {
         const { status, data } = await getEmployees();
         if (status === 200) {
           setEmployeeDetails(data);
+        
         } else {
           console.error("Failed to fetch employee data");
         }
       } catch (error) {
         console.error("Error fetching employee details:", error);
-      }
+      } 
     };
 
     getEmployeeDetails();
@@ -179,7 +180,11 @@ export default function Employees() {
       .toUpperCase()
       .slice(0, 2);
   };
-  return (
+
+
+
+ 
+    return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="items-center">
         <div className="flex flex-row justify-end">

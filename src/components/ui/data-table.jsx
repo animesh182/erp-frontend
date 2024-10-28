@@ -49,6 +49,7 @@ function DataTable({
   initialEndDate,
   projectOptions,
   onDeleteRow,
+  userId,
 }) {
   const [sorting, setSorting] = useState([]);
   const [selectedTab, setSelectedTab] = useState("All");
@@ -117,9 +118,13 @@ function DataTable({
     formInputs?.find((input) => input.name === filterColumn)?.filterValues ||
     [];
 
-  const handleRowClick = (id, event) => {
+  const handleRowClick = (id,row, event) => {
     if (isProjectPage) {
       router.push(`/dashboard/projects/${id}`);
+    }
+    if(isUsersPage){
+      router.push(`/users/dashboard/${id}/?userId=${userId}`);
+  
     }
   };
 
@@ -221,8 +226,9 @@ function DataTable({
             key={row.id}
             data-state={row.getIsSelected() && "selected"}
             className={
-              isProjectPage
+              isProjectPage || isUsersPage
                 ? "cursor-pointer hover:bg-muted"
+             
                 : isTransactionPage
                 ? row.original.transactionType === "Expense"
                   ? "bg-[#dc9d9c]" // Light red for expense
@@ -244,7 +250,7 @@ function DataTable({
                     isProjectPage &&
                     cell.column.id === "progressTracking"
                   )
-                    ? (event) => handleRowClick(row.original.id, event)
+                    ? (event) => handleRowClick(row.original.id,row.original, event)
                     : undefined
                 }
               >

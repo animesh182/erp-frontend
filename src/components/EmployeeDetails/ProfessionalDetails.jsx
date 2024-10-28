@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 const formSchema = z.object({
     department: z.string().min(1, "Please select your department"),
     jobTitle: z.string().min(1,"Please provide your job title"),
-    level: z.string().min(1).max(3),
+    level: z.string().min(1),
     panNumber: z.string().min(1,"Please provide your PAN number"),
   });
 function ProfessionalDetails({onSubmission,defaultValues}) {
