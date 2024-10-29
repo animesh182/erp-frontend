@@ -9,7 +9,7 @@ import { useState } from "react";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/utils";
-const EmployeeDetailsTab = ({ employeeDetails }) => {
+const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions }) => {
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
 
   if (!employeeDetails) {
@@ -37,8 +37,8 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
     { label: "Email", value: employeeDetails?.email },
     {
       label: "LinkedIn",
-      value: employeeDetails?.linkedin_name || "N/A",
-      link: employeeDetails?.linkedin_url || "",
+      value: employeeDetails?.fullName,
+      link: employeeDetails?.linkedInUrl,
     },
   ];
 
@@ -61,7 +61,7 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
       label: "Salary",
       value: `${formatAmountToNOK(employeeDetails?.salary)} per month`,
     },
-    { label: "PAN Number", value: employeeDetails?.PAN },
+    { label: "PAN Number", value: employeeDetails?.pan_number },
   ];
 
   const renderDetailItem = ({ label, value, link }) => (
@@ -85,20 +85,20 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
   // console.log(employeeDetails, "ed");
   const handleEditEmployee = async (formData) => {
     const employeeId = employeeDetails.id; // Extract employee ID from employeeData
-    console.log(formData, "formData");
     // Generate a new ID (you might want to use a more robust method in production)
     const payload = {
       employee_id: formData.employeeId,
-      full_name: formData.linkedInName,
+      full_name: formData.fullName,
       email: formData.email,
-      password: "avinto123",
+      // password: "avinto123",
       employee_id: formData.employeeId,
       salary: formData.salary,
       employment_type: formData.employeeType,
-      role: formData.role,
+      role: formData.jobTitle,
       country: formData.country,
       phone_number: formData.phone,
-      PAN: formData.panNumber,
+      pan_number: formData.panNumber,
+      supervisor: formData.supervisor,
       start_date: formData.startDate,
       end_date: formData.endDate || null,
       level: formData.level,
@@ -118,7 +118,7 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
       );
       console.log(response, "response");
       if (response.ok) {
-        toast.success("Employee added successfully");
+        toast.success("Employee edited successfully");
         // setIsSheetOpen(false);
       }
     } catch (error) {
@@ -191,6 +191,8 @@ const EmployeeDetailsTab = ({ employeeDetails }) => {
         onClose={() => setIsEditSheetOpen(false)}
         employeeData={employeeDetails}
         onEditEmployee={handleEditEmployee}
+        levelOptions={levelOptions}
+        roleOptions={roleOptions}
       />
     </div>
   );

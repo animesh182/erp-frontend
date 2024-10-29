@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import KpiCard from "@/components/kpicard";
 
 const ProjectDetailsMain = ({ project }) => {
+  console.log(project);
   const totalHoursWorked = project.all_user_projects.reduce(
     (total, userProject) => {
       const utilization = parseFloat(userProject.utilization); // Convert utilization to a number
@@ -44,18 +45,18 @@ const ProjectDetailsMain = ({ project }) => {
             <Badge
               variant="subtle"
               className={`${
-                project.project_status === 1
+                project.project_status === "Done"
                   ? "bg-green-100 text-green-800"
-                  : project.project_status === 2
+                  : project.project_status === "Not Started"
                   ? "bg-red-100 text-red-800"
                   : "bg-yellow-100 text-yellow-800"
               }`}
             >
               <Dot className="mr-1 h-4 w-4" />
               {/* Ensure project.project_status exists and map to a status */}
-              {project.project_status === 1
+              {project.project_status === "Done"
                 ? "DONE"
-                : project.project_status === 2
+                : project.project_status === "Not Started"
                 ? "NOT STARTED"
                 : "ONGOING"}
             </Badge>
@@ -85,7 +86,7 @@ const ProjectDetailsMain = ({ project }) => {
               -{" "}
               {project.end_date
                 ? format(new Date(project.end_date), "MMM dd, yyyy")
-                : "N/A"}
+                : "Present"}
             </div>
           </div>
         </div>

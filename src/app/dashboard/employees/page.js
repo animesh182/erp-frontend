@@ -1,6 +1,6 @@
 "use client"; // Ensure this is at the top of the file
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { columns } from "./Columns";
 
 import TableTitle from "@/components/TableTitle";
@@ -14,18 +14,102 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
-// import getEmployees from "@/app/api/employees/getEmployees";
-import { RectangleSkeleton } from "@/components/Skeletons";
-import {
-  getEmployees,
-  getEmployeesWithRoles,
-} from "@/app/api/employees/getEmployees";
-import { apiClient } from "@/lib/utils";
+import { createEmployee } from "@/app/api/employees/createEmployee";
+import { getRoles } from "@/app/api/role/getRoles";
+import { getLevels } from "@/app/api/level/getLevels";
+import { getProjects } from "@/app/api/projects/getProjects";
+import { getEmployees } from "@/app/api/employees/getEmployees";
+import { deleteEmployeeById } from "@/app/api/employees/deleteEmployeeById";
+
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeTab, setActiveTab] = useState("employeeDetails");
-  const [employeeDetails, setEmployeeDetails] = useState([]);
+  const [employeeDetails, setEmployeeDetails] = useState(null);
+  const [roleOptions, setRoleOptions] = useState([]);
+  const [levelOptions, setLevelOptions] = useState([]);
+  const [projectOptions, setProjectOptions] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshComponent = useCallback(() => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  }, []);
+
+  const [payments, setPayments] = useState([
+    {
+      id: "728ed52f",
+      employeeName: "John Doe",
+      imageUrl: "/default-avatar.jpg",
+      email: "john.doe@example.com",
+      role: "Software Engineer",
+      type: "Executive",
+      salary: 12000,
+    },
+    {
+      id: "489e1d42",
+      employeeName: "Jane Smith",
+      imageUrl: "/default-avatar.jpg",
+      email: "jane.smith@example.com",
+      role: "Product Manager",
+      type: "Full-time",
+      salary: 11000,
+    },
+    {
+      id: "153b3a2c",
+      employeeName: "Bob Johnson",
+      imageUrl: "/default-avatar.jpg",
+      email: "bob.johnson@example.com",
+      role: "UX Designer",
+      type: "Part-time",
+      salary: 8000,
+    },
+    {
+      id: "621f4e3b",
+      employeeName: "Alice Williams",
+      imageUrl: "/default-avatar.jpg",
+      email: "alice.williams@example.com",
+      role: "Data Analyst",
+      type: "Full-time",
+      salary: 9500,
+    },
+    {
+      id: "984c7d6a",
+      employeeName: "Charlie Brown",
+      imageUrl: "/default-avatar.jpg",
+      email: "charlie.brown@example.com",
+      role: "Marketing Specialist",
+      type: "Contract",
+      salary: 8500,
+    },
+  ]);
+
+  const fetchRoles = async () => {
+    try {
+      const roles = await getRoles();
+      setRoleOptions(roles);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const projects = await getProjects(true);
+      setProjectOptions(projects);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
+  };
+
+  const fetchLevels = async () => {
+    try {
+      const levels = await getLevels();
+      setLevelOptions(levels);
+    } catch (error) {
+      console.error("Error fetching levels:", error);
+    }
+  };
+
   useEffect(() => {
     const getEmployeeDetails = async () => {
       try {
@@ -41,69 +125,60 @@ export default function Employees() {
     };
 
     getEmployeeDetails();
-  }, []);
-  // console.log(employeeDetails, "eD");
-
-  useEffect(() => {
-    setActiveTab("employeeDetails");
-  }, [selectedEmployee]);
+    fetchRoles();
+    fetchLevels();
+    fetchProjects();
+  }, [refreshKey]);
 
   const handleEmployeeAdd = () => {
     setIsSheetOpen(true);
   };
-  // console.log(selectedEmployee);
-  const onAddEmployee = async (formData) => {
-    // Generate a new ID (you might want to use a more robust method in production)
-    const payload = {
-      employee_id: formData.employeeId,
-      full_name: formData.linkedInName,
-      email: formData.email,
-      password: "avinto123",
-      employee_id: formData.employeeId,
-      salary: formData.salary,
-      employment_type: formData.employeeType,
-      role: formData.role,
-      country: formData.country,
-      phone_number: formData.phone,
-      PAN: formData.panNumber,
-      start_date: formData.startDate,
-      end_date: formData.endDate || null,
-      level: formData.level,
-      gender: formData.gender,
-      marital_status: formData.maritalStatus,
-      linkedin_name: formData.linkedInName,
-      linkedin_url: formData.linkedInUrl,
-      date_of_birth: formData.dateOfBirth,
-    };
-    try {
-      const response = await apiClient(
-        `${process.env.NEXT_PUBLIC_API_URL}api/users/register/`,
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        }
-      );
-      if (response.ok) {
-        toast.success("Employee added successfully");
-        // setIsSheetOpen(false);
-      }
-    } catch (error) {
-      toast.error("There was an error adding the employee");
-      console.error(error);
-    }
 
-    // const newId = `employee_${Date.now()}`;
-    // const newEmployee = {
-    //   formData,
-    // };
-    // setEmployeeDetails([...employeeDetails, newEmployee]);
+  const onAddEmployee = async (formData) => {
+    try {
+      const response = await createEmployee(formData);
+      toast.success("Employee added successfully");
+      console.log(response);
+
+      const newEmployee = {
+        id: response.id,
+        ...formData,
+      };
+      setPayments([...payments, newEmployee]);
+      setIsSheetOpen(false);
+      refreshComponent();
+    } catch (error) {
+      toast.error(error.message || "Failed to add employee");
+      console.error("Error adding employee:", error);
+    }
+  };
+
+  const onDeleteEmployee = async (id) => {
+    try {
+      const response = await deleteEmployeeById(id);
+      toast.success("Employee deleted successfully");
+      refreshComponent();
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      toast.error("Failed to delete employee");
+    }
   };
 
   const handleRowSelect = (row) => {
-    // console.log(row);
     setSelectedEmployee(row);
   };
 
+  const getInitials = (name) => {
+    if (!name || typeof name !== "string") {
+      return "";
+    }
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="items-center">
@@ -113,40 +188,38 @@ export default function Employees() {
           </Button>
         </div>
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 py-4 px-0">
-          <div className="h-full flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
-            {
-              employeeDetails && employeeDetails.length > 0 && (
-                <>
-                  <TableTitle
-                    title="List of Employees"
-                    subtitle="List of all employees in the company"
-                    totalItemCount={employeeDetails.length}
-                  />
-                  <SimpleDataTable
-                    columns={columns}
-                    data={employeeDetails}
-                    onRowSelect={handleRowSelect}
-                  />
-                </>
-              )
-              // : (
-              //   <div className=" ">
-              //     <RectangleSkeleton height={"745"} />
-              //   </div>
-            }
+          <div className="h-screen flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
+            {employeeDetails && employeeDetails.length > 0 && (
+              <>
+                <TableTitle
+                  title="List of Employees"
+                  subtitle="List of all employees in the company"
+                  totalItemCount={employeeDetails.length}
+                />
+                <SimpleDataTable
+                  columns={columns}
+                  data={employeeDetails}
+                  onRowSelect={handleRowSelect}
+                  onDeleteRow={onDeleteEmployee}
+                />
+              </>
+            )}
           </div>
           <div className="flex flex-col items-center gap-1 text-center border rounded-md">
             <div className="h-24 w-full flex items-center bg-muted px-5 min-h-24">
               <div className="flex items-center gap-3">
                 <Avatar className="w-12 h-12">
                   <AvatarImage
-                    src={selectedEmployee?.imageUrl || "/default-avatar.jpg"}
+                    src={selectedEmployee?.imageUrl}
                     className="object-cover"
                   />
-                  <AvatarFallback className="text-lg font-semibold">
-                    <span>
-                      {selectedEmployee?.employeeName?.charAt(0) || "JD"}
-                    </span>
+
+                  <AvatarFallback>
+                    {selectedEmployee?.imageUrl ? (
+                      <span>{selectedEmployee?.full_name}</span>
+                    ) : (
+                      getInitials(selectedEmployee?.full_name)
+                    )}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col items-start">
@@ -154,7 +227,7 @@ export default function Employees() {
                     {selectedEmployee?.full_name || "John Doe"}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {selectedEmployee?.role || "Product Manager"}
+                    {selectedEmployee?.role}
                   </div>
                 </div>
               </div>
@@ -162,7 +235,7 @@ export default function Employees() {
             <Tabs
               value={activeTab}
               onValueChange={setActiveTab}
-              className="w-full mt-4 justify-start text-left h-[calc(100%-7.2rem)] flex flex-col"
+              className="w-full mt-4 justify-start text-left max-h-[calc(100vh-7.2rem)] h-[calc(100%-7.2rem)] flex flex-col"
             >
               <TabsList className="mx-6 w-max">
                 <TabsTrigger value="projects">Projects</TabsTrigger>
@@ -173,12 +246,18 @@ export default function Employees() {
               </TabsList>
               <div className="flex-1 overflow-y-auto">
                 <TabsContent value="employeeDetails">
-                  <EmployeeDetailsTab employeeDetails={selectedEmployee} />
+                  <EmployeeDetailsTab
+                    employeeDetails={selectedEmployee}
+                    levelOptions={levelOptions}
+                    roleOptions={roleOptions}
+                  />
                 </TabsContent>
                 <TabsContent value="projects">
                   <ProjectsTab
+                    employeeId={selectedEmployee?.id}
+                    projectOptions={projectOptions}
+                    roleOptions={roleOptions}
                     employeeProjects={selectedEmployee?.user_projects}
-                    userId={selectedEmployee?.id}
                   />
                 </TabsContent>
                 <TabsContent value="payroll">
@@ -188,14 +267,13 @@ export default function Employees() {
             </Tabs>
           </div>
         </div>
-        {/* {console.log(selectedEmployee)} */}
       </div>
       <EditEmployeeSheet
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddEmployee={onAddEmployee}
-        // employeeData={selectedEmployee}
-        //the edit employee is on the employee details tab
+        roleOptions={roleOptions}
+        levelOptions={levelOptions}
       />
     </main>
   );

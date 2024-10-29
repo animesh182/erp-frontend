@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -15,16 +16,15 @@ import {
 import { DatePicker } from "@/components/DatePicker";
 import { prettifyText, cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { getRoles, getLevels } from "@/app/api/employees/getEmployees";
 export function EditEmployeeSheet({
   isOpen,
   onClose,
   employeeData,
   onEditEmployee,
   onAddEmployee,
+  roleOptions,
+  levelOptions,
 }) {
-  const [roles, setRoles] = useState();
-  const [levels, setLevels] = useState();
   const {
     getValues,
     watch,
@@ -35,39 +35,8 @@ export function EditEmployeeSheet({
   } = useForm({
     defaultValues: employeeData || {},
   });
-  useEffect(() => {
-    const getRolesFromApi = async () => {
-      try {
-        const { status, data } = await getRoles();
-        if (status === 200) {
-          setRoles(data);
-        } else {
-          console.error("Failed to fetch employee data");
-        }
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      }
-    };
 
-    getRolesFromApi();
-  }, []);
-  useEffect(() => {
-    const getLevelsFromApi = async () => {
-      try {
-        const { status, data } = await getLevels();
-        if (status === 200) {
-          setLevels(data);
-        } else {
-          console.error("Failed to fetch employee data");
-        }
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      }
-    };
-
-    getLevelsFromApi();
-  }, []);
-  console.log(employeeData, "ed");
+  console.log(roleOptions, "role");
 
   // useEffect(() => {
   //   if (employeeData) {
@@ -84,21 +53,22 @@ export function EditEmployeeSheet({
           dateOfBirth: employeeData.date_of_birth,
           gender: employeeData.gender,
           maritalStatus: employeeData.marital_status,
-          startDate: employeeData.start_date || null,
-          endDate: employeeData.end_date || null,
+          fullName: employeeData.full_name,
+          startDate: employeeData.start_date,
+          endDate: employeeData.end_date,
           country: employeeData.country,
           phone: employeeData.phone_number,
           email: employeeData.email,
           linkedInName: employeeData.linkedin_name,
           linkedInUrl: employeeData.linkedin_url,
           // jobTitle:  employeeData.,
-          role: employeeData.role,
+          jobTitle: employeeData.role,
           level: employeeData.level,
           department: employeeData.department,
           employeeType: employeeData.employment_type,
-          supervisor: employeeData.supervisor || null,
+          supervisor: employeeData.supervisor,
           salary: employeeData.salary,
-          panNumber: employeeData.PAN,
+          panNumber: employeeData.pan_number,
         });
       } else {
         reset({
@@ -106,14 +76,17 @@ export function EditEmployeeSheet({
           dateOfBirth: null,
           gender: "",
           maritalStatus: "",
+          fullName: "",
           startDate: null,
           endDate: null,
           country: "",
           phone: "",
           email: "",
+          startDate: "",
+          endDate: "",
           linkedInName: "",
           linkedInUrl: "",
-          // jobTitle: "",
+          jobTitle: "",
           level: "",
           department: "",
           employeeType: "",
@@ -125,7 +98,7 @@ export function EditEmployeeSheet({
     }
   }, [isOpen, employeeData, reset]);
 
-  console.log(watch());
+  // console.log(watch());
   const onSubmit = (data) => {
     if (employeeData) {
       onEditEmployee(data);
@@ -163,9 +136,10 @@ export function EditEmployeeSheet({
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue className="capitalize">
-                      {field.value ? field.value : "Select Gender"}{" "}
-                      {/* Show the selected gender */}
-                    </SelectValue>{" "}
+                      {field.value
+                        ? field.value
+                        : `Select ${prettifyText(name)}`}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>{props.children}</SelectContent>
                 </Select>
@@ -220,6 +194,8 @@ export function EditEmployeeSheet({
             <h3 className="font-semibold mb-2">Basic Details</h3>
             <div className="space-y-4">
               {renderField("employeeId", Input, { required: true })}
+              {renderField("fullName", Input, { required: true })}
+
               {renderField("dateOfBirth", DatePicker, { required: true })}
               {renderField("gender", Select, {
                 required: true,
@@ -235,10 +211,10 @@ export function EditEmployeeSheet({
                 required: true,
                 children: (
                   <>
-                    <SelectItem value="Single">Single</SelectItem>
-                    <SelectItem value="Married">Married</SelectItem>
-                    <SelectItem value="Divorced">Divorced</SelectItem>
-                    <SelectItem value="Widowed">Widowed</SelectItem>
+                    <SelectItem value="single">Single</SelectItem>
+                    <SelectItem value="married">Married</SelectItem>
+                    <SelectItem value="divorced">Divorced</SelectItem>
+                    <SelectItem value="widowed">Widowed</SelectItem>
                   </>
                 ),
               })}
@@ -253,7 +229,6 @@ export function EditEmployeeSheet({
               {renderField("country", Input, { required: true })}
               {renderField("phone", Input, { required: true })}
               {renderField("email", Input, { required: true })}
-              {renderField("linkedInName", Input)}
               {renderField("linkedInUrl", Input)}
             </div>
           </div>
@@ -261,44 +236,43 @@ export function EditEmployeeSheet({
           <div>
             <h3 className="font-semibold mb-2">Employment Details</h3>
             <div className="space-y-4">
-              {/* {renderField("jobTitle", Input, { required: true })} */}
-              {renderField("role", Select, {
+              {renderField("jobTitle", Select, {
                 required: true,
-
-                children: roles
-                  ? roles.map((role, index) => (
-                      <SelectItem key={index} value={role.id}>
+                children: (
+                  <>
+                    {roleOptions?.map((role) => (
+                      <SelectItem key={role.id} value={role.title}>
                         {role.title}
                       </SelectItem>
-                    ))
-                  : null,
+                    ))}
+                  </>
+                ),
               })}
-
               {renderField("level", Select, {
                 required: true,
-                children: levels
-                  ? levels.map((level) => {
-                      return (
-                        <SelectItem key={level.id} value={String(level.id)}>
-                          {level.description}
-                        </SelectItem>
-                      );
-                    })
-                  : null,
+                children: (
+                  <>
+                    {levelOptions?.map((level) => (
+                      <SelectItem key={level.id} value={level.description}>
+                        {level.description}
+                      </SelectItem>
+                    ))}
+                  </>
+                ),
               })}
               {renderField("department", Input, { required: true })}
               {renderField("employeeType", Select, {
                 required: true,
                 children: (
                   <>
-                    <SelectItem value="Full-time">Full-time</SelectItem>
-                    <SelectItem value="Part-time">Part-time</SelectItem>
-                    <SelectItem value="Contract">Contract</SelectItem>
-                    <SelectItem value="Intern">Intern</SelectItem>
+                    <SelectItem value="full-time">Full-time</SelectItem>
+                    <SelectItem value="part-time">Part-time</SelectItem>
+                    <SelectItem value="contract">Contract</SelectItem>
+                    <SelectItem value="intern">Intern</SelectItem>
                   </>
                 ),
               })}
-              {renderField("supervisor", Input, { required: true })}
+              {renderField("supervisor", Input, { required: false })}
             </div>
           </div>
 

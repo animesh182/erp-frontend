@@ -16,6 +16,11 @@ export const ProjectSelect = ({ projectOptions, value, onChange }) => {
     return <Input placeholder="Add" value={value} disabled />;
   }
 
+  // Sort projectOptions alphabetically by name
+  const sortedProjectOptions = [...projectOptions].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
   return (
     <Select onValueChange={onChange} value={value}>
       <SelectTrigger>
@@ -26,7 +31,7 @@ export const ProjectSelect = ({ projectOptions, value, onChange }) => {
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Project</SelectLabel>
-          {projectOptions.map((project) => (
+          {sortedProjectOptions.map((project) => (
             <SelectItem key={project.id} value={project.name}>
               {project.name}
             </SelectItem>

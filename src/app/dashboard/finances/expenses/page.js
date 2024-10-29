@@ -1,12 +1,16 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import DataTable from "@/components/ui/data-table";
 import { columns } from "@/app/dashboard/finances/expenses/Columns";
 import { toast } from "sonner";
 import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
 import { subDays, format } from "date-fns";
 import { useForm, FormProvider } from "react-hook-form";
-import { fetchExpenses } from "@/app/api/expenses"; // Import the fetch function
+import { getExpense } from "@/app/api/expense/getExpense";
+import { createExpense } from "@/app/api/expense/createExpense";
+import { getProjects } from "@/app/api/projects/getProjects";
+import { editExpense } from "@/app/api/expense/editExpense";
+import { deleteExpense } from "@/app/api/expense/deleteExpense";
 
 export default function Expenses() {
   const methods = useForm();
@@ -17,45 +21,41 @@ export default function Expenses() {
   const [data, setData] = useState([]); // State to hold the fetched data
   const [loading, setLoading] = useState(true); // Loading state
   const [projectOptions, setProjectOptions] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshComponent = useCallback(() => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  }, []);
 
   useEffect(() => {
     if (startDate && endDate) {
       fetchData(startDate, endDate);
     }
-  }, [startDate, endDate]);
+    fetchProjects();
+  }, [startDate, endDate, refreshKey]);
 
   const fetchData = async (startDate, endDate) => {
-    setLoading(true);
+    // console.log("Fetching data from:", startDate, "to:", endDate);
     try {
-      // Fetch data from the invoices API
-      const fetchedData = await fetchExpenses(
+      const fetchedData = await getExpense(
         format(startDate, "yyyy-MM-dd"),
         format(endDate, "yyyy-MM-dd")
       );
-
-      // Map the fetched data to match your table column structure
-      const mappedData = fetchedData.map((invoice) => ({
-        id: invoice.id,
-        name: invoice.name, // Assuming "name" field corresponds to the expense name
-        projectName: invoice.project_name,
-        invoice: `#${invoice.id}`, // Generate an invoice number if needed
-        invoiceIssuedDate: invoice.issued_date,
-        paidDate: invoice.payment_date,
-        status: invoice.payment_status === 2 ? "paid" : "pending", // Assuming payment_status 2 is 'paid'
-        type: invoice.transaction_type, // Assuming this is either 'Revenue' or 'Expense'
-        amount: invoice.amount,
-        costType: "", // Leaving costType empty for now
-      }));
-
-      console.log(mappedData, "Invoice data with project mapping");
-
-      setData(mappedData); // Store the fetched data in state
-      toast.success("Data fetched successfully");
+      // console.log(fetchedData, "data");
+      setData(fetchedData);
+      setLoading(false);
     } catch (error) {
-      toast.error("Failed to fetch data");
       console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false); // Stop loading after fetching data
+      setLoading(false);
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const projects = await getProjects(true);
+      setProjectOptions(projects);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
     }
   };
 
@@ -64,15 +64,37 @@ export default function Expenses() {
     setEndDate(endDate);
   };
 
-  const onAddRow = (newRowData) => {
-    toast.success("New row added");
-    console.log(newRowData, "in form");
+  const onAddRow = async (newRowData) => {
+    try {
+      await createExpense(newRowData);
+      toast.success("New expense added");
+      refreshComponent();
+    } catch (error) {
+      toast.error("Failed to add new expense");
+      console.error("Error adding new expense:", error);
+    }
   };
 
-  const onEditRow = (editedData) => {
-    toast.success("Row updated");
-    console.log(editedData, "edited data");
-    // Update the data in your state or send it to the server
+  const onEditRow = async (editedData) => {
+    try {
+      await editExpense(editedData.id, editedData);
+      toast.success("Expense updated successfully");
+      refreshComponent();
+    } catch (error) {
+      toast.error("Failed to update expense");
+      console.error("Error updating expense:", error);
+    }
+  };
+
+  const onDeleteRow = async (rowId) => {
+    try {
+      await deleteExpense(rowId);
+      toast.success("Expense deleted successfully");
+      refreshComponent();
+    } catch (error) {
+      toast.error("Failed to delete expense");
+      console.error("Error deleting expense:", error);
+    }
   };
 
   return (
@@ -82,17 +104,18 @@ export default function Expenses() {
           title={"Expenses"}
           subtitle={"List of all expenses in the company"}
           columns={columns}
-          data={data} // Use dynamic data here
+          data={data}
           projectOptions={projectOptions}
           formInputs={formInputs}
           isTableAddFormEnabled={true}
           onAddRow={onAddRow}
           onEditRow={onEditRow}
+          onDeleteRow={onDeleteRow}
           filterColumn={"costType"}
           onDateChange={handleDateChange}
-          initialStartDate={startDate} // Pass initial start date
-          initialEndDate={endDate} // Pass initial end date
-          loading={loading} // Pass loading state to the DataTable component if necessary
+          initialStartDate={startDate}
+          initialEndDate={endDate}
+          loading={loading}
         />
       </FormProvider>
     </main>

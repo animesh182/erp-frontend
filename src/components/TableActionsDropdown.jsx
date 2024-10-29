@@ -13,18 +13,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EditRowSheet } from "./EditRowSheet";
+import DeleteDialog from "./DeleteDialog";
 
-const TableActionsDropdown = ({ formInputs, onDelete, rowData }) => {
+const TableActionsDropdown = ({ formInputs, rowData }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const { onEditRow } = useContext(EditRowContext);
+  const { onEditRow, onDeleteRow } = useContext(EditRowContext);
 
   const handleOpen = () => {
     setIsOpen(true);
   };
 
-  const handleClose = () => {
-    setIsOpen(false);
+  const handleDelete = () => {
+    onDeleteRow(rowData.id);
+    setIsDeleteDialogOpen(false);
   };
 
   const methods = useForm();
@@ -40,19 +43,28 @@ const TableActionsDropdown = ({ formInputs, onDelete, rowData }) => {
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleOpen}>Edit</DropdownMenuItem>
-        <DropdownMenuItem onClick={onDelete} className="hover:cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => setIsDeleteDialogOpen(true)}
+          className="hover:cursor-pointer text-destructive"
+        >
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
       <FormProvider {...methods}>
         <EditRowSheet
           isOpen={isOpen}
-          onClose={handleClose}
+          onClose={() => setIsOpen(false)}
           rowData={rowData}
           formInputs={formInputs}
           onEditRow={onEditRow}
         />
       </FormProvider>
+      <DeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        itemName={rowData.name}
+        onDelete={handleDelete}
+      />
     </DropdownMenu>
   );
 };

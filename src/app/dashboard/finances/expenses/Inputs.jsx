@@ -36,7 +36,7 @@ export const formInputs = [
   {
     component: <ProjectSelect />,
     name: "projectName",
-    required: true,
+    required: false,
   },
   {
     component: <Input placeholder="Add" onChange={handleUppercaseChange} />,
@@ -57,9 +57,9 @@ export const formInputs = [
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Status</SelectLabel>
-            <SelectItem value="paid">Paid</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="Paid">Paid</SelectItem>
+            <SelectItem value="Pending">Pending</SelectItem>
+            <SelectItem value="Cancelled">Cancelled</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
@@ -81,16 +81,16 @@ export const formInputs = [
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Cost Type</SelectLabel>
-            <SelectItem value="direct-cost">Direct Cost</SelectItem>
-            <SelectItem value="fixed-cost">Fixed Cost</SelectItem>
-            <SelectItem value="npa-cost">NPA Cost</SelectItem>
+            <SelectItem value="Direct Cost">Direct Cost</SelectItem>
+            <SelectItem value="Fixed Cost">Fixed Cost</SelectItem>
+            <SelectItem value="NPA Cost">NPA Cost</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
     ),
     name: "costType",
     required: true,
-    filterValues: ["All", "direct-cost", "fixed-cost", "npa-cost"],
+    filterValues: ["All", "Direct Cost", "Fixed Cost", "NPA Cost"],
   },
   {
     component: (
@@ -101,8 +101,8 @@ export const formInputs = [
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Payment Type</SelectLabel>
-            <SelectItem value="one-time">One-Time</SelectItem>
-            <SelectItem value="recurring">Recurring</SelectItem>
+            <SelectItem value="One-Time">One-Time</SelectItem>
+            <SelectItem value="Recurring">Recurring</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

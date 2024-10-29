@@ -6,15 +6,15 @@ import { Dot } from "lucide-react";
 import { format } from "date-fns";
 
 export function ProjectCard({
-  title = "Jambo Travel House",
-  projectName = "Itinerary App",
-  category = "Web Development",
-  status = "Ongoing",
-  startDate = "2024-01-01",
-  endDate = "2024-01-01",
-  progress = 70,
-  timeInvolved = 4,
-  totalDaysInvolved = 32,
+  title,
+  projectName,
+  category,
+  status,
+  startDate,
+  endDate,
+  progress,
+  timeInvolved,
+  totalDaysInvolved,
 }) {
   return (
     <Card className="w-full p-6">
@@ -43,7 +43,7 @@ export function ProjectCard({
         </Badge>
         <p className="text-xs mt-4">
           {format(new Date(startDate), "MMM dd, yyyy")} -{" "}
-          {format(new Date(endDate), "MMM dd, yyyy")}
+          {!endDate ? "Present" : format(new Date(endDate), "MMM dd, yyyy")}
         </p>
         <div className="mt-4 flex items-center">
           <Progress value={progress} className="h-1.5" />

@@ -22,16 +22,21 @@ export const columns = [
     header: "Invoice",
     enableSorting: false,
   },
-  // {
-  //   accessorKey: "invoiceIssuedDate",
-  //   header: "Invoice Issued Date",
-  //   enableSorting: false,
-  //   cell: ({ row }) => {
-  //     const { invoiceDate } = row.original;
-  //     return <span>{format(invoiceDate, "MMM d, yyyy")}</span>;
-  //   },
-  // },
-
+  {
+    accessorKey: "invoiceIssuedDate",
+    header: "Invoice Issued Date",
+    cell: ({ row }) => {
+      const { invoiceIssuedDate } = row.original;
+      return (
+        <span>
+          {invoiceIssuedDate
+            ? format(new Date(invoiceIssuedDate), "MMM dd yyyy")
+            : "N/A"}
+        </span>
+      );
+    },
+    enableSorting: true,
+  },
   {
     accessorKey: "status",
     header: "Status",
@@ -40,7 +45,7 @@ export const columns = [
       return (
         <Badge
           className={`${
-            status === "paid"
+            status === "Paid"
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
           }`}
@@ -54,6 +59,14 @@ export const columns = [
   {
     accessorKey: "paidDate",
     header: "Paid Date",
+    cell: ({ row }) => {
+      const { paidDate } = row.original;
+      return (
+        <span>
+          {paidDate ? format(new Date(paidDate), "MMM dd yyyy") : "N/A"}
+        </span>
+      );
+    },
     enableSorting: false,
   },
   {
@@ -90,18 +103,9 @@ export const columns = [
     cell: ({ row }) => {
       const rowData = row.original;
 
-      const handleDelete = () => {
-        console.log("Delete", row.original.id);
-        // Handle delete action
-      };
-
       return (
         <div className="flex items-center">
-          <TableActionsDropdown
-            rowData={rowData}
-            onDelete={handleDelete}
-            formInputs={formInputs}
-          />
+          <TableActionsDropdown rowData={rowData} formInputs={formInputs} />
         </div>
       );
     },

@@ -48,7 +48,7 @@ function DataTable({
   initialStartDate,
   initialEndDate,
   projectOptions,
-  theme,
+  onDeleteRow,
 }) {
   const [sorting, setSorting] = useState([]);
   const [selectedTab, setSelectedTab] = useState("All");
@@ -63,12 +63,17 @@ function DataTable({
     let filtered = data;
 
     if (selectedTab !== "All") {
+      // console.log(data, "data");
+      // console.log(`Filtering by ${filterColumn}: ${selectedTab}`);
       filtered = filtered.filter((row) => row[filterColumn] === selectedTab);
     }
 
     if (searchValue) {
-      filtered = filtered.filter((row) =>
-        row.name.toLowerCase().includes(searchValue.toLowerCase())
+      filtered = filtered.filter(
+        (row) =>
+          row.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          (row.projectName &&
+            row.projectName.toLowerCase().includes(searchValue.toLowerCase()))
       );
     }
 
@@ -93,6 +98,12 @@ function DataTable({
         pageSize: 10, // Number of rows per page
         pageIndex: 0, // Starting from the first page
       },
+      sorting: [
+        {
+          id: "invoicedIssuedDate",
+          desc: false,
+        },
+      ],
     },
   });
 
@@ -107,7 +118,7 @@ function DataTable({
   };
 
   return (
-    <EditRowContext.Provider value={{ onEditRow }}>
+    <EditRowContext.Provider value={{ onEditRow, onDeleteRow }}>
       <div className="w-full">
         <div className="space-y-5">
           {filterValues.length > 0 && (
@@ -188,20 +199,12 @@ function DataTable({
                             data-state={row.getIsSelected() && "selected"}
                             className={
                               isProjectPage
-                                ? `cursor-pointer hover:bg-muted ${
-                                    theme === "dark"
-                                      ? "bg-gray-700 text-white"
-                                      : ""
-                                  }`
+                                ? "cursor-pointer hover:bg-muted"
                                 : isTransactionPage
-                                ? row.original.isExpense === true
-                                  ? theme === "dark"
-                                    ? "bg-[#fe5555]" // Darker shade for expense in dark mode
-                                    : "bg-[#FEF2F2]" // Light mode expense color
-                                  : row.original.isExpense === false
-                                  ? theme === "dark"
-                                    ? "bg-[#46954b]" // Darker shade for revenue in dark mode
-                                    : "bg-[#f0fdf4]" // Light mode revenue color
+                                ? row.original.transactionType === "Expense"
+                                  ? "bg-[#dc9d9c]" // Light red for expense
+                                  : row.original.transactionType === "Revenue"
+                                  ? "bg-[#78ae78]" // Light green for revenue
                                   : ""
                                 : ""
                             }
@@ -228,13 +231,6 @@ function DataTable({
                             ))}
                           </TableRow>
                         ))}
-                        {isTableAddFormEnabled && (
-                          <FormRow
-                            onAddRow={onAddRow}
-                            formInputs={formInputs}
-                            projectOptions={projectOptions}
-                          />
-                        )}
                       </>
                     ) : (
                       <TableRow>
@@ -245,6 +241,13 @@ function DataTable({
                           No results.
                         </TableCell>
                       </TableRow>
+                    )}
+                    {isTableAddFormEnabled && (
+                      <FormRow
+                        onAddRow={onAddRow}
+                        formInputs={formInputs}
+                        projectOptions={projectOptions}
+                      />
                     )}
                   </TableBody>
                 </Table>
@@ -263,7 +266,9 @@ function DataTable({
                     <PaginationItem key={index}>
                       <PaginationLink
                         onClick={() => table.setPageIndex(index)}
-                        active={table.getState().pagination.pageIndex === index}
+                        isActive={
+                          table.getState().pagination.pageIndex === index
+                        }
                       >
                         {index + 1}
                       </PaginationLink>

@@ -66,7 +66,7 @@ export function FormRow({ formInputs, onAddRow, projectOptions }) {
             rules={{ required: field.required }}
             render={({ field: { onChange, value } }) => (
               <ProjectSelect
-                value={value}
+                value={value || "None"}
                 onChange={onChange}
                 projectOptions={projectOptions}
               />
@@ -81,14 +81,14 @@ export function FormRow({ formInputs, onAddRow, projectOptions }) {
           <Controller
             control={control}
             name={field.name}
-            rules={{ required: field.required && status === "paid" }}
+            rules={{ required: field.required && status === "Paid" }}
             render={({ field: { onChange, value } }) => (
               <Component
                 {...field.component.props}
                 value={value || ""}
                 onChange={Component === DatePicker ? onChange : undefined}
                 onValueChange={Component === Select ? onChange : undefined}
-                disabled={status !== "paid"}
+                disabled={status !== "Paid"}
                 minDate={
                   Component === DatePicker ? invoiceIssuedDate : undefined
                 }

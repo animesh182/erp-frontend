@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import DataTable from "@/components/ui/data-table";
 import { CreditCard, DollarSign, Download } from "lucide-react";
 import { columns } from "@/app/dashboard/finances/payroll/Columns";
@@ -10,69 +10,74 @@ import { subDays, format } from "date-fns";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
-import { fetchPayroll } from "@/app/api/payroll"; // Import the fetchSalaries function
-import { updatePayroll } from "@/app/api/update_payroll"; // Import the updateSalary function
+import { fetchPayroll } from "@/app/api/payroll";
+import { updatePayroll } from "@/app/api/update_payroll";
 import { getPayrollKpi } from "@/app/api/finances/payroll/getPayrollKpi";
+import { getExcelPayroll } from "@/app/api/finances/payroll/getExcelPayroll";
+
 import * as XLSX from "xlsx";
 import { KpiSkeleton } from "@/components/Skeletons";
+import { deletePayroll } from "@/app/api/finances/payroll/deletePayroll";
 
 export default function Payroll() {
   const methods = useForm();
-  const initialEndDate = new Date(); // Today's date
-  const initialStartDate = subDays(initialEndDate, 28); // 4 weeks ago
+  const initialEndDate = new Date();
+  const initialStartDate = subDays(initialEndDate, 28);
   const [startDate, setStartDate] = useState(initialStartDate);
   const [endDate, setEndDate] = useState(initialEndDate);
-  const [data, setData] = useState([]); // State to hold the fetched data
-  const [loading, setLoading] = useState(true); // Add a loading state
-  const [kpiValues, setKpiValues] = useState(null); // State to hold KPI data
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [kpiValues, setKpiValues] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshComponent = useCallback(() => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  }, []);
 
   useEffect(() => {
     if (startDate && endDate) {
       fetchData(startDate, endDate);
     }
-  }, [startDate, endDate]);
-
-  useEffect(() => {
     fetchKpiData();
-  }, []);
+  }, [startDate, endDate, refreshKey]);
+
   const fetchData = async (startDate, endDate) => {
-    setLoading(true); // Set loading state before fetching data
+    setLoading(true);
     try {
-      // Fetch data using the fetchSalaries function
       const fetchedData = await fetchPayroll(
         format(startDate, "yyyy-MM-dd"),
         format(endDate, "yyyy-MM-dd")
       );
 
-      // Map the fetched data to match your table structure
       const mappedData = fetchedData.map((item) => ({
-        name: item.description,
-        projectName: null, // If no projectName is available
+        id: item.id,
+        name: item.name,
+        projectName: null,
         invoice: `#${item.id}`,
         invoiceIssuedDate: item.invoice_issued_date,
         paidDate: item.payment_date,
-        status: item.payment_status.toLowerCase(), // Assuming it's "Paid" or "Pending"
-        type: item.type.toLowerCase(), // Ensure type is properly formatted
-        amount: parseFloat(item.amount), // Convert amount to a number
+        status: item.payment_status.toLowerCase(),
+        type: item.type.toLowerCase(),
+        amount: parseFloat(item.amount),
       }));
 
-      setData(mappedData); // Store the fetched data in state
+      setData(mappedData);
       toast.success("Data fetched successfully");
     } catch (error) {
       toast.error("Failed to fetch data");
       console.error("Error fetching data:", error);
     } finally {
-      setLoading(false); // Stop loading after fetching data
+      setLoading(false);
     }
   };
+
   const fetchKpiData = async () => {
     try {
-      const response = await getPayrollKpi(); // Call the KPI API function
+      const response = await getPayrollKpi();
       if (response.status === 200) {
         const { total_outstanding, upcoming_payroll, previous_payroll } =
           response.data;
 
-        // Map the API response to the KPI card data
         const updatedKpiValues = [
           {
             title: "Total Outstanding",
@@ -106,7 +111,7 @@ export default function Payroll() {
           },
         ];
 
-        setKpiValues(updatedKpiValues); // Update the state with KPI values
+        setKpiValues(updatedKpiValues);
       } else {
         toast.error("Failed to fetch KPI data");
         console.error(response.message);
@@ -116,70 +121,35 @@ export default function Payroll() {
       console.error("Error fetching KPI data:", error);
     }
   };
+
   const handleDateChange = (startDate, endDate) => {
     setStartDate(startDate);
     setEndDate(endDate);
   };
-  console.log(kpiValues, "kpikpikpi");
 
-  const kpivalues = [
-    {
-      title: "Total Outstanding",
-      value: formatAmountToNOK(5000),
-      subtitle: "Total outstanding invoices",
-      icon: <DollarSign className="h-4 w-4" />,
-    },
-    {
-      title: "Upcoming Payment",
-      value: "Aug 1, 2024",
-      subtitle: "Next payment due",
-      icon: <CreditCard className="h-4 w-4" />,
-    },
-    {
-      title: "Previous Payroll",
-      value: formatAmountToNOK(2500),
-      subtitle: "Last payroll amount",
-      icon: <DollarSign className="h-4 w-4" />,
-    },
-  ];
+  const  handleSheetDownload = async () => {
+    console.log('bhutro')
+    try{
+      const response = await getExcelPayroll();
+    }
+    catch{
 
-  const handleSheetDownload = () => {
-    // Prepare the data for Excel
-    const worksheetData = data.map((item) => ({
-      Name: item.name || "No Name",
-      "Project Name": item.projectName || "No Project",
-      Invoice: item.invoice,
-      "Invoice Issued Date": item.invoiceIssuedDate,
-      "Paid Date": item.paidDate || "Not Paid",
-      Status: item.status,
-      Type: item.type,
-      Amount: item.amount,
-    }));
-
-    // Create a new worksheet and workbook
-    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Payroll");
-
-    // Generate Excel file and trigger download
-    XLSX.writeFile(workbook, "payroll_sheet.xlsx");
+    }
   };
 
   const onEditRow = async (editedData) => {
     try {
-      console.log("Edited data:", editedData); // Log the edited data
+      console.log("Edited data:", editedData);
 
-      // Send the edited data to the server
       const updatedSalary = await updatePayroll(editedData.id, {
         description: editedData.name,
         invoice_issued_date: editedData.invoiceIssuedDate,
         payment_date: editedData.paidDate,
         payment_status: editedData.status === "paid" ? "Paid" : "Pending",
-        type: editedData.type, // Ensure type is sent correctly
+        type: editedData.type,
         amount: editedData.amount,
       });
 
-      // Update the table state with the updated salary data
       setData((prevData) =>
         prevData.map((row) =>
           row.id === updatedSalary.id ? updatedSalary : row
@@ -187,9 +157,21 @@ export default function Payroll() {
       );
 
       toast.success("Row updated successfully");
+      refreshComponent();
     } catch (error) {
       toast.error("Failed to update row");
       console.error("Error updating row:", error.message);
+    }
+  };
+
+  const onDeleteRow = async (id) => {
+    try {
+      await deletePayroll(id);
+      toast.success("Payroll deleted successfully");
+      refreshComponent();
+    } catch (error) {
+      toast.error("Failed to delete payroll");
+      console.error("Error deleting payroll:", error);
     }
   };
 
@@ -215,8 +197,7 @@ export default function Payroll() {
                 hasSubText={false}
               />
             ))
-          : // Render skeletons when kpiValues is empty or undefined
-            [...Array(3)].map((_, index) => (
+          : [...Array(3)].map((_, index) => (
               <div key={index}>
                 <KpiSkeleton />
               </div>
@@ -228,12 +209,14 @@ export default function Payroll() {
           title={"Payroll"}
           subtitle="View and manage comprehensive salary details of all employees"
           columns={columns}
-          data={data} // Use dynamic data here
+          data={data}
           isTableAddFormEnabled={false}
           onEditRow={onEditRow}
+          onDeleteRow={onDeleteRow}
           initialStartDate={startDate}
           initialEndDate={endDate}
           onDateChange={handleDateChange}
+          loading={loading}
         />
       </FormProvider>
     </main>
