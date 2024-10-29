@@ -62,7 +62,7 @@ export const columns = [
     header: "Utilization Percentage",
     cell: ({ row }) => {
       const { utilization } = row.original;
-      // console.log(utilization,"Test");
+    
       return (
       
         <>
@@ -100,9 +100,7 @@ export const columns = [
           {endDate==="N/A" || !endDate
             ? "N/A":format(new Date(endDate), "MMM dd yyyy")
             }
-          {/* {endDate
-            ? format(new Date(endDate), "MMM dd yyyy")
-            : "N/A"} */}
+      
            
         </span>
       );

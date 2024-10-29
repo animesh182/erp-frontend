@@ -1,12 +1,11 @@
 "use client";
 
 import React, { Suspense, useEffect, useState } from "react";
-import { useParams } from "next/navigation"; // Use `useParams` from `next/navigation`
-// import ProjectDetailsSidebar from "./ProjectDetailsSidebar";
+import { useParams } from "next/navigation";
 import TableTitle from "@/components/TableTitle";
 import SimpleDataTable from "@/components/ui/simple-data-table";
 
-import { getProjectById } from "@/app/api/getProjects"; // Import the API function to get project by ID
+import { getProjectById } from "@/app/api/getProjects";
 import ProjectDetailsMain from "./ProjectDetailsMain";
 import ProjectDetailsSidebar from "@/app/dashboard/projects/[id]/ProjectDetailsSidebar";
 import { columns } from "./Columns";
@@ -14,42 +13,33 @@ import { columns } from "./Columns";
 
 
 function EmployeeProjectDetails() {
-  const [project, setProject] = useState(null); // Project state
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
-  const { id } = useParams(); // Get the projectId from the dynamic route
+  const [project, setProject] = useState(null); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null); 
+  const { id } = useParams(); 
 
   useEffect(() => {
     if (id) {
       const fetchProjectDetails = async () => {
         try {
-          const { status, data } = await getProjectById(id); // Fetch project details by ID
+          const { status, data } = await getProjectById(id); 
 
           if (status === 200 && data) {
-            setProject(data); // Set the project state with the response data
+            setProject(data); 
           } else {
             setError(`Error: ${data.message}`);
           }
         } catch (err) {
           setError("Failed to fetch project details");
         } finally {
-          setLoading(false); // Set loading to false after fetch
+          setLoading(false);
         }
       };
 
-      fetchProjectDetails(); // Fetch the project details using projectId
+      fetchProjectDetails();
     }
   }, [id]);
 
-//   const onDeleteRow = async (userId, projectId) => {
-//     try {
-//       await deleteResourceUtilization(userId, projectId);
-//       toast.success("Resource utilization deleted successfully");
-//     } catch (error) {
-//       toast.error("Error deleting resource utilization");
-//       console.error("Error deleting resource utilization:", error);
-//     }
-//   };
 
 
   if (loading) return <div>Loading...</div>;
@@ -59,7 +49,7 @@ function EmployeeProjectDetails() {
 
   if (!project) return <div>No project found</div>;
 
-
+  
   // console.log(columns,"coliulaskdnkjabsd")
 
   return (
@@ -73,7 +63,8 @@ function EmployeeProjectDetails() {
         <TableTitle
           title="Resource Utilization"
           subtitle="List of all employees in the project"
-          totalItemCount={6}
+          // totalItemCount={6}
+          totalItemCount={project?.all_user_projects.length}
         />
       
         <SimpleDataTable

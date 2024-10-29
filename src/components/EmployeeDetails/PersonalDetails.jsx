@@ -3,7 +3,7 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
     Form,
     FormControl,
@@ -13,12 +13,18 @@ import {
     FormMessage,
   } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { format } from "date-fns";
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { Calendar } from '../ui/calendar';
+import { DatePicker } from '../DatePicker';
 
 const formSchema = z.object({
     gender: z.string().min(1, "Please select your gender"),
     maritalStatus: z.string().min(1, "Please select your marital status"),
     country: z.string().min(1, "Please select your country"),
     phoneNumber: z.string().length(10, "Phone number must be exactly 10 digits"),
+    dateOfBirth:z.string().date()
   });
 
 function PersonalDetails({onSubmission,defaultValues}) {
@@ -32,7 +38,7 @@ function PersonalDetails({onSubmission,defaultValues}) {
         Nepal: "+977",
         Norway:"+47"
       };
-      const maritalStatusOptions=["Single","Married"];
+      const maritalStatusOptions=["Single","Married","Divorced","Widowed"];
       
     
         const [selectedPhoneCode, setSelectedPhoneCode] = useState(phoneCodes[defaultValues?.country] || "");
@@ -49,6 +55,7 @@ function PersonalDetails({onSubmission,defaultValues}) {
               maritalStatus: "",
               country: "",
               phoneNumber: "",
+              dateOfBirth:""
             },
           });
     
@@ -57,13 +64,17 @@ function PersonalDetails({onSubmission,defaultValues}) {
             console.log(values,"values")
             onSubmission(values)
           }
+
+
+        
   return (
     <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
     <div className="text-[#020617] tracking-tight text-xl font-semibold">Enter your personal details</div>
     <br/>
-   
-     <FormField
+   <div className='grid grid-cols-2 justify-between gap-5'>
+    <div className="col-span-1">
+           <FormField
           control={form.control}
           name="gender"
           render={({ field }) => (
@@ -85,6 +96,40 @@ function PersonalDetails({onSubmission,defaultValues}) {
             </FormItem>
           )}
         />
+
+
+</div>
+<div className="col-span-1">
+
+<FormField
+          control={form.control}
+          name="dateOfBirth"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Date of Birth</FormLabel>
+              {/* <Popover> */}
+                    {/* <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full justify-start text-left font-normal">
+                        {field.value ? format(field.value, "MMM dd yyyy") : "Pick a date"}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger> */}
+                    {/* <PopoverContent align="start" className="p-0"> */}
+                     
+                    <DatePicker
+        value={field.value}
+        onChange={field.onChange}
+      // optional: specify if needed
+      />
+                
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+</div>
+   
+              </div>
+            
     <br />
     <FormField
           control={form.control}

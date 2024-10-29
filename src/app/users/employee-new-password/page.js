@@ -16,6 +16,7 @@ import {
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import LoginTextHeader, { LoginTextFooter } from '@/components/EmployeeDetails/LoginText';
+import { useRouter } from 'next/navigation';
 
   const formSchema = z.object({
     password:z.string().min(7,"Password must be at least 7 characters long"),
@@ -25,7 +26,7 @@ import LoginTextHeader, { LoginTextFooter } from '@/components/EmployeeDetails/L
     path: ["confirmPassword"],
   });
 const EmployeeNewPassword = () => {
-
+  const router=useRouter()
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,10 +35,16 @@ const EmployeeNewPassword = () => {
     },
   });
 
+  
   function onSubmit(values) {
+    const { password } = values; 
     console.log(values,"values")
 
-    window.location.href="/users/onboarding"
+    // window.location.href="/users/onboarding"
+    // router.push(`/users/onboarding?password=${password}`);
+    sessionStorage.setItem("password", values.password);
+router.push("/users/onboarding");
+
   }
   return (
     <Form {...form}>

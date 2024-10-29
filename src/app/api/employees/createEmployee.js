@@ -9,7 +9,7 @@ export async function createEmployee(employeeData) {
     date_of_birth: employeeData.dateOfBirth,
     gender: employeeData.gender,
     marital_status: employeeData.maritalStatus,
-    password: "klololo",
+    password: employeeData.password || "klololo",
     country: employeeData.country,
     start_date: employeeData.startDate,
     ...(employeeData.endDate && { end_date: employeeData.endDate }),

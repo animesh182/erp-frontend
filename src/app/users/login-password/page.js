@@ -54,7 +54,6 @@ const EmployeeLoginPassword = () => {
   });
 
 
-  console.log(email,"emaksfiubaosfihaiusfb")
 
   async function onSubmit(values) {
     const formData = {
@@ -68,7 +67,7 @@ const EmployeeLoginPassword = () => {
       const response = await login(formData);
       if (response.status === 200) {
         toast.success("Login successful!");
-        // router.push(`/users/dashboard?userId=${userId}`);
+     
         router.push(`/users/dashboard?userId=${userId}`);
       } else {
         toast.error(response.message || "An error occurred. Please try again.");
@@ -80,11 +79,10 @@ const EmployeeLoginPassword = () => {
     }
 
 
-    //here the condition to check password lies
+
 
   }
   return (
-    // <Suspense fallback={<div>Loading...</div>}>
     <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
     <div className="h-screen w-full flex flex-col justify-center items-center ">   
@@ -130,9 +128,8 @@ const EmployeeLoginPassword = () => {
     </div>
     </form>
 </Form>
-// </Suspense>
+
   )
 }
 
-// export default EmployeeLoginPassword
 

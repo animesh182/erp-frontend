@@ -82,6 +82,7 @@ const EmployeeLogin = () => {
       }
     } else {
       console.log("employee not found");
+      window.location.href = `/users/email-verify?email=${values.email}`;
     }
   }
 

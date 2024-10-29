@@ -11,7 +11,7 @@ export const columns = [
     accessorKey: "employeeName",
     header: "Assigned To",
     cell: ({ row }) => {
-      const { user_name, user_email } = row.original; // Access the full row data
+      const { user_name, user_email } = row.original; 
       return <MultiLineNameCell title={user_name} subtitle={user_email} />;
     },
     enableSorting: false,

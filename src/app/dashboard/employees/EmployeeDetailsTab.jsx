@@ -18,11 +18,17 @@ const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions }) => {
 
   const basicDetails = [
     { label: "Employee ID", value: employeeDetails?.employee_id },
+    // {
+    //   label: "Date of Birth",
+    //   value: employeeDetails?.date_of_birth
+    //     ? format(new Date(employeeDetails?.date_of_birth), "MMM dd yyyy")
+    //     : "N/A",
+    // },
     {
       label: "Date of Birth",
-      value: employeeDetails?.date_of_birth
-        ? format(new Date(employeeDetails?.date_of_birth), "MMM dd yyyy")
-        : "N/A",
+      value: employeeDetails?.date_of_birth==="N/A" || !employeeDetails?.date_of_birth
+        ?"N/A": format(new Date(employeeDetails?.date_of_birth), "MMM dd yyyy")
+   
     },
     { label: "Gender", value: employeeDetails?.gender || "N/A" },
     {
