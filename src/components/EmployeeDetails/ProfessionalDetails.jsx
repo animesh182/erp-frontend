@@ -1,4 +1,6 @@
-import React from 'react'
+"use client"
+
+import React, { useEffect, useState } from 'react'
 import { Avatar, AvatarImage } from '../ui/avatar'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -17,15 +19,22 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 
+
 const formSchema = z.object({
     department: z.string().min(1, "Please select your department"),
     jobTitle: z.string().min(1,"Please provide your job title"),
     level: z.string().min(1),
     panNumber: z.string().min(1,"Please provide your PAN number"),
+    empType:z.string().min(1,"Please select your employment type")
   });
-function ProfessionalDetails({onSubmission,defaultValues}) {
+function ProfessionalDetails({onSubmission,defaultValues,role,level,isLoading}) {
 
-    const departmentOption=["IT","Management"]
+    const departmentOption=["IT","Management"]  
+
+    const employeementTypeOption=["Full-time",
+    "Part-time",
+  "Intern",
+  "Contract"]
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -33,7 +42,8 @@ function ProfessionalDetails({onSubmission,defaultValues}) {
             department:"",
             jobTitle:"",
             level:"",
-            panNumber:""
+            panNumber:"",
+            empType:""
         },
       });
 
@@ -43,6 +53,8 @@ function ProfessionalDetails({onSubmission,defaultValues}) {
         console.log(values,"values")
         onSubmission(values)
       }
+
+      console.log(role,level,)
 
     return (
   
@@ -74,34 +86,88 @@ function ProfessionalDetails({onSubmission,defaultValues}) {
         )}
     />
     <br />
-    <FormField
-                  control={form.control}
-                  name="jobTitle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Job Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter your job title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-    <br />
 
+
+<FormField
+        control={form.control}
+        name="jobTitle"
+        render={({ field }) => (
+        <FormItem>
+            <FormLabel>Job Title</FormLabel>
+            <Select onValueChange={field.onChange} value={field.value}>
+            <SelectTrigger className="border rounded p-2">
+                <SelectValue placeholder="Select your job title" />
+            </SelectTrigger>
+            <SelectContent>
+                {role.map((empRole) => (
+                <SelectItem key={empRole.id} value={empRole.title}>
+                    {empRole.title}
+                </SelectItem>
+                ))}
+            </SelectContent>
+            </Select>
+            <FormMessage />
+        </FormItem>
+        )}
+    />
+    <br />
+    <div className="grid grid-cols-2 justify-between gap-5">
+      <div className="col-span-1">
     <FormField
-                  control={form.control}
-                  name="level"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Level</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter your job level" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+        control={form.control}
+        name="level"
+        render={({ field }) => (
+        <FormItem>
+            <FormLabel>Level</FormLabel>
+            <Select onValueChange={field.onChange} value={field.value}>
+            <SelectTrigger className="border rounded p-2">
+                <SelectValue placeholder="Select your job level" />
+            </SelectTrigger>
+            <SelectContent>
+                {level.map((empLevel) => (
+                <SelectItem key={empLevel.id} value={empLevel.description}>
+                    {empLevel.description}
+                </SelectItem>
+                ))}
+            </SelectContent>
+            </Select>
+            <FormMessage />
+        </FormItem>
+        )}
+    />
+    </div>
+    <div className="col-span-1">
+
+
+
+
+<FormField
+        control={form.control}
+        name="empType"
+        render={({ field }) => (
+        <FormItem>
+            <FormLabel>Employment Type</FormLabel>
+            <Select onValueChange={(value) => field.onChange(value)} value={field.value}>
+            {/* <Select onValueChange={field.onChange} value={field.value}> */}
+            <SelectTrigger className="border rounded p-2">
+                <SelectValue placeholder="Employment Type" />
+            </SelectTrigger>
+            <SelectContent>
+                {employeementTypeOption.map((empType) => (
+                <SelectItem key={empType} value={empType}>
+                    {empType}
+                </SelectItem>
+                ))}
+            </SelectContent>
+            </Select>
+            <FormMessage />
+        </FormItem>
+        )}
+    />
+  
+    </div>
+    </div>
+  
     <br/>
 
 
@@ -123,7 +189,7 @@ function ProfessionalDetails({onSubmission,defaultValues}) {
           
 
     <br/>
-    <Button className="w-full text-sm" type="submit">Continue</Button>
+    <Button className="w-full text-sm" type="submit" disabled={isLoading}>Continue</Button>
     </form>
 </Form>
 

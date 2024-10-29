@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import React, { useState } from "react";
-import { Button } from "./ui/button";
 import { Home, Clock, ChevronDown, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { CompanyIcon } from "./companyicon";
@@ -101,9 +100,6 @@ export default function Sidebar({ userId }) {
               </div>
             ))}
           </nav>
-        </div>
-        <div className="mt-auto p-4">
-          {/* Your other components like upgrade options can go here */}
         </div>
       </div>
     </aside>

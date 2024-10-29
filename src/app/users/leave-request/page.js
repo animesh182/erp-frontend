@@ -13,19 +13,8 @@ import { toast } from "sonner";
 import { deleteLeaveRequestById } from "@/app/api/employees/deleteLeaveRequest";
 
 
-
-// export default function LeaveRequestPage() {
-//   return (
-    
-//     <Suspense fallback={<div>Loading...</div>}>
-//       <LeaveRequest />
-//     </Suspense>
-//   );
-// }
-
 const LeaveRequest=()=>{
 
-  // State to manage the data and the sheet modal
   const [data, setData] = useState([
     {
       leaveReason: "Sick leave (Illness or Injury)",
@@ -55,7 +44,6 @@ const LeaveRequest=()=>{
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
   }, []);
-  // Function to handle adding a new leave request
   const handleAddLeaveRequest = async (formData) => {
     try {
       const response = await createEmployeeLeaveRequest(formData, userId);
@@ -68,7 +56,7 @@ const LeaveRequest=()=>{
     }
 
 
-    setSheetOpen(false); // Close the sheet after submission
+    setSheetOpen(false); 
   };
 
 
@@ -130,7 +118,6 @@ const LeaveRequest=()=>{
 
 
   return (
-    // <Suspense fallback={<div>Loading...</div>}>
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex justify-end gap-2">
         <Button
@@ -141,7 +128,7 @@ const LeaveRequest=()=>{
           Filter
         </Button>
 
-        {/* Open the sheet on button click */}
+     
         <Button
           className="flex items-center justify-center gap-3 py-2 h-8"
           onClick={() => setSheetOpen(true)}
@@ -160,19 +147,19 @@ const LeaveRequest=()=>{
         }
         columns={columns}
         data={transformedData} 
-        // data={data} 
+      
         onDeleteRow={onDeleteLeaveRequest}
-        // showSearch={false}
+       
       />
 
-      {/* Render the RequestForLeaveSheet when isSheetOpen is true */}
+    
       <RequestForLeaveSheet
         isOpen={isSheetOpen}
         onClose={() => setSheetOpen(false)}
-        onSubmit={handleAddLeaveRequest} // Pass the function to handle form submission
+        onSubmit={handleAddLeaveRequest} 
       />
     </main>
-    // </Suspense>
+
   );
 };
 
