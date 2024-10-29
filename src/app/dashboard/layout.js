@@ -1,20 +1,19 @@
 import Header from "@/components/header";
-import Sidebar from "@/components/sidebar";
+import AppSidebar from "@/components/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function DashboardLayout({ children }) {
   return (
-    <div>
-      <main>
-        <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-          <div className="overflow-hidden">
-            <Sidebar />
-          </div>
-          <div className="flex flex-col">
-            <Header />
-            {children}
-          </div>
+    <SidebarProvider>
+      <AppSidebar />
+      <main className="w-full">
+        <div className="flex items-center justify-between border-b bg-muted/40 ">
+          <SidebarTrigger className="ml-5" />
+          <Header />
         </div>
+
+        {children}
       </main>
-    </div>
+    </SidebarProvider>
   );
 }

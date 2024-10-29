@@ -9,11 +9,20 @@ import { useState } from "react";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/utils";
+import { TitleSkeleton, DetailsSkeleton } from "@/components/Skeletons";
+
 const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions }) => {
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
 
   if (!employeeDetails) {
-    return <div>Loading employee details...</div>;
+    return (
+      <div className="flex flex-col space-y-4 p-6">
+        <TitleSkeleton />
+        <DetailsSkeleton /> {/* Basic Details skeleton */}
+        <DetailsSkeleton /> {/* Contact Information skeleton */}
+        <DetailsSkeleton /> {/* Employment Details skeleton */}
+      </div>
+    );
   }
 
   const basicDetails = [
