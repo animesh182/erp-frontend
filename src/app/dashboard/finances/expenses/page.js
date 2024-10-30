@@ -115,6 +115,7 @@ export default function Expenses() {
           onDateChange={handleDateChange}
           initialStartDate={startDate}
           initialEndDate={endDate}
+          isMonthPicker={true}
           loading={loading}
         />
       </FormProvider>
