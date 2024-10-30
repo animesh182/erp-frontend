@@ -3,7 +3,7 @@ import { apiClient } from "@/lib/utils";
 export async function getEmployeeLeaveRequest(userId) {
     try {
       const response = await apiClient(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/leave_records/${userId}/`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/leave_records/?user_id=${userId}`
       );
       return  response;
     } catch (error) {

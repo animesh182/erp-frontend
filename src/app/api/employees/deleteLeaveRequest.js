@@ -27,7 +27,7 @@ import { deleteApiClient } from "@/lib/utils";
 export async function deleteLeaveRequestById(userId, leaveRequestId) {
   try {
     const response = await deleteApiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/leave_records/${userId}/${leaveRequestId}/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/leave_records/${leaveRequestId}/?user_id=${userId}`,
       { method: "DELETE" }
     );
     if (response.status === 404) {

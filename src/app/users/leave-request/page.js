@@ -80,6 +80,8 @@ const LeaveRequest=()=>{
     getLeaveRecords();
   }, [refreshKey]);
 
+
+
   const transformedData = employeeLeaveRequest.map((leaveRequest) => {
     const startDate = new Date(leaveRequest.start_date);
     const endDate = new Date(leaveRequest.end_date);
@@ -147,7 +149,6 @@ const LeaveRequest=()=>{
         }
         columns={columns}
         data={transformedData} 
-      
         onDeleteRow={onDeleteLeaveRequest}
        
       />
