@@ -187,3 +187,61 @@ export async function deleteApiClient(url, options = {}) {
     );
   }
 }
+
+export async function changeApprovalStatus(url, status, options = {}) {
+  let token = Cookies.get("access_token"); // Get the access token from cookies
+
+  const defaultHeaders = {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }), // Add Authorization header if token exists
+  };
+
+  try {
+    // Attempt to make the PUT request to change the status
+    let response = await fetch(url, {
+      ...options,
+      method: "PUT",
+      headers: {
+        ...defaultHeaders,
+        ...options.headers, // Merge additional headers if provided
+      },
+      body: JSON.stringify({ status }), // Set the new status in the request body
+    });
+
+    // If the token is invalid or expired, try to refresh it
+    if (response.status === 401) {
+      const errorData = await response.json();
+      if (errorData.code === "token_not_valid") {
+        // Try refreshing the token
+        token = await refreshToken();
+        // Retry the PUT request with the new token
+        response = await fetch(url, {
+          ...options,
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status }),
+        });
+      }
+    }
+
+    // If the response is successful, return true
+    if (response.ok) {
+      return true;
+    }
+
+    // If the response is not successful, throw an error
+    const errorData = await response.json();
+    throw new Error(
+      errorData.message || "An error occurred while updating status"
+    );
+  } catch (error) {
+    console.error("API Status Change Request Failed:", error.message);
+    throw new Error(
+      error.message ||
+        "An error occurred while processing the status change request"
+    );
+  }
+}

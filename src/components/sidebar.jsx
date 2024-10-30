@@ -74,6 +74,18 @@ export const navItems = [
     label: "Employees",
     href: "/dashboard/employees",
     icon: <Users className="h-4 w-4" />,
+    subItems: [
+      {
+        label: "General",
+        href: "/dashboard/employees/general",
+        icon: <CreditCard className="h-4 w-4" />,
+      },
+      {
+        label: "Leave Request",
+        href: "/dashboard/employees/leave-request",
+        icon: <CreditCard className="h-4 w-4" />,
+      },
+    ],
   },
 ];
 

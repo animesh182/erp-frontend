@@ -59,6 +59,7 @@ function DataTable({
   const isProjectPage = pathname === "/dashboard/projects";
   const isUsersPage = pathname === "/users/dashboard";
   const isLeavePage = pathname === "/users/leave-request";
+  const isAdminLeavePage = pathname === "/dashboard/employees/leave-request"
   const isTransactionPage = pathname === "/dashboard/finances/transactions";
 
 
@@ -151,7 +152,7 @@ function DataTable({
               <TableTitle
                 title={title}
                 subtitle={subtitle}
-                totalItemCount={(isUsersPage | isProjectPage | isLeavePage) && table.getRowCount()}
+                totalItemCount={(isUsersPage | isProjectPage | isLeavePage | isAdminLeavePage) && table.getRowCount()}
               />
               {!pathname.includes("/leave-request") &&
               <div className="relative w-full mr-4">
