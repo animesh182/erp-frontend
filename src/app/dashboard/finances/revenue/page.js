@@ -115,6 +115,7 @@ export default function Revenue() {
           onDateChange={handleDateChange}
           initialStartDate={startDate}
           initialEndDate={endDate}
+          isMonthPicker={true}
         />
       </FormProvider>
     </main>

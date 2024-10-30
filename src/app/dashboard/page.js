@@ -305,10 +305,11 @@ export default function Dashboard() {
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Home</h1>
         <DateRangePicker
-          numberOfMonths={2}
+          // numberOfMonths={2}
           onDateChange={handleDateChange}
           initialStartDate={startDate}
           initialEndDate={endDate}
+          isMonthPicker={true}
         />
       </div>
 

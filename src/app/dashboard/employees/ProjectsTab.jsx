@@ -8,6 +8,7 @@ import CustomSheetTitle from "@/components/CustomSheetTitle";
 import { ProjectCard } from "@/components/ProjectCard";
 import { assignProject } from "@/app/api/employees/assignProject";
 import { toast } from "sonner";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const ProjectsTab = ({
   employeeId,
@@ -15,6 +16,7 @@ const ProjectsTab = ({
   roleOptions,
   employeeProjects,
 }) => {
+  console.log("employeeProjects", employeeProjects);
   const [localEmployeeProjects, setLocalEmployeeProjects] = useState(
     employeeProjects || []
   );
@@ -57,6 +59,13 @@ const ProjectsTab = ({
     return <div>No Projects</div>;
   }
 
+  const ongoingProjects = localEmployeeProjects.filter(
+    (project) => project.project_status !== "Done"
+  );
+  const completedProjects = localEmployeeProjects.filter(
+    (project) => project.project_status === "Done"
+  );
+
   return (
     <div>
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -74,9 +83,9 @@ const ProjectsTab = ({
         </SheetContent>
       </Sheet>
       <div className="flex flex-col gap-4 overflow-y-auto p-6 space-y-2">
-        <div className="flex items-center justify-between ">
+        <div className="flex items-center justify-between">
           <div className="font-semibold text-xl">
-            Current projects ({localEmployeeProjects.length})
+            Projects ({localEmployeeProjects.length})
           </div>
           <Button
             variant="secondary"
@@ -87,21 +96,55 @@ const ProjectsTab = ({
             <PlusCircle className="h-4 w-4" /> Assign Project
           </Button>
         </div>
-        {localEmployeeProjects.map((empProject, index) => (
-          <div key={index}>
-            <ProjectCard
-              title={empProject.project_title}
-              projectName={empProject.project_name}
-              category="Category N/A"
-              status={empProject.project_status}
-              startDate={empProject.start_date}
-              endDate={empProject.end_date}
-              progress={empProject.completion}
-              timeInvolved={empProject.utilization}
-              totalDaysInvolved={empProject.days_involved}
-            />
-          </div>
-        ))}
+
+        <Tabs defaultValue="ongoing" className="w-full">
+          <TabsList>
+            <TabsTrigger value="ongoing">
+              Ongoing ({ongoingProjects.length})
+            </TabsTrigger>
+            <TabsTrigger value="completed">
+              Completed ({completedProjects.length})
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="ongoing">
+            <div className="space-y-4">
+              {ongoingProjects.map((empProject, index) => (
+                <div key={index}>
+                  <ProjectCard
+                    title={empProject.project_title}
+                    projectName={empProject.project_name}
+                    category="Category N/A"
+                    status={empProject.project_status}
+                    startDate={empProject.start_date}
+                    endDate={empProject.end_date}
+                    progress={empProject.completion}
+                    timeInvolved={empProject.utilization}
+                    totalDaysInvolved={empProject.days_involved}
+                  />
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="completed">
+            <div className="space-y-4">
+              {completedProjects.map((empProject, index) => (
+                <div key={index}>
+                  <ProjectCard
+                    title={empProject.project_title}
+                    projectName={empProject.project_name}
+                    category="Category N/A"
+                    status={empProject.project_status}
+                    startDate={empProject.start_date}
+                    endDate={empProject.end_date}
+                    progress={empProject.completion}
+                    timeInvolved={empProject.utilization}
+                    totalDaysInvolved={empProject.days_involved}
+                  />
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
