@@ -16,6 +16,7 @@ import {
   TrendingDown,
   DollarSign,
   Clock,
+  UserCheck,
 } from "lucide-react";
 import {
   Card,
@@ -78,12 +79,12 @@ export const navItems = [
       {
         label: "General",
         href: "/dashboard/employees/general",
-        icon: <CreditCard className="h-4 w-4" />,
+        icon: <UserCheck className="h-4 w-4" />,
       },
       {
         label: "Leave Request",
         href: "/dashboard/employees/leave-request",
-        icon: <CreditCard className="h-4 w-4" />,
+        icon: <Clock className="h-4 w-4" />,
       },
     ],
   },
