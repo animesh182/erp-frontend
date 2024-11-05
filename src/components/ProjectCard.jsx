@@ -2,8 +2,9 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Dot } from "lucide-react";
+import { Dot, Edit } from "lucide-react";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
 
 export function ProjectCard({
   title,
@@ -15,12 +16,21 @@ export function ProjectCard({
   progress,
   timeInvolved,
   totalDaysInvolved,
+  onEdit,
 }) {
   return (
     <Card className="w-full p-6">
       <CardHeader className="p-0">
-        <CardTitle className="text-lg flex justify-between w-full">
+        <CardTitle className="text-lg flex justify-end w-full items-center">
           {title}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onEdit}
+            className="h-8 w-8"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0 space-y-2 mt-2">

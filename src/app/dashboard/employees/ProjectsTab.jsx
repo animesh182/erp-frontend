@@ -9,6 +9,7 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { assignProject } from "@/app/api/employees/assignProject";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { format } from "date-fns";
 
 const ProjectsTab = ({
   employeeId,
@@ -16,17 +17,20 @@ const ProjectsTab = ({
   roleOptions,
   employeeProjects,
 }) => {
-  // console.log("employeeProjects", employeeProjects);
   const [localEmployeeProjects, setLocalEmployeeProjects] = useState(
     employeeProjects || []
   );
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
     setLocalEmployeeProjects(employeeProjects || []);
   }, [employeeProjects]);
 
-  const openSheet = () => setIsSheetOpen(true);
+  const openSheet = (project = null) => {
+    setSelectedProject(project);
+    setIsSheetOpen(true);
+  };
 
   const onAssignProject = async (values) => {
     try {
@@ -55,6 +59,12 @@ const ProjectsTab = ({
     }
   };
 
+  const onEditProject = async (values) => {
+    try {
+      console.log(values, "values");
+    } catch (error) {}
+  };
+
   if (!localEmployeeProjects) {
     return <div>No Projects</div>;
   }
@@ -71,7 +81,7 @@ const ProjectsTab = ({
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent>
           <CustomSheetTitle
-            title="Assign Project"
+            title={selectedProject ? "Edit Project" : "Assign Project"}
             subtitle="Make changes to your task here. Click save when you're done."
           />
 
@@ -79,6 +89,18 @@ const ProjectsTab = ({
             projectOptions={projectOptions}
             roleOptions={roleOptions}
             onAssignProject={onAssignProject}
+            onEditProject={onEditProject}
+            defaultValues={
+              selectedProject
+                ? {
+                    projectName: selectedProject.project_name,
+                    role: selectedProject.project_role,
+                    timeAllocatedPerDay: selectedProject.utilization,
+                    startDate: selectedProject.start_date,
+                    endDate: selectedProject.end_date,
+                  }
+                : undefined
+            }
           />
         </SheetContent>
       </Sheet>
@@ -91,7 +113,7 @@ const ProjectsTab = ({
             variant="secondary"
             size="sm"
             className="bg-primary text-white hover:bg-primary cursor-pointer gap-2"
-            onClick={openSheet}
+            onClick={() => openSheet()}
           >
             <PlusCircle className="h-4 w-4" /> Assign Project
           </Button>
@@ -120,6 +142,7 @@ const ProjectsTab = ({
                     progress={empProject.completion}
                     timeInvolved={empProject.utilization}
                     totalDaysInvolved={empProject.days_involved}
+                    onEdit={() => openSheet(empProject)}
                   />
                 </div>
               ))}
@@ -139,6 +162,7 @@ const ProjectsTab = ({
                     progress={empProject.completion}
                     timeInvolved={empProject.utilization}
                     totalDaysInvolved={empProject.days_involved}
+                    onEdit={() => openSheet(empProject)}
                   />
                 </div>
               ))}

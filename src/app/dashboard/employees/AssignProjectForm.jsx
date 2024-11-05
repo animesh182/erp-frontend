@@ -1,17 +1,10 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import React, { useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ProjectSelect } from "@/components/ProjectSelect";
 import {
@@ -22,6 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/DatePicker";
+import { cn, prettifyText } from "@/lib/utils";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   projectName: z.string().min(1, "Project is required"),
@@ -35,60 +30,86 @@ const AssignProjectForm = ({
   projectOptions,
   roleOptions,
   onAssignProject,
+  onEditProject,
+  defaultValues,
 }) => {
-  // console.log(projectOptions, "proj");
-  const form = useForm({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      projectName: "",
-      role: "",
-      timeAllocatedPerDay: 0,
-      startDate: new Date(),
-      endDate: undefined,
-    },
+    defaultValues: defaultValues || {},
   });
 
-  function onSubmit(values) {
-    onAssignProject(values);
-  }
+  useEffect(() => {
+    if (defaultValues) {
+      reset({
+        projectName: defaultValues.projectName,
+        role: defaultValues.role,
+        timeAllocatedPerDay: defaultValues.timeAllocatedPerDay,
+        startDate: defaultValues.startDate,
+        endDate: defaultValues.endDate,
+      });
+    } else {
+      reset({
+        projectName: "",
+        role: "",
+        timeAllocatedPerDay: 0,
+        startDate: undefined,
+        endDate: undefined,
+      });
+    }
+  }, [defaultValues, reset]);
 
-  return (
-    <div className="mt-4">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField
-            control={form.control}
-            name="projectName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Project Name</FormLabel>
-                <FormControl>
-                  <ProjectSelect
-                    projectOptions={projectOptions}
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+  const onSubmit = (data) => {
+    if (defaultValues) {
+      onEditProject(data);
+    } else {
+      onAssignProject(data);
+    }
+    reset();
+  };
 
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Role</FormLabel>
+  const onError = (errors) => {
+    console.error(errors);
+    toast.error("Please fill in all required fields correctly.");
+  };
+
+  const renderField = (name, Component, props = {}) => {
+    const hasError = errors[name];
+
+    return (
+      <div key={name} className="space-y-1">
+        <label htmlFor={name} className="text-sm font-medium">
+          {prettifyText(name)}
+        </label>
+        <Controller
+          name={name}
+          control={control}
+          rules={{ required: props.required }}
+          render={({ field }) => {
+            if (Component === ProjectSelect) {
+              return (
+                <ProjectSelect
+                  projectOptions={projectOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  className={cn(hasError && "ring-2 ring-red-500")}
+                />
+              );
+            }
+            if (Component === Select) {
+              return (
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  value={field.value}
+                  className={cn(hasError && "ring-2 ring-red-500")}
                 >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                  </FormControl>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={`Select ${prettifyText(name)}`} />
+                  </SelectTrigger>
                   <SelectContent>
                     {roleOptions.map((role) => (
                       <SelectItem key={role.id} value={role.title}>
@@ -97,66 +118,61 @@ const AssignProjectForm = ({
                     ))}
                   </SelectContent>
                 </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="timeAllocatedPerDay"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Time Allocated Per Day (hours)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    {...field}
-                    onChange={(e) =>
-                      field.onChange(parseInt(e.target.value, 10))
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="startDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Start Date</FormLabel>
-                <DatePicker
+              );
+            }
+            if (Component === DatePicker) {
+              return (
+                <Component
+                  {...field}
+                  {...props}
                   selected={field.value}
-                  onSelect={field.onChange}
                   onChange={(date) => field.onChange(date)}
+                  ref={null}
+                  className={cn(
+                    props?.className,
+                    hasError && "ring-2 ring-red-500"
+                  )}
                 />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              );
+            }
+            return (
+              <Component
+                {...field}
+                {...props}
+                value={field.value || ""}
+                className={cn(
+                  props?.className,
+                  hasError && "ring-2 ring-red-500"
+                )}
+              />
+            );
+          }}
+        />
+        {hasError && (
+          <p className="text-sm text-red-500">{errors[name].message}</p>
+        )}
+      </div>
+    );
+  };
 
-          <FormField
-            control={form.control}
-            name="endDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>End Date (Optional)</FormLabel>
-                <DatePicker
-                  selected={field.value}
-                  onSelect={field.onChange}
-                  onChange={(date) => field.onChange(date)}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+  return (
+    <div className="mt-4">
+      <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
+        {renderField("projectName", ProjectSelect, { required: true })}
+        {renderField("role", Select, { required: true })}
+        {renderField("timeAllocatedPerDay", Input, {
+          type: "number",
+          min: "1",
+          max: "12",
+          required: true,
+        })}
+        {renderField("startDate", DatePicker, { required: true })}
+        {renderField("endDate", DatePicker)}
 
-          <Button type="submit">Assign Project</Button>
-        </form>
-      </Form>
+        <Button type="submit">
+          {defaultValues ? "Update Project" : "Assign Project"}
+        </Button>
+      </form>
     </div>
   );
 };
