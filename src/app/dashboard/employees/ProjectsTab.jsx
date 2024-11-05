@@ -16,7 +16,7 @@ const ProjectsTab = ({
   roleOptions,
   employeeProjects,
 }) => {
-  console.log("employeeProjects", employeeProjects);
+  // console.log("employeeProjects", employeeProjects);
   const [localEmployeeProjects, setLocalEmployeeProjects] = useState(
     employeeProjects || []
   );
