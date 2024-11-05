@@ -77,7 +77,7 @@ function MonthRangePicker({
   onMonthRangeSelect,
   onStartMonthSelect,
   callbacks,
-  selectedMonthRange,
+  selectedMonthRange = { start: new Date(), end: new Date() },
   onYearBackward,
   onYearForward,
   variant,
@@ -112,7 +112,7 @@ function MonthRangePicker({
 }
 
 function MonthRangeCal({
-  selectedMonthRange,
+  selectedMonthRange = { start: new Date(), end: new Date() },
   onMonthRangeSelect,
   onStartMonthSelect,
   callbacks,
@@ -125,16 +125,24 @@ function MonthRangeCal({
   onYearForward,
 }) {
   const [startYear, setStartYear] = React.useState(
-    selectedMonthRange?.start.getFullYear() ?? new Date().getFullYear()
+    selectedMonthRange?.start instanceof Date
+      ? selectedMonthRange.start.getFullYear()
+      : new Date().getFullYear()
   );
   const [startMonth, setStartMonth] = React.useState(
-    selectedMonthRange?.start?.getMonth() ?? new Date().getMonth()
+    selectedMonthRange?.start instanceof Date
+      ? selectedMonthRange.start.getMonth()
+      : new Date().getMonth()
   );
   const [endYear, setEndYear] = React.useState(
-    selectedMonthRange?.end?.getFullYear() ?? new Date().getFullYear() + 1
+    selectedMonthRange?.end instanceof Date
+      ? selectedMonthRange.end.getFullYear()
+      : new Date().getFullYear() + 1
   );
   const [endMonth, setEndMonth] = React.useState(
-    selectedMonthRange?.end?.getMonth() ?? new Date().getMonth()
+    selectedMonthRange?.end instanceof Date
+      ? selectedMonthRange.end.getMonth()
+      : new Date().getMonth()
   );
   const [rangePending, setRangePending] = React.useState(false);
   const [endLocked, setEndLocked] = React.useState(true);
