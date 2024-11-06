@@ -22,9 +22,16 @@ export default function DateRangePicker({
   isMonthPicker = false,
 }) {
   const [date, setDate] = React.useState({
-    from: initialStartDate,
-    to: initialEndDate,
+    from: initialStartDate ? new Date(initialStartDate) : null,
+    to: initialEndDate ? new Date(initialEndDate) : null,
   });
+
+  React.useEffect(() => {
+    setDate({
+      from: initialStartDate ? new Date(initialStartDate) : null,
+      to: initialEndDate ? new Date(initialEndDate) : null,
+    });
+  }, [initialStartDate, initialEndDate]);
 
   const handleDateSelect = (selectedDate) => {
     setDate(selectedDate);
