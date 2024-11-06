@@ -5,7 +5,7 @@ import { columns } from "./Columns";
 import { useForm, FormProvider } from "react-hook-form";
 import DataTable from "@/components/ui/data-table";
 import { toast } from "sonner";
-import { subDays, format } from "date-fns";
+import { format, startOfMonth, addMonths } from "date-fns";
 import { getRevenue } from "@/app/api/revenue/getRevenue";
 import { createRevenue } from "@/app/api/revenue/createRevenue";
 import { getProjects } from "@/app/api/projects/getProjects";
@@ -15,13 +15,20 @@ import { deleteRevenue } from "@/app/api/revenue/deleteRevenue";
 
 export default function Revenue() {
   const methods = useForm();
-  const initialEndDate = new Date();
-  const initialStartDate = subDays(initialEndDate, 28);
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
+
   const [data, setData] = useState([]);
   const [projectOptions, setProjectOptions] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Get first day of current month
+  const initialStartDate = startOfMonth(new Date());
+  // Get first day of next month
+  const initialEndDate = startOfMonth(addMonths(new Date(), 1));
+
+  const [startDate, setStartDate] = useState(
+    format(initialStartDate, "yyyy-MM-dd")
+  );
+  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
 
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);

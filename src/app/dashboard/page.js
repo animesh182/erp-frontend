@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { subDays, format, startOfDay } from "date-fns";
+import { format, startOfMonth, addMonths } from "date-fns";
 import { KpiSkeleton, RectangleSkeleton } from "@/components/Skeletons";
 import { fetchKpiData } from "@/app/api/fetchKpiData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -118,14 +118,16 @@ export default function Dashboard() {
   const [kpiValues, setKpiValues] = useState();
   const [ongoingProjects, setOngoingProjects] = useState([]);
   const [completedProjects, setCompletedProjects] = useState([]);
-  const initialEndDate = startOfDay(new Date()); // Today's date
-  const initialStartDate = startOfDay(subDays(initialEndDate, 28)); // 4 weeks ago
+
+  // Get first day of current month
+  const initialStartDate = startOfMonth(new Date());
+  // Get first day of next month
+  const initialEndDate = startOfMonth(addMonths(new Date(), 1));
+
   const [startDate, setStartDate] = useState(
-    format(startOfDay(initialStartDate), "yyyy-MM-dd")
+    format(initialStartDate, "yyyy-MM-dd")
   );
-  const [endDate, setEndDate] = useState(
-    format(startOfDay(initialEndDate), "yyyy-MM-dd")
-  );
+  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
 
   const router = useRouter();
   useEffect(() => {
