@@ -18,8 +18,9 @@ const SimpleTableActionsDropdown = ({ rowData }) => {
   const { onDeleteRow } = useContext(SimpleDataTableContext);
 
   const handleDelete = () => {
-    onDeleteRow(rowData.user_id, rowData.project_id);
+    onDeleteRow(rowData.id);
     setIsDeleteDialogOpen(false);
+
   };
 
   return (

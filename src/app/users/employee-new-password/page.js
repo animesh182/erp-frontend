@@ -60,7 +60,7 @@ const EmployeeNewPassword = () => {
     const formData={email,password}
     console.log(formData,"form")
     
-    if (document.referrer.endsWith("/users")) {
+    // if (document.referrer.endsWith("/users")) {
     try {
       const response = await createNewPassword(formData);
       // if (response.status === 200 && response.is_employee) {
@@ -76,12 +76,12 @@ const EmployeeNewPassword = () => {
       toast.error("An error occurred. Please try again.");
       console.log(error,"error")
     }
-  }
-  else
-{
-    sessionStorage.setItem("password", values.password);
-router.push("/users/onboarding");
-}
+  // }
+//   else
+// {
+//     sessionStorage.setItem("password", values.password);
+// router.push("/users/onboarding");
+// }
 
   }
 

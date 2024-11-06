@@ -38,9 +38,9 @@ export default function ProjectDetails() {
     }
   }, [id]);
 
-  const onDeleteRow = async (userId, projectId) => {
+  const onDeleteRow = async (resourceId) => {
     try {
-      await deleteResourceUtilization(userId, projectId);
+      await deleteResourceUtilization(resourceId);
       toast.success("Resource utilization deleted successfully");
     } catch (error) {
       toast.error("Error deleting resource utilization");

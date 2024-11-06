@@ -1,9 +1,9 @@
 import { apiClient } from "@/lib/utils";
 
-export async function deleteResourceUtilization(userId, projectId) {
+export async function deleteResourceUtilization(id) {
   try {
     const result = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/user_projects/${userId}/${projectId}/delete/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/user_projects/delete/?id=${id}`,
       {
         method: "DELETE",
       }

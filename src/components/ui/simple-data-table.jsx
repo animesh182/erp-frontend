@@ -44,12 +44,14 @@ function SimpleDataTable({ columns, data, onRowSelect, onDeleteRow }) {
   }, [data, onRowSelect, userSelected]);
 
   const handleRowClick = (row, index) => {
+    
     if (onRowSelect) {
       onRowSelect(row.original);
       setSelectedRowIndex(index);
       setUserSelected(true);
     }
   };
+
 
   return (
     <SimpleDataTableContext.Provider value={{ onDeleteRow }}>
