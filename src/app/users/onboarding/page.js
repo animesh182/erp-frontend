@@ -17,6 +17,7 @@ import { getLevels } from '@/app/api/level/getLevels';
 
 
 
+
 const Onboarding = () => {
 
   const [step, setStep] = useState(1);
@@ -122,15 +123,40 @@ const Onboarding = () => {
 
 
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const rolesData = await getRoles();
+  //       const levelsData = await getLevels();
+        
+  //       if (rolesData && levelsData) {
+  //         setRole(rolesData);
+  //         setLevel(levelsData);
+  //       } else {
+  //         console.error("Failed to fetch data");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  
+  //   fetchData();
+  // }, []);
+
+
+
+
+    useEffect(() => {
     const fetchData = async () => {
       try {
         const rolesData = await getRoles();
-        const levelsData = await getLevels();
+        // const levelsData = await getLevels();
         
-        if (rolesData && levelsData) {
+        if (rolesData) {
           setRole(rolesData);
-          setLevel(levelsData);
+          // setLevel(levelsData);
         } else {
           console.error("Failed to fetch data");
         }
@@ -143,6 +169,10 @@ const Onboarding = () => {
   
     fetchData();
   }, []);
+  
+
+
+
   
 
 
@@ -176,7 +206,7 @@ const Onboarding = () => {
             />}
           </div>
           <div className="lg:flex flex-col items-end space-y-2 pb-6 pt-20 pl-10 hidden md:hidden">
-            <img src="/employeeInformationPreview.png" alt="information preview" className="shadow-lg rounded-2xl" />
+          <img src="/employeeInformationPreview.png" alt="information preview" className="shadow-lg rounded-2xl" />
           </div>
         </CardContent>
       </Card>

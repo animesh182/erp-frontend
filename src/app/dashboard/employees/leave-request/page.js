@@ -6,12 +6,11 @@ import { columns } from "./Columns";
 import { Button } from "@/components/ui/button";
 import { Filter, PlusCircle } from "lucide-react";
 import { RequestForLeaveSheet } from "@/components/EditLeaveSheet"; // Import the form component
-import { getEmployeeLeaveRequestById } from "@/app/api/employees/getEmployeeLeaveRequest";
-import { createEmployeeLeaveRequest } from "@/app/api/employees/createEmployeeLeaveRequest";
-import { useSearchParams } from "next/navigation";
+import { getEmployeeLeaveRequest } from "@/app/api/employees/getEmployeeLeaveRequest";
 import { toast } from "sonner";
 import { deleteLeaveRequestById } from "@/app/api/employees/deleteLeaveRequest";
-import { updateLeaveRequestStatus } from "@/app/api/employees/approveLeaveRequest";
+import ComboboxEmployees from "@/app/users/leave-request/combobox";
+import { formInputs } from "./Inputs";
 
 const LeaveRequest = () => {
   const [data, setData] = useState([
@@ -28,9 +27,6 @@ const LeaveRequest = () => {
   ]);
 
   const [employeeLeaveRequest, setEmployeeLeaveRequest] = useState([]);
-  const searchParams = useSearchParams();
-
-  const userId = searchParams.get("userId");
 
   const [isSheetOpen, setSheetOpen] = useState(false);
 
@@ -39,24 +35,12 @@ const LeaveRequest = () => {
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
   }, []);
-  const handleAddLeaveRequest = async (formData) => {
-    try {
-      const response = await createEmployeeLeaveRequest(formData, userId);
-      toast.success("Leave Request added successfully");
-      refreshComponent();
-      setSheetOpen(false);
-    } catch (error) {
-      toast.error("Failed to create leave request");
-      console.error("Error creating leave request:", error.message);
-    }
 
-    setSheetOpen(false);
-  };
 
   useEffect(() => {
     const getLeaveRecords = async () => {
       try {
-        const data = await getEmployeeLeaveRequestById(userId);
+        const data = await getEmployeeLeaveRequest();
 
         if (data) {
           setEmployeeLeaveRequest(data);
@@ -71,8 +55,6 @@ const LeaveRequest = () => {
     getLeaveRecords();
   }, [refreshKey]);
 
-
-
   const transformedData = employeeLeaveRequest.map((leaveRequest) => {
     const startDate = new Date(leaveRequest.start_date);
     const endDate = new Date(leaveRequest.end_date);
@@ -82,6 +64,7 @@ const LeaveRequest = () => {
 
     return {
       id: leaveRequest.id,
+      employeeName:leaveRequest.username,
       leaveReason:
         leaveRequest.type_of_leave === 1
           ? "Sick leave (Illness or Injury)"
@@ -99,56 +82,44 @@ const LeaveRequest = () => {
       numberOfLeaveDays,
     };
   });
+
   const onDeleteLeaveRequest = async (leaveRequestId) => {
     try {
-      const response = await deleteLeaveRequestById( leaveRequestId);
-      // console.log(response,"responesesese")
-      // if (response && response.message) {
-        // toast.success(response.message);
-        toast.success("Leave request deleted successfully");
+      const response = await deleteLeaveRequestById(leaveRequestId);
+      if (response && response.message) {
+        toast.success(response.message);
         refreshComponent();
-      // }
+      }
     } catch (error) {
       toast.error("There was an error deleting the leave request");
       console.error("There was an error deleting the leave request:", error);
+      refreshComponent();
     }
   };
-  // const onUpdateLeaveRequest = async (leaveRequestId) => {
+
+  // const onUpdateLeaveRequestStatus = async (id) => {
   //   try {
-  //     const response = await updateLeaveRequestStatus(leaveRequestId);
+  //     const response = await updateLeaveRequestStatus(id);
   //     if (response && response.message) {
   //       toast.success(response.message);
-  //       refreshComponent();
+  //       refreshComponent(); // Refresh the component to reflect the new status
   //     }
   //   } catch (error) {
-  //     toast.error("There was an error editing the leave request status");
-  //     console.error(
-  //       "There was an error editing the leave request status:",
-  //       error
-  //     );
+  //     toast.error(`There was an error updating the leave request`);
+  //     console.error(`Error updating leave request:`, error);
+  //     refreshComponent();
   //   }
   // };
+
+  const employeeNames=transformedData.map((emp)=>{
+    return emp.employeeName
+  })
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex justify-end gap-2">
-        <Button
-          className="flex items-center justify-center gap-3 py-2 h-8"
-          variant="outline"
-        >
-          <Filter className="w-4" />
-          Filter
-        </Button>
-
-        <Button
-          className="flex items-center justify-center gap-3 py-2 h-8"
-          onClick={() => setSheetOpen(true)}
-        >
-          <PlusCircle className="w-4" />
-          Request
-        </Button>
+        <ComboboxEmployees employeeNames={employeeNames}/>
       </div>
-
       <DataTable
         title={"Leave Request"}
         subtitle={
@@ -157,14 +128,16 @@ const LeaveRequest = () => {
         columns={columns}
         data={transformedData}
         onDeleteRow={onDeleteLeaveRequest}
-        // onEditRow={onUpdateLeaveRequest}
+        formInputs={formInputs}
+        filterColumn={"status"}
+        // onUpdateLeaveRequestStatus={onUpdateLeaveRequestStatus}
       />
 
-      <RequestForLeaveSheet
+      {/* <RequestForLeaveSheet
         isOpen={isSheetOpen}
         onClose={() => setSheetOpen(false)}
         onSubmit={handleAddLeaveRequest}
-      />
+      /> */}
     </main>
   );
 };

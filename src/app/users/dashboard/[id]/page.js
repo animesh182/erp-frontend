@@ -12,6 +12,15 @@ import { columns } from "./Columns";
 
 
 
+export default function EmployeeProjectDetailsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EmployeeProjectDetails />
+    </Suspense>
+  );
+}
+
+
 function EmployeeProjectDetails() {
   const [project, setProject] = useState(null); 
   const [loading, setLoading] = useState(true); 
@@ -78,10 +87,3 @@ function EmployeeProjectDetails() {
 }
 
 
-export default function EmployeeProjectDetailsPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <EmployeeProjectDetails />
-    </Suspense>
-  );
-}

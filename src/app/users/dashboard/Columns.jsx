@@ -74,7 +74,6 @@ export const columns = [
       );
     },
     enableSorting: false,
-   
   },
   {
     accessorKey: "startDate",

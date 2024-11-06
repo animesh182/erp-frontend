@@ -6,6 +6,7 @@ export function middleware(request) {
   // Allow the base path '/', static assets, API routes, and favicon
   if (
     pathname === "/" ||
+    pathname.startsWith("/users") ||
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/favicon.ico")
@@ -16,7 +17,6 @@ export function middleware(request) {
   // Check for the authentication token in cookies
   const token = request.cookies.get("access_token");
   //   console.log(token, "token");
-
   if (!token) {
     // Redirect to '/' if not authenticated
     return NextResponse.redirect(new URL("/", request.url));

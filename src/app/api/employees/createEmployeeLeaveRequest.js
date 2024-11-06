@@ -1,9 +1,9 @@
 import { apiClient } from "@/lib/utils";
 
-export async function createEmployeeLeaveRequest(leaveData,userId) {
+export async function createEmployeeLeaveRequest(leaveData) {
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/leave_records/${userId}/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/leave_records/`,
       {
         method: "POST",
         body: JSON.stringify({

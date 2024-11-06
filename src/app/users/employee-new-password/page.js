@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import React from 'react'
+import React, { Suspense } from 'react'
 import EmployeeLoginFooter from '@/components/EmployeeLoginFooter';
 import { useForm } from "react-hook-form";
 import {
@@ -16,7 +16,9 @@ import {
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import LoginTextHeader, { LoginTextFooter } from '@/components/EmployeeDetails/LoginText';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { createNewPassword } from '@/app/api/auth/newPassword';
+import { toast } from 'sonner';
 
   const formSchema = z.object({
     password:z.string().min(7,"Password must be at least 7 characters long"),
@@ -25,6 +27,16 @@ import { useRouter } from 'next/navigation';
     message: "Passwords must match",
     path: ["confirmPassword"],
   });
+
+
+  export default function EmployeeNewPasswordPage() {
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <EmployeeNewPassword />
+      </Suspense>
+    );
+  }
+
 const EmployeeNewPassword = () => {
   const router=useRouter()
   const form = useForm({
@@ -35,17 +47,46 @@ const EmployeeNewPassword = () => {
     },
   });
 
-  
-  function onSubmit(values) {
-    const { password } = values; 
-    console.log(values,"values")
+  const searchParams = useSearchParams(); 
+  const rawEmail = searchParams.get('email');
 
-    // window.location.href="/users/onboarding"
-    // router.push(`/users/onboarding?password=${password}`);
+  const email = rawEmail ? decodeURIComponent(rawEmail) : "";
+  
+
+
+
+  async function onSubmit(values) {
+    const  password  = values.password; 
+    const formData={email,password}
+    console.log(formData,"form")
+    
+    if (document.referrer.endsWith("/users")) {
+    try {
+      const response = await createNewPassword(formData);
+      // if (response.status === 200 && response.is_employee) {
+      if (response.status === 200 ) {
+        toast.success(response.message);
+     
+        router.push(`/users`);
+      } else {
+        toast.error(response.message || "An error occurred. Please try again.");
+        console.log(error,"error")
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+      console.log(error,"error")
+    }
+  }
+  else
+{
     sessionStorage.setItem("password", values.password);
 router.push("/users/onboarding");
+}
 
   }
+
+
+
   return (
     <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -107,4 +148,4 @@ router.push("/users/onboarding");
   )
 }
 
-export default EmployeeNewPassword
+

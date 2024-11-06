@@ -33,7 +33,8 @@ export default function EmployeeLoginPasswordPage() {
 
 
   const formSchema = z.object({
-    password:z.string().min(7,"Password must be at least 7 characters long")
+    password:z.string()
+    // password:z.string().min(7,"Password must be at least 7 characters long")
   })
 const EmployeeLoginPassword = () => {
 
@@ -41,8 +42,8 @@ const EmployeeLoginPassword = () => {
   const rawEmail = searchParams.get('email');
 
   const email = rawEmail ? decodeURIComponent(rawEmail) : "";
-
-  const userId=searchParams.get('userId')
+  const paramEmail=encodeURIComponent(email)
+  // const userId=searchParams.get('userId')
 
   const router = useRouter();
 
@@ -65,10 +66,11 @@ const EmployeeLoginPassword = () => {
 
     try {
       const response = await login(formData);
-      if (response.status === 200) {
+      // if (response.status === 200 && response.is_employee) {
+      if (response.status === 200 ) {
         toast.success("Login successful!");
      
-        router.push(`/users/dashboard?userId=${userId}`);
+        router.push(`/users/dashboard?userId=${response.user_details.id}`);
       } else {
         toast.error(response.message || "An error occurred. Please try again.");
         console.log(error,"error")
@@ -82,6 +84,14 @@ const EmployeeLoginPassword = () => {
 
 
   }
+
+
+
+
+
+
+ 
+
   return (
     <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -108,7 +118,7 @@ const EmployeeLoginPassword = () => {
                 />
  
 
-            <Link href="/" className='text-[#020617] text-xs tracking-tight'><u>Forgot Password?</u></Link>
+            <Link href={`/users/email-verify?email=${paramEmail}`} className='text-[#020617] text-xs tracking-tight'><u>Forgot Password?</u></Link>
         <Button className="w-full text-sm" type="submit">Confirm</Button>
   
     

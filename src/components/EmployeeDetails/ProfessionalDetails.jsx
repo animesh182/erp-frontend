@@ -23,11 +23,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 const formSchema = z.object({
     department: z.string().min(1, "Please select your department"),
     jobTitle: z.string().min(1,"Please provide your job title"),
-    level: z.string().min(1),
+    // level: z.string().min(1),
     panNumber: z.string().min(1,"Please provide your PAN number"),
     empType:z.string().min(1,"Please select your employment type")
   });
-function ProfessionalDetails({onSubmission,defaultValues,role,level,isLoading}) {
+function ProfessionalDetails({onSubmission,defaultValues,role,isLoading}) {
 
     const departmentOption=["IT","Management"]  
 
@@ -41,7 +41,7 @@ function ProfessionalDetails({onSubmission,defaultValues,role,level,isLoading}) 
         defaultValues:defaultValues|| {
             department:"",
             jobTitle:"",
-            level:"",
+            // level:"",
             panNumber:"",
             empType:""
         },
@@ -54,7 +54,7 @@ function ProfessionalDetails({onSubmission,defaultValues,role,level,isLoading}) 
         onSubmission(values)
       }
 
-      console.log(role,level,)
+      console.log(role)
 
     return (
   
@@ -112,7 +112,7 @@ function ProfessionalDetails({onSubmission,defaultValues,role,level,isLoading}) 
     />
     <br />
     <div className="grid grid-cols-2 justify-between gap-5">
-      <div className="col-span-1">
+      {/* <div className="col-span-1">
     <FormField
         control={form.control}
         name="level"
@@ -135,7 +135,7 @@ function ProfessionalDetails({onSubmission,defaultValues,role,level,isLoading}) 
         </FormItem>
         )}
     />
-    </div>
+    </div> */}
     <div className="col-span-1">
 
 

@@ -14,6 +14,15 @@ import LeaveRequestDropDown from "@/components/LeaveRequestDropDown";
 
 export const columns = [
   {
+    accessorKey: "employeeName",
+    header: "Employee Name",
+    enableSorting: false,
+    cell: ({ row }) => {
+      const { employeeName } = row.original;
+      return employeeName ? <span className="font-medium">{employeeName}</span> : "No Data"; // Show "No Data" if the project is null or undefined
+    },
+  },
+  {
     accessorKey: "leaveReason",
     header: "Type of Leave",
     enableSorting: false,
