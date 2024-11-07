@@ -21,7 +21,7 @@ import { toast } from "sonner";
 const formSchema = z.object({
   projectName: z.string().min(1, "Project is required"),
   role: z.string().min(1, "Role is required"),
-  timeAllocatedPerDay: z.number().int().min(1).max(12).positive(),
+  timeAllocatedPerDay: z.coerce.number().int().min(1).max(12).positive(),
   startDate: z.string(),
   endDate: z.string().optional(),
 });
@@ -162,8 +162,7 @@ const AssignProjectForm = ({
         {renderField("role", Select, { required: true })}
         {renderField("timeAllocatedPerDay", Input, {
           type: "number",
-          min: "1",
-          max: "12",
+
           required: true,
         })}
         {renderField("startDate", DatePicker, { required: true })}

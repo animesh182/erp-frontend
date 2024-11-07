@@ -204,9 +204,9 @@ function DataTable({
                                 ? "cursor-pointer hover:bg-muted"
                                 : isTransactionPage
                                 ? row.original.transactionType === "Expense"
-                                  ? "bg-[#dc9d9c]" // Light red for expense
+                                  ? "bg-[#f6b2b1]" // Light red for expense
                                   : row.original.transactionType === "Revenue"
-                                  ? "bg-[#78ae78]" // Light green for revenue
+                                  ? "bg-[#c3eec3]" // Light green for revenue
                                   : ""
                                 : ""
                             }

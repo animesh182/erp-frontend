@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { format, startOfMonth, addMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { KpiSkeleton, RectangleSkeleton } from "@/components/Skeletons";
 import { fetchKpiData } from "@/app/api/fetchKpiData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -118,11 +118,12 @@ export default function Dashboard() {
   const [kpiValues, setKpiValues] = useState();
   const [ongoingProjects, setOngoingProjects] = useState([]);
   const [completedProjects, setCompletedProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Get first day of current month
   const initialStartDate = startOfMonth(new Date());
-  // Get first day of next month
-  const initialEndDate = startOfMonth(addMonths(new Date(), 1));
+  // Get last day of current month
+  const initialEndDate = endOfMonth(new Date());
 
   const [startDate, setStartDate] = useState(
     format(initialStartDate, "yyyy-MM-dd")
@@ -294,12 +295,13 @@ export default function Dashboard() {
         },
       ];
       setKpiValues(updatedKpiDatas); // Setting the new kpiDatas array
+      setLoading(false);
     }
   }, [fetchedKpiData]); // This will trigger whenever kpiData is fetched
 
   const handleDateChange = (startDate, endDate) => {
-    setStartDate(format(startDate, "yyyy-MM-dd"));
-    setEndDate(format(endDate, "yyyy-MM-dd"));
+    setStartDate(startDate);
+    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
   };
 
   return (

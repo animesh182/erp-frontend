@@ -4,7 +4,7 @@ import DataTable from "@/components/ui/data-table";
 import { columns } from "@/app/dashboard/finances/expenses/Columns";
 import { toast } from "sonner";
 import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
-import { format, startOfMonth, addMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { useForm, FormProvider } from "react-hook-form";
 import { getExpense } from "@/app/api/expense/getExpense";
 import { createExpense } from "@/app/api/expense/createExpense";
@@ -16,8 +16,8 @@ export default function Expenses() {
   const methods = useForm();
   // Get first day of current month
   const initialStartDate = startOfMonth(new Date());
-  // Get first day of next month
-  const initialEndDate = startOfMonth(addMonths(new Date(), 1));
+  // Get last day of current month
+  const initialEndDate = endOfMonth(new Date());
 
   const [startDate, setStartDate] = useState(
     format(initialStartDate, "yyyy-MM-dd")
@@ -66,7 +66,7 @@ export default function Expenses() {
 
   const handleDateChange = (startDate, endDate) => {
     setStartDate(startDate);
-    setEndDate(endDate);
+    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
   };
 
   const onAddRow = async (newRowData) => {

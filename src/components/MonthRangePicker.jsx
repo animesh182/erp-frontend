@@ -257,15 +257,16 @@ function MonthRangeCal({
                               } else {
                                 setRangePending(false);
                                 setEndLocked(true);
-                                // Event fire data selected
+                                const endDate = new Date(
+                                  menuYear + m.yearOffset,
+                                  m.number + 1,
+                                  0
+                                );
 
                                 if (onMonthRangeSelect)
                                   onMonthRangeSelect({
                                     start: new Date(startYear, startMonth),
-                                    end: new Date(
-                                      menuYear + m.yearOffset,
-                                      m.number
-                                    ),
+                                    end: endDate,
                                   });
                               }
                             } else {
