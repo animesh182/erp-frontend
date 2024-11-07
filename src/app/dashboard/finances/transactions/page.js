@@ -4,14 +4,15 @@ import { columns } from "./Columns";
 import DataTable from "@/components/ui/data-table";
 import KpiCard from "@/components/kpicard";
 import { Activity, CreditCard, DollarSign } from "lucide-react";
-import { format, startOfMonth, addMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { getTransactions } from "@/app/api/transactions/getTransactions";
 import { fetchTransactionKpi } from "@/app/api/finances/transaction/fetchTransactionKpi";
+
 export default function Transactions() {
   // Get first day of current month
   const initialStartDate = startOfMonth(new Date());
-  // Get first day of next month
-  const initialEndDate = startOfMonth(addMonths(new Date(), 1));
+  // Get last day of current month
+  const initialEndDate = endOfMonth(new Date());
 
   const [startDate, setStartDate] = useState(
     format(initialStartDate, "yyyy-MM-dd")
@@ -100,7 +101,7 @@ export default function Transactions() {
 
   const handleDateChange = (startDate, endDate) => {
     setStartDate(startDate);
-    setEndDate(endDate);
+    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
   };
 
   return (
@@ -141,6 +142,7 @@ export default function Transactions() {
         onDateChange={handleDateChange}
         initialStartDate={startDate}
         initialEndDate={endDate}
+        isMonthPicker={true}
       />
     </main>
   );
