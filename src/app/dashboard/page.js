@@ -179,7 +179,10 @@ export default function Dashboard() {
   // console.log(profitLoss);
   useEffect(() => {
     const getKpiData = async () => {
-      const { status, data } = await fetchKpiData(startDate, endDate);
+      const { status, data } = await fetchKpiData(
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd")
+      );
       if (status === 200) {
         setFetchedKpiData(data);
       } else {
@@ -191,7 +194,10 @@ export default function Dashboard() {
   }, [startDate, endDate]);
   useEffect(() => {
     const getResourceUtilData = async () => {
-      const { status, data } = await fetchReourceUtil(startDate, endDate);
+      const { status, data } = await fetchReourceUtil(
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd")
+      );
 
       if (status === 200) {
         const transformedData = data.map((user) => {

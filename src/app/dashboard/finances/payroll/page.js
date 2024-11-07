@@ -6,7 +6,7 @@ import { columns } from "@/app/dashboard/finances/payroll/Columns";
 import { formatAmountToNOK } from "@/lib/utils";
 import KpiCard from "@/components/kpicard";
 import { toast } from "sonner";
-import { format, startOfMonth, addMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
@@ -21,8 +21,8 @@ export default function Payroll() {
   const methods = useForm();
   // Get first day of current month
   const initialStartDate = startOfMonth(new Date());
-  // Get first day of next month
-  const initialEndDate = startOfMonth(addMonths(new Date(), 1));
+  // Get last day of current month
+  const initialEndDate = endOfMonth(new Date());
 
   const [startDate, setStartDate] = useState(
     format(initialStartDate, "yyyy-MM-dd")
