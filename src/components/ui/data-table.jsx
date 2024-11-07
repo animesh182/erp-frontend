@@ -125,6 +125,7 @@ function DataTable({
     }
     if(isUsersPage){
       router.push(`/users/dashboard/${id}/?userId=${userId}`);
+     
   
     }
   };

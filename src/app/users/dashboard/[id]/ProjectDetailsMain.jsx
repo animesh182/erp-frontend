@@ -8,44 +8,39 @@ import KpiCard from "@/components/kpicard";
 
 const ProjectDetailsMain = ({ project }) => {
   console.log(project);
-  const totalHoursWorked = project.all_user_projects.reduce(
+  // const totalHoursWorked = project.all_user_projects.reduce(
+  //   (total, userProject) => {
+  //     const utilization = parseFloat(userProject.utilization); // Convert utilization to a number
+  //     return total + utilization;
+  //   },
+  //   0
+  // );
+
+
+  const totalHoursWorked = project.reduce(
     (total, userProject) => {
       const utilization = parseFloat(userProject.utilization); // Convert utilization to a number
       return total + utilization;
     },
     0
   );
+ 
 
-  const totalIncome = project.invoices
-    ?.filter((invoice) => invoice.payment_status === "Paid")
-    .reduce((total, invoice) => {
-      const paidAmount = parseFloat(invoice.amount);
-      return total + paidAmount;
-    }, 0);
-
-  const totalExpense = project.project_costs
-    ?.filter((cost) => invoice.payment_status === "Paid")
-    .reduce((total, cost) => {
-      const paidAmount = parseFloat(invoice.amount);
-      return total + paidAmount;
-    }, 0);
-
-  const totalProfit = totalIncome - totalExpense;
   return (
-    <div className="w-full md:w-2/3 space-y-6">
+    <div className="w-full  space-y-6">
       <div className="w-full rounded-lg border p-6 space-y-4">
         <div className="flex flex-col items-start justify-between space-y-2">
           <div className="flex w-full gap-2 items-center">
             <h2 className="text-2xl font-bold text-foreground">
-              {project.name}
+              {project[0].project_name}
             </h2>
-            <ProjectHealth health={project.project_health} />
+            <ProjectHealth health={project[0].project_health} />
 
             {/* Add a check for project_status */}
             <Badge
               variant="subtle"
               className={`${
-                project.project_status === "Done"
+                project[0].project_status === "Done"
                   ? "bg-green-100 text-green-800"
                   : project.project_status === "Not Started"
                   ? "bg-red-100 text-red-800"
@@ -54,7 +49,7 @@ const ProjectDetailsMain = ({ project }) => {
             >
               <Dot className="mr-1 h-4 w-4" />
               {/* Ensure project.project_status exists and map to a status */}
-              {project.project_status === "Done"
+              {project[0].project_status === "Done"
                 ? "DONE"
                 : project.project_status === "Not Started"
                 ? "NOT STARTED"
@@ -72,20 +67,20 @@ const ProjectDetailsMain = ({ project }) => {
           <div className="text-left space-y-2">
             <div className="flex flex-row gap-2">
               <p className="text-lg text-foreground">
-                {project.project_category || "No Category"}
+                {project[0].project_category || "No Category"}
               </p>
               <p className="text-lg text-muted-foreground">
-                {project.platform || "No Platform"}
+                {project[0].platform || "No Platform"}
               </p>
             </div>
             <div className="flex items-center text-sm text-foreground gap-2">
               <CalendarDaysIcon />
               {project.start_date
-                ? format(new Date(project.start_date), "MMM dd, yyyy")
+                ? format(new Date(project[0].start_date), "MMM dd, yyyy")
                 : "N/A"}{" "}
               -{" "}
               {project.end_date
-                ? format(new Date(project.end_date), "MMM dd, yyyy")
+                ? format(new Date(project[0].end_date), "MMM dd, yyyy")
                 : "Present"}
             </div>
           </div>
@@ -95,7 +90,7 @@ const ProjectDetailsMain = ({ project }) => {
           <div>
             <p className="text-sm text-muted-foreground">Project Progress</p>
             <p className="text-3xl font-bold text-foreground">
-              {project.completion ? `${project.completion}%` : "N/A"}
+              {project[0].completion ? `${project[0].completion}%` : "N/A"}
             </p>
           </div>
           <Separator orientation="vertical" className="h-16" />
@@ -114,7 +109,7 @@ const ProjectDetailsMain = ({ project }) => {
           <div>
             <p className="text-sm text-muted-foreground">Team Involved</p>
             <p className="text-3xl font-bold text-foreground">
-              {project.all_user_projects.length || "N/A"}
+              {project.length || "N/A"}
             </p>
           </div>
         </div>

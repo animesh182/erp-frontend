@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
 import { getEmployeeProjects } from "@/app/api/employees/getEmployeeProjects";
 import { getEmployeeKpi } from "@/app/api/employees/getEmployeeKpi";
+import  { fetchTimeEntries } from "@/app/api/clockify/getUserTimeEntries";
 
 const dummyKPIInfo = [
   {
@@ -48,12 +49,132 @@ const dummyKPIInfo = [
 
 const tabs = ["Current Projects", "Previous Projects"];
 
+
+
+
+const formatClockifyDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const day = String(date.getDate()).padStart(2, '0');
+  const time = "T00:00:00Z";
+  // return `${year}-${month}-${day}${time}`;
+  return `2024-11-06T00:00:00Z`;
+};
+
+
+
+
+
+
+
+
+
+
+
+const formatDurationToHours = (duration) => {
+  // Handle duration format from Clockify (e.g., PT3H14M51S)
+  const regex = /PT(\d+H)?(\d+M)?(\d+S)?/;
+  const matches = regex.exec(duration);
+
+  let hours = 0;
+  let minutes = 0;
+
+  if (matches[1]) hours = parseInt(matches[1].replace('H', ''));
+  if (matches[2]) minutes = parseInt(matches[2].replace('M', ''));
+
+  return hours + minutes / 60;
+};
+
+const processTimeEntries = (timeEntries) => {
+
+
+  if (!timeEntries || timeEntries.length === 0) {
+    return []; // Return an empty array if no time entries are available
+  }
+return timeEntries.map((entry) => {
+    const { description, timeInterval } = entry;
+
+    let durationInHours = 0;
+    if (timeInterval && timeInterval.duration) {
+      durationInHours = formatDurationToHours(timeInterval.duration);
+    }
+
+    return {
+      description,
+      duration: durationInHours,
+    };
+  });
+};
+
+const DoughnutChartData = (timeEntries) => {
+  if (!timeEntries || timeEntries.length === 0) {
+    return [
+      { name: 'Project A', value: 30, color: '#6875F5' },
+      { name: 'Project B', value: 50, color: '#34D399' },
+      { name: 'Project C', value: 20, color: '#FBBF24' },
+    ];
+  }
+  const totalWorkedHours = timeEntries.reduce((acc, entry) => acc + entry.duration, 0);
+  
+  return timeEntries.map((entry, index) => {
+    const percentage = (entry.duration / totalWorkedHours) * 100;
+    return {
+      name: entry.description, // or use project name
+      value: percentage,
+      color: ["#6875F5", "#34D399", "#FBBF24", "#EF4444"][index % 4], // Example color cycling
+    };
+  });
+};
+
+
+
+
 const UsersHome = () => {
   const [employeeProjects, setEmployeeProjects] = useState([]);
   const [kpiInfo, setKpiInfo] = useState([]);
   const searchParams = useSearchParams(); 
   const userId = searchParams.get('userId');  
   const [selectedTab, setSelectedTab] = useState("Current Projects");
+  const [timeEntries, setTimeEntries] = useState(null);
+  const [userData, setUserData] = useState({ email: '', name: '' });
+    // const userData = { email: "sankalpa351@gmail.com", name: "Sankalpa Joshi" };
+
+    const date=new Date()
+    const clockifyDate = formatClockifyDate(date);
+    // const fetchTimeEntries = async () => {
+    //   try {
+    //     const userId = await findUserByEmailOrName(userData); // userData contains email and name
+  
+    //     if (userId) {
+    //       const timeEntriesResponse = await fetch(
+    //         `https://api.clockify.me/api/v1/workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_ID}/user/${userId}/time-entries`,
+    //         {
+    //           method: 'GET',
+    //           headers: {
+    //             'X-Api-Key': process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY,
+    //             'Content-Type': 'application/json',
+    //           },
+    //         }
+    //       );
+  
+    //       if (!timeEntriesResponse.ok) {
+    //         throw new Error(`Failed to fetch time entries with status: ${timeEntriesResponse.status}`);
+    //       }
+  
+    //       const clockifyData = await timeEntriesResponse.json();
+    //       console.log("Clockify Time Entries:", clockifyData);
+    //     } else {
+    //       console.log("User not found by email or name");
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching Clockify data:", error);
+    //   }
+    // };
+
+
+
+
+
 
   useEffect(() => {
     const getEmployeeDetails = async () => {
@@ -61,6 +182,10 @@ const UsersHome = () => {
         const { data, status } = await getEmployeeProjects(userId);
         if (status === 200) {
           setEmployeeProjects(data);
+          setUserData({
+            email: data[0].user_email,
+            name: data[0].user_name,
+          });
         } else {
           console.error("Failed to fetch employee data");
         }
@@ -82,10 +207,54 @@ const UsersHome = () => {
       } 
     };
 
+
+
+  //   const fetchUserTimeEntries = async () => {
+    
+  //     try {
+
+  //       const data = await fetchTimeEntries(userData,clockifyDate);
+  //       if (data) {
+  //         setTimeEntries(data);
+  //       } else {
+  //         console.log("No time entries found");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error in useEffect:", error);
+  //     }
+  //   };
+  //   if (userData.email && userData.name) {
+  //     fetchUserTimeEntries();
+  // }
     getEmployeeDetails();
     getEmployeeKpiData()
   }, [userId]);
 
+
+
+
+  useEffect(() => {
+    const fetchUserTimeEntries = async () => {
+      try {
+        const data = await fetchTimeEntries(userData, clockifyDate);
+        if (data) {
+          setTimeEntries(data);
+        } else {
+          console.log("No time entries found");
+        }
+      } catch (error) {
+        console.error("Error fetching time entries:", error);
+      }
+    };
+  
+    if (userData.email && userData.name) {
+      fetchUserTimeEntries();
+    }
+  }, [userData, clockifyDate]);
+
+  console.log(userData,"userData")
+  console.log(timeEntries,"time")
+  
   const filteredProjects = Array.isArray(employeeProjects) 
   ? employeeProjects.filter((project) => {
 
@@ -158,6 +327,9 @@ const UsersHome = () => {
   ]
 
 
+
+  const clockifyData = processTimeEntries(timeEntries);
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex flex-row space-x-4">
@@ -174,11 +346,21 @@ const UsersHome = () => {
       </div>
       <div className="w-full grid grid-cols-1 lg:grid-cols-6 gap-8 py-4 px-0 max-h-[320px]">
         <div className="col-span-2 justify-center w-full">
-          <DoughnutChart chartData={filteredProjects.map((project, index) => ({
+
+          {clockifyData && clockifyData.length > 0 ?( <DoughnutChart chartData={DoughnutChartData(clockifyData)} />):( <DoughnutChart chartData={filteredProjects.map((project, index) => ({
             name: project.project_name,
             value: (project.utilization / 8) * 100,
             color: ["#6875F5", "#34D399", "#FBBF24", "#EF4444"][index % 4] // Example colors
           }))} />
+)}
+          {/* <DoughnutChart chartData={filteredProjects.map((project, index) => ({
+            name: project.project_name,
+            value: (project.utilization / 8) * 100,
+            color: ["#6875F5", "#34D399", "#FBBF24", "#EF4444"][index % 4] // Example colors
+          }))} />
+
+
+          <DoughnutChart chartData={DoughnutChartData(clockifyData)} /> */}
         </div>
         <div className="grid col-span-4 h-full">
           <div className="flex space-x-4 mb-4">
