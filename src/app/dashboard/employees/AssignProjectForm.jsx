@@ -23,7 +23,7 @@ const formSchema = z.object({
   role: z.string().min(1, "Role is required"),
   timeAllocatedPerDay: z.coerce.number().int().min(1).max(12).positive(),
   startDate: z.string(),
-  endDate: z.string().optional(),
+  endDate: z.string().nullable().optional(),
 });
 
 const AssignProjectForm = ({
@@ -51,6 +51,7 @@ const AssignProjectForm = ({
         timeAllocatedPerDay: defaultValues.timeAllocatedPerDay,
         startDate: defaultValues.startDate,
         endDate: defaultValues.endDate,
+        userProjectId: defaultValues.userProjectId,
       });
     } else {
       reset({
@@ -65,7 +66,7 @@ const AssignProjectForm = ({
 
   const onSubmit = (data) => {
     if (defaultValues) {
-      onEditProject(data);
+      onEditProject(defaultValues.userProjectId, data);
     } else {
       onAssignProject(data);
     }
