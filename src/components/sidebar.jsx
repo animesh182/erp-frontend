@@ -1,3 +1,4 @@
+"use client";
 import {
   Home,
   LineChart,
@@ -9,6 +10,8 @@ import {
   TrendingDown,
   DollarSign,
   ChevronRight, // Import ChevronRight
+  CircleUser,
+  ChevronUp,
 } from "lucide-react";
 import {
   Sidebar,
@@ -19,7 +22,16 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Collapsible,
   CollapsibleTrigger,
@@ -27,7 +39,9 @@ import {
 } from "@/components/ui/collapsible";
 import { CompanyIcon } from "./companyicon";
 import Link from "next/link";
-
+import { useLogout } from "@/app/api/auth/logout";
+import { Button } from "./ui/button";
+import { useTheme } from "next-themes";
 // Menu items
 export const navItems = [
   {
@@ -80,21 +94,33 @@ export const navItems = [
 ];
 
 export default function AppSidebar() {
+  const logout = useLogout();
+  const theme = useTheme();
+  console.log(theme);
+  const handleLogout = () => {
+    logout();
+  };
   return (
-    <Sidebar>
-      <SidebarContent>
+    <Sidebar collapsible="icon">
+      <SidebarContent className="dark:bg-[#0E1525]">
         <SidebarGroup>
-          <SidebarGroupLabel className="mb-4">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-2 font-semibold"
-            >
-              <CompanyIcon size={24} color="#1169C4" />
-              <span className="text-xl">Avinto AS</span>
-            </Link>
-          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem className="mb-5 mt-2 ">
+                <SidebarMenuButton asChild className="hover:bg-transparent">
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center gap-2 font-semibold"
+                  >
+                    <CompanyIcon
+                      // size={30}
+                      // color="#1169C4"
+                      className="min-h-5 min-w-5"
+                    />
+                    <span className="text-xl">Avinto AS</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               {navItems.map((item) => (
                 <Collapsible
                   key={item.label}
@@ -142,6 +168,36 @@ export default function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="dark:bg-[#0E1525]">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton className="">
+                  <CircleUser className="h-5 w-5" />
+                  <span className="sr-only">Toggle user menu</span>
+                  Rahul Kayastha
+                  <ChevronUp className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                className="w-[--radix-popper-anchor-width]"
+              >
+                <DropdownMenuItem>
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <span>Support</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

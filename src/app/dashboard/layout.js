@@ -7,10 +7,7 @@ export default function DashboardLayout({ children }) {
     <SidebarProvider>
       <AppSidebar />
       <main className="w-full">
-        <div className="flex items-center justify-between border-b bg-muted/40 ">
-          <SidebarTrigger className="ml-5" />
-          <Header />
-        </div>
+        <Header />
 
         {children}
       </main>
