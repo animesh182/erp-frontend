@@ -53,10 +53,10 @@ const tabs = ["Current Projects", "Previous Projects"];
 
 
 const formatClockifyDate = (date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-  const day = String(date.getDate()).padStart(2, '0');
-  const time = "T00:00:00Z";
+  // const year = date.getFullYear();
+  // const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  // const day = String(date.getDate()).padStart(2, '0');
+  // const time = "T00:00:00Z";
   // return `${year}-${month}-${day}${time}`;
   return `2024-11-06T00:00:00Z`;
 };
@@ -89,7 +89,7 @@ const processTimeEntries = (timeEntries) => {
 
 
   if (!timeEntries || timeEntries.length === 0) {
-    return []; // Return an empty array if no time entries are available
+    return []; 
   }
 return timeEntries.map((entry) => {
     const { description, timeInterval } = entry;
@@ -137,41 +137,11 @@ const UsersHome = () => {
   const [selectedTab, setSelectedTab] = useState("Current Projects");
   const [timeEntries, setTimeEntries] = useState(null);
   const [userData, setUserData] = useState({ email: '', name: '' });
-    // const userData = { email: "sankalpa351@gmail.com", name: "Sankalpa Joshi" };
+    // const userData = { email: "sankalpa351asdasdasda@gmail.com", name: "Sankalpa Joshi" };
 
     const date=new Date()
     const clockifyDate = formatClockifyDate(date);
-    // const fetchTimeEntries = async () => {
-    //   try {
-    //     const userId = await findUserByEmailOrName(userData); // userData contains email and name
-  
-    //     if (userId) {
-    //       const timeEntriesResponse = await fetch(
-    //         `https://api.clockify.me/api/v1/workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_ID}/user/${userId}/time-entries`,
-    //         {
-    //           method: 'GET',
-    //           headers: {
-    //             'X-Api-Key': process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY,
-    //             'Content-Type': 'application/json',
-    //           },
-    //         }
-    //       );
-  
-    //       if (!timeEntriesResponse.ok) {
-    //         throw new Error(`Failed to fetch time entries with status: ${timeEntriesResponse.status}`);
-    //       }
-  
-    //       const clockifyData = await timeEntriesResponse.json();
-    //       console.log("Clockify Time Entries:", clockifyData);
-    //     } else {
-    //       console.log("User not found by email or name");
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching Clockify data:", error);
-    //   }
-    // };
-
-
+ 
 
 
 
@@ -353,14 +323,7 @@ const UsersHome = () => {
             color: ["#6875F5", "#34D399", "#FBBF24", "#EF4444"][index % 4] // Example colors
           }))} />
 )}
-          {/* <DoughnutChart chartData={filteredProjects.map((project, index) => ({
-            name: project.project_name,
-            value: (project.utilization / 8) * 100,
-            color: ["#6875F5", "#34D399", "#FBBF24", "#EF4444"][index % 4] // Example colors
-          }))} />
-
-
-          <DoughnutChart chartData={DoughnutChartData(clockifyData)} /> */}
+         
         </div>
         <div className="grid col-span-4 h-full">
           <div className="flex space-x-4 mb-4">

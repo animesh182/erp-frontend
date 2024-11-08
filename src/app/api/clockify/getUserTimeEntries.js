@@ -1,39 +1,8 @@
-// export default async function getUserTimeEntries() {
-//     try {
-//       const response = await fetch(
-//         `https://api.clockify.me/api/v1/workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_ID}/user/66b44dd4e8576917c883711b/time-entries`,
-//         {
-//           method: 'GET',
-//           headers: {
-//             'X-Api-Key': process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY,
-//             'Content-Type': 'application/json',
-//           },
-//         }
-//       );
 
-import { toast } from "sonner";
-
-  
-//       // Check if the response is successful
-//       if (!response.ok) {
-//         console.error(`Error: ${response.status} ${response.statusText}`);
-//         throw new Error("Failed to fetch time entries");
-//       }
-  
-//       // Parse the response as JSON
-//       const data = await response.json();
-//       return data; // Return the JSON data
-//     } catch (error) {
-//       console.error("Error fetching time entries:", error);
-//       throw new Error("Failed to fetch time entries");
-//     }
-//   }
-  
-
-
-
-
-
+    
+    
+    
+    import { toast } from "sonner";
 export async function findUserByEmailOrName(userData) {
     try {
       const response = await fetch(

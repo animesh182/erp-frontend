@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import TableTitle from "@/components/TableTitle";
 import SimpleDataTable from "@/components/ui/simple-data-table";
 
-import {  getUserProjectById } from "@/app/api/getProjects";
+import {  getProjectById } from "@/app/api/getProjects";
 import ProjectDetailsMain from "./ProjectDetailsMain";
 import ProjectDetailsSidebar from "@/app/dashboard/projects/[id]/ProjectDetailsSidebar";
 import { columns } from "./Columns";
@@ -31,10 +31,11 @@ function EmployeeProjectDetails() {
     if (id) {
       const fetchProjectDetails = async () => {
         try {
-          const { status, data } = await getUserProjectById(id); 
+          const { status, data } = await getProjectById(id); 
 
           if (status === 200 && data) {
-            setProject(data.data); 
+            console.log(data,"data")
+            setProject(data); 
           } else {
             setError(`Error: ${data.message}`);
           }
@@ -78,7 +79,7 @@ function EmployeeProjectDetails() {
       
         <SimpleDataTable
           columns={columns}
-          data={project}
+          data={project.all_user_projects}
         />
       </div>
     </main>

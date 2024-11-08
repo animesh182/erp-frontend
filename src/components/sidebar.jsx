@@ -17,6 +17,7 @@ import {
   DollarSign,
   Clock,
   UserCheck,
+  PieChart
 } from "lucide-react";
 import {
   Card,
@@ -85,6 +86,11 @@ export const navItems = [
         label: "Leave Request",
         href: "/dashboard/employees/leave-request",
         icon: <Clock className="h-4 w-4" />,
+      },
+      {
+        label: "Clockify Stats",
+        href: "/dashboard/employees/clockify-stats",
+        icon: <PieChart className="h-4 w-4" />,
       },
     ],
   },
