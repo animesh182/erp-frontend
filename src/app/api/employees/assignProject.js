@@ -16,7 +16,7 @@ export async function assignProject(employeeId, projectData) {
   try {
     // console.log(transformedData, "transformedData");
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/user_projects/${employeeId}/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/user_projects/?user_id=${employeeId}`,
       {
         method: "POST",
         body: JSON.stringify(transformedData),

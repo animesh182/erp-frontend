@@ -3,7 +3,7 @@ import { deleteApiClient } from "@/lib/utils";
 export async function deleteEmployeeById(userId) {
   try {
     const result = await deleteApiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/users/${userId}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/user/${userId}`,
       {
         method: "DELETE",
       }

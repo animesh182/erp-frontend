@@ -1,8 +1,7 @@
 import { apiClient } from "@/lib/utils";
 
-export async function assignProject(employeeId, projectData) {
-  //   console.log(projectData, "projectData");
-
+export async function editAssignedProject(userProjectId, projectData) {
+  console.log(userProjectId, "userProjectId");
   // Transform the projectData structure if needed
   const transformedData = {
     project_id: projectData.projectName,
@@ -14,9 +13,8 @@ export async function assignProject(employeeId, projectData) {
   };
 
   try {
-    // console.log(transformedData, "transformedData");
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/user_projects/${employeeId}/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/user_projects/patch/?id=${userProjectId}`,
       {
         method: "PATCH",
         body: JSON.stringify(transformedData),

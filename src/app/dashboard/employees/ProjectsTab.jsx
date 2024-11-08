@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import React, { useState, useEffect } from "react";
-import { MinusCircle, PlusCircle } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import AssignProjectForm from "./AssignProjectForm";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
@@ -9,7 +9,9 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { assignProject } from "@/app/api/employees/assignProject";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { format } from "date-fns";
+import { deleteAssignedProject } from "@/app/api/employees/deleteAssignedProject";
+import { editAssignedProject } from "@/app/api/employees/editAssignedProject";
+import DeleteDialog from "@/components/DeleteDialog";
 
 const ProjectsTab = ({
   employeeId,
@@ -22,6 +24,8 @@ const ProjectsTab = ({
   );
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
 
   useEffect(() => {
     setLocalEmployeeProjects(employeeProjects || []);
@@ -59,10 +63,51 @@ const ProjectsTab = ({
     }
   };
 
-  const onEditProject = async (values) => {
+  const onEditProject = async (userProjectId, values) => {
     try {
-      console.log(values, "values");
-    } catch (error) {}
+      const response = await editAssignedProject(userProjectId, values);
+      toast.success("Project edited successfully");
+      setIsSheetOpen(false);
+
+      // Update local state with edited project data
+      setLocalEmployeeProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.user_project_id === userProjectId
+            ? {
+                ...project,
+                project_name: values.projectName,
+                project_role: values.role,
+                utilization: values.timeAllocatedPerDay,
+                start_date: values.startDate,
+                end_date: values.endDate,
+              }
+            : project
+        )
+      );
+    } catch (error) {
+      toast.error(error.message || "Failed to edit project");
+    }
+  };
+
+  const handleDeleteClick = (project) => {
+    setProjectToDelete(project);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const onDeleteProject = async (userProjectId) => {
+    try {
+      const response = await deleteAssignedProject(userProjectId);
+      toast.success("Project deleted successfully");
+      setIsDeleteDialogOpen(false);
+      // Update local state to remove the deleted project
+      setLocalEmployeeProjects((prevProjects) =>
+        prevProjects.filter(
+          (project) => project.user_project_id !== userProjectId
+        )
+      );
+    } catch (error) {
+      toast.error(error.message || "Failed to delete project");
+    }
   };
 
   if (!localEmployeeProjects) {
@@ -78,6 +123,12 @@ const ProjectsTab = ({
 
   return (
     <div>
+      <DeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        itemName={projectToDelete?.project_name || ""}
+        onDelete={() => onDeleteProject(projectToDelete?.user_project_id)}
+      />
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent>
           <CustomSheetTitle
@@ -98,6 +149,7 @@ const ProjectsTab = ({
                     timeAllocatedPerDay: selectedProject.utilization,
                     startDate: selectedProject.start_date,
                     endDate: selectedProject.end_date,
+                    userProjectId: selectedProject.user_project_id,
                   }
                 : undefined
             }
@@ -143,6 +195,7 @@ const ProjectsTab = ({
                     timeInvolved={empProject.utilization}
                     totalDaysInvolved={empProject.days_involved}
                     onEdit={() => openSheet(empProject)}
+                    onDelete={() => handleDeleteClick(empProject)}
                   />
                 </div>
               ))}
