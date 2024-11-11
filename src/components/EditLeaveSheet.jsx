@@ -74,7 +74,7 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit,data }) {
             {leaveReason === "Other" ? (others || "Specify your leave reason") : leaveReason}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-4 w-full space-y-2 max-h-32 overflow-y-auto">
+        <PopoverContent className="p-4 w-full space-y-2 max-h-52 overflow-y-auto">
           {data.map((item) => (
             <div
               key={item.id}
