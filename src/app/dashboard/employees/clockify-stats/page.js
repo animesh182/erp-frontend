@@ -163,7 +163,6 @@ function ClockifyStats() {
     const [projects, setProjects] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const itemsPerPage = 5;
-    const[employees,setEmployees]=useState(null)
     const[employeeNames,setEmployeeNames]=useState(null)
     const [selectedEmployee, setSelectedEmployee] = useState("");
     const [timeEntries, setTimeEntries] = useState(null);

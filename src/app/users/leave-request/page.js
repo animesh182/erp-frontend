@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { deleteLeaveRequestById } from "@/app/api/employees/deleteLeaveRequest";
 import { updateLeaveRequestStatus } from "@/app/api/employees/approveLeaveRequest";
+import { getTypeOfLeave } from "@/app/api/getTypeOfLeave";
 
 const LeaveRequest = () => {
   const [data, setData] = useState([
@@ -28,6 +29,7 @@ const LeaveRequest = () => {
   ]);
 
   const [employeeLeaveRequest, setEmployeeLeaveRequest] = useState([]);
+  const[typeOfLeave,setTypeOfLeave]=useState([])
   const searchParams = useSearchParams();
 
   const userId = searchParams.get("userId");
@@ -67,11 +69,28 @@ const LeaveRequest = () => {
         console.error("Error fetching employee details:", error);
       }
     };
+    
+      const getLeaveTypes = async () => {
+        try {
+          const data = await getTypeOfLeave();
+  
+          if (data) {
+            setTypeOfLeave(data);
+          } else {
+            console.error("Failed to fetch leave data");
+          }
+        } catch (error) {
+          console.error("Error fetching leave types:", error);
+        }
+      };
+  
+      
+      
+      getLeaveRecords();
+      getLeaveTypes();
+    }, [refreshKey]);
 
-    getLeaveRecords();
-  }, [refreshKey]);
-
-
+ 
 
   const transformedData = employeeLeaveRequest.map((leaveRequest) => {
     const startDate = new Date(leaveRequest.start_date);
@@ -83,13 +102,7 @@ const LeaveRequest = () => {
     return {
       id: leaveRequest.id,
       leaveReason:
-        leaveRequest.type_of_leave === 1
-          ? "Sick leave (Illness or Injury)"
-          : leaveRequest.type_of_leave === 2
-          ? "Bereavement leave"
-          : leaveRequest.type_of_leave === 3
-          ? "Vacation leave"
-          : "Leave without pay",
+        leaveRequest.type_of_leave,
 
       typeOfLeave: leaveRequest.type_of_day,
       startedLeaveDate: leaveRequest.start_date,
@@ -129,6 +142,10 @@ const LeaveRequest = () => {
   //   }
   // };
 
+
+
+
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex justify-end gap-2">
@@ -164,6 +181,7 @@ const LeaveRequest = () => {
         isOpen={isSheetOpen}
         onClose={() => setSheetOpen(false)}
         onSubmit={handleAddLeaveRequest}
+        data={typeOfLeave.data}
       />
     </main>
   );
