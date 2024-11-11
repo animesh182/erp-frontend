@@ -9,8 +9,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/textarea";
 import { format, differenceInCalendarDays } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
-export function RequestForLeaveSheet({ isOpen, onClose, onSubmit }) {
+export function RequestForLeaveSheet({ isOpen, onClose, onSubmit,data }) {
   const { control, handleSubmit, reset, watch, setValue } = useForm({
     defaultValues: {
       leaveReason: "Sick leave (Illness or Injury)",
@@ -40,9 +41,11 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit }) {
     const newLeaveRequest = { ...data, status: "Pending" };
     onSubmit(newLeaveRequest);
     reset(); // Reset the form after submission
+    setOthers();
     onClose(); // Close the sheet
+  
   };
-
+ 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="">
@@ -56,84 +59,61 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit }) {
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6 mt-6">
           {/* Type of Leave */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Type of Leave</label>
-            <Controller
-              name="leaveReason"
-              control={control}
-              render={({ field }) => (
-                <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start" onClick={() => setIsPopoverOpen(!isPopoverOpen)}>
-                      {leaveReason === "Other" ? (others || "Specify your leave reason") : leaveReason}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="p-4 w-full space-y-2">
-                    <div
-                      onClick={() => {
-                        setLeaveReason("Sick leave (Illness or Injury)");
-                        field.onChange("Sick leave (Illness or Injury)");
-                        setIsPopoverOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Sick leave (Illness or Injury)
-                    </div>
-                    <div
-                      onClick={() => {
-                        setLeaveReason("Bereavement leave");
-                        field.onChange("Bereavement leave");
-                        setIsPopoverOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Bereavement leave
-                    </div>
-                    <div
-                      onClick={() => {
-                        setLeaveReason("Vacation leave");
-                        field.onChange("Vacation leave");
-                        setIsPopoverOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Vacation leave
-                    </div>
-                    <div
-                      onClick={() => {
-                        setLeaveReason("Leave without pay");
-                        field.onChange("Leave without pay");
-                        setIsPopoverOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Leave without pay
-                    </div>
-                    <div
-                      onClick={() => {
-                        setLeaveReason("Other");
-                        field.onChange("Other");
-                        setIsPopoverOpen(true); // Keep Popover open for input
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Other
-                    </div>
-                    {leaveReason === "Other" && (
-                      <Input
-                        placeholder="Specify your leave reason"
-                        value={others}
-                        onChange={(e) => {
-                          setOthers(e.target.value);
-                          field.onChange(e.target.value);
-                        }}
-                        className="mt-2"
-                      />
-                    )}
-                  </PopoverContent>
-                </Popover>
-              )}
-            />
+  <label className="text-sm font-medium">Type of Leave</label>
+  <Controller
+    name="leaveReason"
+    control={control}
+    render={({ field }) => (
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+          >
+            {leaveReason === "Other" ? (others || "Specify your leave reason") : leaveReason}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="p-4 w-full space-y-2 max-h-32 overflow-y-auto">
+          {data.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => {
+                setLeaveReason(item.name);
+                field.onChange(item.name);
+                setIsPopoverOpen(false);
+              }}
+              className="cursor-pointer"
+            >
+              {item.name}
+            </div>
+          ))}
+          <div
+            onClick={() => {
+              setLeaveReason("Other");
+              field.onChange("Other");
+              setIsPopoverOpen(true); // Keep Popover open for input
+            }}
+            className="cursor-pointer"
+          >
+            Other
           </div>
+          {leaveReason === "Other" && (
+            <Input
+              placeholder="Specify your leave reason"
+              value={others}
+              onChange={(e) => {
+                setOthers(e.target.value);
+                field.onChange(e.target.value);
+              }}
+              className="mt-2"
+            />
+          )}
+        </PopoverContent>
+      </Popover>
+    )}
+  />
+</div>
 
           {/* Date Range (From - To) */}
           <div className="grid grid-cols-2 gap-4 z-0">

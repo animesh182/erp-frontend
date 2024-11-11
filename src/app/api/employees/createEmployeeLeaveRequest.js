@@ -7,7 +7,8 @@ export async function createEmployeeLeaveRequest(leaveData) {
       {
         method: "POST",
         body: JSON.stringify({
-          type_of_leave: getTypeOfLeave(leaveData.leaveReason), 
+          // type_of_leave: getTypeOfLeave(leaveData.leaveReason), 
+          type_of_leave: leaveData.leaveReason, 
           start_date: leaveData.startedLeaveDate 
           ? new Date(leaveData.startedLeaveDate).toISOString().split('T')[0] 
           : null,
