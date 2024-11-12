@@ -36,6 +36,11 @@ export const navItems = [
     icon: <Home className="h-4 w-4" />,
   },
   {
+    label: "Clockify",
+    href: "/dashboard/clockify",
+    icon: <PieChart className="h-4 w-4" />,
+  },
+  {
     label: "Finances",
     href: "/dashboard/finances",
     icon: <ShoppingCart className="h-4 w-4" />,
@@ -87,11 +92,7 @@ export const navItems = [
         href: "/dashboard/employees/leave-request",
         icon: <Clock className="h-4 w-4" />,
       },
-      {
-        label: "Clockify Stats",
-        href: "/dashboard/employees/clockify-stats",
-        icon: <PieChart className="h-4 w-4" />,
-      },
+      
     ],
   },
 ];
