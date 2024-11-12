@@ -74,7 +74,7 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit,data }) {
             {leaveReason === "Other" ? (others || "Specify your leave reason") : leaveReason}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="p-4 w-full space-y-2 max-h-32 overflow-y-auto">
+        <PopoverContent className="p-4 w-full space-y-2 max-h-52 overflow-y-auto">
           {data.map((item) => (
             <div
               key={item.id}
@@ -167,16 +167,24 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit,data }) {
               name="typeOfLeave"
               control={control}
               render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Full Day">Full Day</SelectItem>
-                    <SelectItem value="AM">AM</SelectItem>
-                    <SelectItem value="PM">PM</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      {field.value || "Select Type"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full justify-start">
+                    <div onClick={() => field.onChange("Full Day")} className="cursor-pointer p-2">
+                      Full Day
+                    </div>
+                    <div onClick={() => field.onChange("AM")} className="cursor-pointer p-2">
+                      AM
+                    </div>
+                    <div onClick={() => field.onChange("PM")} className="cursor-pointer p-2">
+                      PM
+                    </div>
+                  </PopoverContent>
+                </Popover>
               )}
             />
           </div>
