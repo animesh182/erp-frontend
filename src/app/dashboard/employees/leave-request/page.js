@@ -66,13 +66,7 @@ const LeaveRequest = () => {
       id: leaveRequest.id,
       employeeName:leaveRequest.username,
       leaveReason:
-        leaveRequest.type_of_leave === 1
-          ? "Sick leave (Illness or Injury)"
-          : leaveRequest.type_of_leave === 2
-          ? "Bereavement leave"
-          : leaveRequest.type_of_leave === 3
-          ? "Vacation leave"
-          : "Leave without pay",
+        leaveRequest.type_of_leave ,
 
       typeOfLeave: leaveRequest.type_of_day,
       startedLeaveDate: leaveRequest.start_date,

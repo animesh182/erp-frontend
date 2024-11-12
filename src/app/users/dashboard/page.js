@@ -57,8 +57,8 @@ const formatClockifyDate = (date) => {
   const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
   const day = String(date.getDate()).padStart(2, '0');
   const time = "T00:00:00Z";
-  return `${year}-${month}-${day}${time}`;
-  // return `2024-11-06T00:00:00Z`;
+  // return `${year}-${month}-${day}${time}`;
+  return `2024-11-06T00:00:00Z`;
 };
 
 
