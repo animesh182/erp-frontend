@@ -63,8 +63,8 @@ function PieChartwithBarChart() {
                 data={pieChartData}
                 dataKey="visitors"
                 nameKey="browser"
-                innerRadius={70} // Increase innerRadius
-                outerRadius={170} // Increase outerRadius
+                innerRadius={55} // Increase innerRadius
+                outerRadius={140} // Increase outerRadius
               />
             </PieChart>
           </ChartContainer>
