@@ -1,7 +1,7 @@
 "use client";
 
 import { TrendingUp } from "lucide-react";
-import { Pie, PieChart, Bar, BarChart, XAxis, YAxis, Cell } from "recharts";
+import { Pie, PieChart, Bar, BarChart, XAxis, YAxis, Cell, Tooltip, LabelList } from "recharts";
 
 import {
   Card,
@@ -34,8 +34,8 @@ const barChartData = [
 ];
 
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
+  value: {
+    label: "Value",
   },
   desktop: {
     label: "Desktop",
@@ -43,80 +43,172 @@ const chartConfig = {
   },
 };
 
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    const { name, value: durationInSeconds, color } = data;
+
+    return (
+      <div 
+        className="custom-tooltip flex gap-4" 
+        style={{
+          backgroundColor: '#fff', 
+          padding: '5px', 
+          border: `1px solid ${color}`, 
+          borderRadius: '4px'
+        }}
+      >
+        <p style={{ color }}>{name}</p>
+        <p>{`${formatDuration(durationInSeconds)}`}</p>
+      </div>
+    );
+  }
+
+  return null;
+};
+export const formatDuration = (totalSeconds) => {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
 function PieChartwithBarChart({chartData}) {
 
+
+  const formattedChartData = chartData.map((entry) => ({
+    ...entry,
+    value: formatDuration(entry.value), // Apply formatDuration here
+  }));
+
+
+const total = chartData.reduce((acc, data) => {
+  return acc + data.value;  // Accumulate the durations
+}, 0);
+  const chartDataWithPercentage = chartData.map(entry => ({
+    ...entry,
+    percentage: (entry.value / total) * 100, // Calculate percentage
+    remaining: 100 - (entry.value / total) * 100 ,// Remaining percentage for black color
+  combinedLabel: `${entry.name}    \u00A0\u00A0\u00A0\u00A0 ${formatDuration(entry.value)}`
+  }));
+
+  
   return (
-    <Card className="flex justify-between items-center gap-6 px-6">
+    // <Card className="flex justify-between items-center gap-6 pr-6 w-full h-full">
+    <Card className="grid grid-cols-8 justify-between items-center gap-6 pr-6 w-fit h-fit">
       {/* Pie Chart Section */}
-      <div className="flex-1 ">
-        {/* <CardHeader className=" pb-0" /> */}
-        <CardContent className=" pb-0">
-          <ChartContainer
-            config={chartConfig}
-            // className="mx-auto" // Remove height restrictions
+      {/* <div className="col-span-3 h-[400px] w-full">
+   
+  <CardContent className="p-0 h-full w-full">
+    <ChartContainer
+      config={chartConfig}
+      className="" 
+    >
+      
+      <PieChart className="border-2" >
+        <ChartTooltip
+          cursor={false}
+          content={<ChartTooltipContent hideLabel />}
+        />
+        <Pie
+          data={chartData}
+          dataKey="value"
+          nameKey="name"
+          innerRadius={55}
+          outerRadius={150}
+        >
+          {chartData.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={entry.color} />
+          ))}
+        </Pie>
+      </PieChart>
+      
+    </ChartContainer>
+  </CardContent>
+</div> */}
+<div className="col-span-3 flex justify-center items-center h-[400px]"> 
+  <CardContent className="p-0 w-full h-full"> 
+    <ChartContainer
+      config={chartConfig}
+      className="w-full h-full flex justify-center items-center"  
+    >
+      <div className="relative w-[400px] h-[400px] ml-10">
+        <PieChart width={400} height={400} className="w-full h-full"> 
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent hideLabel />}
+          />
+          <Pie
+            data={chartData}
+            dataKey="value"
+            nameKey="name"
+            innerRadius={65}
+            outerRadius={170}
           >
-            <PieChart width={400} height={400}> {/* Adjust width and height */}
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-              />
-              <Pie
-                data={chartData}
-                dataKey="value"
-                nameKey="name"
-                innerRadius={80} // Increase innerRadius
-                outerRadius={200} // Increase outerRadius
-                // fill="color"
-              >
-                 {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-              </Pie>
-                {/* <Pie
-              data={chartData}
-              dataKey="value"
-              nameKey="name"
-              // cx="50%"
-              // cy="50%"
-              innerRadius={40}
-              outerRadius={80}
-              // labelLine={true}
-              // // label={renderCustomizedLabel}
-            /> */}
-            </PieChart>
-          </ChartContainer>
-        </CardContent>
-        {/* <CardFooter className="flex-col gap-2 text-sm" /> */}
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+        </PieChart>
       </div>
+    </ChartContainer>
+  </CardContent>
+</div>
+
 
       {/* Bar Chart Section */}
-      <div className="flex-1">
-        {/* <CardHeader /> */}
-        <CardContent className="p-2">
-          <ChartContainer config={chartConfig}>
-            <BarChart
-              accessibilityLayer
-              data={barChartData}
-              layout="vertical"
-              margin={{
-                left: -20,
-              }}
-            >
-              <XAxis type="number" dataKey="desktop" hide />
-              <YAxis
-                dataKey="month"
-                type="category"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                tickFormatter={(value) => value.slice(0, 3)}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-              />
-              <Bar dataKey="desktop" fill="var(--color-desktop)" radius={5} />
-            </BarChart>
+      {/* <div className="flex-1 "> */}
+      <div className="col-span-5   ">
+     
+        <CardContent className="">
+          <ChartContainer config={chartConfig} className="py-3">
+
+  <BarChart
+      layout="vertical"
+      width={400}
+      height={400}  // Adjust height based on number of items
+      data={chartDataWithPercentage}
+      margin={{ top: 0, right: 50, bottom: 0, left:0 }}
+            className=""
+    >
+      <XAxis type="number" domain={[0, 100]} hide />
+      <YAxis
+        dataKey="combinedLabel"
+        type="category"
+        tickLine={false}
+        axisLine={false}
+        className="font-medium text-xs"
+        width={300}
+      />
+      <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+      <Bar dataKey="percentage" stackId="a" radius={[5, 0, 0, 5]}>
+        {chartDataWithPercentage.map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={entry.color} />
+        ))}
+      </Bar>
+
+      {/* Remaining Percentage Bar with lower opacity */}
+      <Bar dataKey="remaining" stackId="a" radius={[0, 5, 5, 0]}>
+        {chartDataWithPercentage.map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={entry.color} opacity={0.25} />
+        ))}
+      </Bar>
+
+      {/* Display Total Time and Percentage Text */}
+      {chartDataWithPercentage.map((entry, index) => (
+        <text
+          key={`text-${index}`}
+          x={ 630}  // Adjusts position based on percentage
+          y={index * 43.5 + 9}  
+          dy={20}   
+          fontSize={12}
+          fill="#333"
+          textAnchor="start"
+        >
+          {`${entry.percentage.toFixed(1)}%`}
+        </text>
+      ))}
+    </BarChart>
+            
           </ChartContainer>
         </CardContent>
       </div>
