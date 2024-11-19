@@ -245,3 +245,34 @@ export async function changeApprovalStatus(url, status, options = {}) {
     );
   }
 }
+
+
+
+export const formatClockifyDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  const day = String(date.getDate()).padStart(2, "0");
+  const time = "T00:00:00Z";
+  return `${year}-${month}-${day}${time}`;
+};
+
+
+export const formatDuration = (durationInSeconds) => {
+  const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, "0");
+          const minutes = Math.floor((durationInSeconds % 3600) / 60)
+            .toString()
+            .padStart(2, "0");
+          const seconds = (durationInSeconds % 60).toString().padStart(2, "0");
+          return `${hours}:${minutes}:${seconds}`;
+};
+
+
+export function convertDateToTime(timestamp) {
+  const date = new Date(timestamp);
+
+  // Extract hours, minutes, and seconds
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+
+  return `${hours}:${minutes}`;
+}

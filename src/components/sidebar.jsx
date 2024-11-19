@@ -17,7 +17,9 @@ import {
   DollarSign,
   Clock,
   UserCheck,
-  PieChart
+  PieChart,
+  FolderClock,
+  History
 } from "lucide-react";
 import {
   Card,
@@ -39,6 +41,17 @@ export const navItems = [
     label: "Clockify",
     href: "/dashboard/clockify",
     icon: <PieChart className="h-4 w-4" />,
+    subItems: [
+      {
+        label: "General",
+        href: "/dashboard/clockify/general",
+        icon: <FolderClock className="h-4 w-4" />,
+      },
+      {
+        label: "History",
+        href: "/dashboard/clockify/history",
+        icon: <History className="h-4 w-4" />,
+      }]
   },
   {
     label: "Finances",

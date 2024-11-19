@@ -58,8 +58,6 @@ function DataTable({
   const router = useRouter();
   const isProjectPage = pathname === "/dashboard/projects";
   const isUsersPage = pathname === "/users/dashboard";
-  const isLeavePage = pathname === "/users/leave-request";
-  const isAdminLeavePage = pathname === "/dashboard/employees/leave-request"
   const isTransactionPage = pathname === "/dashboard/finances/transactions";
 
 
@@ -103,7 +101,7 @@ function DataTable({
     manualPagination: false, // You are not fetching data for each page separately
     initialState: {
       pagination: {
-        pageSize: 100, // Number of rows per page
+        pageSize: 30, // Number of rows per page
         pageIndex: 0, // Starting from the first page
       },
       sorting: [
@@ -153,7 +151,8 @@ function DataTable({
               <TableTitle
                 title={title}
                 subtitle={subtitle}
-                totalItemCount={(isUsersPage | isProjectPage | isLeavePage | isAdminLeavePage) && table.getRowCount()}
+                totalItemCount={table.getRowCount()}
+                // totalItemCount={(isUsersPage | isProjectPage | isLeavePage | isAdminLeavePage) && table.getRowCount()}
               />
               {!pathname.includes("/leave-request") &&
               <div className="relative w-full mr-4">
@@ -288,7 +287,7 @@ function DataTable({
               </div>
 
               {/* Pagination Controls */}
-              <Pagination className="justify-end mt-4">
+              {/* <Pagination className="justify-end mt-4">
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
@@ -315,7 +314,48 @@ function DataTable({
                     />
                   </PaginationItem>
                 </PaginationContent>
-              </Pagination>
+              </Pagination> */}
+
+<Pagination className="justify-end mt-4">
+  <PaginationContent>
+    {/* Previous Button */}
+    <PaginationItem>
+      <PaginationPrevious
+        onClick={() => table.previousPage()}
+        disabled={!table.getCanPreviousPage()}
+      />
+    </PaginationItem>
+
+    {/* Display Limited Page Numbers */}
+    {Array.from({ length: table.getPageCount() }, (_, index) => index)
+      .filter((page) => {
+        const currentPage = table.getState().pagination.pageIndex;
+        // Show only pages around the current page (e.g., current - 1, current, current + 1)
+        return (
+          page === currentPage || page === currentPage - 1 || page === currentPage + 1
+        );
+      })
+      .map((page) => (
+        <PaginationItem key={page}>
+          <PaginationLink
+            onClick={() => table.setPageIndex(page)}
+            isActive={table.getState().pagination.pageIndex === page}
+          >
+            {page + 1}
+          </PaginationLink>
+        </PaginationItem>
+      ))}
+
+    {/* Next Button */}
+    <PaginationItem>
+      <PaginationNext
+        onClick={() => table.nextPage()}
+        disabled={!table.getCanNextPage() || table.getRowModel().rows.length === 0} 
+      />
+    </PaginationItem>
+  </PaginationContent>
+</Pagination>
+
             </div>
           </div>
         </div>

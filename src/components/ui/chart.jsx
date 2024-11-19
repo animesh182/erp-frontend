@@ -2,8 +2,8 @@
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 
-import { cn } from "@/lib/utils";
-import { formatDuration } from "../charts/PieChartwithBarChart";
+import { cn, formatDuration } from "@/lib/utils";
+// import { formatDuration } from "../charts/PieChartwithBarChart";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = {

@@ -25,7 +25,7 @@ export async function getClockifyProjects() {
   }
 
 
-  export async function getClockifyProjectSummary() {
+  export async function getClockifyProjectSummary(startDate,endDate) {
     try {
         const response = await fetch(
             `https://reports.api.clockify.me/v1/workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_ID}/reports/summary`,
@@ -36,8 +36,8 @@ export async function getClockifyProjects() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    dateRangeStart: "2024-11-11T00:00:00Z",
-                    dateRangeEnd: "2024-11-17T23:59:59Z",
+                    dateRangeStart: startDate || "2024-11-11T00:00:00Z",
+                    dateRangeEnd: endDate|| "2024-11-17T23:59:59Z",
                     summaryFilter: {
                         groups: ["PROJECT"]
                     },

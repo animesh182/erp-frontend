@@ -15,6 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { formatDuration } from "@/lib/utils";
 
 const pieChartData = [
   { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
@@ -66,12 +67,12 @@ const CustomTooltip = ({ active, payload }) => {
 
   return null;
 };
-export const formatDuration = (totalSeconds) => {
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-};
+// export const formatDuration = (totalSeconds) => {
+//   const hours = Math.floor(totalSeconds / 3600);
+//   const minutes = Math.floor((totalSeconds % 3600) / 60);
+//   const seconds = totalSeconds % 60;
+//   return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+// };
 function PieChartwithBarChart({chartData}) {
 
 
@@ -95,36 +96,7 @@ const total = chartData.reduce((acc, data) => {
   return (
     // <Card className="flex justify-between items-center gap-6 pr-6 w-full h-full">
     <Card className="grid grid-cols-8 justify-between items-center gap-6 pr-6 w-fit h-fit">
-      {/* Pie Chart Section */}
-      {/* <div className="col-span-3 h-[400px] w-full">
-   
-  <CardContent className="p-0 h-full w-full">
-    <ChartContainer
-      config={chartConfig}
-      className="" 
-    >
-      
-      <PieChart className="border-2" >
-        <ChartTooltip
-          cursor={false}
-          content={<ChartTooltipContent hideLabel />}
-        />
-        <Pie
-          data={chartData}
-          dataKey="value"
-          nameKey="name"
-          innerRadius={55}
-          outerRadius={150}
-        >
-          {chartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={entry.color} />
-          ))}
-        </Pie>
-      </PieChart>
-      
-    </ChartContainer>
-  </CardContent>
-</div> */}
+
 <div className="col-span-3 flex justify-center items-center h-[400px]"> 
   <CardContent className="p-0 w-full h-full"> 
     <ChartContainer
@@ -160,56 +132,59 @@ const total = chartData.reduce((acc, data) => {
       <div className="col-span-5   ">
      
         <CardContent className="">
-          <ChartContainer config={chartConfig} className="py-3">
-
+        <ChartContainer config={chartConfig} className="pt-3">
   <BarChart
-      layout="vertical"
-      width={400}
-      height={400}  // Adjust height based on number of items
-      data={chartDataWithPercentage}
-      margin={{ top: 0, right: 50, bottom: 0, left:0 }}
-            className=""
-    >
-      <XAxis type="number" domain={[0, 100]} hide />
-      <YAxis
-        dataKey="combinedLabel"
-        type="category"
-        tickLine={false}
-        axisLine={false}
-        className="font-medium text-xs"
-        width={300}
-      />
-      <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
-      <Bar dataKey="percentage" stackId="a" radius={[5, 0, 0, 5]}>
-        {chartDataWithPercentage.map((entry, index) => (
-          <Cell key={`cell-${index}`} fill={entry.color} />
-        ))}
-      </Bar>
+    layout="vertical"
+    width={400}
+    // height={350}
+    data={chartDataWithPercentage}
+    margin={{ top: 10, right: 50, bottom: 0, left: 70}}
+    className=""
+  >
+    <XAxis type="number" domain={[0, 100]} hide />
+    
+    <YAxis
+      dataKey="combinedLabel"
+      type="category"
+      tickLine={false}
+      axisLine={false}
+      className="font-medium text-xs"
+      width={300}
+    />
 
-      {/* Remaining Percentage Bar with lower opacity */}
-      <Bar dataKey="remaining" stackId="a" radius={[0, 5, 5, 0]}>
-        {chartDataWithPercentage.map((entry, index) => (
-          <Cell key={`cell-${index}`} fill={entry.color} opacity={0.25} />
-        ))}
-      </Bar>
-
-      {/* Display Total Time and Percentage Text */}
-      {chartDataWithPercentage.map((entry, index) => (
+    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+    
+    <Bar 
+      dataKey="percentage" 
+      stackId="a" 
+      radius={[5, 0, 0, 5]}
+      label={({  y, value ,height}) => (
         <text
-          key={`text-${index}`}
-          x={ 630}  // Adjusts position based on percentage
-          y={index * 43.5 + 9}  
-          dy={20}   
+          x={740}  // Position the label outside the bar to the right
+          y={y + height / 2}  // Center the label vertically along the bar
           fontSize={12}
           fill="#333"
           textAnchor="start"
+          alignmentBaseline="middle"
         >
-          {`${entry.percentage.toFixed(1)}%`}
+          {`${value.toFixed(1)}%`}
         </text>
+      )}
+    >
+      {chartDataWithPercentage.map((entry, index) => (
+        <Cell key={`cell-${index}`} fill={entry.color} />
       ))}
-    </BarChart>
-            
-          </ChartContainer>
+    </Bar>
+
+    {/* Remaining Percentage Bar with lower opacity */}
+    <Bar dataKey="remaining" stackId="a" radius={[0, 5, 5, 0]}>
+      {chartDataWithPercentage.map((entry, index) => (
+        <Cell key={`cell-${index}`} fill={entry.color} opacity={0.25} />
+      ))}
+    </Bar>
+  </BarChart>
+</ChartContainer>
+
         </CardContent>
       </div>
     </Card>

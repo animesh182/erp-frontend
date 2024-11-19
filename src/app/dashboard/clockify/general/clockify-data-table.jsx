@@ -25,6 +25,9 @@ import { Button } from "@/components/ui/button";
 
 export const EditRowContext = createContext(null); 
 
+
+
+
 function ClockifyDataTable({
   title,
   subtitle,
@@ -54,18 +57,30 @@ function ClockifyDataTable({
 
 
 
-  // Memoize filtered data
   const filteredData = useMemo(() => {
     let filtered = data;
-
+  
     if (selectedTab !== "All") {
-      filtered = filtered.filter((row) => row[filterColumn] === selectedTab);
+      filtered = filtered.filter((row) => {
+        const status = row[filterColumn]?.toLowerCase(); // Ensure case insensitivity
+  
+        // If status is 'Ongoing' or has a dynamic value like 'x days ago', 'x hours ago'
+        if (selectedTab === "Ongoing" && status === "ongoing") {
+          return true;
+        }
+  
+        // Use regex to check if status is a dynamic time (e.g., "2 days ago", "1 hour ago")
+        if (selectedTab === "Completed" && /(\d+\s?(hour|day|minute)s? ago)/.test(status)) {
+          return true;
+        }
+  
+        return false;
+      });
     }
-
-
-
+  
     return filtered;
   }, [data, selectedTab, filterColumn]);
+  
 
   const table = useReactTable({
     data: filteredData,
@@ -105,6 +120,9 @@ function ClockifyDataTable({
 
   const tabs = ["All", "Ongoing", "Completed"];
 
+
+
+
   return (
     <EditRowContext.Provider value={{ onEditRow, onDeleteRow }}>
       <div className="w-full">
@@ -123,7 +141,7 @@ function ClockifyDataTable({
               <TableTitle
                 title={title}
                 subtitle={subtitle}
-                totalItemCount={(isUsersPage | isProjectPage | isLeavePage | isAdminLeavePage) && table.getRowCount()}
+                totalItemCount={ table.getRowCount()}
                 
               />
               <div className="lg:flex md:flex" >
@@ -157,7 +175,7 @@ function ClockifyDataTable({
               <div className="rounded-md">
                 
 
-<Table>
+<Table className="overflow-hidden">
   <TableHeader>
     {table.getHeaderGroups().map((headerGroup) => (
       <TableRow key={headerGroup.id}>
@@ -199,7 +217,7 @@ function ClockifyDataTable({
             className={
               isProjectPage || isUsersPage
                 ? "cursor-pointer hover:bg-muted"
-             
+            
                 : isTransactionPage
                 ? row.original.transactionType === "Expense"
                   ? "bg-[#dc9d9c]" // Light red for expense
@@ -264,3 +282,6 @@ function ClockifyDataTable({
 }
 
 export default ClockifyDataTable;
+
+
+
