@@ -14,31 +14,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import ComboboxProjects from './ProjectComboBox';
 import { clockifyProjects, users } from '@/app/dashboard/clockify/general/page';
 
-// const clockifyProjects = [
-//     { projectId: "6436493afa74a43247e70f13", projectName: "Animesh" },
-//     { projectId: "670e41120a55801c11fd696c", projectName: "Avinto General" },
-//     { projectId: "6717768390254d10caababf8", projectName: "Benediks Transport" },
-//     { projectId: "6715b9d0fd2ed55491501ff5", projectName: "Bring API" },
-//     { projectId: "6715b9d9fd2ed55491502058", projectName: "Bring SBL" },
-//     { projectId: "6703641ed8a5b241d2a462ea", projectName: "Creative Arrangements" },
-//     { projectId: "66c5bf1e52d1f70e64e3e444", projectName: "E-bibaaha" },
-//     { projectId: "66fe52a4cdc43032a1fe61b5", projectName: "Hugo Assist" },
-//     { projectId: "66c6c5b219b51b469d7ccaa3", projectName: "Jambo Booking" },
-//     { projectId: "6711ed429f4db553e6edee70", projectName: "Krunch" },
-//     { projectId: "6729eb7f0066b72ea6e0c848", projectName: "LogiApp" },
-//     { projectId: "6729a11d5d0d3d59b22a4a0e", projectName: "Logistikknyhetene" },
-//     { projectId: "670faf3e90b0e73dcc801965", projectName: "Logitrans" },
-//     { projectId: "672b3ef3eae6c227b3bbd791", projectName: "Logitrans Design" },
-//     { projectId: "6715b9e3fd2ed554915020b8", projectName: "OEG Android" },
-//     { projectId: "671220462df45276ae141162", projectName: "OEG Offshore" },
-//     { projectId: "66cee83ec8e39b3ef12cd090", projectName: "Safari Planner O&M" },
-//     { projectId: "66166796b7d9b2173867225e", projectName: "Sakar hours" },
-//     { projectId: "66c5cd72204f1963fca58cc0", projectName: "SyncWave" },
-//     { projectId: "66b4e0123e25013d2ff9da6d", projectName: "Viken Fremtind Integration" },
-//     { projectId: "65ed5aa033c90b16eac35120", projectName: "Viken Power BI" },
-//     { projectId: "668e551351ffa171de759bf3", projectName: "Viken Transportsenter change requests" }
-// ];
-
 const ClockifyTimeEntry = React.memo(({userId}) => {
     const [selectedProject, setSelectedProject] = useState("");
     const [description, setDescription] = useState("");
@@ -317,5 +292,6 @@ const ClockifyTimeEntry = React.memo(({userId}) => {
         </Card>
     );
 });
+ClockifyTimeEntry.displayName = "ClockifyTimeEntry";
 
 export default ClockifyTimeEntry;
