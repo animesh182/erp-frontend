@@ -276,3 +276,14 @@ export function convertDateToTime(timestamp) {
 
   return `${hours}:${minutes}`;
 }
+
+export function convertTimeToDate(time) {
+  const [hours, minutes] = time.split(":").map(Number);
+  const currentDate = new Date();
+  currentDate.setHours(hours);
+  currentDate.setMinutes(minutes);
+  currentDate.setSeconds(0); // Optionally set seconds to 0
+  currentDate.setMilliseconds(0); // Optionally set milliseconds to 0
+
+  return currentDate;
+}

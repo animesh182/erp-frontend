@@ -12,7 +12,7 @@ const CustomTooltip = ({ payload, label }) => {
   const totalDuration = payload.reduce((total, entry) => total + entry.value, 0);
 
   return (
-    <div className="custom-tooltip gap-4 w-80 bg-white p-2 rounded-2 shadow-2xl absolute left-10 top-7">
+    <div className="custom-tooltip gap-4 w-80 bg-background p-2 rounded-2 shadow-2xl absolute left-10 top-7">
       <div className="total-duration flex justify-between mb-5">
         <p>{userData.userName}</p>
         <p>{formatDuration(totalDuration)}</p>

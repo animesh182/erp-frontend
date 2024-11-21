@@ -309,9 +309,8 @@ export default function Dashboard() {
           onDateChange={handleDateChange}
           initialStartDate={startDate}
           initialEndDate={endDate}
-        />
+          />
       </div>
-
       <div className="flex flex-1 flex-col gap-4 md:gap-8 ">
         <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
           {kpiValues && kpiValues.length > 0

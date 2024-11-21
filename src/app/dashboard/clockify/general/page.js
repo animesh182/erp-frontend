@@ -10,6 +10,7 @@ import ClockifyDataTable from "./clockify-data-table";
 import DateRangePicker from "@/components/DateRangePicker";
 import { format, subDays } from "date-fns";
 import {  formatClockifyDate } from "@/lib/utils";
+import ClockifyTimeEntry from "@/components/ClockifyTimeTracking";
 
 
 
@@ -54,7 +55,7 @@ const dummyData = [
 ];
 
 
-const users = [
+export const users = [
   { userId: "66b44dd4e8576917c883711b", userName: "Animesh Adhikari", userEmail: "animesh@avinto.no" },
   { userId: "64364969efbb4f34828d1f8c", userName: "Animesh", userEmail: "animeshadhikari38@gmail.com" },
   { userId: "661381ab496c22503f32ee2d", userName: "Rishitosh Acharya", userEmail: "rishitosh@gmail.com" },
@@ -84,7 +85,7 @@ const users = [
 ];
 
 
-const clockifyProjects = [
+export const clockifyProjects = [
   { projectId: "6436493afa74a43247e70f13", projectName: "Animesh" },
   { projectId: "670e41120a55801c11fd696c", projectName: "Avinto General" },
   { projectId: "6717768390254d10caababf8", projectName: "Benediks Transport" },
@@ -344,7 +345,7 @@ useEffect(() => {
 
 
   return (
-    <div className="grid grid-cols-1 p-6 gap-4">
+    <div className="grid grid-cols-1 p-6 gap-8">
         <div className="flex justify-between">
       <div className="font-semibold text-2xl">Team Activities</div>
       {initialStartDate && initialEndDate && handleDateChange && (
@@ -372,6 +373,7 @@ useEffect(() => {
 
       </>
       }
+               <ClockifyTimeEntry userId={process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY}/>
       {allUsers && (
 
       

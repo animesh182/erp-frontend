@@ -8,7 +8,7 @@ import React, { useEffect, useState } from 'react'
 import ClockifyDataTable from '../general/clockify-data-table';
 import DataTable from '@/components/ui/data-table';
 import { columns } from './Columns';
-import { formatClockifyDate, formatDuration } from '@/lib/utils';
+import { formatClockifyDate } from '@/lib/utils';
 
 
 
@@ -138,6 +138,13 @@ const ClockifyHistory = () => {
     }
   }, [endDate,numberOfEntries]);
 
+
+
+   const formatDuration = (durationInSeconds) => {
+    const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, "0");
+            return `${hours}`;
+  };
+  
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
 
@@ -160,8 +167,7 @@ const ClockifyHistory = () => {
 { kpiData &&  ( 
   <>  <KpiCard
         title="Total Time"
-        value={ formatDuration(kpiData[0]?.totalTime)} // Pass the raw number
-        // change={Number(kpiData.changeInRevenue)} // Pass the raw percentage number
+        value={` ${formatDuration(kpiData[0]?.totalTime)} hours`} // Pass the raw number
         icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
       />
       <KpiCard

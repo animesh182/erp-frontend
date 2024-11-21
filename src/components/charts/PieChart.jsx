@@ -75,9 +75,9 @@ function DoughnutChart({chartData}) {
               cx="50%"
               cy="50%"
               innerRadius={40}
-              outerRadius={80}
+              outerRadius={140}
               labelLine={true}
-              label={renderCustomizedLabel}
+              // label={renderCustomizedLabel}
             >
             {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />

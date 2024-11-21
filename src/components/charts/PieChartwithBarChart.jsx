@@ -160,12 +160,13 @@ const total = chartData.reduce((acc, data) => {
       radius={[5, 0, 0, 5]}
       label={({  y, value ,height}) => (
         <text
-          x={740}  // Position the label outside the bar to the right
+          x={950}  // Position the label outside the bar to the right
           y={y + height / 2}  // Center the label vertically along the bar
           fontSize={12}
           fill="#333"
           textAnchor="start"
           alignmentBaseline="middle"
+
         >
           {`${value.toFixed(1)}%`}
         </text>

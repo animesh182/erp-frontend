@@ -16,7 +16,7 @@ export const columns = (barChartUser,startDate,endDate) => [
       return (
         <div>
           <p>{user_name || "N/A"}</p>
-          <p className="text-[#64748B] text-sm">{user_email || "N/A"}</p>
+          <p className="text-muted-foreground text-sm">{user_email || "N/A"}</p>
         </div>
       );
     },
@@ -55,7 +55,7 @@ export const columns = (barChartUser,startDate,endDate) => [
           className={`${
             status === "Ongoing"
               ? "bg-[#FEEDDA] text-[#FAA745]"
-              : "bg-gray-100 text-gray-800"
+              : " p-1 bg-muted text-foreground"
           }`}
         >
           {status.toUpperCase()}

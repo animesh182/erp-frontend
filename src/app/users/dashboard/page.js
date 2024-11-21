@@ -11,6 +11,11 @@ import { useSearchParams } from "next/navigation";
 import { getEmployeeProjects } from "@/app/api/employees/getEmployeeProjects";
 import { getEmployeeKpi } from "@/app/api/employees/getEmployeeKpi";
 import { fetchTimeEntries } from "@/app/api/clockify/getUserTimeEntries";
+import { Card } from "@/components/ui/card";
+import ClockifyTimeEntry from "@/components/ClockifyTimeTracking";
+
+
+
 
 const dummyKPIInfo = [
   {
@@ -54,8 +59,8 @@ const formatClockifyDate = (date) => {
   const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
   const day = String(date.getDate()).padStart(2, "0");
   const time = "T00:00:00Z";
-  // return `${year}-${month}-${day}${time}`;
-  return `2024-11-06T00:00:00Z`;
+  return `${year}-${month}-${day}${time}`;
+  // return `2024-11-06T00:00:00Z`;
 };
 
 const formatDurationToHours = (duration) => {
@@ -270,8 +275,22 @@ const UsersHome = () => {
 
   const clockifyData = processTimeEntries(timeEntries);
 
+
+
+
+
+//replace with clockify id of user when backend is ready
+const clockifyUserId="671639ea898fb01147870ac8"
+
+
+// const clockifyTimeEntryProp={
+//   clockifyUserId,
+//   userData
+// }
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+      <ClockifyTimeEntry userId={clockifyUserId}/>
       <div className="flex flex-row space-x-4">
         {transformedKpiInfo &&
           transformedKpiInfo.map((dummyKPICard) => (
