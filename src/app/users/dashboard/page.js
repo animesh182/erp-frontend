@@ -70,11 +70,14 @@ const formatDurationToHours = (duration) => {
 
   let hours = 0;
   let minutes = 0;
+  let seconds = 0;
 
-  if (matches[1]) hours = parseInt(matches[1].replace("H", ""));
-  if (matches[2]) minutes = parseInt(matches[2].replace("M", ""));
+  if (matches[1]) hours = parseInt(matches[1].replace("H", ""), 10);
+  if (matches[2]) minutes = parseInt(matches[2].replace("M", ""), 10);
+  if (matches[3]) seconds = parseInt(matches[3].replace("S", ""), 10);
 
-  return hours + minutes / 60;
+  // return hours + minutes / 60;
+  return hours * 3600 + minutes * 60 + seconds;
 };
 
 const processTimeEntries = (timeEntries) => {
@@ -87,6 +90,7 @@ const processTimeEntries = (timeEntries) => {
     let durationInHours = 0;
     if (timeInterval && timeInterval.duration) {
       durationInHours = formatDurationToHours(timeInterval.duration);
+      console.log(durationInHours,"dddd")
     }
 
     return {
@@ -113,7 +117,7 @@ const DoughnutChartData = (timeEntries) => {
     const percentage = (entry.duration / totalWorkedHours) * 100;
     return {
       name: entry.description, // or use project name
-      value: percentage,
+      value: entry.duration,
       color: ["#6875F5", "#34D399", "#FBBF24", "#EF4444"][index % 4], // Example color cycling
     };
   });
@@ -162,24 +166,6 @@ const UsersHome = () => {
         console.error("Error fetching employee details:", error);
       }
     };
-
-    //   const fetchUserTimeEntries = async () => {
-
-    //     try {
-
-    //       const data = await fetchTimeEntries(userData,clockifyDate);
-    //       if (data) {
-    //         setTimeEntries(data);
-    //       } else {
-    //         console.log("No time entries found");
-    //       }
-    //     } catch (error) {
-    //       console.error("Error in useEffect:", error);
-    //     }
-    //   };
-    //   if (userData.email && userData.name) {
-    //     fetchUserTimeEntries();
-    // }
     getEmployeeDetails();
     getEmployeeKpiData();
   }, [userId]);
@@ -189,7 +175,14 @@ const UsersHome = () => {
       try {
         const data = await fetchTimeEntries(userData, clockifyDate);
         if (data) {
-          setTimeEntries(data);
+          const transformedData = data.map((entry) => ({
+            timeInterval: entry.timeInterval,
+            description: entry.description, // Include description if needed
+            projectId: entry.projectId, // Include projectId if needed
+          }));
+
+          setTimeEntries(transformedData);
+          console.log(timeEntries, "transformedData");
         } else {
           console.log("No time entries found");
         }
@@ -203,8 +196,6 @@ const UsersHome = () => {
     }
   }, [userData, clockifyDate]);
 
-  console.log(userData, "userData");
-  console.log(timeEntries, "time");
 
   const filteredProjects = Array.isArray(employeeProjects)
     ? employeeProjects.filter((project) => {
@@ -276,21 +267,19 @@ const UsersHome = () => {
   const clockifyData = processTimeEntries(timeEntries);
 
 
-
-
-
 //replace with clockify id of user when backend is ready
 const clockifyUserId="671639ea898fb01147870ac8"
 
 
-// const clockifyTimeEntryProp={
-//   clockifyUserId,
-//   userData
-// }
+const clockifyTimeEntryProp={
+  clockifyUserId,
+  userName:userData.name
+}
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <ClockifyTimeEntry userId={clockifyUserId}/>
+      <ClockifyTimeEntry clockifyTimeEntryProp={clockifyTimeEntryProp}/>
+      {/* <ClockifyTimeEntry userId={clockifyUserId}/> */}
       <div className="flex flex-row space-x-4">
         {transformedKpiInfo &&
           transformedKpiInfo.map((dummyKPICard) => (
@@ -326,8 +315,8 @@ const clockifyUserId="671639ea898fb01147870ac8"
                 variant="employeePageBtn"
                 className={`px-4 py-2 text-sm font-medium rounded-lg ${
                   selectedTab === tab
-                    ? "bg-blue-50 text-blue-600 border border-blue-500"
-                    : "text-gray-500 hover:bg-gray-50"
+                    ? "bg-secondary text-ring border border-ring"
+                    : "text-muted-foreground hover:bg-secondary"
                 }`}
                 onClick={() => setSelectedTab(tab)}
               >

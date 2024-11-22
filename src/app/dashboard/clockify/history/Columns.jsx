@@ -3,14 +3,14 @@
 import { convertDateToTime, formatDuration } from "@/lib/utils";
 import { format } from "date-fns";
 import { Dot } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 export const columns = () => [
 {
         accessorKey: "latest_activity",
         header: "Time Entry",
         cell: ({ row }) => {
-          const { latest_activity, projectName,project_color } = row.original; 
+        const { latest_activity, projectName,project_color } = row.original; 
         return (
             <div className="w-96">
             <p>{latest_activity || "N/A"}</p>
@@ -28,7 +28,7 @@ export const columns = () => [
     accessorKey: "name",
     header: "User",
     cell: ({ row }) => {
-      const { name, user_email } = row.original; 
+    const { name, user_email } = row.original; 
     return (
         <div>
         <p className="">{name || "N/A"}</p>
@@ -43,7 +43,7 @@ export const columns = () => [
     accessorKey: "start_time",
     header: "Time",
     cell: ({ row }) => {
-      const { start_time, end_time } = row.original; 
+    const { start_time, end_time } = row.original; 
 
     return (
         <div className="space-y-1"> 
@@ -59,7 +59,7 @@ export const columns = () => [
         accessorKey: "duration",
         header: "Duration",
         cell: ({ row }) => {
-          const { duration } = row.original; 
+        const { duration } = row.original; 
         return (
             <p>{formatDuration(duration)}</p>
         );

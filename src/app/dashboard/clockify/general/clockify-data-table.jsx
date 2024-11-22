@@ -51,8 +51,6 @@ function ClockifyDataTable({
   const router = useRouter();
   const isProjectPage = pathname === "/dashboard/projects";
   const isUsersPage = pathname === "/users/dashboard";
-  const isLeavePage = pathname === "/users/leave-request";
-  const isAdminLeavePage = pathname === "/dashboard/employees/leave-request"
   const isTransactionPage = pathname === "/dashboard/finances/transactions";
 
 
@@ -282,6 +280,3 @@ function ClockifyDataTable({
 }
 
 export default ClockifyDataTable;
-
-
-

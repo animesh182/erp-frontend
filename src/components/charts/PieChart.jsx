@@ -52,6 +52,8 @@ const renderCustomizedLabel = ({ name, value, percent, x, y, cx, cy }) => {
 };
 
 function DoughnutChart({chartData}) {
+
+  console.log(chartData,"dlallta")
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-start pb-0">

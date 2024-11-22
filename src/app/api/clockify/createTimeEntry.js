@@ -25,7 +25,7 @@ export async function createTimeEntry(timeEntry) {
     // Assuming the response contains a message or success info, return it
     if (response.ok) {
       const data = await response.json();
-      toast("Time entry created successfully!")
+      toast.success("Time entry created successfully!")
       return data 
       
     } else {

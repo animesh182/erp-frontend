@@ -35,7 +35,7 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const { timeAllocated } = row.original;
-      return timeAllocated ? <span className="font-medium">{timeAllocated} hours/day</span> : "No Data"; // Show "No Data" if the invoice_no is null or undefined
+      return timeAllocated ? <span className="font-medium">{timeAllocated} hours/day</span> : "No Data";
     },
   },
   {

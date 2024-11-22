@@ -13,22 +13,23 @@ import { updateTimeEntry } from '@/app/api/clockify/updateTimeEntry';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import ComboboxProjects from './ProjectComboBox';
 import { clockifyProjects, users } from '@/app/dashboard/clockify/general/page';
+import { getActiveUsers } from '@/app/api/clockify/getActiveUsers';
 
-const ClockifyTimeEntry = React.memo(({userId}) => {
+
+const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
     const [selectedProject, setSelectedProject] = useState("");
     const [description, setDescription] = useState("");
     const [billable, setBillable] = useState(true);
     const [start, setStart] = useState(true);
     const [timer, setTimer] = useState(0);
     const [startTime, setStartTime] = useState(new Date().toISOString());
+    const[timeEntryId,setTimeEntryId]=useState()
     const [comboboxProp, setComboboxProp] = useState("");
-    const [inputTime, setInputTime] = useState(convertDateToTime(startTime))
-
-    // Use refs for more efficient interval management
+    const [inputTime, setInputTime] = useState(convertDateToTime(startTime));
     const intervalRef = useRef(null);
     const timerRef = useRef(0);
 
-    // Memoize project-related calculations
+
     const projectNames = useMemo(() => 
         clockifyProjects.map((project) => project.projectName), 
         []
@@ -39,7 +40,6 @@ const ClockifyTimeEntry = React.memo(({userId}) => {
         [selectedProject]
     );
 
-    // Memoize submit data
     const submitData = useMemo(() => ({
         projectId: matchedProject ? matchedProject.projectId : null,
         description: description,
@@ -48,23 +48,14 @@ const ClockifyTimeEntry = React.memo(({userId}) => {
     }), [matchedProject, description, billable]);
 
     const startTimer = useCallback(() => {
-        const startTimestamp = Date.now() - timerRef.current * 1000; // Adjust for current timer value
-    
-        // Save start time in local storage
-        if (typeof window !== "undefined") {
-            localStorage.setItem("timerStartTimestamp", startTimestamp);
-        }
-    
+        const startTimestamp = Date.now() - timerRef.current * 1000;
         const updateTimer = () => {
             const now = Date.now();
             const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
             timerRef.current = elapsedSeconds;
             setTimer(elapsedSeconds);
-    
-            // Use requestAnimationFrame for smooth updates
             intervalRef.current = requestAnimationFrame(updateTimer);
         };
-    
         updateTimer();
     }, []);
     
@@ -73,97 +64,119 @@ const ClockifyTimeEntry = React.memo(({userId}) => {
             cancelAnimationFrame(intervalRef.current);
             intervalRef.current = null;
         }
-    
-        // Clear timer start from local storage
-        if (typeof window !== "undefined") {
-            localStorage.removeItem("timerStartTimestamp");
-        }
     }, []);
 
     const handleProjectSelect = useCallback((project) => {
         setSelectedProject(project);
     }, []);
 
-    // Fetch time entry details with improved efficiency
-    const fetchTimeEntryDetails = useCallback(async (id) => {
-        try {
-            const timeEntry = await getTimeEntryById(id);
-            const matchedProjectWithId = clockifyProjects.find(
-                (project) => project.projectId === timeEntry.projectId
-            );
+    useEffect(() => {
+        const fetchClockifyActiveUsers = async () => {
+            try {
+                const data = await getActiveUsers(30);
+                if (data) {
+                    const filteredData = data.filter(
+                        (user) => users.some(
+                            (u) => u.userName === clockifyTimeEntryProp.userName &&
+                                u.userId === user.userId
+                        )
+                    );
 
-            // Minimize state updates
-            setDescription(timeEntry.description);
-            
-            if (matchedProjectWithId) {
-                setSelectedProject(matchedProjectWithId.projectName);
-            }
+                    if (filteredData.length > 0) {
+                        const activeUser = filteredData[0]; // Get the first matching active user
+                        const matchedProject = clockifyProjects.find(
+                            (project) => project.projectId === activeUser.projectId
+                        );
+                        setTimeEntryId(activeUser.id)
+                        setDescription(activeUser.description || "");
+                        if (matchedProject) {
+                            setSelectedProject(matchedProject.projectName);
+                        }
+                        setBillable(activeUser.billable);
+                        setStart(false);
+                        setStartTime(activeUser.timeInterval.start);
+                        setInputTime(convertDateToTime(activeUser.timeInterval.start));
 
-            setBillable(timeEntry.billable);
-            setStart(false);
-            setStartTime(timeEntry.timeInterval.start);
-            setInputTime(convertDateToTime(timeEntry.timeInterval.start))
-            // Handle timer more efficiently
-            if (!timeEntry.timeInterval.end) {
-                const elapsedTime = Math.floor(
-                    (new Date().getTime() - new Date(timeEntry.timeInterval.start).getTime()) / 1000
-                );
-                timerRef.current = elapsedTime;
-                setTimer(elapsedTime);
-                startTimer();
+                        if (!activeUser.timeInterval.end) {
+                            const elapsedTime = Math.floor(
+                                (new Date().getTime() - new Date(activeUser.timeInterval.start).getTime()) / 1000
+                            );
+                            timerRef.current = elapsedTime;
+                            setTimer(elapsedTime);
+                            startTimer();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching active users:", error);
             }
-        } catch (error) {
-            console.error("Error fetching time entry:", error);
-            toast.error("Failed to fetch time entry details");
-        }
-    }, [startTimer]);
-    
-    // Optimize button click handler
+        };
+
+        fetchClockifyActiveUsers();
+        
+        return () => {
+            stopTimer();
+        };
+    }, [users, clockifyTimeEntryProp, clockifyProjects, startTimer, stopTimer]);
+
     const handleButtonClick = useCallback(async () => {
         try {
             if (start) {
                 const response = await createTimeEntry(submitData);
                 setStart(false);
-                
-
-                // Persist time entry ID
-                if (typeof window !== "undefined") {
-                    localStorage.setItem("timeEntryId", response.id);
-                }
-                
                 if (response.id) {
-                    await fetchTimeEntryDetails(response.id);
+                    const timeEntry = await getTimeEntryById(response.id);
+                    const matchedProjectWithId = clockifyProjects.find(
+                        (project) => project.projectId === timeEntry.projectId
+                    );
+
+                    setDescription(timeEntry.description);
+                    if (matchedProjectWithId) {
+                        setSelectedProject(matchedProjectWithId.projectName);
+                    }
+                    setBillable(timeEntry.billable);
+                    setStartTime(timeEntry.timeInterval.start);
+                    setInputTime(convertDateToTime(timeEntry.timeInterval.start));
+                    setTimeEntryId(response.id)
+
+                    if (!timeEntry.timeInterval.end) {
+                        const elapsedTime = Math.floor(
+                            (new Date().getTime() - new Date(timeEntry.timeInterval.start).getTime()) / 1000
+                        );
+                        timerRef.current = elapsedTime;
+                        setTimer(elapsedTime);
+                        startTimer();
+                    }
                 }
             } else {
-                const message = await stopTimeEntry(userId, new Date().toISOString());
-                toast.success(message);
-                
-                // Reset states
-                setStart(true);
-                stopTimer();
-                
-                // Clear form
-                setDescription("");
-                setSelectedProject("");
-                setComboboxProp("");
-                setBillable(true);
-                
-                // Clear localStorage
-                if (typeof window !== "undefined") {
-                    localStorage.removeItem("timeEntryId");
+                    const message = await stopTimeEntry(clockifyTimeEntryProp.clockifyUserId, new Date().toISOString());
+                    toast.success(message);
+                    
+                    // Reset states
+                    setStart(true);
+                    stopTimer();
+                    
+                    // Clear form
+                    setDescription("");
+                    setSelectedProject("");
+                    setComboboxProp("");
+                    setBillable(true);
+                    
+                    // Clear localStorage
+                    if (typeof window !== "undefined") {
+                        localStorage.removeItem("timeEntryId");
+                    }
+                    
+                    // Reset timer
+                    timerRef.current = 0;
+                    setTimer(0);
                 }
-                
-                // Reset timer
-                timerRef.current = 0;
-                setTimer(0);
-            }
         } catch (error) {
             toast.error(error.message || "Failed to process time entry");
             console.error("Error handling time entry:", error);
         }
-    }, [start, submitData, userId, fetchTimeEntryDetails, stopTimer]);
+    }, [start, submitData, clockifyTimeEntryProp.clockifyUserId, startTimer, stopTimer, clockifyProjects]);
     
-    // Handle time entry update
     const handleUpdate = useCallback(async () => {
         const updateData = {
             startTime: startTime,
@@ -172,12 +185,9 @@ const ClockifyTimeEntry = React.memo(({userId}) => {
             billable: billable
         };
         
-        const savedTimeEntryId = localStorage.getItem("timeEntryId");
+        if(timeEntryId)
         try {
-            const response = await updateTimeEntry(savedTimeEntryId, updateData);
-            
-            
-            
+            const response = await updateTimeEntry(timeEntryId, updateData);
             if (!response.timeInterval.end) {
                 const elapsedTime = Math.floor(
                     (new Date().getTime() - new Date(response.timeInterval.start).getTime()) / 1000
@@ -186,49 +196,23 @@ const ClockifyTimeEntry = React.memo(({userId}) => {
                 setTimer(elapsedTime);
                 startTimer();
             }
-            
             toast.success(response.message || "Time entry has been updated!");
-
         } catch (error) {
-            toast.error(error.message || "Failed to update time entry");
             console.error("Error updating time entry:", error);
+            toast.error(error.message || "Failed to update time entry");
         }
-    }, [startTime, description, matchedProject, selectedProject, billable]);
+    }, [startTime, description, matchedProject, selectedProject, billable, clockifyTimeEntryProp.clockifyUserId, startTimer]);
     
-    // Handle time change
     const handleTimeChange = useCallback((newTime) => {
         const updatedDate = convertTimeToDate(newTime || new Date().toISOString());
         setStartTime(updatedDate);
         setInputTime(newTime);
     }, []);
 
-
-    useEffect(() => {
-        const savedTimeEntryId = localStorage.getItem("timeEntryId");
-        const savedStartTimestamp = localStorage.getItem("timerStartTimestamp");
-    
-        if (savedTimeEntryId) {
-            fetchTimeEntryDetails(savedTimeEntryId);
-        }
-    
-        if (savedStartTimestamp) {
-            const elapsedSeconds = Math.floor((Date.now() - Number(savedStartTimestamp)) / 1000);
-            timerRef.current = elapsedSeconds;
-            setTimer(elapsedSeconds);
-            startTimer();
-        }
-    
-        return () => {
-            stopTimer();
-        };
-    }, [fetchTimeEntryDetails, startTimer, stopTimer]);
-    
-    // Sync combobox prop with selected project
     useEffect(() => {
         setComboboxProp(selectedProject);
     }, [selectedProject]);
 
-    
     return (
         <Card className="p-2 flex items-center justify-between">
             <Input
@@ -248,7 +232,7 @@ const ClockifyTimeEntry = React.memo(({userId}) => {
                 <Tooltip>
                     <TooltipTrigger>
                         <DollarSign
-                            className={`${billable ? "text-blue-500" : "text-gray-400"} w-10 cursor-pointer`}
+                            className={`${billable ? "text-ring" : "text-muted-foreground"} w-10 cursor-pointer`}
                             onClick={() => setBillable((prev) => !prev)}
                         />
                     </TooltipTrigger>
@@ -266,7 +250,6 @@ const ClockifyTimeEntry = React.memo(({userId}) => {
                     <PopoverContent className="flex items-center">
                         <p className='text-sm w-1/2'>Start Time:</p>
                         <Input
-                            // value={convertDateToTime(startTime)}
                             value={inputTime}
                             onChange={(e) => handleTimeChange(e.target.value)}
                             className="w-1/2 text-center"
@@ -292,6 +275,7 @@ const ClockifyTimeEntry = React.memo(({userId}) => {
         </Card>
     );
 });
+
 ClockifyTimeEntry.displayName = "ClockifyTimeEntry";
 
 export default ClockifyTimeEntry;

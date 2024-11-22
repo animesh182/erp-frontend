@@ -60,7 +60,7 @@ const CustomTooltip = ({ active, payload }) => {
         }}
       >
         <p style={{ color }}>{name}</p>
-        <p>{`${formatDuration(durationInSeconds)}`}</p>
+        <p className="text-black">{`${formatDuration(durationInSeconds)}`}</p>
       </div>
     );
   }
@@ -74,7 +74,6 @@ const CustomTooltip = ({ active, payload }) => {
 //   return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 // };
 function PieChartwithBarChart({chartData}) {
-
 
   const formattedChartData = chartData.map((entry) => ({
     ...entry,

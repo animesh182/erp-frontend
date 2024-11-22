@@ -93,7 +93,7 @@ const ClockifyBarChart = ({ userName, selected }) => {
             dataKey={project.projectName}
             stackId="a"
             fill={project.projectColor}
-            className=""
+            className="bg-white"
           />
         ))}
       </BarChart>

@@ -294,7 +294,6 @@ oneDayAfter.setDate(date.getDate() + 1);
       console.error("Error fetching users:", error);
     }
   };
-  console.log(barChartUser,"barchartrtr")
   function formatMillisecondsToHourDifference(startTime, endTime) {
   const timeDifference = new Date(endTime) - new Date(startTime);
   const hours = Math.floor(timeDifference / (1000 * 60 * 60));
@@ -327,7 +326,6 @@ function formatTimeAgo(endTime) {
 }
 
 
-console.log(barChartUser,"barbar")
 useEffect(() => {
   fetchClockifyProjectsReport();
   fetchClockifyUsersProjectsReport()
@@ -343,6 +341,11 @@ useEffect(() => {
   }
 }, [activeUsers, inactiveUsers]); 
 
+
+const clockifyTimeEntryProp={
+  clockifyUserId:process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY,
+  userName:"Animesh Adhikari"
+}
 
   return (
     <div className="grid grid-cols-1 p-6 gap-8">
@@ -373,7 +376,8 @@ useEffect(() => {
 
       </>
       }
-               <ClockifyTimeEntry userId={process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY}/>
+              <ClockifyTimeEntry clockifyTimeEntryProp={clockifyTimeEntryProp}/>
+               {/* <ClockifyTimeEntry userId={process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY}/> */}
       {allUsers && (
 
       

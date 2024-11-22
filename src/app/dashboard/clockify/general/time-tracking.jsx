@@ -24,18 +24,21 @@ const TimeCell = ({ initialTime, status }) => {
 
   useEffect(() => {
     if (status === "Ongoing") {
+      const startTimestamp = Date.now();
+
       const interval = setInterval(() => {
-        setTotalSeconds((prevSeconds) => prevSeconds + 1);
+        const elapsedSeconds = Math.floor((Date.now() - startTimestamp) / 1000);
+        setTotalSeconds(initialTotalSeconds + elapsedSeconds);
       }, 1000);
 
       return () => clearInterval(interval);
     }
-  }, [status]);
+  }, [status, initialTotalSeconds]);
 
   return (
     <div className="flex items-center gap-2">
       <p className="text-sm">{formatDuration(totalSeconds)}</p>
-      {status === "Ongoing" && <CircleDot color="red" height={14} width={14} />}
+      {status === "Ongoing" && <CircleDot className="text-destructive" height={14} width={14} />}
     </div>
   );
 };
