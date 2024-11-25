@@ -38,7 +38,7 @@ export const navItems = [
     icon: <Home className="h-4 w-4" />,
   },
   {
-    label: "Clockify",
+    label: "Punch Clock",
     href: "/dashboard/clockify",
     icon: <PieChart className="h-4 w-4" />,
     subItems: [

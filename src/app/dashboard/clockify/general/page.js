@@ -247,9 +247,6 @@ oneDayAfter.setDate(date.getDate() + 1);
 
         //to be sent to barchart
 
-
-
-
           const userProjectsMap = {};
           data.timeentries.forEach((entry) => {
             const { userName, projectName, projectColor ,timeInterval} = entry;
@@ -281,9 +278,6 @@ oneDayAfter.setDate(date.getDate() + 1);
           });
           const transformedUsersProjects = Object.values(userProjectsMap);
 
-          // const selected = transformedUsersProjects.find(
-          //   (user) => user.userName === userName
-          // );
           setBarChartUser(transformedUsersProjects || null); 
         
 
@@ -377,7 +371,6 @@ const clockifyTimeEntryProp={
       </>
       }
               <ClockifyTimeEntry clockifyTimeEntryProp={clockifyTimeEntryProp}/>
-               {/* <ClockifyTimeEntry userId={process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY}/> */}
       {allUsers && (
 
       

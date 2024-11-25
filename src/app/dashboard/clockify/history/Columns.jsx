@@ -32,7 +32,7 @@ export const columns = () => [
     return (
         <div>
         <p className="">{name || "N/A"}</p>
-        <p className="text-[#64748B] text-sm">{user_email|| "N/A"}</p>
+        <p className="text-muted-foreground  text-sm">{user_email|| "N/A"}</p>
         
         </div>
     );
@@ -48,7 +48,7 @@ export const columns = () => [
     return (
         <div className="space-y-1"> 
         <p className="">{convertDateToTime(start_time)|| "N/A"} - {convertDateToTime(end_time)|| "N/A"}</p>
-        <p className="text-[#64748B] text-sm"> {format(start_time, "LLL dd, y")}</p>
+        <p className="text-muted-foreground  text-sm"> {format(start_time, "LLL dd, y")}</p>
         
         </div>
     );

@@ -17,10 +17,8 @@ import {
 } from "@/components/ui/table";
 import { FormRow } from "@/components/FormRow";
 import TableTitle from "@/components/TableTitle";
-import { Input } from "@/components/ui/input";
 import DateRangePicker from "@/components/DateRangePicker";
 import TabFilters from "@/components/TabFilters";
-import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export const EditRowContext = createContext(null); 
@@ -47,14 +45,6 @@ function ClockifyDataTable({
 }) {
   const [sorting, setSorting] = useState([]);
   const [selectedTab, setSelectedTab] = useState("All");
-  const pathname = usePathname();
-  const router = useRouter();
-  const isProjectPage = pathname === "/dashboard/projects";
-  const isUsersPage = pathname === "/users/dashboard";
-  const isTransactionPage = pathname === "/dashboard/finances/transactions";
-
-
-
   const filteredData = useMemo(() => {
     let filtered = data;
   
@@ -104,18 +94,6 @@ function ClockifyDataTable({
   const filterValues =
     formInputs?.find((input) => input.name === filterColumn)?.filterValues ||
     [];
-
-  const handleRowClick = (id,row, event) => {
-    if (isProjectPage) {
-      router.push(`/dashboard/projects/${id}`);
-    }
-    if(isUsersPage){
-      router.push(`/users/dashboard/${id}/?userId=${userId}`);
-     
-  
-    }
-  };
-
   const tabs = ["All", "Ongoing", "Completed"];
 
 
@@ -149,8 +127,8 @@ function ClockifyDataTable({
                 variant="employeePageBtn"
                 className={`px-4 py-2 text-sm font-medium rounded-lg ${
                   selectedTab === tab
-                    ? "bg-blue-50 text-blue-600 border border-blue-500"
-                    : "text-gray-500 hover:bg-gray-50"
+                    ? "bg-secondary text-ring border border-ring"
+                    : "text-muted-foreground hover:bg-secondary"
                 }`}
                 onClick={() => setSelectedTab(tab)}
               >
@@ -212,34 +190,13 @@ function ClockifyDataTable({
           <TableRow
             key={row.id}
             data-state={row.getIsSelected() && "selected"}
-            className={
-              isProjectPage || isUsersPage
-                ? "cursor-pointer hover:bg-muted"
-            
-                : isTransactionPage
-                ? row.original.transactionType === "Expense"
-                  ? "bg-[#dc9d9c]" // Light red for expense
-                  : row.original.transactionType === "Revenue"
-                  ? "bg-[#78ae78]" // Light green for revenue
-                  : ""
-                : ""
-            }
           >
             {row.getVisibleCells().map((cell, index) => (
               <TableCell
                 key={cell.id}
                 className={`${
                   cell.column.columnDef.hideOnMobile ? "hidden md:table-cell" : ""
-                }`} // Conditionally hide on mobile
-                onClick={
-                  index !== row.getVisibleCells().length - 1 &&
-                  !(
-                    isProjectPage &&
-                    cell.column.id === "progressTracking"
-                  )
-                    ? (event) => handleRowClick(row.original.id,row.original, event)
-                    : undefined
-                }
+                }`} 
               >
                 {flexRender(
                   cell.column.columnDef.cell,

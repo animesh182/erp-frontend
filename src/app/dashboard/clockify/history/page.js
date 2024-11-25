@@ -87,7 +87,7 @@ const ClockifyHistory = () => {
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
 
     <div className="flex justify-between">
-      <h2 className="font-semibold text-2xl">Clockify History</h2>
+      <h2 className="font-semibold text-2xl">Punch CLock History</h2>
       {initialStartDate && initialEndDate && handleDateChange && (
                 <div>
                   <DateRangePicker
