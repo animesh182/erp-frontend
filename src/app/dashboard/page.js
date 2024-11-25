@@ -186,7 +186,7 @@ export default function Dashboard() {
       if (status === 200) {
         setFetchedKpiData(data);
       } else {
-        console.error("Failed to fetch KPI data");
+        console.error("Failed to fetch KPIs data");
       }
     };
 
