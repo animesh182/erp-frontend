@@ -4,7 +4,7 @@ import DataTable from "@/components/ui/data-table";
 import { columns } from "@/app/dashboard/finances/expenses/Columns";
 import { toast } from "sonner";
 import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
-import { subDays, format } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { useForm, FormProvider } from "react-hook-form";
 import { getExpense } from "@/app/api/expense/getExpense";
 import { createExpense } from "@/app/api/expense/createExpense";
@@ -14,10 +14,15 @@ import { deleteExpense } from "@/app/api/expense/deleteExpense";
 
 export default function Expenses() {
   const methods = useForm();
-  const initialEndDate = new Date(); // Today's date
-  const initialStartDate = subDays(initialEndDate, 28); // 4 weeks ago
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
+  // Get first day of current month
+  const initialStartDate = startOfMonth(new Date());
+  // Get last day of current month
+  const initialEndDate = endOfMonth(new Date());
+
+  const [startDate, setStartDate] = useState(
+    format(initialStartDate, "yyyy-MM-dd")
+  );
+  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
   const [data, setData] = useState([]); // State to hold the fetched data
   const [loading, setLoading] = useState(true); // Loading state
   const [projectOptions, setProjectOptions] = useState([]);
@@ -61,7 +66,7 @@ export default function Expenses() {
 
   const handleDateChange = (startDate, endDate) => {
     setStartDate(startDate);
-    setEndDate(endDate);
+    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
   };
 
   const onAddRow = async (newRowData) => {
@@ -115,6 +120,7 @@ export default function Expenses() {
           onDateChange={handleDateChange}
           initialStartDate={startDate}
           initialEndDate={endDate}
+          isMonthPicker={true}
           loading={loading}
         />
       </FormProvider>

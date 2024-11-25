@@ -162,7 +162,8 @@ const total = chartData.reduce((acc, data) => {
           x={950}  // Position the label outside the bar to the right
           y={y + height / 2}  // Center the label vertically along the bar
           fontSize={12}
-          fill="#333"
+          // fill="#FFFFFF"
+          className=" fill-secondary-foreground"
           textAnchor="start"
           alignmentBaseline="middle"
 

@@ -6,7 +6,7 @@ import { columns } from "@/app/dashboard/finances/payroll/Columns";
 import { formatAmountToNOK } from "@/lib/utils";
 import KpiCard from "@/components/kpicard";
 import { toast } from "sonner";
-import { subDays, format } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
@@ -19,10 +19,15 @@ import { deletePayroll } from "@/app/api/finances/payroll/deletePayroll";
 
 export default function Payroll() {
   const methods = useForm();
-  const initialEndDate = new Date();
-  const initialStartDate = subDays(initialEndDate, 28);
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
+  // Get first day of current month
+  const initialStartDate = startOfMonth(new Date());
+  // Get last day of current month
+  const initialEndDate = endOfMonth(new Date());
+
+  const [startDate, setStartDate] = useState(
+    format(initialStartDate, "yyyy-MM-dd")
+  );
+  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [kpiValues, setKpiValues] = useState(null);

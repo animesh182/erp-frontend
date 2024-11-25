@@ -5,7 +5,7 @@ import { columns } from "./Columns";
 import { useForm, FormProvider } from "react-hook-form";
 import DataTable from "@/components/ui/data-table";
 import { toast } from "sonner";
-import { subDays, format } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { getRevenue } from "@/app/api/revenue/getRevenue";
 import { createRevenue } from "@/app/api/revenue/createRevenue";
 import { getProjects } from "@/app/api/projects/getProjects";
@@ -15,11 +15,17 @@ import { deleteRevenue } from "@/app/api/revenue/deleteRevenue";
 
 export default function Revenue() {
   const methods = useForm();
-  const initialEndDate = new Date();
-  const initialStartDate = subDays(initialEndDate, 28);
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
+  // Get first day of current month
+  const initialStartDate = startOfMonth(new Date());
+  // Get last day of current month
+  const initialEndDate = endOfMonth(new Date());
+
+  const [startDate, setStartDate] = useState(
+    format(initialStartDate, "yyyy-MM-dd")
+  );
+  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [projectOptions, setProjectOptions] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -29,23 +35,23 @@ export default function Revenue() {
 
   useEffect(() => {
     if (startDate && endDate) {
-      fetchData(startDate, endDate); // Fetch data on date change or refresh
+      fetchData(startDate, endDate);
     }
     fetchProjects();
   }, [startDate, endDate, refreshKey]);
 
   const fetchData = async (startDate, endDate) => {
-    console.log("Fetching data from:", startDate, "to:", endDate);
     try {
       const fetchedData = await getRevenue(
         format(startDate, "yyyy-MM-dd"),
         format(endDate, "yyyy-MM-dd")
       );
-      console.log(fetchedData, "data");
       setData(fetchedData);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to fetch revenue data");
+      setLoading(false);
     }
   };
 
@@ -61,14 +67,14 @@ export default function Revenue() {
 
   const handleDateChange = (startDate, endDate) => {
     setStartDate(startDate);
-    setEndDate(endDate);
+    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
   };
 
   const onAddRow = async (newRowData) => {
     try {
       await createRevenue(newRowData);
       toast.success("New revenue added");
-      refreshComponent(); // Refresh the component
+      refreshComponent();
     } catch (error) {
       toast.error("Failed to add new revenue");
       console.error("Error adding new revenue:", error);
@@ -79,7 +85,7 @@ export default function Revenue() {
     try {
       await editRevenue(editedData.id, editedData);
       toast.success("Revenue updated successfully");
-      refreshComponent(); // Refresh the component
+      refreshComponent();
     } catch (error) {
       console.error("Error updating revenue:", error);
       toast.error("Failed to update revenue");
@@ -90,7 +96,7 @@ export default function Revenue() {
     try {
       await deleteRevenue(rowId);
       toast.success("Revenue deleted successfully");
-      refreshComponent(); // Refresh the component
+      refreshComponent();
     } catch (error) {
       console.error("Error deleting revenue:", error);
       toast.error("Failed to delete revenue");
@@ -115,6 +121,8 @@ export default function Revenue() {
           onDateChange={handleDateChange}
           initialStartDate={startDate}
           initialEndDate={endDate}
+          isMonthPicker={true}
+          loading={loading}
         />
       </FormProvider>
     </main>

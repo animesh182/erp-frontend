@@ -50,6 +50,7 @@ function DataTable({
   projectOptions,
   onDeleteRow,
   userId,
+  isMonthPicker = false,
 }) {
   const [sorting, setSorting] = useState([]);
   const [selectedTab, setSelectedTab] = useState("All");
@@ -171,6 +172,7 @@ function DataTable({
                     onDateChange={onDateChange}
                     initialStartDate={initialStartDate}
                     initialEndDate={initialEndDate}
+                    isMonthPicker={isMonthPicker}
                   />
                 </div>
               )}

@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { subDays, format, startOfDay } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { KpiSkeleton, RectangleSkeleton } from "@/components/Skeletons";
 import { fetchKpiData } from "@/app/api/fetchKpiData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -118,14 +118,17 @@ export default function Dashboard() {
   const [kpiValues, setKpiValues] = useState();
   const [ongoingProjects, setOngoingProjects] = useState([]);
   const [completedProjects, setCompletedProjects] = useState([]);
-  const initialEndDate = startOfDay(new Date()); // Today's date
-  const initialStartDate = startOfDay(subDays(initialEndDate, 28)); // 4 weeks ago
+  const [loading, setLoading] = useState(true);
+
+  // Get first day of current month
+  const initialStartDate = startOfMonth(new Date());
+  // Get last day of current month
+  const initialEndDate = endOfMonth(new Date());
+
   const [startDate, setStartDate] = useState(
-    format(startOfDay(initialStartDate), "yyyy-MM-dd")
+    format(initialStartDate, "yyyy-MM-dd")
   );
-  const [endDate, setEndDate] = useState(
-    format(startOfDay(initialEndDate), "yyyy-MM-dd")
-  );
+  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
 
   const router = useRouter();
   useEffect(() => {
@@ -176,7 +179,10 @@ export default function Dashboard() {
   // console.log(profitLoss);
   useEffect(() => {
     const getKpiData = async () => {
-      const { status, data } = await fetchKpiData(startDate, endDate);
+      const { status, data } = await fetchKpiData(
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd")
+      );
       if (status === 200) {
         setFetchedKpiData(data);
       } else {
@@ -188,7 +194,10 @@ export default function Dashboard() {
   }, [startDate, endDate]);
   useEffect(() => {
     const getResourceUtilData = async () => {
-      const { status, data } = await fetchReourceUtil(startDate, endDate);
+      const { status, data } = await fetchReourceUtil(
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd")
+      );
 
       if (status === 200) {
         const transformedData = data.map((user) => {
@@ -292,12 +301,13 @@ export default function Dashboard() {
         },
       ];
       setKpiValues(updatedKpiDatas); // Setting the new kpiDatas array
+      setLoading(false);
     }
   }, [fetchedKpiData]); // This will trigger whenever kpiData is fetched
 
   const handleDateChange = (startDate, endDate) => {
-    setStartDate(format(startDate, "yyyy-MM-dd"));
-    setEndDate(format(endDate, "yyyy-MM-dd"));
+    setStartDate(startDate);
+    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
   };
 
   return (
@@ -305,11 +315,12 @@ export default function Dashboard() {
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Home</h1>
         <DateRangePicker
-          numberOfMonths={2}
+          // numberOfMonths={2}
           onDateChange={handleDateChange}
           initialStartDate={startDate}
           initialEndDate={endDate}
-          />
+          isMonthPicker={true}
+        />
       </div>
       <div className="flex flex-1 flex-col gap-4 md:gap-8 ">
         <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
