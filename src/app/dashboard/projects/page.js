@@ -18,7 +18,7 @@ import { createProject } from "@/app/api/projects/createProject";
 import { editProject } from "@/app/api/projects/editProject";
 import { createClient } from "@/app/api/projects/createClient";
 import { deleteProject } from "@/app/api/projects/deleteProject";
-
+import { ProjectPageSkeletonCard, TitleSkeleton } from "@/components/Skeletons";
 export default function Projects() {
   const methods = useForm();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -181,7 +181,10 @@ export default function Projects() {
             </FormProvider>
           )
         ) : (
-          <div className="text-3xl font-semibold">Loading...</div>
+          <div className="flex w-full flex-col gap-y-3 font-semibold">
+            <TitleSkeleton />
+            <ProjectPageSkeletonCard />
+          </div>
         )}
       </div>
       <EditProjectSheet //this is for add

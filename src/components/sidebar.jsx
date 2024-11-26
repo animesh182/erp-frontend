@@ -1,31 +1,48 @@
 "use client";
-
-import Link from "next/link";
-import React, { useState } from "react";
-import { Button } from "./ui/button";
 import {
   Home,
   LineChart,
   Package,
   ShoppingCart,
   Users,
-  ChevronDown,
-  ChevronRight,
   CreditCard,
   TrendingUp,
   TrendingDown,
   DollarSign,
+  ChevronRight, // Import ChevronRight
+  CircleUser,
+  ChevronUp,
 } from "lucide-react";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import { usePathname } from "next/navigation";
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarFooter,
+} from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@/components/ui/collapsible";
 import { CompanyIcon } from "./companyicon";
-
+import Link from "next/link";
+import { useLogout } from "@/app/api/auth/logout";
+import { Button } from "./ui/button";
+import { useTheme } from "next-themes";
+// Menu items
 export const navItems = [
   {
     label: "Dashboard",
@@ -76,107 +93,111 @@ export const navItems = [
   },
 ];
 
-export default function Sidebar() {
-  const pathname = usePathname();
-  const [expandedItem, setExpandedItem] = useState(null);
-
-  const toggleExpand = (label) => {
-    setExpandedItem(expandedItem === label ? null : label);
+export default function AppSidebar() {
+  const logout = useLogout();
+  const theme = useTheme();
+  console.log(theme);
+  const handleLogout = () => {
+    logout();
   };
-
-  const isActive = (href) => {
-    if (href === "/dashboard") {
-      return pathname === "/dashboard" || pathname === "/dashboard/";
-    }
-    return pathname.startsWith(href + "/") || pathname === href;
-  };
-
-  const isParentActive = (item) => {
-    return (
-      item.subItems && item.subItems.some((subItem) => isActive(subItem.href))
-    );
-  };
-
   return (
-    <aside className="hidden md:fixed md:top-0 md:left-0 md:h-full md:w-[220px] lg:w-[280px] md:border-r md:bg-muted/40 md:block md:overflow-y-auto">
-      <div className="flex h-full max-h-screen flex-col gap-2">
-        <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 font-semibold"
-          >
-            <CompanyIcon size={24} color="#1169C4" />
-            <span className="">Avinto AS</span>
-          </Link>
-        </div>
-        <div className="flex-1">
-          <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-            {navItems.map((navItem) => (
-              <div key={navItem.label}>
-                <Link
-                  href={navItem.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted/80 
-                    ${
-                      isActive(navItem.href) || isParentActive(navItem)
-                        ? "bg-muted text-primary"
-                        : "text-muted-foreground hover:text-primary"
-                    }`}
-                  onClick={(e) => {
-                    if (navItem.subItems) {
-                      e.preventDefault();
-                      toggleExpand(navItem.label);
-                    }
-                  }}
+    <Sidebar collapsible="icon">
+      <SidebarContent className="dark:bg-[#0E1525]">
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem className="mb-5 mt-2 ">
+                <SidebarMenuButton asChild className="hover:bg-transparent">
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center gap-2 font-semibold"
+                  >
+                    <CompanyIcon
+                      // size={30}
+                      // color="#1169C4"
+                      className="min-h-5 min-w-5"
+                    />
+                    <span className="text-xl">Avinto AS</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              {navItems.map((item) => (
+                <Collapsible
+                  key={item.label}
+                  asChild
+                  defaultOpen={true}
+                  className="group/collapsible"
                 >
-                  {navItem.icon}
-                  {navItem.label}
-                  {navItem.subItems &&
-                    (expandedItem === navItem.label ? (
-                      <ChevronDown className="ml-auto h-4 w-4" />
+                  <SidebarMenuItem>
+                    {item.subItems ? (
+                      <>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton>
+                            {item.icon}
+                            <span>{item.label}</span>
+                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenu>
+                            {item.subItems.map((subItem) => (
+                              <SidebarMenuItem key={subItem.label}>
+                                <SidebarMenuButton asChild>
+                                  <a href={subItem.href} className="pl-6">
+                                    {subItem.icon}
+                                    <span>{subItem.label}</span>
+                                  </a>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            ))}
+                          </SidebarMenu>
+                        </CollapsibleContent>
+                      </>
                     ) : (
-                      <ChevronRight className="ml-auto h-4 w-4" />
-                    ))}
-                </Link>
-                {navItem.subItems && expandedItem === navItem.label && (
-                  <div className="ml-6 mt-2">
-                    {navItem.subItems.map((subItem) => (
-                      <Link
-                        key={subItem.label}
-                        href={subItem.href}
-                        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted/80 
-                          ${
-                            isActive(subItem.href)
-                              ? "bg-muted text-primary"
-                              : "text-muted-foreground hover:text-primary"
-                          }`}
-                      >
-                        {subItem.icon}
-                        {subItem.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </nav>
-        </div>
-        <div className="mt-auto p-4">
-          {/* <Card>
-            <CardHeader className="p-2 pt-0 md:p-4">
-              <CardTitle>Upgrade to Pro</CardTitle>
-              <CardDescription>
-                Unlock all features and get unlimited access to our support
-                team.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
-              <Button size="sm" className="w-full">
-                Upgrade
-              </Button>
-            </CardContent>
-          </Card> */}
-        </div>
-      </div>
-    </aside>
+                      <SidebarMenuButton asChild>
+                        <a href={item.href}>
+                          {item.icon}
+                          <span>{item.label}</span>
+                        </a>
+                      </SidebarMenuButton>
+                    )}
+                  </SidebarMenuItem>
+                </Collapsible>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter className="dark:bg-[#0E1525]">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton className="">
+                  <CircleUser className="h-5 w-5" />
+                  <span className="sr-only">Toggle user menu</span>
+                  Rahul Kayastha
+                  <ChevronUp className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                className="w-[--radix-popper-anchor-width]"
+              >
+                <DropdownMenuItem>
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <span>Support</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
   );
 }

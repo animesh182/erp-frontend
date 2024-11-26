@@ -285,19 +285,19 @@ export default function Dashboard() {
         },
         {
           title: "Expected Cost",
-          value: "N/A",
-          change: "N/A",
+          value: fetchedKpiData.total_expected_cost,
+          change: parseFloat(fetchedKpiData.expected_cost_percentage_change),
           period: "month",
           icon: <CreditCard />,
-          isMoney: false,
+          // isMoney: false,
         },
         {
           title: "Expected Liquidity",
-          value: "N/A",
-          change: "N/A",
+          value: fetchedKpiData.total_expected_liquidity,
+          change: parseFloat(fetchedKpiData.expected_liquidity_percentage_change),
           period: "month",
           icon: <CreditCard />,
-          isMoney: false,
+          // isMoney: false,
         },
       ];
       setKpiValues(updatedKpiDatas); // Setting the new kpiDatas array
