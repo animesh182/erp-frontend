@@ -40,7 +40,7 @@ const renderCustomizedLabel = ({ name, value, percent, x, y, cx, cy }) => {
     <text
       x={x}
       y={y}
-      fill="black"
+      // fill={entry.color}
       textAnchor={x > cx ? "start" : "end"}
       dominantBaseline="central"
       fontSize={14}
@@ -52,6 +52,8 @@ const renderCustomizedLabel = ({ name, value, percent, x, y, cx, cy }) => {
 };
 
 function DoughnutChart({chartData}) {
+
+  console.log(chartData,"dlallta")
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-start pb-0">
@@ -75,9 +77,9 @@ function DoughnutChart({chartData}) {
               cx="50%"
               cy="50%"
               innerRadius={40}
-              outerRadius={80}
+              outerRadius={140}
               labelLine={true}
-              label={renderCustomizedLabel}
+              // label={renderCustomizedLabel}
             >
             {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />

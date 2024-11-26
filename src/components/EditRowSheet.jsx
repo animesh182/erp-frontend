@@ -22,8 +22,12 @@ export function EditRowSheet({
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useFormContext();
+
+  const invoiceIssuedDate = watch("invoiceIssuedDate");
+  const status = watch("status");
 
   React.useEffect(() => {
     if (isOpen && rowData) {
@@ -106,6 +110,31 @@ export function EditRowSheet({
         );
       }
 
+      if (field.name === "paidDate") {
+        return (
+          <Controller
+            control={control}
+            name={field.name}
+            rules={{ required: field.required && status === "Paid" }}
+            render={({ field: { onChange, value } }) => (
+              <DatePicker
+                {...field.component.props}
+                value={value ? new Date(value) : null}
+                onChange={(date) => onChange(date ? date : null)}
+                className={cn(
+                  field.component.props?.className,
+                  hasError && "ring-2 ring-red-500"
+                )}
+                disabled={status !== "Paid"}
+                minDate={
+                  invoiceIssuedDate ? new Date(invoiceIssuedDate) : undefined
+                }
+              />
+            )}
+          />
+        );
+      }
+
       if (Component === DatePicker) {
         return (
           <Controller
@@ -116,7 +145,7 @@ export function EditRowSheet({
               <DatePicker
                 {...field.component.props}
                 value={value ? new Date(value) : null}
-                onChange={(date) => onChange(date ? date.toISOString() : null)}
+                onChange={(date) => onChange(date ? date : null)}
                 className={cn(
                   field.component.props?.className,
                   hasError && "ring-2 ring-red-500"

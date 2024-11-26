@@ -10,7 +10,7 @@ const TableTitle = ({ title, subtitle, totalItemCount }) => {
             {totalItemCount}
           </span>
         </div>
-        <p className="text-muted-foreground text-sm">{subtitle}</p>
+        <p className="text-muted-foreground text-sm hidden lg:block">{subtitle}</p>
       </div>
     </div>
   );

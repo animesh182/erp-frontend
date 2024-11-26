@@ -15,6 +15,11 @@ import {
   TrendingUp,
   TrendingDown,
   DollarSign,
+  Clock,
+  UserCheck,
+  PieChart,
+  FolderClock,
+  History
 } from "lucide-react";
 import {
   Card,
@@ -31,6 +36,22 @@ export const navItems = [
     label: "Dashboard",
     href: "/dashboard",
     icon: <Home className="h-4 w-4" />,
+  },
+  {
+    label: "Punch Clock",
+    href: "/dashboard/clockify",
+    icon: <PieChart className="h-4 w-4" />,
+    subItems: [
+      {
+        label: "General",
+        href: "/dashboard/clockify/general",
+        icon: <FolderClock className="h-4 w-4" />,
+      },
+      {
+        label: "History",
+        href: "/dashboard/clockify/history",
+        icon: <History className="h-4 w-4" />,
+      }]
   },
   {
     label: "Finances",
@@ -73,8 +94,22 @@ export const navItems = [
     label: "Employees",
     href: "/dashboard/employees",
     icon: <Users className="h-4 w-4" />,
+    subItems: [
+      {
+        label: "General",
+        href: "/dashboard/employees/general",
+        icon: <UserCheck className="h-4 w-4" />,
+      },
+      {
+        label: "Leave Request",
+        href: "/dashboard/employees/leave-request",
+        icon: <Clock className="h-4 w-4" />,
+      },
+      
+    ],
   },
 ];
+
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -101,7 +136,10 @@ export default function Sidebar() {
     <aside className="hidden md:fixed md:top-0 md:left-0 md:h-full md:w-[220px] lg:w-[280px] md:border-r md:bg-muted/40 md:block md:overflow-y-auto">
       <div className="flex h-full max-h-screen flex-col gap-2">
         <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 font-semibold"
+          >
             <CompanyIcon size={24} color="#1169C4" />
             <span className="">Avinto AS</span>
           </Link>

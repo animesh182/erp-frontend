@@ -26,10 +26,13 @@ export default function KpiCard({
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">
-          {isMoney ? `${formatAmountToNOK(value)}` : value}
+          {/* {isMoney ? `${formatAmountToNOK(value)}` : value} */}
+         {value}
         </div>
         <p className="text-xs text-muted-foreground">
-          {hasSubText && isTrend ? `${change}% from last ${period}` : period}
+          {/* {hasSubText && isTrend ? `${change}% from last ${period}` : period} */}
+          {period && (hasSubText && isTrend ? `${change}% from last ${period}` : period)}
+
         </p>
       </CardContent>
     </Card>

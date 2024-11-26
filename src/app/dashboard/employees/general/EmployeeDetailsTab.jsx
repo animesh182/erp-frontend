@@ -18,11 +18,17 @@ const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions }) => {
 
   const basicDetails = [
     { label: "Employee ID", value: employeeDetails?.employee_id },
+    // {
+    //   label: "Date of Birth",
+    //   value: employeeDetails?.date_of_birth
+    //     ? format(new Date(employeeDetails?.date_of_birth), "MMM dd yyyy")
+    //     : "N/A",
+    // },
     {
       label: "Date of Birth",
-      value: employeeDetails?.date_of_birth
-        ? format(new Date(employeeDetails?.date_of_birth), "MMM dd yyyy")
-        : "N/A",
+      value: employeeDetails?.date_of_birth==="N/A" || !employeeDetails?.date_of_birth
+        ?"N/A": format(new Date(employeeDetails?.date_of_birth), "MMM dd yyyy")
+   
     },
     { label: "Gender", value: employeeDetails?.gender || "N/A" },
     {
@@ -88,16 +94,17 @@ const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions }) => {
     // Generate a new ID (you might want to use a more robust method in production)
     const payload = {
       employee_id: formData.employeeId,
-      full_name: formData.linkedInName,
+      full_name: formData.fullName,
       email: formData.email,
-      password: "avinto123",
+      // password: "avinto123",
       employee_id: formData.employeeId,
       salary: formData.salary,
       employment_type: formData.employeeType,
       role: formData.jobTitle,
       country: formData.country,
       phone_number: formData.phone,
-      PAN: formData.panNumber,
+      pan_number: formData.panNumber,
+      supervisor: formData.supervisor,
       start_date: formData.startDate,
       end_date: formData.endDate || null,
       level: formData.level,

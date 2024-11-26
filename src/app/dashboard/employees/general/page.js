@@ -1,6 +1,6 @@
 "use client"; // Ensure this is at the top of the file
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { columns } from "./Columns";
 
 import TableTitle from "@/components/TableTitle";
@@ -18,13 +18,9 @@ import { createEmployee } from "@/app/api/employees/createEmployee";
 import { getRoles } from "@/app/api/role/getRoles";
 import { getLevels } from "@/app/api/level/getLevels";
 import { getProjects } from "@/app/api/projects/getProjects";
-// import getEmployees from "@/app/api/employees/getEmployees";
-// import { RectangleSkeleton } from "@/components/Skeletons";
-import {
-  getEmployees,
-  // getEmployeesWithRoles,
-} from "@/app/api/employees/getEmployees";
-// import { apiClient } from "@/lib/utils";
+import { getEmployees } from "@/app/api/employees/getEmployees";
+import { deleteEmployeeById } from "@/app/api/employees/deleteEmployeeById";
+
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -33,6 +29,11 @@ export default function Employees() {
   const [roleOptions, setRoleOptions] = useState([]);
   const [levelOptions, setLevelOptions] = useState([]);
   const [projectOptions, setProjectOptions] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshComponent = useCallback(() => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  }, []);
 
   const [payments, setPayments] = useState([
     {
@@ -110,29 +111,25 @@ export default function Employees() {
   };
 
   useEffect(() => {
-    // console.log('running')
     const getEmployeeDetails = async () => {
       try {
         const { status, data } = await getEmployees();
         if (status === 200) {
           setEmployeeDetails(data);
+        
         } else {
           console.error("Failed to fetch employee data");
         }
       } catch (error) {
         console.error("Error fetching employee details:", error);
-      }
+      } 
     };
 
     getEmployeeDetails();
     fetchRoles();
     fetchLevels();
     fetchProjects();
-  }, []);
-
-  // useEffect(() => {
-  //   setActiveTab("employeeDetails");
-  // }, [selectedEmployee]);
+  }, [refreshKey]);
 
   const handleEmployeeAdd = () => {
     setIsSheetOpen(true);
@@ -145,23 +142,49 @@ export default function Employees() {
       console.log(response);
 
       const newEmployee = {
-        id: response.id, // Assuming the API returns an id
+        id: response.id,
         ...formData,
       };
       setPayments([...payments, newEmployee]);
       setIsSheetOpen(false);
+      refreshComponent();
     } catch (error) {
       toast.error(error.message || "Failed to add employee");
       console.error("Error adding employee:", error);
     }
   };
 
+  const onDeleteEmployee = async (id) => {
+    try {
+      const response = await deleteEmployeeById(id);
+      toast.success("Employee deleted successfully");
+      refreshComponent();
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      toast.error("Failed to delete employee");
+    }
+  };
+
   const handleRowSelect = (row) => {
-    // console.log(row);
     setSelectedEmployee(row);
   };
 
-  return (
+  const getInitials = (name) => {
+    if (!name || typeof name !== "string") {
+      return "";
+    }
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+
+
+ 
+    return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="items-center">
         <div className="flex flex-row justify-end">
@@ -170,40 +193,38 @@ export default function Employees() {
           </Button>
         </div>
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 py-4 px-0">
-          <div className="h-full flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
-            {
-              employeeDetails && employeeDetails.length > 0 && (
-                <>
-                  <TableTitle
-                    title="List of Employees"
-                    subtitle="List of all employees in the company"
-                    totalItemCount={employeeDetails.length}
-                  />
-                  <SimpleDataTable
-                    columns={columns}
-                    data={employeeDetails}
-                    onRowSelect={handleRowSelect}
-                  />
-                </>
-              )
-              // : (
-              //   <div className=" ">
-              //     <RectangleSkeleton height={"745"} />
-              //   </div>
-            }
+          <div className="h-screen flex flex-col px-5 py-5 items-center gap-1 text-left border rounded-md">
+            {employeeDetails && employeeDetails.length > 0 && (
+              <>
+                <TableTitle
+                  title="List of Employees"
+                  subtitle="List of all employees in the company"
+                  totalItemCount={employeeDetails.length}
+                />
+                <SimpleDataTable
+                  columns={columns}
+                  data={employeeDetails}
+                  onRowSelect={handleRowSelect}
+                  onDeleteRow={onDeleteEmployee}
+                />
+              </>
+            )}
           </div>
           <div className="flex flex-col items-center gap-1 text-center border rounded-md">
             <div className="h-24 w-full flex items-center bg-muted px-5 min-h-24">
               <div className="flex items-center gap-3">
                 <Avatar className="w-12 h-12">
                   <AvatarImage
-                    src={selectedEmployee?.imageUrl || "/default-avatar.jpg"}
+                    src={selectedEmployee?.imageUrl}
                     className="object-cover"
                   />
-                  <AvatarFallback className="text-lg font-semibold">
-                    <span>
-                      {selectedEmployee?.employeeName?.charAt(0) || "JD"}
-                    </span>
+
+                  <AvatarFallback>
+                    {selectedEmployee?.imageUrl ? (
+                      <span>{selectedEmployee?.full_name}</span>
+                    ) : (
+                      getInitials(selectedEmployee?.full_name)
+                    )}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col items-start">
@@ -211,7 +232,7 @@ export default function Employees() {
                     {selectedEmployee?.full_name || "John Doe"}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {selectedEmployee?.role || "Product Manager"}
+                    {selectedEmployee?.role}
                   </div>
                 </div>
               </div>
@@ -219,7 +240,7 @@ export default function Employees() {
             <Tabs
               value={activeTab}
               onValueChange={setActiveTab}
-              className="w-full mt-4 justify-start text-left h-[calc(100%-7.2rem)] flex flex-col"
+              className="w-full mt-4 justify-start text-left max-h-[calc(100vh-7.2rem)] h-[calc(100%-7.2rem)] flex flex-col"
             >
               <TabsList className="mx-6 w-max">
                 <TabsTrigger value="projects">Projects</TabsTrigger>
@@ -251,7 +272,6 @@ export default function Employees() {
             </Tabs>
           </div>
         </div>
-        {/* {console.log(selectedEmployee)} */}
       </div>
       <EditEmployeeSheet
         isOpen={isSheetOpen}
@@ -259,7 +279,6 @@ export default function Employees() {
         onAddEmployee={onAddEmployee}
         roleOptions={roleOptions}
         levelOptions={levelOptions}
-        //the edit employee is on the employee details tab
       />
     </main>
   );

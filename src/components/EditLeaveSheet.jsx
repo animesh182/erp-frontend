@@ -4,14 +4,14 @@ import { useForm, Controller } from "react-hook-form";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/textarea";
 import { format, differenceInCalendarDays } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
-export function RequestForLeaveSheet({ isOpen, onClose, onSubmit }) {
+export function RequestForLeaveSheet({ isOpen, onClose, onSubmit,data }) {
   const { control, handleSubmit, reset, watch, setValue } = useForm({
     defaultValues: {
       leaveReason: "Sick leave (Illness or Injury)",
@@ -22,6 +22,9 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit }) {
       numberOfLeaveDays: 0, // Adding number of leave days to the form
     },
   });
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [others, setOthers] = useState("");
+  const [leaveReason, setLeaveReason] = useState("Sick leave (Illness or Injury)");
 
   // Watch for changes in start and end date to automatically calculate the number of days
   const startDate = watch("startedLeaveDate");
@@ -35,20 +38,18 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit }) {
   }, [startDate, endDate, setValue]);
 
   const handleFormSubmit = (data) => {
-    // Set status as "Pending" when submitting
-    const newLeaveRequest = {
-      ...data,
-      status: "Pending",
-    };
-    onSubmit(newLeaveRequest); // Call the parent function to handle form data
+    const newLeaveRequest = { ...data, status: "Pending" };
+    onSubmit(newLeaveRequest);
     reset(); // Reset the form after submission
+    setOthers();
     onClose(); // Close the sheet
+  
   };
-
+ 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="w-[480px]">
-        <SheetHeader>
+      <SheetContent className="">
+        <SheetHeader className="text-left">
           <SheetTitle>Request for Leave</SheetTitle>
           <SheetDescription>
             Here you can request for leave by filling the form below.
@@ -58,28 +59,64 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit }) {
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6 mt-6">
           {/* Type of Leave */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Type of Leave</label>
-            <Controller
-              name="leaveReason"
-              control={control}
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Type of Leave" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Sick leave (Illness or Injury)">Sick leave (Illness or Injury)</SelectItem>
-                    <SelectItem value="Bereavement leave">Bereavement leave</SelectItem>
-                    <SelectItem value="Vacation Leave">Vacation Leave</SelectItem>
-                    <SelectItem value="Leave without pay">Leave without pay</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
+  <label className="text-sm font-medium">Type of Leave</label>
+  <Controller
+    name="leaveReason"
+    control={control}
+    render={({ field }) => (
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+          >
+            {leaveReason === "Other" ? (others || "Specify your leave reason") : leaveReason}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="p-4 w-full space-y-2 max-h-52 overflow-y-auto">
+          {data.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => {
+                setLeaveReason(item.name);
+                field.onChange(item.name);
+                setIsPopoverOpen(false);
+              }}
+              className="cursor-pointer"
+            >
+              {item.name}
+            </div>
+          ))}
+          <div
+            onClick={() => {
+              setLeaveReason("Other");
+              field.onChange("Other");
+              setIsPopoverOpen(true); // Keep Popover open for input
+            }}
+            className="cursor-pointer"
+          >
+            Other
           </div>
+          {leaveReason === "Other" && (
+            <Input
+              placeholder="Specify your leave reason"
+              value={others}
+              onChange={(e) => {
+                setOthers(e.target.value);
+                field.onChange(e.target.value);
+              }}
+              className="mt-2"
+            />
+          )}
+        </PopoverContent>
+      </Popover>
+    )}
+  />
+</div>
 
           {/* Date Range (From - To) */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 z-0">
             <div>
               <label className="text-sm font-medium">From</label>
               <Controller
@@ -130,16 +167,24 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit }) {
               name="typeOfLeave"
               control={control}
               render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Full Day">Full Day</SelectItem>
-                    <SelectItem value="AM">AM</SelectItem>
-                    <SelectItem value="PM">PM</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      {field.value || "Select Type"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full justify-start">
+                    <div onClick={() => field.onChange("Full Day")} className="cursor-pointer p-2">
+                      Full Day
+                    </div>
+                    <div onClick={() => field.onChange("AM")} className="cursor-pointer p-2">
+                      AM
+                    </div>
+                    <div onClick={() => field.onChange("PM")} className="cursor-pointer p-2">
+                      PM
+                    </div>
+                  </PopoverContent>
+                </Popover>
               )}
             />
           </div>

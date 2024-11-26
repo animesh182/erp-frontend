@@ -3,7 +3,6 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK } from "@/lib/utils";
 import TableActionsDropdown from "@/components/TableActionsDropdown";
-import { formInputs } from "@/app/dashboard/payroll/Inputs";
 import { format } from "date-fns";
 
 export const columns = [
@@ -102,18 +101,9 @@ export const columns = [
     cell: ({ row }) => {
       const rowData = row.original;
 
-      const handleDelete = () => {
-        console.log("Delete", row.original.id);
-        // Handle delete action
-      };
-
       return (
         <div className="flex items-center">
-          <TableActionsDropdown
-            rowData={rowData}
-            onDelete={handleDelete}
-            formInputs={formInputs}
-          />
+          <TableActionsDropdown rowData={rowData} />
         </div>
       );
     },

@@ -6,15 +6,11 @@ import { format } from "date-fns";
 import { MoreHorizontal } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { util } from "zod";
+import ProjectTableActionsDropdown from "@/components/ProjectTableActionsDropdown";
+import LeaveRequestDropDown from "@/components/LeaveRequestDropDown";
 
 
-export const ProgressBar = ({value}) => {
-  return (
-    <div className="flex items-center w-full gap-2">
-      <Progress value={value} className="h-2 w-2/3"/><span className="font-semibold">{value}%</span>
-    </div>
-  )
-}
+
 
 export const columns = [
   {
@@ -39,7 +35,8 @@ export const columns = [
         </span>
       );
     },
-    enableSorting: false,  
+    enableSorting: true,  
+    hideOnMobile: true,
   },
   {
     accessorKey: "endedLeaveDate",
@@ -54,12 +51,14 @@ export const columns = [
         </span>
       );
     },
-    enableSorting: false,  
+    enableSorting: true,
+    hideOnMobile: true,  
   },
   {
     accessorKey: "numberOfLeaveDays",
     header: "Days",
     enableSorting: false,
+    hideOnMobile: true,
     cell: ({ row }) => {
       const { numberOfLeaveDays } = row.original;
       return numberOfLeaveDays ? <span className="font-medium">{numberOfLeaveDays}</span> : "No Data"; // Show "No Data" if the project is null or undefined
@@ -69,6 +68,7 @@ export const columns = [
     accessorKey: "typeOfLeave",
     header: "Type",
     enableSorting: false,
+    hideOnMobile: true,
     cell: ({ row }) => {
       const { typeOfLeave } = row.original;
       return typeOfLeave ? <span className="font-medium">{typeOfLeave}</span> : "No Data"; // Show "No Data" if the project is null or undefined
@@ -83,8 +83,10 @@ export const columns = [
         <Badge
           className={`${
             status?.toLowerCase() === "approved"
-              ? "bg-green-100 text-green-800"
-              : "bg-orange-300 text-orange-600"
+            ? "bg-green-100 text-green-800"
+            : status?.toLowerCase() === "pending"
+            ? "bg-orange-300 text-orange-600"
+            : "bg-red-100 text-red-800"
           }`}
         >
           {status ? status : "No Data"} {/* Show "No Data" */}
@@ -97,6 +99,7 @@ export const columns = [
     accessorKey: "detailedExplanation",
     header: "Detailed Explanation",
     enableSorting: false,
+    hideOnMobile: true,
     cell: ({ row }) => {
       const { detailedExplanation } = row.original;
       return detailedExplanation ? (
@@ -107,5 +110,20 @@ export const columns = [
         "No Data"
       );
     },
-  }
+  },
+
+
+  {
+    accessorKey: "actions",
+    header: "",
+    cell: ({ row }) => {
+      const rowData = row.original;
+      return (
+        <div className="flex items-center">
+          <LeaveRequestDropDown rowData={rowData} />
+        </div>
+      );
+    },
+    enableSorting: false,
+  },
 ];

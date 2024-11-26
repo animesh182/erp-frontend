@@ -1,44 +1,57 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import DataTable from "@/components/ui/data-table";
 import { columns } from "@/app/dashboard/finances/expenses/Columns";
 import { toast } from "sonner";
 import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
-import { subDays, format } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { useForm, FormProvider } from "react-hook-form";
 import { getExpense } from "@/app/api/expense/getExpense";
 import { createExpense } from "@/app/api/expense/createExpense";
 import { getProjects } from "@/app/api/projects/getProjects";
 import { editExpense } from "@/app/api/expense/editExpense";
+import { deleteExpense } from "@/app/api/expense/deleteExpense";
 
 export default function Expenses() {
   const methods = useForm();
-  const initialEndDate = new Date(); // Today's date
-  const initialStartDate = subDays(initialEndDate, 28); // 4 weeks ago
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
+  // Get first day of current month
+  const initialStartDate = startOfMonth(new Date());
+  // Get last day of current month
+  const initialEndDate = endOfMonth(new Date());
+
+  const [startDate, setStartDate] = useState(
+    format(initialStartDate, "yyyy-MM-dd")
+  );
+  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
   const [data, setData] = useState([]); // State to hold the fetched data
   const [loading, setLoading] = useState(true); // Loading state
   const [projectOptions, setProjectOptions] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refreshComponent = useCallback(() => {
+    setRefreshKey((prevKey) => prevKey + 1);
+  }, []);
 
   useEffect(() => {
     if (startDate && endDate) {
       fetchData(startDate, endDate);
     }
     fetchProjects();
-  }, [startDate, endDate]);
+  }, [startDate, endDate, refreshKey]);
 
   const fetchData = async (startDate, endDate) => {
-    console.log("Fetching data from:", startDate, "to:", endDate);
+    // console.log("Fetching data from:", startDate, "to:", endDate);
     try {
       const fetchedData = await getExpense(
         format(startDate, "yyyy-MM-dd"),
         format(endDate, "yyyy-MM-dd")
       );
-      console.log(fetchedData, "data");
+      // console.log(fetchedData, "data");
       setData(fetchedData);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setLoading(false);
     }
   };
 
@@ -53,17 +66,17 @@ export default function Expenses() {
 
   const handleDateChange = (startDate, endDate) => {
     setStartDate(startDate);
-    setEndDate(endDate);
+    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
   };
 
   const onAddRow = async (newRowData) => {
     try {
       await createExpense(newRowData);
-      toast.success("New row added");
-      // console.log(newRowData, "in form");
+      toast.success("New expense added");
+      refreshComponent();
     } catch (error) {
-      toast.error("Failed to add new row");
-      console.error("Error adding new row:", error);
+      toast.error("Failed to add new expense");
+      console.error("Error adding new expense:", error);
     }
   };
 
@@ -71,13 +84,21 @@ export default function Expenses() {
     try {
       await editExpense(editedData.id, editedData);
       toast.success("Expense updated successfully");
-      // Optionally, you can update the local state here if needed
-      setData((prevData) =>
-        prevData.map((item) => (item.id === editedData.id ? editedData : item))
-      );
+      refreshComponent();
     } catch (error) {
       toast.error("Failed to update expense");
       console.error("Error updating expense:", error);
+    }
+  };
+
+  const onDeleteRow = async (rowId) => {
+    try {
+      await deleteExpense(rowId);
+      toast.success("Expense deleted successfully");
+      refreshComponent();
+    } catch (error) {
+      toast.error("Failed to delete expense");
+      console.error("Error deleting expense:", error);
     }
   };
 
@@ -94,11 +115,13 @@ export default function Expenses() {
           isTableAddFormEnabled={true}
           onAddRow={onAddRow}
           onEditRow={onEditRow}
+          onDeleteRow={onDeleteRow}
           filterColumn={"costType"}
           onDateChange={handleDateChange}
-          initialStartDate={startDate} // Pass initial start date
-          initialEndDate={endDate} // Pass initial end date
-          loading={loading} // Pass loading state to the DataTable component if necessary
+          initialStartDate={startDate}
+          initialEndDate={endDate}
+          isMonthPicker={true}
+          loading={loading}
         />
       </FormProvider>
     </main>

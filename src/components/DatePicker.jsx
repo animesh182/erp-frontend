@@ -33,7 +33,6 @@ export function DatePicker({ value, onChange, minDate, disabled }) {
     date ? date.getMonth() : new Date().getMonth()
   );
 
-  // Sync internal state with the value prop when it changes (e.g., after a reset)
   React.useEffect(() => {
     const newDate = value ? new Date(value) : null;
     setDate(newDate);
@@ -60,7 +59,7 @@ export function DatePicker({ value, onChange, minDate, disabled }) {
 
     setYear(adjustedDate.getFullYear());
     setMonth(adjustedDate.getMonth());
-    onChange(formattedDate); // Pass the formatted date string to onChange
+    onChange(formattedDate);
   };
 
   const handleYearChange = (increment) => {
@@ -99,51 +98,58 @@ export function DatePicker({ value, onChange, minDate, disabled }) {
       </PopoverTrigger>
       {!disabled && (
         <PopoverContent className="w-auto p-0" align="start">
-          <div className="flex items-center justify-between p-2">
-            <Button
-              variant="outline"
-              className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-              onClick={() => handleYearChange(-1)}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Select
-              value={year.toString()}
-              onValueChange={handleYearChangeSelect}
-            >
-              <SelectTrigger className="h-7 w-[120px]">
-                <SelectValue placeholder={year} />
-              </SelectTrigger>
-              <SelectContent>
-                {years.map((y) => (
-                  <SelectItem key={y} value={y.toString()}>
-                    {y}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              variant="outline"
-              className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-              onClick={() => handleYearChange(1)}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+          <div className="flex flex-col space-y-2 p-2">
+            <div className="flex items-center justify-between">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => handleYearChange(-1)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Select
+                value={year.toString()}
+                onValueChange={handleYearChangeSelect}
+              >
+                <SelectTrigger className="h-7 w-[120px]">
+                  <SelectValue placeholder={year} />
+                </SelectTrigger>
+                <SelectContent
+                  position="popper"
+                  className="max-h-[300px] overflow-y-auto"
+                >
+                  {years.map((y) => (
+                    <SelectItem key={y} value={y.toString()}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => handleYearChange(1)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={handleDateChange}
+              month={new Date(year, month)}
+              onMonthChange={(newMonth) => {
+                setMonth(newMonth.getMonth());
+                setYear(newMonth.getFullYear());
+              }}
+              initialFocus
+              disabled={(date) =>
+                minDate ? date < new Date(minDate).setHours(0, 0, 0, 0) : false
+              }
+            />
           </div>
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={handleDateChange}
-            month={new Date(year, month)}
-            onMonthChange={(newMonth) => {
-              setMonth(newMonth.getMonth());
-              setYear(newMonth.getFullYear());
-            }}
-            initialFocus
-            disabled={(date) =>
-              minDate && date < new Date(minDate).setHours(12, 0, 0, 0)
-            }
-          />
         </PopoverContent>
       )}
     </Popover>

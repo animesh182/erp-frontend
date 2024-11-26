@@ -1,5 +1,6 @@
 "use client";
 import { fetchProfitLoss } from "../api/dashboard/fetchProfitLoss";
+import { fetchOngoingProjects } from "../api/dashboard/getFinancialStatus";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { subDays, format, startOfDay } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { KpiSkeleton, RectangleSkeleton } from "@/components/Skeletons";
 import { fetchKpiData } from "@/app/api/fetchKpiData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,49 +21,7 @@ import ProfitLossChart from "@/components/charts/ProfitLoss";
 import DateRangePicker from "@/components/DateRangePicker";
 import { useState, useEffect } from "react";
 import fetchReourceUtil from "@/app/api/dashboard/fetchResourceUtil";
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-const projectBudget = [
-  {
-    project: "Basic Booking App",
-    totalIncome: 100000,
-    expenses: { direct: 2000, fixed: 5000, npa: 50000 },
-    isRecurring: true,
-  },
-  {
-    project: "Jambo Booking House",
-    totalIncome: 200000,
-    expenses: { direct: 3000, fixed: 15000, npa: 170000 },
-    isRecurring: true,
-  },
-  {
-    project: "Avinto ERP",
-    totalIncome: 1000000,
-    expenses: { direct: 3000, fixed: 20000, npa: 500000 },
-  },
-  {
-    project: "Ebibaaha",
-    totalIncome: 500000,
-    expenses: { direct: 20000, fixed: 100000, npa: 150000 },
-  },
-  {
-    project: "Changeride",
-    totalIncome: 500000,
-    expenses: { direct: 20000, fixed: 100000, npa: 150000 },
-    completed: true,
-  },
-  {
-    project: "Tutor App",
-    totalIncome: 500000,
-    expenses: { direct: 20000, fixed: 100000, npa: 150000 },
-    completed: true,
-  },
-  {
-    project: "Logistikk",
-    totalIncome: 500000,
-    expenses: { direct: 20000, fixed: 100000, npa: 150000 },
-    completed: true,
-  },
-];
+import { useRouter } from "next/navigation";
 
 export const profitLossData = [
   {
@@ -151,21 +110,27 @@ export const profitLossData = [
     // profitPercentage: 73,
   },
 ];
-const ongoingProjects = projectBudget.filter((project) => !project.completed);
-const completedProjects = projectBudget.filter((project) => project.completed);
+
 export default function Dashboard() {
   const [profitLoss, setProfitLoss] = useState([]);
   const [resourceUtilData, setResourceUtilData] = useState();
   const [fetchedKpiData, setFetchedKpiData] = useState();
   const [kpiValues, setKpiValues] = useState();
-  const initialEndDate = startOfDay(new Date()); // Today's date
-  const initialStartDate = startOfDay(subDays(initialEndDate, 28)); // 4 weeks ago
+  const [ongoingProjects, setOngoingProjects] = useState([]);
+  const [completedProjects, setCompletedProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Get first day of current month
+  const initialStartDate = startOfMonth(new Date());
+  // Get last day of current month
+  const initialEndDate = endOfMonth(new Date());
+
   const [startDate, setStartDate] = useState(
-    format(startOfDay(initialStartDate), "yyyy-MM-dd")
+    format(initialStartDate, "yyyy-MM-dd")
   );
-  const [endDate, setEndDate] = useState(
-    format(startOfDay(initialEndDate), "yyyy-MM-dd")
-  );
+  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
+
+  const router = useRouter();
   useEffect(() => {
     const getProfitLoss = async () => {
       const { status, data } = await fetchProfitLoss();
@@ -211,14 +176,17 @@ export default function Dashboard() {
     getProfitLoss();
   }, []);
 
-  console.log(profitLoss);
+  // console.log(profitLoss);
   useEffect(() => {
     const getKpiData = async () => {
-      const { status, data } = await fetchKpiData(startDate, endDate);
+      const { status, data } = await fetchKpiData(
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd")
+      );
       if (status === 200) {
         setFetchedKpiData(data);
       } else {
-        console.error("Failed to fetch KPI data");
+        console.error("Failed to fetch KPIs data");
       }
     };
 
@@ -226,7 +194,10 @@ export default function Dashboard() {
   }, [startDate, endDate]);
   useEffect(() => {
     const getResourceUtilData = async () => {
-      const { status, data } = await fetchReourceUtil(startDate, endDate);
+      const { status, data } = await fetchReourceUtil(
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd")
+      );
 
       if (status === 200) {
         const transformedData = data.map((user) => {
@@ -247,6 +218,22 @@ export default function Dashboard() {
 
     getResourceUtilData();
   }, [startDate, endDate]);
+
+  useEffect(() => {
+    const getOngoingProjects = async () => {
+      const { status, data } = await fetchOngoingProjects();
+      if (status === 200) {
+        setOngoingProjects(data.ongoing_projects);
+        setCompletedProjects(data.completed_projects);
+        // console.log(data, "data");
+      } else {
+        console.error("Failed to fetch ongoing projects data");
+      }
+    };
+
+    getOngoingProjects();
+  }, []);
+
   useEffect(() => {
     if (fetchedKpiData) {
       const updatedKpiDatas = [
@@ -314,12 +301,13 @@ export default function Dashboard() {
         },
       ];
       setKpiValues(updatedKpiDatas); // Setting the new kpiDatas array
+      setLoading(false);
     }
   }, [fetchedKpiData]); // This will trigger whenever kpiData is fetched
 
   const handleDateChange = (startDate, endDate) => {
-    setStartDate(format(startDate, "yyyy-MM-dd"));
-    setEndDate(format(endDate, "yyyy-MM-dd"));
+    setStartDate(startDate);
+    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
   };
 
   return (
@@ -327,16 +315,13 @@ export default function Dashboard() {
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Home</h1>
         <DateRangePicker
-          numberOfMonths={2}
+          // numberOfMonths={2}
           onDateChange={handleDateChange}
           initialStartDate={startDate}
           initialEndDate={endDate}
+          isMonthPicker={true}
         />
       </div>
-      {/* <div
-        className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm"
-        x-chunk="dashboard-02-chunk-1"
-      > */}
       <div className="flex flex-1 flex-col gap-4 md:gap-8 ">
         <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
           {kpiValues && kpiValues.length > 0
@@ -354,36 +339,38 @@ export default function Dashboard() {
                 </div>
               ))
             : // Render skeletons based on expected number of KPI cards
-              [...Array(6)].map((_, index) => (
+              [...Array(8)].map((_, index) => (
                 <div key={index}>
                   <KpiSkeleton />
                 </div>
               ))}
         </div>
       </div>
-      <div className="flex items-center justify-center gap-x-6 w-full select-none">
-        <Card className="w-3/5">
+      <div className="grid grid-cols-5 gap-x-6 select-none">
+        <Card className="col-span-5 lg:col-span-3 h-full">
           <CardHeader className="flex-row justify-between items-center">
             <CardTitle>
               Profit & Loss
               <div className="text-sm font-normal text-muted-foreground">
-                This table caputures all cost streams associated with each
-                project
+                This chart provides a financial overview of the company
               </div>
             </CardTitle>
-            <Button>View More</Button>
+            <Button
+              onClick={() => router.push("/dashboard/finances/projection")}
+            >
+              View More
+            </Button>
           </CardHeader>
-          <CardContent className="p-0 w-full h-[400px]">
+          <CardContent className="p-0 w-full h-[600px]">
             <ProfitLossChart data={profitLoss} />
           </CardContent>
         </Card>
-        <Card className="w-2/5 h-full">
+        <Card className="col-span-5 lg:col-span-2 h-full">
           <CardHeader className="flex-row justify-between items-center pb-0 ">
             <CardTitle>
               Project Financial Status
               <div className="text-sm font-normal text-muted-foreground">
-                This table caputures all cost streams associated with each
-                project
+                This chart provides a financial health of specific projects
               </div>
             </CardTitle>
           </CardHeader>
@@ -410,27 +397,27 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-      <Card className="select-none">
-        <CardHeader className="flex-row justify-between items-center">
-          <CardTitle>
-            Resource Utilization
-            <div className="text-sm font-normal text-muted-foreground">
-              This table caputures all cost streams associated with each project
-            </div>
-          </CardTitle>
-          <Button>View More</Button>
-        </CardHeader>
-        <CardContent className="w-full h-full">
-          {resourceUtilData && resourceUtilData.length > 0 ? (
-            <EmployeeMonthlyHours rawData={resourceUtilData} />
-          ) : resourceUtilData && resourceUtilData.length === 0 ? (
-            <div className="text-3xl font-semibold">No Data Available</div>
-          ) : (
-            <RectangleSkeleton />
-          )}
-        </CardContent>
-      </Card>
-      {/* </div> */}
+      <div className="grid grid-cols-5 gap-x-6 select-none">
+        <Card className="col-span-5 select-none w-full overflow-hidden">
+          <CardHeader className="flex-row justify-between items-center">
+            <CardTitle>
+              Resource Utilization
+              <div className="text-sm font-normal text-muted-foreground">
+                This graph shows an overview of all resources in the project
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="w-full h-full min-h-[800px]">
+            {resourceUtilData && resourceUtilData.length > 0 ? (
+              <EmployeeMonthlyHours rawData={resourceUtilData} />
+            ) : resourceUtilData && resourceUtilData.length === 0 ? (
+              <div className="text-3xl font-semibold">No Data Available</div>
+            ) : (
+              <RectangleSkeleton />
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </main>
   );
 }

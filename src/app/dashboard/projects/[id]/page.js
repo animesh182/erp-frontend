@@ -8,7 +8,8 @@ import TableTitle from "@/components/TableTitle";
 import SimpleDataTable from "@/components/ui/simple-data-table";
 import { columns } from "./Columns";
 import { getProjectById } from "@/app/api/getProjects"; // Import the API function to get project by ID
-
+import { deleteResourceUtilization } from "@/app/api/projects/deleteResourceUtilization";
+import { toast } from "sonner";
 export default function ProjectDetails() {
   const [project, setProject] = useState(null); // Project state
   const [loading, setLoading] = useState(true); // Loading state
@@ -36,20 +37,16 @@ export default function ProjectDetails() {
       fetchProjectDetails(); // Fetch the project details using projectId
     }
   }, [id]);
-  console.log(project);
-  const dummyEmployeeData = [
-    {
-      id: "1",
-      imageUrl: "/default-avatar.jpg",
-      employeeName: "John Doe",
-      email: "john.doe@example.com",
-      role: "Frontend Developer",
-      timeAllocated: "40 hours/week",
-      startDate: "2023-01-15",
-      endDate: "2023-12-15",
-    },
-    // More employee data...
-  ];
+
+  const onDeleteRow = async (resourceId) => {
+    try {
+      await deleteResourceUtilization(resourceId);
+      toast.success("Resource utilization deleted successfully");
+    } catch (error) {
+      toast.error("Error deleting resource utilization");
+      console.error("Error deleting resource utilization:", error);
+    }
+  };
 
   // Show loading while fetching data
   if (loading) return <div>Loading...</div>;
@@ -71,9 +68,13 @@ export default function ProjectDetails() {
         <TableTitle
           title="Resource Utilization"
           subtitle="List of all employees in the project"
-          totalItemCount={dummyEmployeeData.length}
+          totalItemCount={6}
         />
-        <SimpleDataTable columns={columns} data={project.all_user_projects} />
+        <SimpleDataTable
+          columns={columns}
+          data={project.all_user_projects}
+          onDeleteRow={onDeleteRow}
+        />
       </div>
     </main>
   );

@@ -4,17 +4,20 @@ import { columns } from "./Columns";
 import DataTable from "@/components/ui/data-table";
 import KpiCard from "@/components/kpicard";
 import { Activity, CreditCard, DollarSign } from "lucide-react";
-import { subDays, format } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { getTransactions } from "@/app/api/transactions/getTransactions";
 import { fetchTransactionKpi } from "@/app/api/finances/transaction/fetchTransactionKpi";
-export default function Transactions() {
-  // Initialize date range
-  const initialEndDate = new Date(); // Today's date
-  const initialStartDate = subDays(initialEndDate, 28); // 4 weeks ago
 
-  // State to hold date range
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
+export default function Transactions() {
+  // Get first day of current month
+  const initialStartDate = startOfMonth(new Date());
+  // Get last day of current month
+  const initialEndDate = endOfMonth(new Date());
+
+  const [startDate, setStartDate] = useState(
+    format(initialStartDate, "yyyy-MM-dd")
+  );
+  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
 
   // State to hold transaction data
   const [data, setData] = useState([]);
@@ -38,7 +41,10 @@ export default function Transactions() {
       const getKpiData = async () => {
         try {
           // Fetch KPI data
-          const kpiResponse = await fetchTransactionKpi(startDate, endDate);
+          const kpiResponse = await fetchTransactionKpi(
+            format(startDate, "yyyy-MM-dd"),
+            format(endDate, "yyyy-MM-dd")
+          );
 
           if (kpiResponse.status === 200) {
             // Set KPI data from the response
@@ -95,7 +101,7 @@ export default function Transactions() {
 
   const handleDateChange = (startDate, endDate) => {
     setStartDate(startDate);
-    setEndDate(endDate);
+    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
   };
 
   return (
@@ -136,6 +142,7 @@ export default function Transactions() {
         onDateChange={handleDateChange}
         initialStartDate={startDate}
         initialEndDate={endDate}
+        isMonthPicker={true}
       />
     </main>
   );

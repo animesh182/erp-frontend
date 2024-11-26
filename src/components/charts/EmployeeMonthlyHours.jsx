@@ -76,7 +76,9 @@ export default function EmployeeMonthlyHours({ rawData }) {
 
   if (!rawData) return <>Loading...</>;
   const CustomYAxisTick = ({ x, y, payload }) => {
+    // console.log(payload, "payload");
     const remainingHours = calculateRemainingHours(rawData[payload.index]);
+    const truncatedName = payload.value.split(" ").slice(0, 2).join(" ");
     return (
       <g transform={`translate(${x},${y})`}>
         <foreignObject x={-150} y={-10} width="150" height="40">
@@ -87,7 +89,7 @@ export default function EmployeeMonthlyHours({ rawData }) {
           >
             <UserCircleIcon className="h-8 w-8 pb-1.5" />
             <div className="flex flex-col w-full">
-              <div className="font-semibold">{payload.value}</div>
+              <div className="font-semibold">{truncatedName}</div>
               <div className="text-[10px]">
                 {remainingHours < 0
                   ? `${Math.abs(remainingHours)} hours Overtime`
@@ -104,8 +106,7 @@ export default function EmployeeMonthlyHours({ rawData }) {
     );
   };
   return (
-    <ChartContainer className="h-[400px] w-full" config={chartConfig}>
-      {/* <ResponsiveContainer width="100%" height="100%"> */}
+    <ChartContainer className="h-[800px] w-full" config={chartConfig}>
       <BarChart
         layout="vertical"
         data={data}

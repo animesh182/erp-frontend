@@ -2,23 +2,17 @@
 
 import MultiLineNameCell from "@/components/MultiLineNameCell";
 import SimpleTableActionsDropdown from "@/components/SimpleTableActionsDropdown";
-import { apiClient } from "@/lib/utils";
+import { deleteResourceUtilization } from "@/app/api/projects/deleteResourceUtilization";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 export const columns = [
   {
     accessorKey: "employeeName",
     header: "Assigned To",
     cell: ({ row }) => {
-      console.log(row);
       const { user_name, user_email } = row.original; // Access the full row data
-      return (
-        <MultiLineNameCell
-          // imageUrl={imageUrl}
-          title={user_name}
-          subtitle={user_email}
-        />
-      );
+      return <MultiLineNameCell title={user_name} subtitle={user_email} />;
     },
     enableSorting: false,
   },
@@ -38,9 +32,11 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const { start_date } = row.original;
-      return    <div>      {start_date
-        ? format(new Date(start_date), "MMM dd yyyy")
-        : "N/A"}</div>;
+      return (
+        <div>
+          {start_date ? format(new Date(start_date), "MMM dd yyyy") : "N/A"}
+        </div>
+      );
     },
   },
   {
@@ -49,44 +45,20 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const { end_date } = row.original;
-      return    <div>      {end_date
-        ? format(new Date(end_date), "MMM dd yyyy")
-        : "Present"}</div>;
+      return (
+        <div>
+          {end_date ? format(new Date(end_date), "MMM dd yyyy") : "Present"}
+        </div>
+      );
     },
   },
   {
     accessorKey: "actions",
     header: "",
     cell: ({ row }) => {
-      const handleEdit = () => {
-        console.log("Edit", row.original.id);
-        // Handle edit action
-      };
-
-      const handleDelete = () => {
-        const userId = row.original.id;
-        try {
-          const response = apiClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/user_projects/${userId}/${row.original.project_id}/delete/`,
-            {
-              method: "DELETE",
-            }
-          );
-          if (response.ok) {
-            toast.success(
-              `${row.original.user_name} deleted successfully from the project.`
-            );
-          }
-        } catch (error) {
-          toast.error("There was an error deleting the user");
-          console.error("There was an error deleting the user:", error);
-        }
-        // Handle delete action
-      };
-
       return (
         <div className="flex items-center">
-          <SimpleTableActionsDropdown onDelete={handleDelete} />
+          <SimpleTableActionsDropdown rowData={row.original} />
         </div>
       );
     },

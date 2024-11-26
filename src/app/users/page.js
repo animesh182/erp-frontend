@@ -1,135 +1,216 @@
 "use client";
 
-import DoughnutChart from "@/components/charts/PieChart";
-import KpiCard from "@/components/kpicard";
-import DataTable from "@/components/ui/data-table";
-import { DollarSign } from "lucide-react";
-import { columns } from "./Columns";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import React, { useEffect, useState } from "react";
+import google from "../../../public/google.svg";
+import Image from "next/image";
+import EmployeeLoginFooter from "@/components/EmployeeLoginFooter";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { login } from '@/app/api/auth/login';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import LoginTextHeader, {
+  LoginTextFooter,
+} from "@/components/EmployeeDetails/LoginText";
+import { getEmployees } from "../api/employees/getEmployees";
+import Link from "next/link";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-import { Badge } from "@/components/ui/badge";
+const formSchema = z.object({
+  email: z.string().email(),
+});
+const EmployeeLogin = () => {
+  // const [existingUser, setExistingUser] = useState(true);
+  // const [employeeDetails, setEmployeeDetails] = useState([]);
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const[signUPLink,setSignUpLink]=useState("")
 
-// Define dummy KPI data
-const dummyKPIInfo = [
-  {
-    title: "Total Projects Assigned",
-    value: "3",
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-  {
-    title: "Time Allocated",
-    value: (
-      <div className="text-2xl">
-        8 <span className="text-muted-foreground text-base">/8 hours</span>
-      </div>
-    ),
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-  {
-    title: "Total Sick Leave",
-    value: (
-      <div className="text-2xl">
-        4 <span className="text-muted-foreground text-base">/14 days</span>
-      </div>
-    ),
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-  {
-    title: "Total Vacation Leave",
-    value: (
-      <div className="text-2xl">
-        6 <span className="text-muted-foreground text-base">/12 days</span>
-      </div>
-    ),
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-];
 
-// Define project data
-const data = [
-  {
-    project: "Website Redesign",
-    timeAllocated: 8,
-    status: "Completed",
-    utilization: "85",
-    startDate: "2024-01-10",
-    endDate: "2024-01-20",
-  },
-  {
-    project: "App Development",
-    timeAllocated: 7.5,
-    status: "On Going",
-    utilization: "70",
-    startDate: "2024-02-01",
-    endDate: "2024-06-01",
-  },
-  {
-    project: "Marketing Campaign",
-    timeAllocated: 6,
-    status: "Completed",
-    utilization: "90",
-    startDate: "2024-03-15",
-    endDate: "2024-03-25",
-  },
-];
 
-const tabs = ["Current Projects", "Previous Projects"];
 
-// Define chart data and config
-const chartData = [
-  { name: "Jambo Travel House", value: 62, color: "#6875F5" }, // Blue
-  { name: "Avinto Test", value: 28, color: "#34D399" }, // Green
-  { name: "Changeride", value: 10, color: "#F59E0B" }, // Orange
-];
 
-const UsersHome = () => {
-  // State to manage selected tab
-  const [selectedTab, setSelectedTab] = useState("Current Projects");
+
+
+  // useEffect(() => {
+  //   const getEmployeeDetails = async () => {
+  //     try {
+  //       const { status, data } = await getEmployees();
+  //       if (status === 200) {
+  //         setEmployeeDetails(data);
+  //       } else {
+  //         console.error("Failed to fetch employee data");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching employee details:", error);
+  //     }
+  //   };
+
+  //   getEmployeeDetails();
+  // }, []);
+
+  // function onEmailSubmit(values) {
+  //   console.log(values, "values");
+
+  //   const userExists = employeeDetails.some(
+  //     (employee) => employee.email === values.email
+  //   );
+
+  //   setExistingUser(userExists);
+
+  //   const matchedEmployee = employeeDetails.find(
+  //     (employee) => employee.email === values.email
+  //   );
+  //   if (matchedEmployee) {
+  //     const userId = matchedEmployee.id;
+  //     const email = encodeURIComponent(values.email);
+
+  //     if (userExists && matchedEmployee) {
+  //       window.location.href = `/users/login-password?email=${email}&userId=${userId}`;
+  //     } else {
+  //       window.location.href = `/users/email-verify?email=${email}`;
+  //     }
+  //   } else {
+  //     console.log("employee not found");
+  //     window.location.href = `/users/email-verify?email=${values.email}`;
+  //   }
+  // }
+
+  async function  onEmailSubmit(values) {
+    
+    
+    const email = encodeURIComponent(values.email);
+    const formData = {
+      email: values.email || "", 
+      password: "",
+  };
+  
+    try {
+      const response = await login(formData);
+      
+      
+      if (response.status === 200 && response.first_time_login) {
+    
+        // toast.success("First time logged in user detected");
+     
+        router.push(`/users/employee-new-password?email=${email}`);
+      } else {
+        // toast.error(response.message || "An error occurred. Please try again.");
+    
+
+        router.push(`/users/login-password?email=${email}`);
+      }
+    } catch (error) {
+      toast.error("An error occurred. Please try again.");
+      console.log(error,"error")
+    }
+  }
+
+
+
+
+  const onSignUpClick = () => {
+    const email = form.getValues("email");
+    const emailIsValid = formSchema.shape.email.safeParse(email).success;
+
+    if (emailIsValid) {
+      const encodedEmail = encodeURIComponent(email);
+      const linkHref=`/users/email-verify?email=${encodedEmail}`;
+      setSignUpLink(linkHref)
+    } else {
+      toast.error("Please enter a valid email before signing up.");
+    }
+  };
 
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="flex flex-row space-x-4">
-        {dummyKPIInfo.map((dummyKPICard) => (
-          <KpiCard
-            key={dummyKPICard.title}
-            title={dummyKPICard.title}
-            value={dummyKPICard.value}
-            icon={dummyKPICard.icon}
-            hasSubText={false}
-            isMoney={false}
-          />
-        ))}
-      </div>
-      <div className="w-full grid grid-cols-1 lg:grid-cols-6 gap-8 py-4 px-0  max-h-[320px]">
-        <div className="col-span-2 justify-center w-full">
-          <DoughnutChart chartData={chartData} />
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onEmailSubmit)}>
+        <div className="h-screen w-full flex flex-col justify-center items-center ">
+          <Card className="lg:w-7/12 w-10/12  pt-14 pb-2 h-11/12">
+            <CardContent className="">
+              <div className=" lg:grid grid-cols-2">
+                <div className="flex flex-col justify-center space-y-2 lg:px-20  pb-6">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm text-[#020617] font-medium tracking-tight">
+                          Email
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter your work email address"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              setEmail(e.target.value);
+                            }}
+
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button className="w-full text-sm" type="submit">
+                    Sign in with Email
+                  </Button>
+                  <br />
+                  {/* <div className="flex text-[#64748B] justify-center text-xs ">
+                    OR CONTINUE WITH
+                  </div>
+                  <br />
+                  <Button
+                    className="w-full shadow-md text-sm"
+                    variant="outline"
+                    type="button"
+                    onClick={onGoogleEmailSubmit}
+                  >
+                    <Image src={google} alt="google" /> Sign in with Google
+                  </Button> */}
+                
+                  {/* <Link href="/users/employee-new-password" className="text-sm  text-gray-800"><u>Sign Up</u></Link> */}
+                  <Link href={signUPLink && signUPLink} onClick={onSignUpClick} className="text-sm text-gray-800">
+                    <u>Sign Up</u>
+                  </Link>
+                </div>
+                <LoginTextHeader />
+              </div>
+            </CardContent>
+            <CardFooter className="w-1/2 pt-20 pl-24 flex items-end justify-end text-justify">
+              <CardDescription className="text-xs leading-4 hidden lg:block">
+                <LoginTextFooter />
+              </CardDescription>
+            </CardFooter>
+          </Card>
+          <EmployeeLoginFooter />
         </div>
-        <div className="grid col-span-4 h-full">
-          <div className="flex space-x-4 mb-4">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                className={`px-4 py-2 text-sm font-medium rounded-lg ${
-                  selectedTab === tab
-                    ? "bg-blue-50 text-blue-600 border border-blue-500"
-                    : "text-gray-500 hover:bg-gray-50"
-                }`}
-                onClick={() => setSelectedTab(tab)}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-          <DataTable
-            title={"Project Assigned"}
-            subtitle={"View and analyze projects assigned to you."}
-            columns={columns}
-            data={data}
-          />
-        </div>
-      </div>
-    </main>
+      </form>
+    </Form>
   );
 };
 
-export default UsersHome;
+export default EmployeeLogin;
