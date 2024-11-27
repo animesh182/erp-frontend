@@ -1,5 +1,5 @@
 "use client"
-import { getUserReportSummary } from '@/app/api/clockify/getUserReportSummary';
+import { getUserReportSummary, REPORT_TYPES } from '@/app/api/clockify/getUserReportSummary';
 import DateRangePicker from '@/components/DateRangePicker';
 import KpiCard from '@/components/kpicard'
 import { subDays } from 'date-fns';
@@ -25,40 +25,27 @@ const ClockifyHistory = () => {
     setEndDate(endDate);
   };
 
+
   const fetchClockifyUsersReport = async (pageSize) => {
     try {
       if (startDate && endDate) {
         const data = await getUserReportSummary(
           formatClockifyDate(startDate),
           formatClockifyDate(endDate),
-          pageSize // Send the pageSize as numberOfEntries
+          pageSize,
+          REPORT_TYPES.DETAILED_ENTRIES
         );
-
+  
         if (data) {
           setKpiData(data.totals);
-
+          
           if (isFirstLoad) {
             const entriesCount = data.totals?.[0]?.entriesCount || 0;
             setNumberOfEntries(entriesCount);
-            setIsFirstLoad(false); 
+            setIsFirstLoad(false);
           } else {
-            const timeEntriesInformation = data.timeentries;
-            if (timeEntriesInformation) {
-              const initialTransformedData = Object.values(timeEntriesInformation).map((users) => ({
-                latest_activity: users.description || "No data available",
-                name: users.userName,
-                user_email: users.userEmail,
-                projectName: users.projectName,
-                start_time: users.timeInterval.start,
-                end_time: users.timeInterval.end,
-                duration: users.timeInterval.duration,
-                project_color: users.projectColor,
-              }));
-              setAllUsers(initialTransformedData);
-            }
+            setAllUsers(data.timeentries);
           }
-        } else {
-          console.log("No user data found");
         }
       }
     } catch (error) {

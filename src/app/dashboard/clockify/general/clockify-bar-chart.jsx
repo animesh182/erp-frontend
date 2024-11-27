@@ -2,9 +2,25 @@
 
 "use client";
 
-import { formatDuration } from "@/lib/utils";
 import React, { useMemo } from "react";
-import { Bar, BarChart, XAxis, YAxis, Tooltip } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { formatDuration } from "@/lib/utils";
+
+// Chart configuration
+const chartConfig = {
+  width: 400,
+  height: 50,
+  layout: "vertical",
+  margin: { top: 0, right: 0, bottom: 0, left: 0 },
+  barSize: 40,
+  className: "w-full",
+  style: {
+    // Ensure smooth animations
+    WebkitFontSmoothing: "antialiased",
+    MozOsxFontSmoothing: "grayscale"
+  }
+};
 
 const CustomTooltip = ({ payload, label }) => {
   if (!payload || payload.length === 0) return null;
@@ -12,25 +28,33 @@ const CustomTooltip = ({ payload, label }) => {
   const totalDuration = payload.reduce((total, entry) => total + entry.value, 0);
 
   return (
-    <div className="custom-tooltip gap-4 w-80 bg-background p-2 rounded-2 shadow-2xl absolute left-10 top-7">
-      <div className="total-duration flex justify-between mb-5">
-        <p>{userData.userName}</p>
-        <p>{formatDuration(totalDuration)}</p>
-      </div>
+    <div className="rounded-lg border bg-background p-4 gap-4 w-80 shadow-lg z-50">
+      {/* <div className="flex justify-between items-center border-b pb-2 mb-2">
+        <p className="font-medium">{userData.userName}</p>
+        <p className="text-muted-foreground">{formatDuration(totalDuration)}</p>
+      </div> */}
       {payload.map((entry, index) => {
         const { name, value, fill } = entry;
         const formattedDuration = formatDuration(value);
         const percentage = ((value / totalDuration) * 100).toFixed(2);
       
         return (
-          <div 
-            key={index} 
-            className="project-info flex justify-between"
-            style={{ color: fill || '#000' }}
-          >
-            <span style={{ backgroundColor: fill }} className="color-box"></span>
-            <p className="text-left flex-1">{name}</p>
-            <p className="flex-2">{formattedDuration} ({percentage}%)</p>
+          <div key={index} className="flex items-center justify-between py-1">
+            <div className="flex items-center gap-2">
+                    <div
+                          className=
+                            "shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg] h-2.5 w-2.5"
+                          
+                          style={{
+                            "--color-bg": fill,
+                            "--color-border": fill,
+                          }}
+                        />
+              <p className="text-sm">{name}</p>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {formattedDuration} ({percentage}%)
+            </p>
           </div>
         );
       })}
@@ -38,10 +62,14 @@ const CustomTooltip = ({ payload, label }) => {
   );
 };
 
-// Base component
+
+
 const ClockifyBarChart = ({ userName, selected }) => {
-  // Move all calculations into a single useMemo before any conditionals
   const chartInfo = useMemo(() => {
+    if (!Array.isArray(selected)) {
+      return null;
+    }
+    
     const selectedUser = selected.find(user => user.userName === userName);
     
     if (!selectedUser) {
@@ -71,31 +99,48 @@ const ClockifyBarChart = ({ userName, selected }) => {
   if (!chartInfo) {
     return (
       <div className="flex justify-between">
-        <p className="">00:00:00</p>
-        <p className="">No data for {userName}</p>
+        <p className="text-muted-foreground">00:00:00</p>
+        <p className="text-muted-foreground">No data for {userName}</p>
       </div>
     );
   }
 
   return (
     <div className="flex items-center justify-between gap-7">
-      <div className="">{formatDuration(chartInfo.totalDuration)}</div>
-      <BarChart width={400} height={50} data={chartInfo.chartData} layout="vertical">
-        <XAxis type="number" hide />
-        <YAxis type="category" dataKey="duration" hide />
-        <Tooltip 
-          content={CustomTooltip}
-          wrapperStyle={{ zIndex: 1000 }}
-        />
-        {chartInfo.projects.map((project) => (
-          <Bar
-            key={project.projectName}
-            dataKey={project.projectName}
-            stackId="a"
-            fill={project.projectColor}
+      <div className="text-muted-foreground min-w-24">
+        {formatDuration(chartInfo.totalDuration)}
+      </div>
+      <ChartContainer className="h-14 w-full" config={chartConfig}>
+        <BarChart 
+          data={chartInfo.chartData} 
+          layout="vertical"
+          accessibilityLayer
+          // className="w-full"
+        >
+          <CartesianGrid vertical={false} />
+          <XAxis 
+            type="number" 
+            hide 
+            domain={[0, 'dataMax']}
           />
-        ))}
-      </BarChart>
+          <YAxis 
+            type="category" 
+            dataKey="duration" 
+            hide 
+          />
+            <ChartTooltip content={<ChartTooltipContent/>}
+            wrapperStyle={{ zIndex: 50 }}/>
+
+          {chartInfo.projects.map((project) => (
+            <Bar
+              key={project.projectName}
+              dataKey={project.projectName}
+              stackId="a"
+              fill={project.projectColor}
+            />
+          ))}
+        </BarChart>
+      </ChartContainer>
     </div>
   );
 };

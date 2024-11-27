@@ -151,7 +151,7 @@ function ClockifyDataTable({
               <div className="rounded-md">
                 
 
-<Table className="overflow-hidden">
+<Table className="overflow-hidden ">
   <TableHeader>
     {table.getHeaderGroups().map((headerGroup) => (
       <TableRow key={headerGroup.id}>

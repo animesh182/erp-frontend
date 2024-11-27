@@ -21,7 +21,7 @@ export default function DateRangePicker({
   onDateChange,
   initialStartDate,
   initialEndDate,
-  isMonthPicker = false,
+  isMonthPicker = true,
 }) {
   const [date, setDate] = React.useState({
     from: initialStartDate ? new Date(initialStartDate) : null,
