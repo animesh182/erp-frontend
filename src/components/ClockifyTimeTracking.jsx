@@ -218,7 +218,7 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
                 <Tooltip>
                     <TooltipTrigger>
                         <DollarSign
-                            className={`${billable ? "text-ring" : "text-muted-foreground"} w-10 cursor-pointer`}
+                            className={`${billable ? "text-primary" : "text-muted-foreground"} w-10 cursor-pointer`}
                             onClick={() => setBillable((prev) => !prev)}
                         />
                     </TooltipTrigger>

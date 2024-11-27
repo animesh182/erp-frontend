@@ -9,11 +9,11 @@ const LoginTextHeader = () => {
     
     <Link href="/" className="flex items-center gap-2 font-semibold">
       <CompanyIcon size={40} color="#1169C4" />
-      <span className="text-[#2563EB] text-xl">Avinto AS</span>
+      <span className="text-primary text-xl">Avinto AS</span>
     </Link>
 
-  <div className="text-[#020617]  text-2xl font-semibold">Welcome to Avinto ERP.</div>
-  <div className="text-[#64748B] text-sm leading-5">
+  <div className="text-secondary-foreground  text-2xl font-semibold">Welcome to Avinto ERP.</div>
+  <div className="text-muted-foreground text-sm leading-5">
   Avinto ERP is a software dedicated to Avinto and their employees. It is a radically new type of CRM. Built on an entirely new
 <br/>type of data architecture, you&apos;ll have profiles and records <br/>of
 every interaction within your network in minutes, always

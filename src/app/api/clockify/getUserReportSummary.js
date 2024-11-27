@@ -67,7 +67,7 @@ function transformInactiveUsersData(data) {
         timeentries: Object.values(latestUserData).map((inactiveUser) => ({
         user_name: inactiveUser.userName,
         user_email: inactiveUser.userEmail,
-        latest_activity: inactiveUser.description || "No data available",
+        latest_activity: inactiveUser.description || "(no description)",
         project_name: inactiveUser.projectName,
         time: formatMillisecondsToHourDifference(new Date(inactiveUser.timeInterval.start), new Date(inactiveUser.timeInterval.end)), // Initial duration
         status: formatTimeAgo(inactiveUser.timeInterval.start),
@@ -116,7 +116,7 @@ function transformDetailedEntriesData(data) {
     return {
         totals: data.totals,
         timeentries: data.timeentries?.map(users => ({
-            latest_activity: users.description || "No data available",
+            latest_activity: users.description || "(no description)",
             name: users.userName,
             user_email: users.userEmail,
             projectName: users.projectName,

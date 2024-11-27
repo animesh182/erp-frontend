@@ -96,7 +96,6 @@ const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions }) => {
       employee_id: formData.employeeId,
       full_name: formData.fullName,
       email: formData.email,
-      // password: "avinto123",
       employee_id: formData.employeeId,
       salary: formData.salary,
       employment_type: formData.employeeType,

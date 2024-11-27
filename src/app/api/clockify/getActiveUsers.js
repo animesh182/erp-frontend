@@ -81,8 +81,8 @@ function transformUserListData(data, { users, clockifyProjects }) {
       return {
         user_name: matchedUser?.userName || "Unknown User",
         user_email: matchedUser?.userEmail || "Unknown User",
-        latest_activity: user.description || "No data available",
-        project_name: matchedProjects?.projectName || "Unknown Project",
+        latest_activity: user.description || "(no description)",
+        project_name: matchedProjects?.projectName || "(Without project)",
         time: user.timeInterval.start,
         status: "Ongoing"
       };

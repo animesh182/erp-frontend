@@ -10,7 +10,7 @@ export async function createTimeEntry(timeEntry) {
       {
         method: 'POST',
         headers: {
-            'X-Api-Key': "MjdjNTNkMGYtMjE5My00MzQ2LWFiNGEtMjEyY2RiMzI2MmIx",
+            'X-Api-Key': process.env.NEXT_PUBLIC_SANKALPA_CLOCKIFY_API_KEY,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -53,7 +53,7 @@ export async function stopTimeEntry(userID,endTime) {
       {
         method: 'PATCH',
         headers: {
-            'X-Api-Key': "MjdjNTNkMGYtMjE5My00MzQ2LWFiNGEtMjEyY2RiMzI2MmIx",
+            'X-Api-Key': process.env.NEXT_PUBLIC_SANKALPA_CLOCKIFY_API_KEY,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
