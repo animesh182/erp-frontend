@@ -26,6 +26,8 @@ export function EditRowSheet({
     formState: { errors },
   } = useFormContext();
 
+  console.log(rowData);
+
   const invoiceIssuedDate = watch("invoiceIssuedDate");
   const status = watch("status");
 

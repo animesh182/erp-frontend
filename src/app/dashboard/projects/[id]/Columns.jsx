@@ -24,6 +24,10 @@ export const columns = [
   {
     accessorKey: "utilization",
     header: "Time Allocated",
+    cell: ({ row }) => {
+      const { utilization } = row.original;
+      return <div>{utilization} hrs</div>;
+    },
     enableSorting: false,
   },
   {

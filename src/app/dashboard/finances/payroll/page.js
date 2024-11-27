@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import DataTable from "@/components/ui/data-table";
 import { CreditCard, DollarSign, Download } from "lucide-react";
 import { columns } from "@/app/dashboard/finances/payroll/Columns";
-import { formatAmountToNOK } from "@/lib/utils";
 import KpiCard from "@/components/kpicard";
 import { toast } from "sonner";
 import { format, startOfMonth, endOfMonth } from "date-fns";
@@ -18,6 +17,7 @@ import { getExcelPayroll } from "@/app/api/finances/payroll/getExcelPayroll";
 import * as XLSX from "xlsx";
 import { KpiSkeleton } from "@/components/Skeletons";
 import { deletePayroll } from "@/app/api/finances/payroll/deletePayroll";
+import { formInputs } from "./Inputs";
 
 export default function Payroll() {
   const methods = useForm();
@@ -132,14 +132,11 @@ export default function Payroll() {
     setEndDate(endDate);
   };
 
-  const  handleSheetDownload = async () => {
-    console.log('bhutro')
-    try{
+  const handleSheetDownload = async () => {
+    console.log("bhutro");
+    try {
       const response = await getExcelPayroll();
-    }
-    catch{
-
-    }
+    } catch {}
   };
 
   const onEditRow = async (editedData) => {
@@ -217,8 +214,10 @@ export default function Payroll() {
           data={data}
           isTableAddFormEnabled={false}
           onEditRow={onEditRow}
+          formInputs={formInputs}
           onDeleteRow={onDeleteRow}
           initialStartDate={startDate}
+          projectOptions={[]}
           initialEndDate={endDate}
           onDateChange={handleDateChange}
           loading={loading}

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK } from "@/lib/utils";
 import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { format } from "date-fns";
+import { formInputs } from "./Inputs";
 
 export const columns = [
   {
@@ -103,7 +104,7 @@ export const columns = [
 
       return (
         <div className="flex items-center">
-          <TableActionsDropdown rowData={rowData} />
+          <TableActionsDropdown rowData={rowData} formInputs={formInputs} />
         </div>
       );
     },
