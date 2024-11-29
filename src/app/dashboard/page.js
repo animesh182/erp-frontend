@@ -186,7 +186,7 @@ export default function Dashboard() {
       if (status === 200) {
         setFetchedKpiData(data);
       } else {
-        console.error("Failed to fetch KPI data");
+        console.error("Failed to fetch KPIs data");
       }
     };
 
@@ -322,7 +322,6 @@ export default function Dashboard() {
           isMonthPicker={true}
         />
       </div>
-
       <div className="flex flex-1 flex-col gap-4 md:gap-8 ">
         <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
           {kpiValues && kpiValues.length > 0

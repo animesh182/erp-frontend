@@ -26,6 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { login } from "@/app/api/auth/login";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -47,8 +48,17 @@ export default function Page() {
     try {
       const response = await login(values);
       if (response.status === 200) {
-        toast.success("Login successful!");
-        router.push("/dashboard");
+        console.log(response,"responese")
+        if(response.is_admin)
+        {toast.success("Login successful!");
+        
+        router.push("/dashboard")
+      }
+        else if(response.is_employee){
+          
+          toast.success("Please Login as Employee!");
+          router.push("/users");
+        }
       } else {
         toast.error(response.message || "An error occurred. Please try again.");
       }
@@ -104,10 +114,12 @@ export default function Page() {
                 />
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex flex-col">
               <Button type="submit" className="w-full">
                 Sign in
               </Button>
+              <br/>
+              <Link href="/users" className="text-sm "><u>Sign in as Employee</u></Link>
             </CardFooter>
           </form>
         </Form>

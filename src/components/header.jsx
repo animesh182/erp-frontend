@@ -15,8 +15,11 @@ import { CircleUser, Search } from "lucide-react";
 import { ModeToggle } from "./modetoggle";
 import Link from "next/link";
 import { useLogout } from "@/app/api/auth/logout";
+import { usePathname } from "next/navigation";
+import UserMobileSidebar from "./UserMobileSideBar";
 
 export default function Header() {
+  const pathname = usePathname();
   const logout = useLogout();
 
   const handleLogout = () => {
@@ -25,7 +28,7 @@ export default function Header() {
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-      <MobileSidebar />
+     {pathname.includes("/users/") ? <UserMobileSidebar /> : <MobileSidebar />} 
 
       <div className="w-full flex-1">
         {/* <form>

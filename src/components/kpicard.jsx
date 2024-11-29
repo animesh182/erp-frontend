@@ -30,7 +30,9 @@ export default function KpiCard({
           {isMoney ? `${formatAmountToNOK(value)}` : isPercentage? `${value}%` : value}
         </div>
         <p className="text-xs text-muted-foreground">
-          {hasSubText && isTrend ? `${change}% from last ${period}` : period}
+          {/* {hasSubText && isTrend ? `${change}% from last ${period}` : period} */}
+          {period && (hasSubText && isTrend ? `${change}% from last ${period}` : period)}
+
         </p>
       </CardContent>
     </Card>

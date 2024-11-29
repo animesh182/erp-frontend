@@ -15,6 +15,11 @@ import {
   TrendingUp,
   TrendingDown,
   DollarSign,
+  Clock,
+  UserCheck,
+  PieChart,
+  FolderClock,
+  History
 } from "lucide-react";
 import {
   Card,
@@ -31,6 +36,22 @@ export const navItems = [
     label: "Dashboard",
     href: "/dashboard",
     icon: <Home className="h-4 w-4" />,
+  },
+  {
+    label: "Punch Clock",
+    href: "/dashboard/clockify",
+    icon: <PieChart className="h-4 w-4" />,
+    subItems: [
+      {
+        label: "General",
+        href: "/dashboard/clockify/general",
+        icon: <FolderClock className="h-4 w-4" />,
+      },
+      {
+        label: "History",
+        href: "/dashboard/clockify/history",
+        icon: <History className="h-4 w-4" />,
+      }]
   },
   {
     label: "Finances",
@@ -73,8 +94,22 @@ export const navItems = [
     label: "Employees",
     href: "/dashboard/employees",
     icon: <Users className="h-4 w-4" />,
+    subItems: [
+      {
+        label: "General",
+        href: "/dashboard/employees/general",
+        icon: <UserCheck className="h-4 w-4" />,
+      },
+      {
+        label: "Leave Request",
+        href: "/dashboard/employees/leave-request",
+        icon: <Clock className="h-4 w-4" />,
+      },
+      
+    ],
   },
 ];
+
 
 export default function Sidebar() {
   const pathname = usePathname();

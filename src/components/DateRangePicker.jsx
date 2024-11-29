@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import * as React from "react";
@@ -19,7 +21,7 @@ export default function DateRangePicker({
   onDateChange,
   initialStartDate,
   initialEndDate,
-  isMonthPicker = false,
+  isMonthPicker = true,
 }) {
   const [date, setDate] = React.useState({
     from: initialStartDate ? new Date(initialStartDate) : null,
@@ -48,6 +50,7 @@ export default function DateRangePicker({
     setDate(selectedDate);
     onDateChange(range.start, range.end);
   };
+
 
   return (
     <div className={cn("grid gap-2", className)}>

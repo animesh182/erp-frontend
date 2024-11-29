@@ -2,7 +2,8 @@
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 
-import { cn } from "@/lib/utils";
+import { cn, formatDuration } from "@/lib/utils";
+// import { formatDuration } from "../charts/PieChartwithBarChart";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = {
@@ -82,6 +83,7 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
+
 const ChartTooltipContent = React.forwardRef(
   (
     {
@@ -94,7 +96,8 @@ const ChartTooltipContent = React.forwardRef(
       label,
       labelFormatter,
       labelClassName,
-      formatter,
+     formatter = (value, name) => `${name}: ${formatDuration(value)}`,
+    // formatter,
       color,
       nameKey,
       labelKey,
@@ -159,7 +162,7 @@ const ChartTooltipContent = React.forwardRef(
             const key = `${nameKey || item.name || item.dataKey || "value"}`;
             const itemConfig = getPayloadConfigFromPayload(config, item, key);
             const indicatorColor = color || item.payload.fill || item.color;
-
+            
             return (
               <div
                 key={item.dataKey}
@@ -168,15 +171,7 @@ const ChartTooltipContent = React.forwardRef(
                   indicator === "dot" && "items-center"
                 )}
               >
-                {formatter && item?.value !== undefined && item.name ? (
-                  formatter(item.value, item.name, item, index, item.payload)
-                ) : (
-                  <>
-                    {itemConfig?.icon ? (
-                      <itemConfig.icon />
-                    ) : (
-                      !hideIndicator && (
-                        <div
+                <div
                           className={cn(
                             "shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg]",
                             {
@@ -192,8 +187,11 @@ const ChartTooltipContent = React.forwardRef(
                             "--color-border": indicatorColor,
                           }}
                         />
-                      )
-                    )}
+                {formatter && item?.value !== undefined && item.name ? (
+                  formatter(item.value, item.name, item, index, item.payload)
+                ) : (
+                  <>
+                    
                     <div
                       className={cn(
                         "flex flex-1 justify-between leading-none",
