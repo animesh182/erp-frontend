@@ -7,7 +7,6 @@ import { format } from "date-fns";
 import KpiCard from "@/components/kpicard";
 
 const ProjectDetailsMain = ({ project }) => {
-  console.log(project);
   const totalHoursWorked = project.all_user_projects.reduce(
     (total, userProject) => {
       const utilization = parseFloat(userProject.utilization); // Convert utilization to a number
@@ -16,19 +15,10 @@ const ProjectDetailsMain = ({ project }) => {
     0
   );
 
-  const totalIncome = project.invoices
-    ?.filter((invoice) => invoice.payment_status === "Paid")
-    .reduce((total, invoice) => {
-      const paidAmount = parseFloat(invoice.amount);
-      return total + paidAmount;
-    }, 0);
+  const totalIncome = project.total_revenue
 
-  const totalExpense = project.project_costs
-    ?.filter((cost) => invoice.payment_status === "Paid")
-    .reduce((total, cost) => {
-      const paidAmount = parseFloat(invoice.amount);
-      return total + paidAmount;
-    }, 0);
+  const totalExpense = project.total_expenses
+  const totalGrossProfitMargin = project.total_gross_profit_margin
 
   const totalProfit = totalIncome - totalExpense;
   return (
@@ -119,7 +109,7 @@ const ProjectDetailsMain = ({ project }) => {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-4 gap-3">
         <KpiCard title="Total Revenue" value={totalIncome} hasSubText={false} />
         <KpiCard
           title="Total Expense"
@@ -127,6 +117,8 @@ const ProjectDetailsMain = ({ project }) => {
           hasSubText={false}
         />
         <KpiCard title="Total Profit" value={totalProfit} hasSubText={false} />
+        <KpiCard title="Gross Profit Margin" value={totalGrossProfitMargin} hasSubText={false} isPercentage={true} isMoney={false}/>
+
       </div>
     </div>
   );

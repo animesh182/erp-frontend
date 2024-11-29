@@ -132,7 +132,7 @@ const ProjectsTab = ({
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent>
           <CustomSheetTitle
-            title={selectedProject ? "Edit Project" : "Assign Project"}
+            title={selectedProject ? "Edit Project Utilization" : "Assign Project"}
             subtitle="Make changes to your task here. Click save when you're done."
           />
 
