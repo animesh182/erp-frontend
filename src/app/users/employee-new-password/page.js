@@ -103,7 +103,7 @@ const EmployeeNewPassword = () => {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm text-[#020617] font-medium tracking-tight">Enter Password</FormLabel>
+                      <FormLabel className="text-sm text-secondary-foreground font-medium tracking-tight">Enter Password</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter a new password" {...field} type="password"/>
                       </FormControl>
@@ -117,7 +117,7 @@ const EmployeeNewPassword = () => {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm text-[#020617] font-medium tracking-tight">Confirm Password</FormLabel>
+                      <FormLabel className="text-sm text-secondary-foreground font-medium tracking-tight">Confirm Password</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter a new password" {...field} type="password" />
                       </FormControl>

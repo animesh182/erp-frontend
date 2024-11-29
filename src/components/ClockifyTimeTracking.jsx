@@ -13,7 +13,7 @@ import { updateTimeEntry } from '@/app/api/clockify/updateTimeEntry';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import ComboboxProjects from './ProjectComboBox';
 import { clockifyProjects, users } from '@/app/dashboard/clockify/general/page';
-import { getActiveUsers } from '@/app/api/clockify/getActiveUsers';
+import { ACTIVE_USERS_TYPES, getActiveUsers } from '@/app/api/clockify/getActiveUsers';
 
 
 const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
@@ -70,48 +70,36 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
         setSelectedProject(project);
     }, []);
 
+
     useEffect(() => {
         const fetchClockifyActiveUsers = async () => {
             try {
-                const data = await getActiveUsers(30);
+                const data = await getActiveUsers(30, ACTIVE_USERS_TYPES.TIMER_ENTRY, {
+                    users,
+                    clockifyTimeEntryProp,
+                    clockifyProjects
+                });
+                
                 if (data) {
-                    const filteredData = data.filter(
-                        (user) => users.some(
-                            (u) => u.userName === clockifyTimeEntryProp.userName &&
-                                u.userId === user.userId
-                        )
-                    );
-
-                    if (filteredData.length > 0) {
-                        const activeUser = filteredData[0]; // Get the first matching active user
-                        const matchedProject = clockifyProjects.find(
-                            (project) => project.projectId === activeUser.projectId
-                        );
-                        setTimeEntryId(activeUser.id)
-                        setDescription(activeUser.description || "");
-                        if (matchedProject) {
-                            setSelectedProject(matchedProject.projectName);
-                        }
-                        setBillable(activeUser.billable);
-                        setStart(false);
-                        setStartTime(activeUser.timeInterval.start);
-                        setInputTime(convertDateToTime(activeUser.timeInterval.start));
-
-                        if (!activeUser.timeInterval.end) {
-                            const elapsedTime = Math.floor(
-                                (new Date().getTime() - new Date(activeUser.timeInterval.start).getTime()) / 1000
-                            );
-                            timerRef.current = elapsedTime;
-                            setTimer(elapsedTime);
-                            startTimer();
-                        }
+                    setTimeEntryId(data.timeEntryId);
+                    setDescription(data.description);
+                    setSelectedProject(data.projectName);
+                    setBillable(data.billable);
+                    setStart(false);
+                    setStartTime(data.timeInterval.start);
+                    setInputTime(convertDateToTime(data.timeInterval.start));
+    
+                    if (data.elapsedTime !== null) {
+                        timerRef.current = data.elapsedTime;
+                        setTimer(data.elapsedTime);
+                        startTimer();
                     }
                 }
             } catch (error) {
                 console.error("Error fetching active users:", error);
             }
         };
-
+    
         fetchClockifyActiveUsers();
         
         return () => {
@@ -119,6 +107,8 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
         };
     }, [users, clockifyTimeEntryProp, clockifyProjects, startTimer, stopTimer]);
 
+
+ 
     const handleButtonClick = useCallback(async () => {
         try {
             if (start) {
@@ -162,11 +152,7 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
                     setComboboxProp("");
                     setBillable(true);
                     
-                    // Clear localStorage
-                    if (typeof window !== "undefined") {
-                        localStorage.removeItem("timeEntryId");
-                    }
-                    
+                
                     // Reset timer
                     timerRef.current = 0;
                     setTimer(0);
@@ -232,7 +218,7 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
                 <Tooltip>
                     <TooltipTrigger>
                         <DollarSign
-                            className={`${billable ? "text-ring" : "text-muted-foreground"} w-10 cursor-pointer`}
+                            className={`${billable ? "text-primary" : "text-muted-foreground"} w-10 cursor-pointer`}
                             onClick={() => setBillable((prev) => !prev)}
                         />
                     </TooltipTrigger>

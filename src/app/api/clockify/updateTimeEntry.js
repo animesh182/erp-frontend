@@ -6,7 +6,7 @@ export async function updateTimeEntry(savedTimeEntryId,timeEntry) {
         {
           method: 'PUT',
           headers: {
-              'X-Api-Key': "MjdjNTNkMGYtMjE5My00MzQ2LWFiNGEtMjEyY2RiMzI2MmIx",
+              'X-Api-Key': process.env.NEXT_PUBLIC_SANKALPA_CLOCKIFY_API_KEY,
               'Content-Type': 'application/json',
           },
           body: JSON.stringify({

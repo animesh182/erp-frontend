@@ -34,26 +34,7 @@ const chartConfig = {
   },
 };
 
-const renderCustomizedLabel = ({ name, value, percent, x, y, cx, cy }) => {
-  
-  return (
-    <text
-      x={x}
-      y={y}
-      // fill={entry.color}
-      textAnchor={x > cx ? "start" : "end"}
-      dominantBaseline="central"
-      fontSize={14}
-    >
-      <tspan x={x} dy="0">{name}</tspan>
-      <tspan x={x} dy="1.2em">{`${(percent * 100).toFixed(0)}%`}</tspan>
-    </text>
-  );
-};
-
 function DoughnutChart({chartData}) {
-
-  console.log(chartData,"dlallta")
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-start pb-0">
@@ -67,7 +48,6 @@ function DoughnutChart({chartData}) {
         >
           <PieChart>
             <ChartTooltip
-              cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie

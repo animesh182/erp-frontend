@@ -27,7 +27,6 @@ import {
 import LoginTextHeader, {
   LoginTextFooter,
 } from "@/components/EmployeeDetails/LoginText";
-import { getEmployees } from "../api/employees/getEmployees";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -36,8 +35,6 @@ const formSchema = z.object({
   email: z.string().email(),
 });
 const EmployeeLogin = () => {
-  // const [existingUser, setExistingUser] = useState(true);
-  // const [employeeDetails, setEmployeeDetails] = useState([]);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,56 +44,6 @@ const EmployeeLogin = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const[signUPLink,setSignUpLink]=useState("")
-
-
-
-
-
-
-
-  // useEffect(() => {
-  //   const getEmployeeDetails = async () => {
-  //     try {
-  //       const { status, data } = await getEmployees();
-  //       if (status === 200) {
-  //         setEmployeeDetails(data);
-  //       } else {
-  //         console.error("Failed to fetch employee data");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching employee details:", error);
-  //     }
-  //   };
-
-  //   getEmployeeDetails();
-  // }, []);
-
-  // function onEmailSubmit(values) {
-  //   console.log(values, "values");
-
-  //   const userExists = employeeDetails.some(
-  //     (employee) => employee.email === values.email
-  //   );
-
-  //   setExistingUser(userExists);
-
-  //   const matchedEmployee = employeeDetails.find(
-  //     (employee) => employee.email === values.email
-  //   );
-  //   if (matchedEmployee) {
-  //     const userId = matchedEmployee.id;
-  //     const email = encodeURIComponent(values.email);
-
-  //     if (userExists && matchedEmployee) {
-  //       window.location.href = `/users/login-password?email=${email}&userId=${userId}`;
-  //     } else {
-  //       window.location.href = `/users/email-verify?email=${email}`;
-  //     }
-  //   } else {
-  //     console.log("employee not found");
-  //     window.location.href = `/users/email-verify?email=${values.email}`;
-  //   }
-  // }
 
   async function  onEmailSubmit(values) {
     
@@ -157,7 +104,7 @@ const EmployeeLogin = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm text-[#020617] font-medium tracking-tight">
+                        <FormLabel className="text-sm text-secondary-foreground font-medium tracking-tight">
                           Email
                         </FormLabel>
                         <FormControl>
@@ -191,11 +138,12 @@ const EmployeeLogin = () => {
                   >
                     <Image src={google} alt="google" /> Sign in with Google
                   </Button> */}
-                
-                  {/* <Link href="/users/employee-new-password" className="text-sm  text-gray-800"><u>Sign Up</u></Link> */}
-                  <Link href={signUPLink && signUPLink} onClick={onSignUpClick} className="text-sm text-gray-800">
+
+
+
+                  {/* <Link href={signUPLink && signUPLink} onClick={onSignUpClick} className="text-sm text-gray-800">
                     <u>Sign Up</u>
-                  </Link>
+                  </Link> */}
                 </div>
                 <LoginTextHeader />
               </div>
