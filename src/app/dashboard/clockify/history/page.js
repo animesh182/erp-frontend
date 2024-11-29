@@ -94,6 +94,7 @@ const ClockifyHistory = () => {
         title="Total Time"
         value={` ${formatDuration(kpiData[0]?.totalTime)} hours`} // Pass the raw number
         icon={<Hourglass className="h-4 w-4 text-muted-foreground" />}
+        isMoney={false}
       />
       <KpiCard
         title="Number of Time Entries"
