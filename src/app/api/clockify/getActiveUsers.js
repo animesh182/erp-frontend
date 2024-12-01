@@ -38,18 +38,23 @@ export async function getActiveUsers(items, type, additionalData = {}) {
   }
 }
 
-function transformTimerEntryData(data, { users, clockifyTimeEntryProp, clockifyProjects }) {
+// function transformTimerEntryData(data, { users, clockifyTimeEntryProp, clockifyProjects }) {
+function transformTimerEntryData(data, { users, clockifyUserData, clockifyProjects }) {
   if (!data?.length) return null;
 
-  const filteredData = data.filter(
-    (user) => users.some(
-      (u) => u.userName === clockifyTimeEntryProp.userName &&
-        u.userId === user.userId
-    )
+
+  // const filteredData = data.filter(
+  //   (user) => users.some(
+  //     // (u) => u.userName === clockifyTimeEntryProp.userName &&
+  //     (u) => u.userName === clockifyUserData.full_name &&
+  //       u.userId === user.userId
+  //   )
+  // );
+
+    const filteredData = data.filter(
+    (user) => user.userId === clockifyUserData.clockify_user_id
   );
-
   if (filteredData.length === 0) return null;
-
   const activeUser = filteredData[0];
   const matchedProject = clockifyProjects.find(
     (project) => project.projectId === activeUser.projectId

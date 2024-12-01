@@ -57,7 +57,6 @@ const EmployeeLogin = () => {
     try {
       const response = await login(formData);
       
-      
       if (response.status === 200 && response.first_time_login) {
     
         // toast.success("First time logged in user detected");
@@ -65,7 +64,6 @@ const EmployeeLogin = () => {
         router.push(`/users/employee-new-password?email=${email}`);
       } else {
         // toast.error(response.message || "An error occurred. Please try again.");
-    
 
         router.push(`/users/login-password?email=${email}`);
       }
@@ -90,6 +88,7 @@ const EmployeeLogin = () => {
       toast.error("Please enter a valid email before signing up.");
     }
   };
+
 
   return (
     <Form {...form}>
@@ -126,24 +125,6 @@ const EmployeeLogin = () => {
                     Sign in with Email
                   </Button>
                   <br />
-                  {/* <div className="flex text-[#64748B] justify-center text-xs ">
-                    OR CONTINUE WITH
-                  </div>
-                  <br />
-                  <Button
-                    className="w-full shadow-md text-sm"
-                    variant="outline"
-                    type="button"
-                    onClick={onGoogleEmailSubmit}
-                  >
-                    <Image src={google} alt="google" /> Sign in with Google
-                  </Button> */}
-
-
-
-                  {/* <Link href={signUPLink && signUPLink} onClick={onSignUpClick} className="text-sm text-gray-800">
-                    <u>Sign Up</u>
-                  </Link> */}
                 </div>
                 <LoginTextHeader />
               </div>

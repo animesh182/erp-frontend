@@ -3,14 +3,15 @@ import { toast } from "sonner";
 
 
 
-export async function createTimeEntry(timeEntry) {
+export async function createTimeEntry(clockifyApiKey,timeEntry) {
   try {
     const response = await fetch(
       `https://api.clockify.me/api/v1/workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_ID}/time-entries`,
       {
         method: 'POST',
         headers: {
-            'X-Api-Key': process.env.NEXT_PUBLIC_SANKALPA_CLOCKIFY_API_KEY,
+            'X-Api-Key': clockifyApiKey,
+            // 'X-Api-Key': process.env.NEXT_PUBLIC_SANKALPA_CLOCKIFY_API_KEY,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -46,14 +47,15 @@ export async function createTimeEntry(timeEntry) {
 
 
 
-export async function stopTimeEntry(userID,endTime) {
+export async function stopTimeEntry(userID,clockifyApiKey,endTime) {
   try {
     const response = await fetch(
       `https://api.clockify.me/api/v1/workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_ID}/user/${userID}/time-entries`,
       {
         method: 'PATCH',
         headers: {
-            'X-Api-Key': process.env.NEXT_PUBLIC_SANKALPA_CLOCKIFY_API_KEY,
+            'X-Api-Key': clockifyApiKey,
+            // 'X-Api-Key': process.env.NEXT_PUBLIC_SANKALPA_CLOCKIFY_API_KEY,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({

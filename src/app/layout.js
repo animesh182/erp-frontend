@@ -5,6 +5,7 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { ThemeProvider } from "@/components/themeprovider";
 import { Toaster } from "@/components/ui/sonner";
+import { ClockifyProvider } from "@/components/ClockifyContext";
 
 export const metadata = {
   title: "Avinto",
@@ -21,7 +22,9 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
+          <ClockifyProvider>
           {children}
+          </ClockifyProvider>
           <Toaster />
         </ThemeProvider>
       </body>

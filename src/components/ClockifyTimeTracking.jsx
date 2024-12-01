@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import ComboboxProjects from './ProjectComboBox';
 import { clockifyProjects, users } from '@/app/dashboard/clockify/general/page';
 import { ACTIVE_USERS_TYPES, getActiveUsers } from '@/app/api/clockify/getActiveUsers';
+import { useClockify } from './ClockifyContext';
 
 
 const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
@@ -28,6 +29,9 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
     const [inputTime, setInputTime] = useState(convertDateToTime(startTime));
     const intervalRef = useRef(null);
     const timerRef = useRef(0);
+    const{clockifyUserData}=useClockify()
+
+
 
 
     const projectNames = useMemo(() => 
@@ -73,10 +77,13 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
 
     useEffect(() => {
         const fetchClockifyActiveUsers = async () => {
+            if(clockifyUserData)
             try {
                 const data = await getActiveUsers(30, ACTIVE_USERS_TYPES.TIMER_ENTRY, {
                     users,
-                    clockifyTimeEntryProp,
+                    // clockifyTimeEntryProp,
+
+                    clockifyUserData,
                     clockifyProjects
                 });
                 
@@ -105,14 +112,15 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
         return () => {
             stopTimer();
         };
-    }, [users, clockifyTimeEntryProp, clockifyProjects, startTimer, stopTimer]);
+    }, [users, clockifyUserData, clockifyProjects, startTimer, stopTimer]);
 
 
  
     const handleButtonClick = useCallback(async () => {
+        if(clockifyUserData.clockify_api_key)
         try {
             if (start) {
-                const response = await createTimeEntry(submitData);
+                const response = await createTimeEntry(clockifyUserData.clockify_api_key,submitData);
                 setStart(false);
                 if (response.id) {
                     const timeEntry = await getTimeEntryById(response.id);
@@ -139,7 +147,8 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
                     }
                 }
             } else {
-                    const message = await stopTimeEntry(clockifyTimeEntryProp.clockifyUserId, new Date().toISOString());
+                    const message = await stopTimeEntry(clockifyUserData.clockify_user_id,clockifyUserData.clockify_api_key, new Date().toISOString());
+                    // const message = await stopTimeEntry(clockifyTimeEntryProp.clockifyUserId, new Date().toISOString());
                     toast.success(message);
                     
                     // Reset states
@@ -161,7 +170,7 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
             toast.error(error.message || "Failed to process time entry");
             console.error("Error handling time entry:", error);
         }
-    }, [start, submitData, clockifyTimeEntryProp.clockifyUserId, startTimer, stopTimer, clockifyProjects]);
+    }, [start, submitData,  startTimer, stopTimer, clockifyProjects]);
     
     const handleUpdate = useCallback(async () => {
         const updateData = {
@@ -171,9 +180,9 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
             billable: billable
         };
         
-        if(timeEntryId)
+        if(timeEntryId && clockifyUserData)
         try {
-            const response = await updateTimeEntry(timeEntryId, updateData);
+            const response = await updateTimeEntry(timeEntryId,clockifyUserData.clockify_api_key, updateData);
             if (!response.timeInterval.end) {
                 const elapsedTime = Math.floor(
                     (new Date().getTime() - new Date(response.timeInterval.start).getTime()) / 1000
@@ -187,7 +196,7 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
             console.error("Error updating time entry:", error);
             toast.error(error.message || "Failed to update time entry");
         }
-    }, [startTime, description, matchedProject, selectedProject, billable, clockifyTimeEntryProp.clockifyUserId, startTimer]);
+    }, [startTime, description, matchedProject, selectedProject, billable,  startTimer]);
     
     const handleTimeChange = useCallback((newTime) => {
         const updatedDate = convertTimeToDate(newTime || new Date().toISOString());
@@ -199,7 +208,12 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
         setComboboxProp(selectedProject);
     }, [selectedProject]);
 
+
+
+
     return (
+        <>
+        {clockifyUserData ? (
         <Card className="p-2 flex items-center justify-between">
             <Input
                 className="w-7/12"
@@ -259,6 +273,8 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
                 {start ? "Start" : "Stop"}
             </Button>
         </Card>
+        ):("Loading....")}
+        </>
     );
 });
 
