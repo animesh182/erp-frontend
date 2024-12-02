@@ -21,9 +21,8 @@ export default function ProjectDetails() {
       const fetchProjectDetails = async () => {
         try {
           const { status, data } = await getProjectById(id); // Fetch project details by ID
-
           if (status === 200 && data) {
-            setProject(data); // Set the project state with the response data
+            setProject(data.data); // Set the project state with the response data
           } else {
             setError(`Error: ${data.message}`);
           }
@@ -61,7 +60,7 @@ export default function ProjectDetails() {
   return (
     <main className="p-6 min-h-screen space-y-4">
       <div className="flex flex-col md:flex-row gap-4 w-full">
-        <ProjectDetailsMain project={project} /> {/* Pass the project data */}
+        <ProjectDetailsMain project={project} /> 
         <ProjectDetailsSidebar project={project} />
       </div>
       <div>

@@ -230,6 +230,7 @@ export default function Payroll() {
           initialEndDate={endDate}
           onDateChange={handleDateChange}
           loading={loading}
+          isMonthPicker={true}
         />
       </FormProvider>
     </main>

@@ -11,6 +11,8 @@ import DateRangePicker from "@/components/DateRangePicker";
 import { format, subDays } from "date-fns";
 import {  formatClockifyDate } from "@/lib/utils";
 import ClockifyTimeEntry from "@/components/ClockifyTimeTracking";
+import { getEmployees } from "@/app/api/employees/getEmployees";
+import { getClockifyIdProjects } from "@/app/api/projects/getProjects";
 
 
 
@@ -74,6 +76,7 @@ export const clockifyProjects = [
 ];
 
 function combineUniqueUsers(activeUsers, inactiveUsers) {
+  console.log(activeUsers,"lklklkl")
   const activeUserMap = new Map(activeUsers.map(user => [user.user_name, user]));
   const filteredInactiveUsers = inactiveUsers.filter(
     user => !activeUserMap.has(user.user_name)
@@ -91,8 +94,8 @@ const Clockify = () => {
   const initialEndDate = new Date(); // Today's date
   const initialStartDate = subDays(initialEndDate, 28); // 4 weeks ago
   const [barChartUser, setBarChartUser] = useState(null);
-
-  // State to hold date range
+  const[employeeClockifyDetails,setEmployeeClockifyDetails]=useState()
+  // const[clockifyProjects,setClockifyProjects]=useState()
   const [startDate, setStartDate] = useState(initialStartDate);
   const [endDate, setEndDate] = useState(initialEndDate);
 
@@ -102,10 +105,31 @@ const Clockify = () => {
   };
 
 
+
+
+const fetchEmployeeDetails=async()=>{
+  try{
+    const response=await getEmployees();
+    const clockifyIds = response.data.map((employee) => ({
+      userId: employee.clockify_user_id,
+      userName: employee.full_name,
+      userEmail: employee.email, // Replace with the actual email field name
+    }));
+
+    setEmployeeClockifyDetails(clockifyIds);
+
+
+  } catch (error) {
+    console.error("Error fetching active users:", error);
+}
+}
+
 const fetchClockifyActiveUsers = async () => {
+  if(employeeClockifyDetails)
   try {
       const transformedData = await getActiveUsers(users.length, ACTIVE_USERS_TYPES.USER_LIST, {
-          users,
+        employeeClockifyDetails,
+          // users,
           clockifyProjects
       });
       
@@ -128,6 +152,22 @@ const oneDayAfter = new Date(date);
 oneDayAfter.setDate(date.getDate() + 1);
 
 // Ensure it's correctly adjusted to the previous day
+
+
+// const fetchProjectsWIthClockifyId=async()=>{
+//   try{
+//     const response=await getClockifyIdProjects();
+    
+//     setClockifyProjects(response)
+  
+
+
+//   } catch (error) {
+//     console.error("Error fetching projects:", error);
+// }
+// }
+
+
 
 
   const fetchClockifyProjectsReport = async () => {
@@ -165,6 +205,7 @@ oneDayAfter.setDate(date.getDate() + 1);
   };
 
 
+
   const fetchClockifyUsersProjectsReport = async () => {
     try {
       const data = await getUserReportSummary(
@@ -184,6 +225,8 @@ oneDayAfter.setDate(date.getDate() + 1);
 
 
 useEffect(() => {
+  fetchEmployeeDetails()
+  // fetchProjectsWIthClockifyId()
   fetchClockifyProjectsReport();
   fetchClockifyUsersProjectsReport()
   fetchClockifyUsersReport()
@@ -191,7 +234,7 @@ useEffect(() => {
 useEffect(()=>{
   fetchClockifyActiveUsers();
 
-},[])
+},[employeeClockifyDetails])
 useEffect(() => {
 
   if (activeUsers && inactiveUsers) {

@@ -22,7 +22,6 @@ export async function getActiveUsers(items, type, additionalData = {}) {
     }
 
     const activeUsers = await response.json();
-
     // Transform data based on type
     switch (type) {
       case ACTIVE_USERS_TYPES.TIMER_ENTRY:
@@ -41,7 +40,6 @@ export async function getActiveUsers(items, type, additionalData = {}) {
 // function transformTimerEntryData(data, { users, clockifyTimeEntryProp, clockifyProjects }) {
 function transformTimerEntryData(data, { users, clockifyUserData, clockifyProjects }) {
   if (!data?.length) return null;
-
 
   // const filteredData = data.filter(
   //   (user) => users.some(
@@ -75,12 +73,14 @@ function transformTimerEntryData(data, { users, clockifyUserData, clockifyProjec
   };
 }
 
-function transformUserListData(data, { users, clockifyProjects }) {
+// function transformUserListData(data, { employeeClockifyDetails, clockifyProjects }) {
+function transformUserListData(data, { employeeClockifyDetails, clockifyProjects }) {
   if (!data?.length) return null;
-
+  console.log(data,"ddsssdd")
+  console.log(employeeClockifyDetails,"detailss")
   return data
     .map((user) => {
-      const matchedUser = users.find((u) => u.userId === user.userId);
+      const matchedUser = employeeClockifyDetails.find((u) => u.userId === user.userId);
       const matchedProjects = clockifyProjects.find((project) => project.projectId === user.projectId);
 
       return {

@@ -17,7 +17,7 @@ import { ACTIVE_USERS_TYPES, getActiveUsers } from '@/app/api/clockify/getActive
 import { useClockify } from './ClockifyContext';
 
 
-const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
+const ClockifyTimeEntry = React.memo(() => {
     const [selectedProject, setSelectedProject] = useState("");
     const [description, setDescription] = useState("");
     const [billable, setBillable] = useState(true);
