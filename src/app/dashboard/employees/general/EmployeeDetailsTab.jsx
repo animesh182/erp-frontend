@@ -5,11 +5,12 @@ import { Edit } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { formatAmountToNOK } from "@/lib/utils";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/utils";
-const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions }) => {
+import { editEmployee } from "@/app/api/employees/editEmployee";
+const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions,setEmployeeDetails }) => {
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
 
   if (!employeeDetails) {
@@ -88,55 +89,25 @@ const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions }) => {
     </div>
   );
 
-  // console.log(employeeDetails, "ed");
-  const handleEditEmployee = async (formData) => {
-    const employeeId = employeeDetails.id; // Extract employee ID from employeeData
-    // Generate a new ID (you might want to use a more robust method in production)
-    const payload = {
-      employee_id: formData.employeeId,
-      full_name: formData.fullName,
-      email: formData.email,
-      employee_id: formData.employeeId,
-      salary: formData.salary,
-      employment_type: formData.employeeType,
-      role: formData.jobTitle,
-      country: formData.country,
-      phone_number: formData.phone,
-      pan_number: formData.panNumber,
-      supervisor: formData.supervisor,
-      start_date: formData.startDate,
-      end_date: formData.endDate || null,
-      level: formData.level,
-      gender: formData.gender,
-      marital_status: formData.maritalStatus,
-      linkedin_name: formData.linkedInName,
-      linkedin_url: formData.linkedInUrl,
-      date_of_birth: formData.dateOfBirth,
-    };
-    try {
-      const response = await apiClient(
-        `${process.env.NEXT_PUBLIC_API_URL}api/users/${employeeId}/`,
-        {
-          method: "PATCH",
-          body: JSON.stringify(payload),
-        }
-      );
-      console.log(response, "response");
-      if (response.ok) {
-        toast.success("Employee edited successfully");
-        // setIsSheetOpen(false);
-      }
-    } catch (error) {
-      toast.error("There was an error adding the employee");
-      console.error(error);
-    }
 
-    // const newId = `employee_${Date.now()}`;
-    // const newEmployee = {
-    //   formData,
-    // };
-    // setEmployeeDetails([...employeeDetails, newEmployee]);
+  const handleEditEmployee = async (formData) => {
+    try {
+      const employeeId = employeeDetails.id; 
+      const response = await editEmployee(employeeId, formData);
+      if (response.success) {
+              toast.success(response.success);
+              setEmployeeDetails((prevDetails) => ({
+                ...prevDetails,
+                ...formData,
+              }));
+            }
+    } catch (error) {
+      toast.error(error.message || "There was an error adding the employee");
+    }
   };
+
+
+
 
   return (
     <div className="flex flex-col p-6 space-y-4 capitalize">

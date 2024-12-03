@@ -62,7 +62,6 @@ function transformInactiveUsersData(data) {
       }
       return acc;
     }, {});
-    
     return {
         timeentries: Object.values(latestUserData).map((inactiveUser) => ({
         user_name: inactiveUser.userName,
@@ -71,6 +70,7 @@ function transformInactiveUsersData(data) {
         project_name: inactiveUser.projectName,
         time: formatMillisecondsToHourDifference(new Date(inactiveUser.timeInterval.start), new Date(inactiveUser.timeInterval.end)), // Initial duration
         status: formatTimeAgo(inactiveUser.timeInterval.start),
+        user_id:inactiveUser.userId
     }))
 };
 }
@@ -80,12 +80,13 @@ function transformProjectSummaryData(data) {
     
     const userProjectsMap = {};
     data.timeentries.forEach((entry) => {
-        const { userName, projectName, projectColor, timeInterval } = entry;
+        const { userName, projectName, projectColor, timeInterval,userId } = entry;
         const duration = timeInterval.duration;
         
         if (!userProjectsMap[userName]) {
             userProjectsMap[userName] = {
           userName,
+          userId,
           projects: [],
         };
     }

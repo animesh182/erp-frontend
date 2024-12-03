@@ -59,6 +59,7 @@ export const formInputs = [
             <SelectLabel>Status</SelectLabel>
             <SelectItem value="Paid">Paid</SelectItem>
             <SelectItem value="Pending">Pending</SelectItem>
+            <SelectItem value="Budget">Budget</SelectItem>
             <SelectItem value="Cancelled">Cancelled</SelectItem>
           </SelectGroup>
         </SelectContent>
@@ -66,7 +67,7 @@ export const formInputs = [
     ),
     name: "status",
     required: true,
-    filterValues: ["All", "Paid", "Pending", "Cancelled"],
+    filterValues: ["All", "Paid", "Pending", "Cancelled","Budget"],
   },
   {
     component: <DatePicker />,

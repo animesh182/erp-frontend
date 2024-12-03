@@ -10,10 +10,12 @@ import { columns } from "./Columns";
 import { getProjectById } from "@/app/api/getProjects"; // Import the API function to get project by ID
 import { deleteResourceUtilization } from "@/app/api/projects/deleteResourceUtilization";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 export default function ProjectDetails() {
   const [project, setProject] = useState(null); // Project state
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
+  const[isDescriptionOpen,setIsDescriptionOpen]=useState(false)
   const { id } = useParams(); // Get the projectId from the dynamic route
 
   useEffect(() => {
@@ -59,9 +61,19 @@ export default function ProjectDetails() {
   // Render the project details
   return (
     <main className="p-6 min-h-screen space-y-4">
-      <div className="flex flex-col md:flex-row gap-4 w-full">
-        <ProjectDetailsMain project={project} /> 
-        <ProjectDetailsSidebar project={project} />
+  <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
+        <ProjectDetailsMain project={project} />
+        {!isDescriptionOpen && (
+          <Button onClick={() => setIsDescriptionOpen(true)}>
+            Description
+          </Button>
+        )}
+        {isDescriptionOpen && (
+          <ProjectDetailsSidebar
+            project={project}
+            onClose={() => setIsDescriptionOpen(false)} // Pass the onClose function
+          />
+        )}
       </div>
       <div>
         <TableTitle

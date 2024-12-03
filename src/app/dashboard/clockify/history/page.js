@@ -69,7 +69,7 @@ const ClockifyHistory = () => {
     const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, "0");
             return `${hours}`;
   };
-  
+  console.log(allUsers,"sdfdsfds")
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
 
@@ -120,6 +120,7 @@ const ClockifyHistory = () => {
         subtitle="The table captures time entries of all users associated with the company"
         columns={columns()}
         data={allUsers}
+        // maxHeight="max-h-[1000px]"
       />
 )}
 </div>

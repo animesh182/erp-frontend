@@ -94,7 +94,7 @@ function DataTable({
     state: {
       sorting,
     },
-    pageCount: Math.ceil(filteredData.length / 10), // Adjust page size as needed
+    pageCount: Math.ceil(filteredData.length / 30), // Adjust page size as needed
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -130,10 +130,9 @@ function DataTable({
   };
 
   
-
   
 
-
+console.log(table.getPageCount(),"count")
 
   return (
     <EditRowContext.Provider value={{ onEditRow, onDeleteRow }}>
@@ -322,41 +321,72 @@ function DataTable({
   <PaginationContent>
     {/* Previous Button */}
     <PaginationItem>
-      <PaginationPrevious
+   {table.getCanPreviousPage() &&  <PaginationPrevious
         onClick={() => table.previousPage()}
         disabled={!table.getCanPreviousPage()}
-      />
+      />}
     </PaginationItem>
 
-    {/* Display Limited Page Numbers */}
-    {Array.from({ length: table.getPageCount() }, (_, index) => index)
-      .filter((page) => {
-        const currentPage = table.getState().pagination.pageIndex;
-        // Show only pages around the current page (e.g., current - 1, current, current + 1)
-        return (
-          page === currentPage || page === currentPage - 1 || page === currentPage + 1
-        );
-      })
-      .map((page) => (
+    {/* First Page Button */}
+    <PaginationItem>
+      <PaginationLink
+        onClick={() => table.setPageIndex(0)}
+        isActive={table.getState().pagination.pageIndex === 0}
+      >
+        1
+      </PaginationLink>
+    </PaginationItem>
+
+    {/* Dynamic Page Numbers */}
+    {(() => {
+      const currentPage = table.getState().pagination.pageIndex;
+      const totalPages = table.getPageCount();
+      const lastPage = totalPages - 1;
+
+      const pages = [];
+
+      // Add pages dynamically
+      for (let page = Math.max(1, currentPage - 1); page <= Math.min(lastPage - 1, currentPage + 1); page++) {
+        pages.push(page);
+      }
+
+      return pages.map((page) => (
         <PaginationItem key={page}>
           <PaginationLink
             onClick={() => table.setPageIndex(page)}
-            isActive={table.getState().pagination.pageIndex === page}
+            isActive={currentPage === page}
           >
             {page + 1}
           </PaginationLink>
         </PaginationItem>
-      ))}
+      ));
+    })()}
+
+    {/* Last Page Button */}
+    {table.getPageCount() > 1 && (
+      <PaginationItem>
+        <PaginationLink
+          onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+          isActive={
+            table.getState().pagination.pageIndex ===
+            table.getPageCount() - 1
+          }
+        >
+          {table.getPageCount()}
+        </PaginationLink>
+      </PaginationItem>
+    )}
 
     {/* Next Button */}
     <PaginationItem>
-      <PaginationNext
+   {table.getCanNextPage() &&   <PaginationNext
         onClick={() => table.nextPage()}
-        disabled={!table.getCanNextPage() || table.getRowModel().rows.length === 0} 
-      />
+        disabled={!table.getCanNextPage()}
+      />}
     </PaginationItem>
   </PaginationContent>
 </Pagination>
+
 
             </div>
           </div>
@@ -367,3 +397,4 @@ function DataTable({
 }
 
 export default DataTable;
+

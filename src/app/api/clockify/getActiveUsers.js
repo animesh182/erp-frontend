@@ -89,7 +89,8 @@ function transformUserListData(data, { employeeClockifyDetails, clockifyProjects
         latest_activity: user.description || "(no description)",
         project_name: matchedProjects?.projectName || "(Without project)",
         time: user.timeInterval.start,
-        status: "Ongoing"
+        status: "Ongoing",
+        user_id:user.userId
       };
     })
     .sort((a, b) => new Date(b.time) - new Date(a.time));

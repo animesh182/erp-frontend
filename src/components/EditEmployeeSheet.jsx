@@ -36,8 +36,6 @@ export function EditEmployeeSheet({
     defaultValues: employeeData || {},
   });
 
-  console.log(roleOptions, "role");
-
   // useEffect(() => {
   //   if (employeeData) {
   //     console.log(watch(), "edit");
@@ -101,6 +99,7 @@ export function EditEmployeeSheet({
   // console.log(watch());
   const onSubmit = (data) => {
     if (employeeData) {
+      
       onEditEmployee(data);
     } else {
       onAddEmployee(data);

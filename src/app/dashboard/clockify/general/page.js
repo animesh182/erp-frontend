@@ -8,7 +8,7 @@ import { ACTIVE_USERS_TYPES, getActiveUsers } from "@/app/api/clockify/getActive
 import { getUserReportSummary, REPORT_TYPES } from "@/app/api/clockify/getUserReportSummary";
 import ClockifyDataTable from "./clockify-data-table";
 import DateRangePicker from "@/components/DateRangePicker";
-import { format, subDays } from "date-fns";
+import { format, startOfMonth, subDays } from "date-fns";
 import {  formatClockifyDate } from "@/lib/utils";
 import ClockifyTimeEntry from "@/components/ClockifyTimeTracking";
 import { getEmployees } from "@/app/api/employees/getEmployees";
@@ -76,11 +76,13 @@ export const clockifyProjects = [
 ];
 
 function combineUniqueUsers(activeUsers, inactiveUsers) {
-  console.log(activeUsers,"lklklkl")
-  const activeUserMap = new Map(activeUsers.map(user => [user.user_name, user]));
+  console.log(inactiveUsers,"lklklkl")
+  const activeUserMap = new Map(activeUsers.map(user => [user.user_id, user]));
+
   const filteredInactiveUsers = inactiveUsers.filter(
-    user => !activeUserMap.has(user.user_name)
+    user => !activeUserMap.has(user.user_id) // Replace user_name with user_id
   );
+  
   const uniqueUsers = [...activeUsers, ...filteredInactiveUsers];
 
   return uniqueUsers;
@@ -92,7 +94,8 @@ const Clockify = () => {
   const [inactiveUsers, setInactiveUsers] = useState();
   const[allUsers,setAllUsers]=useState()
   const initialEndDate = new Date(); // Today's date
-  const initialStartDate = subDays(initialEndDate, 28); // 4 weeks ago
+  const initialStartDate = startOfMonth(initialEndDate) 
+  // const initialStartDate = subDays(initialEndDate, 28); // 4 weeks ago
   const [barChartUser, setBarChartUser] = useState(null);
   const[employeeClockifyDetails,setEmployeeClockifyDetails]=useState()
   // const[clockifyProjects,setClockifyProjects]=useState()

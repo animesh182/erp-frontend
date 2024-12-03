@@ -11,7 +11,6 @@ export async function fetchOngoingProjects() {
       ongoing_projects: [],
       completed_projects: [],
     };
-
     response.forEach((project) => {
       if (project.project_completion) {
         transformedData.completed_projects.push(project);
@@ -20,7 +19,12 @@ export async function fetchOngoingProjects() {
       }
     });
 
-    // Return the transformed data
+    transformedData.ongoing_projects.sort(
+      (a, b) => b.cost_exhausted_percentage - a.cost_exhausted_percentage
+    );
+    transformedData.completed_projects.sort(
+      (a, b) => b.cost_exhausted_percentage - a.cost_exhausted_percentage
+    );
     return { status: 200, data: transformedData };
   } catch (error) {
     return {
