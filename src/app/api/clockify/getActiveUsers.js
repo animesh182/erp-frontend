@@ -38,8 +38,16 @@ export async function getActiveUsers(items, type, additionalData = {}) {
 }
 
 // function transformTimerEntryData(data, { users, clockifyTimeEntryProp, clockifyProjects }) {
-function transformTimerEntryData(data, { users, clockifyUserData, clockifyProjects }) {
-  if (!data?.length) return null;
+function transformTimerEntryData(data, { clockifyUserData, clockifyProjects }) {
+  if (!data?.length || !clockifyUserData || !clockifyProjects) {
+    console.error('Invalid input for transformTimerEntryData', { 
+      dataLength: data?.length, 
+      clockifyUserData, 
+      clockifyProjectsLength: clockifyProjects?.length 
+    });
+    return null;
+  }
+
 
   // const filteredData = data.filter(
   //   (user) => users.some(
@@ -55,7 +63,7 @@ function transformTimerEntryData(data, { users, clockifyUserData, clockifyProjec
   if (filteredData.length === 0) return null;
   const activeUser = filteredData[0];
   const matchedProject = clockifyProjects.find(
-    (project) => project.projectId === activeUser.projectId
+    (project) => project.projectId === activeUser.projectId || ""
   );
 
   return {
@@ -73,11 +81,8 @@ function transformTimerEntryData(data, { users, clockifyUserData, clockifyProjec
   };
 }
 
-// function transformUserListData(data, { employeeClockifyDetails, clockifyProjects }) {
 function transformUserListData(data, { employeeClockifyDetails, clockifyProjects }) {
   if (!data?.length) return null;
-  console.log(data,"ddsssdd")
-  console.log(employeeClockifyDetails,"detailss")
   return data
     .map((user) => {
       const matchedUser = employeeClockifyDetails.find((u) => u.userId === user.userId);

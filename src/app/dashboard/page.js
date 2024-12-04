@@ -19,10 +19,12 @@ import EmployeeMonthlyHours from "@/components/charts/EmployeeMonthlyHours";
 import KpiCard from "@/components/kpicard";
 import ProfitLossChart from "@/components/charts/ProfitLoss";
 import DateRangePicker from "@/components/DateRangePicker";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import fetchReourceUtil from "@/app/api/dashboard/fetchResourceUtil";
 import { useRouter } from "next/navigation";
 import ComboboxProjects from "@/components/ProjectComboBox";
+import { getClockifyIdProjects } from "../api/projects/getProjects";
+import ComboboxProjectsWrapper from "@/components/ProjectComboBoxWrapper";
 
 
 
@@ -34,6 +36,8 @@ export default function Dashboard() {
   const [ongoingProjects, setOngoingProjects] = useState([]);
   const [completedProjects, setCompletedProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const[clockifyProjects,setClockifyProjects]=useState()
+   const [selectedProject, setSelectedProject] = useState("");
 
   // Get first day of current month
   const initialStartDate = startOfMonth(new Date());
@@ -189,6 +193,13 @@ export default function Dashboard() {
             period: "month",
             icon: <DollarSign />,
           },
+          {
+            title: "Invoiced profit",
+            value: "N/A",
+            change: "N/A",
+            period: "month",
+            icon: <DollarSign />,
+          },
         ],
         budgetedData: [
           {
@@ -269,12 +280,48 @@ export default function Dashboard() {
     );
   };
 
+
+  
+  const matchedProject = useMemo(() => {
+    if (clockifyProjects && selectedProject) {
+        const selectedFirstWord = selectedProject.split(' ')[0]?.toLowerCase();
+
+        return clockifyProjects.find((project) => {
+            const projectFirstWord = project.projectName?.split(' ')[0]?.toLowerCase();
+            return projectFirstWord === selectedFirstWord;
+        });
+    }
+    return null;
+}, [selectedProject, clockifyProjects]);
+
+
+  useEffect(() => {
+    const fetchProjectsWIthClockifyId=async()=>{
+        try{
+        const response=await getClockifyIdProjects();
+        
+        setClockifyProjects(response)
+        
+    
+    
+        } catch (error) {
+        console.error("Error fetching projects:", error);
+    }
+    }
+    
+    fetchProjectsWIthClockifyId();
+}, []);
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Home</h1>
         <div className="flex gap-2">
-          <ComboboxProjects/>
+          <ComboboxProjectsWrapper
+              clockifyProjects={clockifyProjects}
+              selectedProject={selectedProject}
+              onProjectSelect={setSelectedProject}
+            />
         <DateRangePicker
           // numberOfMonths={2}
           onDateChange={handleDateChange}

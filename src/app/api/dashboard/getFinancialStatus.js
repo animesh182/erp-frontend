@@ -20,10 +20,10 @@ export async function fetchOngoingProjects() {
     });
 
     transformedData.ongoing_projects.sort(
-      (a, b) => b.cost_exhausted_percentage - a.cost_exhausted_percentage
+      (a, b) => a.cost_exhausted_percentage - b.cost_exhausted_percentage
     );
     transformedData.completed_projects.sort(
-      (a, b) => b.cost_exhausted_percentage - a.cost_exhausted_percentage
+      (a, b) => a.cost_exhausted_percentage - b.cost_exhausted_percentage
     );
     return { status: 200, data: transformedData };
   } catch (error) {

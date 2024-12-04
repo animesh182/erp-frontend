@@ -4,7 +4,7 @@ import MultiLineNameCell from "@/components/MultiLineNameCell";
 import SimpleTableActionsDropdown from "@/components/SimpleTableActionsDropdown";
 import { deleteResourceUtilization } from "@/app/api/projects/deleteResourceUtilization";
 import { format } from "date-fns";
-import { toast } from "sonner";
+
 
 export const columns = [
   {
@@ -75,3 +75,4 @@ export const columns = [
     enableSorting: false,
   },
 ];
+
