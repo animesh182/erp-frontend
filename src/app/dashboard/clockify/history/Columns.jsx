@@ -3,8 +3,45 @@
 import { convertDateToTime, formatDuration } from "@/lib/utils";
 import { format } from "date-fns";
 import { Dot } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 
+
+    const LatestActivityCell = ({ latest_activity, project_name ,project_color }) => {
+        const [isExpanded, setIsExpanded] = useState(false);
+    
+        const fullText = Array.isArray(latest_activity)
+        ? latest_activity.join("")
+        : typeof latest_activity === "string"
+        ? latest_activity
+        : "N/A";
+    
+        const truncatedText = fullText.length > 60
+        ? `${fullText.slice(0, 50)}...`
+        : fullText;
+    
+        const isTruncated = fullText.length > 60;
+    
+        return (
+            <div className="w-96">
+            <p onClick={() => isTruncated && setIsExpanded((prev) => !prev)}  className={` ${isTruncated ? "cursor-pointer" : ""}`}
+                    title={
+                        isTruncated
+                            ? !isExpanded
+                                ? "Click to see full description"
+                                : "Click to collapse"
+                            : ""
+                        }>
+                {isExpanded || !isTruncated ? fullText : truncatedText}
+            </p>
+            <div className="flex items-center mt-1">
+                <Dot style={{ color: project_color }} />
+                <p className="text-sm ml-2" style={{ color: project_color }}>
+                    {project_name || "N/A"}
+                </p>
+            </div>
+        </div>
+        );
+    };
 export const columns = () => [
 {
         accessorKey: "latest_activity",
@@ -12,14 +49,11 @@ export const columns = () => [
         cell: ({ row }) => {
         const { latest_activity, projectName,project_color } = row.original; 
         return (
-            <div className="w-96">
-            <p>{latest_activity || "N/A"}</p>
-            <div className="flex items-center">
-                <Dot className=""style={{ color: project_color }} />
-            <p className=" text-sm"
-            style={{ color: project_color }}>{projectName || "N/A"}</p>
-            </div>
-            </div>
+            <LatestActivityCell
+            latest_activity={latest_activity}
+            project_name={projectName}
+            project_color={project_color}
+          />
         );
         },
         enableSorting: false,

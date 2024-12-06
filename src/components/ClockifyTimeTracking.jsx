@@ -214,24 +214,24 @@ const ClockifyTimeEntry = React.memo(() => {
     //     setComboboxProp(selectedProject);
     // }, [selectedProject]);
 
-  useEffect(() => {
-        const fetchProjectsWIthClockifyId=async()=>{
-            try{
-            const response=await getClockifyIdProjects();
-            
-            setClockifyProjects(response)
-            
-        
-        
+    useEffect(() => {
+        const fetchProjectsWithClockifyId = async () => {
+            try {
+                const response = await getClockifyIdProjects();
+    
+                // Filter out projects with null projectId
+                const filteredProjects = response.filter(project => project.projectId !== null);
+    
+                setClockifyProjects(filteredProjects);
             } catch (error) {
-            console.error("Error fetching projects:", error);
-        }
-        }
-        
-        fetchProjectsWIthClockifyId();
+                console.error("Error fetching projects:", error);
+            }
+        };
+    
+        fetchProjectsWithClockifyId();
     }, []);
 
-
+console.log(clockifyUserData,"sad")
     return (
         <>
         {clockifyUserData ? (

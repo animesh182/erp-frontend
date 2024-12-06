@@ -27,7 +27,7 @@ export async function getProjects(formatData = false) {
 
 
 
-export async function getClockifyIdProjects() {
+export async function getClockifyIdProjects(getAllProjects=false) {
   try {
     const response = await apiClient(
       `${process.env.NEXT_PUBLIC_API_URL}/api/project/project_clockify_id_list/`,
@@ -36,6 +36,12 @@ export async function getClockifyIdProjects() {
       }
     );
 
+    if (getAllProjects) {
+      return response.data.map((project) => ({
+        projectId: project.clockify_id,
+        projectName: project.name,
+      }));
+    }
     const projectsById = new Map();
 
     response.data.forEach((project) => {
@@ -46,7 +52,8 @@ export async function getClockifyIdProjects() {
       }
     });
 
-    const formattedData = Array.from(projectsById.values()).map((projects) => {
+
+ const formattedData = Array.from(projectsById.values()).map((projects) => {
       if (projects.length > 1) {
         const firstName = projects[0].name.split(" ")[0];
         return {

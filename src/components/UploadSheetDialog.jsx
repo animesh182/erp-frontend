@@ -14,7 +14,9 @@ import { FileSpreadsheet, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { createPayroll } from "@/app/api/finances/payroll/createPayroll";
 
-export function UploadSheetDialog() {
+export function UploadSheetDialog({
+  isExpense=false
+}) {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -49,12 +51,12 @@ export function UploadSheetDialog() {
           onClick={() => setIsOpen(true)}
         >
           <FileSpreadsheet className="h-4 w-4" />
-          Upload Payroll Sheet
+          {isExpense?"Upload Expense Sheet":"Upload Payroll Sheet"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Upload Payroll Sheet</DialogTitle>
+          <DialogTitle>{isExpense?"Upload Expense Sheet":"Upload Payroll Sheet"}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="flex items-center gap-4">
@@ -65,14 +67,14 @@ export function UploadSheetDialog() {
               accept=".xlsx, .xls"
               className="cursor-pointer bg-gray-100 hover:bg-gray-200 transition-colors text-black"
             />
-            <Button
+          {!isExpense &&  <Button
               onClick={handleUpload}
               className="gap-2"
               disabled={!file || isUploading}
             >
               <Upload className="h-4 w-4" />
               {isUploading ? "Uploading..." : "Upload"}
-            </Button>
+            </Button>}
           </div>
         </div>
       </DialogContent>

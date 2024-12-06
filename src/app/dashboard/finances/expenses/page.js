@@ -11,6 +11,7 @@ import { createExpense } from "@/app/api/expense/createExpense";
 import { getProjects } from "@/app/api/projects/getProjects";
 import { editExpense } from "@/app/api/expense/editExpense";
 import { deleteExpense } from "@/app/api/expense/deleteExpense";
+import { UploadSheetDialog } from "@/components/UploadSheetDialog";
 
 export default function Expenses() {
   const methods = useForm();
@@ -104,6 +105,9 @@ export default function Expenses() {
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+      <div className="w-full flex justify-end">
+        <UploadSheetDialog className="" isExpense={true}/>
+      </div>
       <FormProvider {...methods}>
         <DataTable
           title={"Expenses"}

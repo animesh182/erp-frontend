@@ -1,11 +1,11 @@
 import { apiClient } from "@/lib/utils";
 
-export async function fetchKpiData(startDate, endDate) {
+export async function fetchKpiData(startDate, endDate,project) {
   try {
     if (startDate && endDate) {
       console.log("fetching data from", startDate, "to", endDate, "api");
       const response = await apiClient(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/finance_kpis/?start_date=${startDate}&end_date=${endDate}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/finance_kpis/?start_date=${startDate}&end_date=${endDate}&project=${project}`
       );
       // Return the response data
       return { status: 200, data: response };

@@ -83,10 +83,13 @@ function transformTimerEntryData(data, { clockifyUserData, clockifyProjects }) {
 
 function transformUserListData(data, { employeeClockifyDetails, clockifyProjects }) {
   if (!data?.length) return null;
+  const validClockifyProjects = clockifyProjects.filter((project) => project.projectId); //excluded the project with projectId= null
   return data
     .map((user) => {
       const matchedUser = employeeClockifyDetails.find((u) => u.userId === user.userId);
-      const matchedProjects = clockifyProjects.find((project) => project.projectId === user.projectId);
+      const matchedProjects =validClockifyProjects.find((project) => project.projectId === user.projectId);
+      // if (!matchedProjects) return null;
+
 
       return {
         user_name: matchedUser?.userName || "Unknown User",
