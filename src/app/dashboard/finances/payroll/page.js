@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import DataTable from "@/components/ui/data-table";
 import { CreditCard, DollarSign, Download } from "lucide-react";
 import { columns } from "@/app/dashboard/finances/payroll/Columns";
-import { formatAmountToNOK } from "@/lib/utils";
 import KpiCard from "@/components/kpicard";
 import { toast } from "sonner";
 import { format, startOfMonth, endOfMonth } from "date-fns";
@@ -13,9 +12,12 @@ import { UploadSheetDialog } from "@/components/UploadSheetDialog";
 import { fetchPayroll } from "@/app/api/payroll";
 import { updatePayroll } from "@/app/api/update_payroll";
 import { getPayrollKpi } from "@/app/api/finances/payroll/getPayrollKpi";
+import { getExcelPayroll } from "@/app/api/finances/payroll/getExcelPayroll";
+
 import * as XLSX from "xlsx";
 import { KpiSkeleton } from "@/components/Skeletons";
 import { deletePayroll } from "@/app/api/finances/payroll/deletePayroll";
+import { formInputs } from "./Inputs";
 
 export default function Payroll() {
   const methods = useForm();
@@ -130,24 +132,11 @@ export default function Payroll() {
     setEndDate(endDate);
   };
 
-  const handleSheetDownload = () => {
-    const worksheetData = data.map((item) => ({
-      id: item.id,
-      Name: item.name || "No Name",
-      "Project Name": item.projectName || "No Project",
-      Invoice: item.invoice,
-      "Invoice Issued Date": item.invoiceIssuedDate,
-      "Paid Date": item.paidDate || "Not Paid",
-      Status: item.status,
-      Type: item.type,
-      Amount: item.amount,
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Payroll");
-
-    XLSX.writeFile(workbook, "payroll_sheet.xlsx");
+  const handleSheetDownload = async () => {
+    console.log("bhutro");
+    try {
+      const response = await getExcelPayroll();
+    } catch {}
   };
 
   const onEditRow = async (editedData) => {
@@ -225,8 +214,10 @@ export default function Payroll() {
           data={data}
           isTableAddFormEnabled={false}
           onEditRow={onEditRow}
+          formInputs={formInputs}
           onDeleteRow={onDeleteRow}
           initialStartDate={startDate}
+          projectOptions={[]}
           initialEndDate={endDate}
           onDateChange={handleDateChange}
           loading={loading}

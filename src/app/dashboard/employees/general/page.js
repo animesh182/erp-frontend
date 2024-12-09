@@ -228,7 +228,7 @@ export default function Employees() {
                 </Avatar>
                 <div className="flex flex-col items-start">
                   <div className="text-lg font-medium">
-                    {selectedEmployee?.full_name || "John Doe"}
+                    {selectedEmployee?.full_name}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {selectedEmployee?.role}

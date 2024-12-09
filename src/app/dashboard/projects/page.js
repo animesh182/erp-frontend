@@ -13,11 +13,12 @@ import { toast } from "sonner";
 import { AddClientDialog } from "@/components/AddClientDialog";
 import { getProjects } from "@/app/api/getProjects";
 import { getClients } from "@/app/api/projects/getClients";
-
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { createProject } from "@/app/api/projects/createProject";
 import { editProject } from "@/app/api/projects/editProject";
 import { createClient } from "@/app/api/projects/createClient";
 import { deleteProject } from "@/app/api/projects/deleteProject";
+import { ProjectPageSkeletonCard, TitleSkeleton } from "@/components/Skeletons";
 
 export default function Projects() {
   const methods = useForm();
@@ -26,6 +27,15 @@ export default function Projects() {
   const [clients, setClients] = useState([]);
   const [isCardLayout, setIsCardLayout] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  // Initialize date states
+  const initialStartDate = startOfMonth(new Date());
+  const initialEndDate = endOfMonth(new Date());
+  const [startDate, setStartDate] = useState(
+    format(initialStartDate, "yyyy-MM-dd")
+  );
+  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
 
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
@@ -39,22 +49,22 @@ export default function Projects() {
     }
   };
 
-  // useEffect(() => {
-  //   console.log("start-stop", isSheetOpen);
-  // }, [isSheetOpen]);
-
   useEffect(() => {
     const getProjectsFromApi = async () => {
       try {
-        const { status, data } = await getProjects();
+        setLoading(true);
+        const { status, data } = await getProjects(startDate, endDate);
         if (status === 200) {
-          console.log(data, "projects");
           setProjects(data);
         } else {
           console.error("Failed to fetch project data");
+          toast.error("Failed to fetch project data");
         }
       } catch (error) {
         console.error("Error fetching project details:", error);
+        toast.error("Error fetching project details");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -65,15 +75,22 @@ export default function Projects() {
           setClients(data);
         } else {
           console.error("Failed to fetch client data");
+          toast.error("Failed to fetch client data");
         }
       } catch (error) {
         console.error("Error fetching client details:", error);
+        toast.error("Error fetching client details");
       }
     };
 
     getProjectsFromApi();
     getClientsFromApi();
-  }, [refreshKey]); // Add refreshKey as a dependency
+  }, [refreshKey, startDate, endDate]);
+
+  const handleDateChange = (startDate, endDate) => {
+    setStartDate(startDate);
+    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
+  };
 
   const handleProjectAdd = () => {
     setIsSheetOpen(true);
@@ -83,7 +100,7 @@ export default function Projects() {
     try {
       const response = await createProject(formData);
       toast.success("Project added successfully");
-      refreshComponent(); // Refresh the component
+      refreshComponent();
       setIsSheetOpen(false);
     } catch (error) {
       toast.error("Failed to add project");
@@ -95,9 +112,8 @@ export default function Projects() {
     try {
       await editProject(projectId, formData);
       toast.success("Project updated successfully");
-      refreshComponent(); // Refresh the component
+      refreshComponent();
       setIsSheetOpen(false);
-      // setEditingProject(null);
     } catch (error) {
       toast.error("Failed to update project");
       console.error("Error updating project:", error.message);
@@ -109,7 +125,7 @@ export default function Projects() {
       const response = await deleteProject(projectId);
       if (response && response.message) {
         toast.success(response.message);
-        refreshComponent(); // Refresh the component
+        refreshComponent();
       }
     } catch (error) {
       toast.error("There was an error deleting the project");
@@ -121,7 +137,7 @@ export default function Projects() {
     try {
       await createClient(formData);
       toast.success("Client added successfully");
-      refreshComponent(); // Refresh the component
+      refreshComponent();
     } catch (error) {
       toast.error("There was an error adding the client");
       console.error("Error adding client:", error.message);
@@ -177,14 +193,22 @@ export default function Projects() {
                 filterColumn={"project_status"}
                 onEditRow={onEditProject}
                 onDeleteRow={onDeleteProject}
+                onDateChange={handleDateChange}
+                initialStartDate={startDate}
+                initialEndDate={endDate}
+                isMonthPicker={true}
+                loading={loading}
               />
             </FormProvider>
           )
         ) : (
-          <div className="text-3xl font-semibold">Loading...</div>
+          <div className="flex w-full flex-col gap-y-3 font-semibold">
+            <TitleSkeleton />
+            <ProjectPageSkeletonCard />
+          </div>
         )}
       </div>
-      <EditProjectSheet //this is for add
+      <EditProjectSheet
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddProject={onAddProject}

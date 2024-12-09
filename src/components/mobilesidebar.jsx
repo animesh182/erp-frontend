@@ -51,7 +51,7 @@ export default function MobileSidebar() {
             <div key={navItem.label}>
               <Link
                 href={navItem.href}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted/80 
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted/80
                   ${
                     isActive(navItem.href) || isParentActive(navItem)
                       ? "bg-muted text-primary"
@@ -79,7 +79,7 @@ export default function MobileSidebar() {
                     <Link
                       key={subItem.label}
                       href={subItem.href}
-                      className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted/80 
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted/80
                         ${
                           isActive(subItem.href)
                             ? "bg-muted text-primary"

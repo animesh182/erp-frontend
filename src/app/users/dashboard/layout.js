@@ -1,6 +1,8 @@
 "use client"
+import { useClockify } from "@/components/ClockifyContext";
 import Header from "@/components/header";
-import Sidebar from "@/components/UserSideBar";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import AppSidebar from "@/components/UserSideBar";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
@@ -19,22 +21,19 @@ function UserDashboardLayout({ children }) {
   const searchParams = useSearchParams(); 
    
   
-  const userId=searchParams.get('userId')  
+  const userId=searchParams.get('userId') 
+  const{clockifyUserData}=useClockify()
 
 
   return (
-    <div>
-      <main>
-        <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-          <div className="overflow-hidden">
-            <Sidebar userId={userId}/>
-          </div>
-          <div className="flex flex-col">
-            <Header />
-            {children}
-          </div>
-        </div>
-      </main>
-    </div>
+
+        <SidebarProvider>
+     <AppSidebar userId={userId} userName={clockifyUserData?.full_name}/>
+        <main className="w-full">
+          <Header />
+  
+          {children}
+        </main>
+      </SidebarProvider>
   );
 }
