@@ -28,9 +28,6 @@ import ProfitAnalysisMargin from "@/components/ProfitAnalysisMargin";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
-
-
-
 export default function Dashboard() {
   const [profitLoss, setProfitLoss] = useState([]);
   const [resourceUtilData, setResourceUtilData] = useState();
@@ -39,8 +36,8 @@ export default function Dashboard() {
   const [ongoingProjects, setOngoingProjects] = useState([]);
   const [completedProjects, setCompletedProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const[clockifyProjects,setClockifyProjects]=useState()
-   const [selectedProject, setSelectedProject] = useState("");
+  const [clockifyProjects, setClockifyProjects] = useState();
+  const [selectedProject, setSelectedProject] = useState("");
 
   const initialStartDate = startOfMonth(new Date());
   const initialEndDate = endOfMonth(new Date());
@@ -90,7 +87,7 @@ export default function Dashboard() {
         setProfitLoss(transformedData); // Set the transformed data to state
       } else {
         console.error("Failed to fetch profit-loss data");
-        toast.error("Failed to fetch profit-loss data ")
+        toast.error("Failed to fetch profit-loss data ");
         const defaultData = Object.values(monthAbbreviations).map((month) => ({
           name: month,
           totalIncome: 0,
@@ -98,7 +95,7 @@ export default function Dashboard() {
           profit: 0,
           profitPercentage: 0,
         }));
-        setProfitLoss(defaultData)
+        setProfitLoss(defaultData);
       }
     };
     getProfitLoss();
@@ -145,8 +142,7 @@ export default function Dashboard() {
 
     getResourceUtilData();
     getKpiData();
-  }, [startDate, endDate,selectedProject]);
-
+  }, [startDate, endDate, selectedProject]);
 
   useEffect(() => {
     if (fetchedKpiData) {
@@ -178,7 +174,9 @@ export default function Dashboard() {
           {
             title: "Invoiced Revenue",
             value: parseFloat(fetchedKpiData.invoiced_revenue),
-            change: parseFloat(fetchedKpiData.invoiced_revenue_percentage_change),
+            change: parseFloat(
+              fetchedKpiData.invoiced_revenue_percentage_change
+            ),
             period: "month",
             icon: <DollarSign />,
           },
@@ -192,7 +190,9 @@ export default function Dashboard() {
           {
             title: "Invoiced profit",
             value: parseFloat(fetchedKpiData.invoiced_profit),
-            change: parseFloat(fetchedKpiData.invoiced_profit_percentage_change),
+            change: parseFloat(
+              fetchedKpiData.invoiced_profit_percentage_change
+            ),
             period: "month",
             icon: <DollarSign />,
           },
@@ -201,10 +201,12 @@ export default function Dashboard() {
           {
             title: "Budgeted Revenue",
             value: parseFloat(fetchedKpiData.budgeted_revenue),
-            change: parseFloat(fetchedKpiData.budgeted_revenue_percentage_change),
+            change: parseFloat(
+              fetchedKpiData.budgeted_revenue_percentage_change
+            ),
             period: "month",
             icon: <CreditCard />,
-            isMoney: false,
+            isMoney: true,
           },
           {
             title: "Budgeted Expense",
@@ -212,15 +214,17 @@ export default function Dashboard() {
             change: parseFloat(fetchedKpiData.budgeted_cost_percentage_change),
             period: "month",
             icon: <CreditCard />,
-            isMoney: false,
+            isMoney: true,
           },
           {
             title: "Budgeted Profit",
             value: parseFloat(fetchedKpiData.budgeted_profit),
-            change: parseFloat(fetchedKpiData.budgeted_profit_percentage_change),
+            change: parseFloat(
+              fetchedKpiData.budgeted_profit_percentage_change
+            ),
             period: "month",
             icon: <CreditCard />,
-            isMoney: false,
+            isMoney: true,
           },
         ],
         otherData: [
@@ -242,7 +246,7 @@ export default function Dashboard() {
           },
         ],
       };
-      
+
       setKpiValues(updatedKpiDatas); // Setting the new kpiDatas array
       setLoading(false);
     }
@@ -253,14 +257,11 @@ export default function Dashboard() {
     setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
   };
 
-
-
   const renderKpiSection = (sectionData, skeletonCount) => {
     return (
       <div className="space-y-2  w-11/12">
         {kpiValues?.[sectionData] && kpiValues[sectionData].length > 0
           ? kpiValues[sectionData].map((data, index) => (
-     
               <KpiCard
                 key={index}
                 title={data.title}
@@ -272,26 +273,24 @@ export default function Dashboard() {
                 isTrend={data.isTrend}
                 isSmall={true}
               />
-           
             ))
-          : [...Array(skeletonCount)].map((_, index) => <KpiSkeleton key={index} isSmall={true} />)}
+          : [...Array(skeletonCount)].map((_, index) => (
+              <KpiSkeleton key={index} isSmall={true} />
+            ))}
       </div>
     );
   };
 
   useEffect(() => {
-    const fetchProjectsWIthClockifyId=async()=>{
-        try{
-        const response=await getClockifyIdProjects(true);
-        
-        setClockifyProjects(response)
-        
-    
-    
-        } catch (error) {
+    const fetchProjectsWIthClockifyId = async () => {
+      try {
+        const response = await getClockifyIdProjects(true);
+
+        setClockifyProjects(response);
+      } catch (error) {
         console.error("Error fetching projects:", error);
-    }
-    }
+      }
+    };
     const getOngoingProjects = async () => {
       const { status, data } = await fetchOngoingProjects();
       if (status === 200) {
@@ -305,7 +304,7 @@ export default function Dashboard() {
 
     getOngoingProjects();
     fetchProjectsWIthClockifyId();
-}, []);
+  }, []);
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
@@ -313,43 +312,45 @@ export default function Dashboard() {
         <h1 className="text-lg font-semibold md:text-2xl">Home</h1>
         <div className="flex gap-2">
           <ComboboxProjectsWrapper
-              clockifyProjects={clockifyProjects}
-              selectedProject={selectedProject}
-              onProjectSelect={setSelectedProject}
-            />
-        <DateRangePicker
-          // numberOfMonths={2}
-          onDateChange={handleDateChange}
-          initialStartDate={startDate}
-          initialEndDate={endDate}
-          isMonthPicker={true}
-        />
+            clockifyProjects={clockifyProjects}
+            selectedProject={selectedProject}
+            onProjectSelect={setSelectedProject}
+          />
+          <DateRangePicker
+            // numberOfMonths={2}
+            onDateChange={handleDateChange}
+            initialStartDate={startDate}
+            initialEndDate={endDate}
+            isMonthPicker={true}
+          />
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-4 md:gap-8 ">
-      <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
-        
+        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-2">
             <h2 className="font-semibold text-xl text-center ">Actual</h2>
-            {renderKpiSection('totalActualData', 3)}
-          </div> 
+            {renderKpiSection("totalActualData", 3)}
+          </div>
 
           <div className="space-y-2">
-          <h2 className="font-semibold text-xl text-center ">Invoiced</h2>
-            {renderKpiSection('invoicedData', 2)}
-            </div>
-            <div className="space-y-2">
-            <h2 className="font-semibold text-xl text-center">Budgeted</h2>
-            {renderKpiSection('budgetedData', 3)}
-            </div>
+            <h2 className="font-semibold text-xl text-center ">Invoiced</h2>
+            {renderKpiSection("invoicedData", 2)}
+          </div>
           <div className="space-y-2">
-          <h2 className="font-semibold text-xl text-center">Others</h2>
-          {renderKpiSection('otherData', 2)}
+            <h2 className="font-semibold text-xl text-center">Budgeted</h2>
+            {renderKpiSection("budgetedData", 3)}
+          </div>
+          <div className="space-y-2">
+            <h2 className="font-semibold text-xl text-center">Others</h2>
+            {renderKpiSection("otherData", 2)}
           </div>
         </div>
-
       </div>
-      <ProfitAnalysisMargin profitLoss={profitLoss} ongoingProjects={ongoingProjects} completedProjects={completedProjects}/>
+      <ProfitAnalysisMargin
+        profitLoss={profitLoss}
+        ongoingProjects={ongoingProjects}
+        completedProjects={completedProjects}
+      />
       <div className="grid grid-cols-5 gap-x-6 select-none">
         <Card className="col-span-5 select-none w-full overflow-hidden">
           <CardHeader className="flex-row justify-between items-center">
