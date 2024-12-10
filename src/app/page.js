@@ -27,6 +27,7 @@ import { useForm } from "react-hook-form";
 import { login } from "@/app/api/auth/login";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useClockify } from "@/components/ClockifyContext";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -34,7 +35,10 @@ const formSchema = z.object({
 });
 
 export default function Page() {
+  const { setClockifyUserData } = useClockify();
   const router = useRouter();
+
+
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -52,6 +56,14 @@ export default function Page() {
         if(response.is_admin)
         {toast.success("Login successful!");
         
+
+
+
+          const res = response.user_details;
+          setClockifyUserData(res);
+
+
+
         router.push("/dashboard")
       }
         else if(response.is_employee){

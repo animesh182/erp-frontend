@@ -3,7 +3,7 @@ import { apiClient } from "@/lib/utils";
 export async function fetchOngoingProjects() {
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}api/ongoing_projects/`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/ongoing_projects/`
     );
 
     // Transform the response data
@@ -11,7 +11,6 @@ export async function fetchOngoingProjects() {
       ongoing_projects: [],
       completed_projects: [],
     };
-
     response.forEach((project) => {
       if (project.project_completion) {
         transformedData.completed_projects.push(project);
@@ -20,7 +19,12 @@ export async function fetchOngoingProjects() {
       }
     });
 
-    // Return the transformed data
+    transformedData.ongoing_projects.sort(
+      (a, b) => a.cost_exhausted_percentage - b.cost_exhausted_percentage
+    );
+    transformedData.completed_projects.sort(
+      (a, b) => a.cost_exhausted_percentage - b.cost_exhausted_percentage
+    );
     return { status: 200, data: transformedData };
   } catch (error) {
     return {

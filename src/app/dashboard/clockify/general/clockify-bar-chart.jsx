@@ -60,13 +60,12 @@ const CustomTooltip = ({ payload, label }) => {
 
 
 
-const ClockifyBarChart = ({ userName, selected }) => {
+const ClockifyBarChart = ({ userName,userId, selected }) => {
   const chartInfo = useMemo(() => {
     if (!Array.isArray(selected)) {
       return null;
     }
-    
-    const selectedUser = selected.find(user => user.userName === userName);
+    const selectedUser = selected.find(user => user.userId === userId);
     
     if (!selectedUser) {
       return null;

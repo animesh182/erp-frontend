@@ -116,7 +116,7 @@ const DoughnutChartData = (timeEntries) => {
   return timeEntries.map((entry, index) => {
     const percentage = (entry.duration / totalWorkedHours) * 100;
     return {
-      name: entry.description || "(no description)", // or use project name
+      name: entry.description || "(No description)", // or use project name
       value: entry.duration,
       color: ["#6875F5", "#34D399", "#FBBF24", "#EF4444"][index % 4], // Example color cycling
     };

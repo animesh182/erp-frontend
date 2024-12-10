@@ -20,6 +20,7 @@ import LoginTextHeader, { LoginTextFooter } from '@/components/EmployeeDetails/L
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { login } from '@/app/api/auth/login';
+import { useClockify } from '@/components/ClockifyContext';
 
 
 export default function EmployeeLoginPasswordPage() {
@@ -37,6 +38,11 @@ export default function EmployeeLoginPasswordPage() {
     // password:z.string().min(7,"Password must be at least 7 characters long")
   })
 const EmployeeLoginPassword = () => {
+
+
+
+
+  const { setClockifyUserData } = useClockify();
 
   const searchParams = useSearchParams(); 
   const rawEmail = searchParams.get('email');
@@ -69,6 +75,11 @@ const EmployeeLoginPassword = () => {
       // if (response.status === 200 && response.is_employee) {
       if (response.status === 200 ) {
         toast.success("Login successful!");
+
+
+
+        const res = response.user_details;
+        setClockifyUserData(res);
      
         router.push(`/users/dashboard?userId=${response.user_details.id}`);
       } else {

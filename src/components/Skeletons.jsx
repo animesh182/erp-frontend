@@ -1,9 +1,11 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function KpiSkeleton() {
+export function KpiSkeleton({
+  isSmall=false
+}) {
   return (
-    <div className="flex flex-col space-y-3">
-      <Skeleton className="h-[125px] w-full rounded-xl" />
+    <div className={`flex flex-col ${isSmall?"space-y-0":"space-y-3"}`}>
+      <Skeleton className={`h-[125px] ${isSmall?"w-11/12":"w-full"} rounded-xl`} />
     </div>
   );
 }

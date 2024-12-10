@@ -187,7 +187,7 @@ export default function Payroll() {
           <Download className="h-4 w-4" />
           Get Payroll Sheet
         </Button>
-        <UploadSheetDialog />
+        <UploadSheetDialog onRefresh={refreshComponent}/>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
         {kpiValues && kpiValues.length > 0
@@ -222,6 +222,7 @@ export default function Payroll() {
           initialEndDate={endDate}
           onDateChange={handleDateChange}
           loading={loading}
+          isMonthPicker={true}
         />
       </FormProvider>
     </main>

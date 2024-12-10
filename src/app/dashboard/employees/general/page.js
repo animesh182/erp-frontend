@@ -139,7 +139,6 @@ export default function Employees() {
     try {
       const response = await createEmployee(formData);
       toast.success("Employee added successfully");
-      console.log(response);
 
       const newEmployee = {
         id: response.id,
@@ -255,6 +254,7 @@ export default function Employees() {
                     employeeDetails={selectedEmployee}
                     levelOptions={levelOptions}
                     roleOptions={roleOptions}
+                    setEmployeeDetails={setSelectedEmployee}
                   />
                 </TabsContent>
                 <TabsContent value="projects">

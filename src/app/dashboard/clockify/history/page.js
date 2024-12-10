@@ -2,7 +2,7 @@
 import { getUserReportSummary, REPORT_TYPES } from '@/app/api/clockify/getUserReportSummary';
 import DateRangePicker from '@/components/DateRangePicker';
 import KpiCard from '@/components/kpicard'
-import { subDays } from 'date-fns';
+import { startOfMonth, subDays } from 'date-fns';
 import { DollarSign, Hourglass, ListOrdered } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import DataTable from '@/components/ui/data-table';
@@ -15,7 +15,8 @@ const ClockifyHistory = () => {
   const [numberOfEntries, setNumberOfEntries] = useState(0);
   const [kpiData, setKpiData] = useState();
   const initialEndDate = new Date(); 
-  const initialStartDate = subDays(initialEndDate, 28);
+  // const initialStartDate = subDays(initialEndDate, 28);
+  const initialStartDate = startOfMonth(initialEndDate) 
   const [startDate, setStartDate] = useState(initialStartDate);
   const [endDate, setEndDate] = useState(initialEndDate);
   const [isFirstLoad, setIsFirstLoad] = useState(true); 
@@ -69,7 +70,6 @@ const ClockifyHistory = () => {
     const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, "0");
             return `${hours}`;
   };
-  
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
 
@@ -121,6 +121,7 @@ const ClockifyHistory = () => {
         subtitle="The table captures time entries of all users associated with the company"
         columns={columns()}
         data={allUsers}
+        // maxHeight="max-h-[1000px]"
       />
 )}
 </div>

@@ -12,20 +12,19 @@ export default function KpiCard({
   isPercentage = false,
   iconSize = "w-4 h-4", // Default size for icons
   hasSubText = true,
+  isSmall=false
 }) {
-  // console.log(value, "value");
   return (
     <Card x-chunk="dashboard-01-chunk-0" className="w-full hover:bg-muted">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className={`flex flex-row items-center justify-between space-y-0 ${isSmall?"pb-0":"pb-2"}`}>
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <span className={`text-muted-foreground ${iconSize}`}>
           {icon && React.isValidElement(icon)
             ? React.cloneElement(icon, { className: iconSize })
             : null}
         </span>
-        {/* Add text-sm or other Tailwind size classes here */}
       </CardHeader>
-      <CardContent>
+      <CardContent >
         <div className="text-2xl font-bold">
           {isMoney ? `${formatAmountToNOK(value)}` : isPercentage? `${value}%` : value}
         </div>

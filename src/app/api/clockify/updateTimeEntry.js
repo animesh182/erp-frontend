@@ -1,12 +1,13 @@
 
-export async function updateTimeEntry(savedTimeEntryId,timeEntry) {
+export async function updateTimeEntry(savedTimeEntryId,clockifyApiKey,timeEntry) {
     try {
       const response = await fetch(
         `https://api.clockify.me/api/v1/workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_ID}/time-entries/${savedTimeEntryId}`,
         {
           method: 'PUT',
           headers: {
-              'X-Api-Key': process.env.NEXT_PUBLIC_SANKALPA_CLOCKIFY_API_KEY,
+              // 'X-Api-Key': process.env.NEXT_PUBLIC_SANKALPA_CLOCKIFY_API_KEY,
+              'X-Api-Key':clockifyApiKey,
               'Content-Type': 'application/json',
           },
           body: JSON.stringify({

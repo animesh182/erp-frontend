@@ -1,10 +1,11 @@
 import { apiClient } from "@/lib/utils";
 import { getYear } from "date-fns";
-export async function fetchProfitLoss() {
-  const currentYear = getYear(new Date());
+export async function fetchProfitLoss(project,selectedYear= getYear(new Date())) {
+  // const currentYear = getYear(new Date());
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}api/profit_loss_report/?year=${currentYear}`
+      // `${process.env.NEXT_PUBLIC_API_URL}api/profit_loss_report/?year=${currentYear}`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/profit_loss_report/?year=${selectedYear}&project=${project}`
     );
     // Return the response data
     return { status: 200, data: response };

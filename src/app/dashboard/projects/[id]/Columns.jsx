@@ -4,7 +4,7 @@ import MultiLineNameCell from "@/components/MultiLineNameCell";
 import SimpleTableActionsDropdown from "@/components/SimpleTableActionsDropdown";
 import { deleteResourceUtilization } from "@/app/api/projects/deleteResourceUtilization";
 import { format } from "date-fns";
-import { toast } from "sonner";
+
 
 export const columns = [
   {
@@ -25,6 +25,16 @@ export const columns = [
     accessorKey: "utilization",
     header: "Time Allocated",
     enableSorting: false,
+    cell: ({ row }) => {
+      const { utilization } = row.original;
+      const daysInMonth=24
+      const monthlyUtlization=utilization*24
+      return (
+        <div>
+          {monthlyUtlization} <span className="text-xs font-medium">hrs/month</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "start_date",
@@ -65,3 +75,4 @@ export const columns = [
     enableSorting: false,
   },
 ];
+
