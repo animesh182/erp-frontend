@@ -21,7 +21,7 @@ export async function getProjectById(projectId) {
     const response = await apiClient(
       `${process.env.NEXT_PUBLIC_API_URL}/api/project/${projectId}`
     );
-    return { status: 200, data: response.data };
+    return { status: 200, data: response };
   } catch (error) {
     return {
       status: error.status || 500,
