@@ -18,7 +18,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-
 const chartConfig = {
   Changeride: {
     label: "Change Ride",
@@ -34,22 +33,19 @@ const chartConfig = {
   },
 };
 
-function DoughnutChart({chartData}) {
+function DoughnutChart({ chartData }) {
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-start pb-0">
         <CardTitle>Projects Chart</CardTitle>
-        <CardDescription className="text-xs">This table captures all cost streams associated with each project.</CardDescription>
+        <CardDescription className="text-xs">
+          This chart shows the projects assigned to you.
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square"
-        >
+        <ChartContainer config={chartConfig} className="mx-auto aspect-square">
           <PieChart>
-            <ChartTooltip
-              content={<ChartTooltipContent hideLabel />}
-            />
+            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
             <Pie
               data={chartData}
               dataKey="value"
@@ -61,7 +57,7 @@ function DoughnutChart({chartData}) {
               labelLine={true}
               // label={renderCustomizedLabel}
             >
-            {chartData.map((entry, index) => (
+              {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>

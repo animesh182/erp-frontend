@@ -14,9 +14,6 @@ import { fetchTimeEntries } from "@/app/api/clockify/getUserTimeEntries";
 import { Card } from "@/components/ui/card";
 import ClockifyTimeEntry from "@/components/ClockifyTimeTracking";
 
-
-
-
 const dummyKPIInfo = [
   {
     title: "Total Projects Assigned",
@@ -90,7 +87,7 @@ const processTimeEntries = (timeEntries) => {
     let durationInHours = 0;
     if (timeInterval && timeInterval.duration) {
       durationInHours = formatDurationToHours(timeInterval.duration);
-      console.log(durationInHours,"dddd")
+      console.log(durationInHours, "dddd");
     }
 
     return {
@@ -196,7 +193,6 @@ const UsersHome = () => {
     }
   }, [userData, clockifyDate]);
 
-
   const filteredProjects = Array.isArray(employeeProjects)
     ? employeeProjects.filter((project) => {
         const endDate = new Date(project.end_date);
@@ -266,19 +262,17 @@ const UsersHome = () => {
 
   const clockifyData = processTimeEntries(timeEntries);
 
+  //replace with clockify id of user when backend is ready
+  const clockifyUserId = "671639ea898fb01147870ac8";
 
-//replace with clockify id of user when backend is ready
-const clockifyUserId="671639ea898fb01147870ac8"
-
-
-const clockifyTimeEntryProp={
-  clockifyUserId,
-  userName:userData.name
-}
+  const clockifyTimeEntryProp = {
+    clockifyUserId,
+    userName: userData.name,
+  };
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <ClockifyTimeEntry clockifyTimeEntryProp={clockifyTimeEntryProp}/>
+      <ClockifyTimeEntry clockifyTimeEntryProp={clockifyTimeEntryProp} />
       {/* <ClockifyTimeEntry userId={clockifyUserId}/> */}
       <div className="flex flex-row space-x-4">
         {transformedKpiInfo &&
