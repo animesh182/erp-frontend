@@ -117,11 +117,12 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit,data }) {
 
           {/* Date Range (From - To) */}
           <div className="grid grid-cols-2 gap-4 z-0">
-            <div>
+            {/* <div>
               <label className="text-sm font-medium">From</label>
               <Controller
                 name="startedLeaveDate"
                 control={control}
+                  rules={{ required: "Start date is required" }}
                 render={({ field }) => (
                   <Popover>
                     <PopoverTrigger asChild>
@@ -142,6 +143,7 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit,data }) {
               <label className="text-sm font-medium">To</label>
               <Controller
                 name="endedLeaveDate"
+                rules={{ required: "End date is required" }}
                 control={control}
                 render={({ field }) => (
                   <Popover>
@@ -157,7 +159,71 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit,data }) {
                   </Popover>
                 )}
               />
-            </div>
+            </div> */}
+            <div>
+  <label className="text-sm font-medium">From</label>
+  <Controller
+    name="startedLeaveDate"
+    control={control}
+    rules={{ required: "Start date is required" }}
+    render={({ field, fieldState }) => (
+      <>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={`w-full justify-start text-left font-normal ${
+                fieldState.invalid ? "border-destructive" : ""
+              }`}
+            >
+              {field.value ? format(field.value, "MMM dd yyyy") : "Pick a date"}
+              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="start" className="p-0">
+            <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+          </PopoverContent>
+        </Popover>
+        {fieldState.error && (
+          <p className="text-destructive text-sm mt-1">{fieldState.error.message}</p>
+        )}
+      </>
+    )}
+  />
+</div>
+
+<div>
+  <label className="text-sm font-medium">To</label>
+  <Controller
+    name="endedLeaveDate"
+    control={control}
+    rules={{ required: "End date is required" }}
+    render={({ field, fieldState }) => (
+      <>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={`w-full justify-start text-left font-normal ${
+                fieldState.invalid ? "border-destructive" : ""
+              }`}
+            >
+              {field.value ? format(field.value, "MMM dd yyyy") : "Pick a date"}
+              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="start" className="p-0">
+            <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+          </PopoverContent>
+        </Popover>
+        {fieldState.error && (
+          <p className="text-destructive text-sm mt-1">{fieldState.error.message}</p>
+        )}
+      </>
+    )}
+  />
+</div>
+
           </div>
 
           {/* Type */}

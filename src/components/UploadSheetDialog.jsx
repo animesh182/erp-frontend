@@ -13,9 +13,11 @@ import { Input } from "@/components/ui/input";
 import { FileSpreadsheet, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { createPayroll } from "@/app/api/finances/payroll/createPayroll";
+import { uploadExpense } from "@/app/api/expense/uploadExpense";
 
 export function UploadSheetDialog({
-  isExpense=false
+  isExpense=false,
+  onRefresh
 }) {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -25,7 +27,9 @@ export function UploadSheetDialog({
     setFile(event.target.files[0]);
   };
 
-  const handleUpload = async () => {
+  
+
+  const handleUploadPayroll = async () => {
     if (file) {
       // console.log(file, "file");
       setIsUploading(true);
@@ -33,11 +37,35 @@ export function UploadSheetDialog({
         const response = await createPayroll(file);
 
         toast.success("Payroll sheet uploaded successfully");
+        if (onRefresh) {
+          onRefresh(); // Trigger the refresh function passed as a prop
+        }
       } catch (error) {
         console.error("Upload failed:", error);
         toast.error("Failed to upload payroll sheet");
       } finally {
         setIsUploading(false);
+        setIsOpen(false)
+      }
+    }
+  };
+  const handleUploadExpense = async () => {
+    if (file) {
+      // console.log(file, "file");
+      setIsUploading(true);
+      try {
+        const response = await uploadExpense(file);
+
+        toast.success(response.message ||"Expense sheet uploaded successfully");
+        if (onRefresh) {
+          onRefresh(); // Trigger the refresh function passed as a prop
+        }
+      } catch (error) {
+        console.error("Upload failed:", error);
+        toast.error("Failed to upload expense sheet");
+      } finally {
+        setIsUploading(false);
+        setIsOpen(false)
       }
     }
   };
@@ -60,21 +88,21 @@ export function UploadSheetDialog({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="flex items-center gap-4">
-            <Input
+          <Input
               id="picture"
               type="file"
               onChange={handleFileChange}
               accept=".xlsx, .xls"
               className="cursor-pointer bg-gray-100 hover:bg-gray-200 transition-colors text-black"
             />
-          {!isExpense &&  <Button
-              onClick={handleUpload}
+            <Button
+              onClick={isExpense ? handleUploadExpense : handleUploadPayroll}
               className="gap-2"
               disabled={!file || isUploading}
             >
               <Upload className="h-4 w-4" />
               {isUploading ? "Uploading..." : "Upload"}
-            </Button>}
+            </Button>
           </div>
         </div>
       </DialogContent>
