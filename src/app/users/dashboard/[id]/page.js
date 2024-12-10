@@ -35,7 +35,7 @@ function EmployeeProjectDetails() {
 
           if (status === 200 && data) {
             console.log(data,"data")
-            setProject(data); 
+            setProject(data.data); 
           } else {
             setError(`Error: ${data.message}`);
           }

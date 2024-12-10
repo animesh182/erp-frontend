@@ -12,11 +12,14 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { updateTimeEntry } from '@/app/api/clockify/updateTimeEntry';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import ComboboxProjects from './ProjectComboBox';
-import { clockifyProjects, users } from '@/app/dashboard/clockify/general/page';
+// import { clockifyProjects} from '@/app/dashboard/clockify/general/page';
 import { ACTIVE_USERS_TYPES, getActiveUsers } from '@/app/api/clockify/getActiveUsers';
+import { useClockify } from './ClockifyContext';
+import { getClockifyIdProjects } from '@/app/api/projects/getProjects';
+import ComboboxProjectsWrapper from './ProjectComboBoxWrapper';
 
 
-const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
+const ClockifyTimeEntry = React.memo(() => {
     const [selectedProject, setSelectedProject] = useState("");
     const [description, setDescription] = useState("");
     const [billable, setBillable] = useState(true);
@@ -24,22 +27,31 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
     const [timer, setTimer] = useState(0);
     const [startTime, setStartTime] = useState(new Date().toISOString());
     const[timeEntryId,setTimeEntryId]=useState()
-    const [comboboxProp, setComboboxProp] = useState("");
     const [inputTime, setInputTime] = useState(convertDateToTime(startTime));
     const intervalRef = useRef(null);
     const timerRef = useRef(0);
+    const{clockifyUserData}=useClockify()
+    const[clockifyProjects,setClockifyProjects]=useState()
 
 
-    const projectNames = useMemo(() => 
-        clockifyProjects.map((project) => project.projectName), 
-        []
-    );
 
-    const matchedProject = useMemo(() => 
-        clockifyProjects.find((project) => project.projectName === selectedProject),
-        [selectedProject]
-    );
+    // const projectNames = useMemo(() => {
+    //     if (!clockifyProjects) return [];
+    //     return clockifyProjects.map((project) => project.projectName);
 
+    // }, [clockifyProjects]);
+
+    const matchedProject = useMemo(() => {
+        if (clockifyProjects && selectedProject) {
+            const selectedFirstWord = selectedProject.split(' ')[0]?.toLowerCase();
+    
+            return clockifyProjects.find((project) => {
+                const projectFirstWord = project.projectName?.split(' ')[0]?.toLowerCase();
+                return projectFirstWord === selectedFirstWord;
+            });
+        }
+        return null;
+    }, [selectedProject, clockifyProjects]);
     const submitData = useMemo(() => ({
         projectId: matchedProject ? matchedProject.projectId : null,
         description: description,
@@ -66,24 +78,25 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
         }
     }, []);
 
-    const handleProjectSelect = useCallback((project) => {
-        setSelectedProject(project);
-    }, []);
+    // const handleProjectSelect = useCallback((project) => {
+    //     setSelectedProject(project);
+    // }, []);
 
 
     useEffect(() => {
         const fetchClockifyActiveUsers = async () => {
+            if(clockifyUserData && clockifyProjects)
             try {
                 const data = await getActiveUsers(30, ACTIVE_USERS_TYPES.TIMER_ENTRY, {
-                    users,
-                    clockifyTimeEntryProp,
+
+                    clockifyUserData,
                     clockifyProjects
                 });
-                
+             
                 if (data) {
                     setTimeEntryId(data.timeEntryId);
                     setDescription(data.description);
-                    setSelectedProject(data.projectName);
+                    setSelectedProject(data.projectName);//matching logic to match the project with CLockifyProjects to get id
                     setBillable(data.billable);
                     setStart(false);
                     setStartTime(data.timeInterval.start);
@@ -105,23 +118,27 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
         return () => {
             stopTimer();
         };
-    }, [users, clockifyTimeEntryProp, clockifyProjects, startTimer, stopTimer]);
+    }, [ clockifyUserData, clockifyProjects, startTimer, stopTimer]);
 
 
  
     const handleButtonClick = useCallback(async () => {
+        if(clockifyUserData.clockify_api_key)
         try {
             if (start) {
-                const response = await createTimeEntry(submitData);
+                const response = await createTimeEntry(clockifyUserData.clockify_api_key,submitData);
                 setStart(false);
                 if (response.id) {
                     const timeEntry = await getTimeEntryById(response.id);
+                    
                     const matchedProjectWithId = clockifyProjects.find(
                         (project) => project.projectId === timeEntry.projectId
                     );
+                    
 
                     setDescription(timeEntry.description);
                     if (matchedProjectWithId) {
+                
                         setSelectedProject(matchedProjectWithId.projectName);
                     }
                     setBillable(timeEntry.billable);
@@ -139,7 +156,7 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
                     }
                 }
             } else {
-                    const message = await stopTimeEntry(clockifyTimeEntryProp.clockifyUserId, new Date().toISOString());
+                    const message = await stopTimeEntry(clockifyUserData.clockify_user_id,clockifyUserData.clockify_api_key, new Date().toISOString());
                     toast.success(message);
                     
                     // Reset states
@@ -149,7 +166,6 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
                     // Clear form
                     setDescription("");
                     setSelectedProject("");
-                    setComboboxProp("");
                     setBillable(true);
                     
                 
@@ -161,8 +177,7 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
             toast.error(error.message || "Failed to process time entry");
             console.error("Error handling time entry:", error);
         }
-    }, [start, submitData, clockifyTimeEntryProp.clockifyUserId, startTimer, stopTimer, clockifyProjects]);
-    
+    }, [start, submitData,  startTimer, stopTimer, clockifyProjects]);
     const handleUpdate = useCallback(async () => {
         const updateData = {
             startTime: startTime,
@@ -171,9 +186,9 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
             billable: billable
         };
         
-        if(timeEntryId)
+        if(timeEntryId && clockifyUserData)
         try {
-            const response = await updateTimeEntry(timeEntryId, updateData);
+            const response = await updateTimeEntry(timeEntryId,clockifyUserData.clockify_api_key, updateData);
             if (!response.timeInterval.end) {
                 const elapsedTime = Math.floor(
                     (new Date().getTime() - new Date(response.timeInterval.start).getTime()) / 1000
@@ -187,7 +202,7 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
             console.error("Error updating time entry:", error);
             toast.error(error.message || "Failed to update time entry");
         }
-    }, [startTime, description, matchedProject, selectedProject, billable, clockifyTimeEntryProp.clockifyUserId, startTimer]);
+    }, [startTime, description, matchedProject, selectedProject, billable,  startTimer]);
     
     const handleTimeChange = useCallback((newTime) => {
         const updatedDate = convertTimeToDate(newTime || new Date().toISOString());
@@ -195,11 +210,31 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
         setInputTime(newTime);
     }, []);
 
-    useEffect(() => {
-        setComboboxProp(selectedProject);
-    }, [selectedProject]);
+    // useEffect(() => {
+    //     setComboboxProp(selectedProject);
+    // }, [selectedProject]);
 
+    useEffect(() => {
+        const fetchProjectsWithClockifyId = async () => {
+            try {
+                const response = await getClockifyIdProjects();
+    
+                // Filter out projects with null projectId
+                const filteredProjects = response.filter(project => project.projectId !== null);
+    
+                setClockifyProjects(filteredProjects);
+            } catch (error) {
+                console.error("Error fetching projects:", error);
+            }
+        };
+    
+        fetchProjectsWithClockifyId();
+    }, []);
+
+console.log(clockifyUserData,"sad")
     return (
+        <>
+        {clockifyUserData ? (
         <Card className="p-2 flex items-center justify-between">
             <Input
                 className="w-7/12"
@@ -207,12 +242,18 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
                 onChange={(e) => setDescription(e.target.value)}
                 value={description}
             />
-            <ComboboxProjects
+            {/* <ComboboxProjects
                 projectNames={projectNames}
                 onSelectProject={handleProjectSelect}
                 className="w-2/12"
-                prop={comboboxProp}
-            />
+                prop={selectedProject}
+            /> */}
+                <ComboboxProjectsWrapper
+            clockifyProjects={clockifyProjects}
+            selectedProject={selectedProject}
+            onProjectSelect={setSelectedProject}
+          />
+
 
             <TooltipProvider>
                 <Tooltip>
@@ -259,9 +300,13 @@ const ClockifyTimeEntry = React.memo(({clockifyTimeEntryProp}) => {
                 {start ? "Start" : "Stop"}
             </Button>
         </Card>
+        ):("Loading....")}
+        </>
     );
 });
 
 ClockifyTimeEntry.displayName = "ClockifyTimeEntry";
 
 export default ClockifyTimeEntry;
+
+

@@ -12,15 +12,37 @@ import { useState, useEffect } from "react";
 import ProfitLossChart from "@/components/charts/ProfitLoss";
 import { DollarSign, CreditCard, Activity } from "lucide-react";
 import KpiCard from "@/components/kpicard";
+import ComboboxProjectsWrapper from "@/components/ProjectComboBoxWrapper";
+import { format } from "date-fns";
+import { getClockifyIdProjects } from "@/app/api/projects/getProjects";
+import YearPicker from "@/components/YearPicker";
 
+
+
+function getYearDateRange(year = new Date().getFullYear()) {
+  if (!year || isNaN(year)) {
+    throw new Error("Invalid year provided");
+  }
+
+  const start_date = new Date(`${year}-01-01`);
+  const end_date = new Date(`${year}-12-31`);
+  const startDate=format(start_date, "yyyy-MM-dd")
+  const endDate=format(end_date, "yyyy-MM-dd")
+
+  return { startDate, endDate };
+}
 export default function ProfitLoss() {
   const [profitLoss, setProfitLoss] = useState([]);
 
   const [fetchedKpiData, setFetchedKpiData] = useState();
   const [kpiValues, setKpiValues] = useState();
+  const[clockifyProjects,setClockifyProjects]=useState()
+   const [selectedProject, setSelectedProject] = useState("");
+  const[selectedYear,setSelectedYear]=useState()
+  const { startDate, endDate } = getYearDateRange(selectedYear);
   useEffect(() => {
     const getProfitLoss = async () => {
-      const { status, data } = await fetchProfitLoss();
+      const { status, data } = await fetchProfitLoss(selectedProject,selectedYear);
       if (status === 200) {
         // Transform the data into the required format
         const transformedData = data.monthly_totals.map((monthData) => {
@@ -61,10 +83,16 @@ export default function ProfitLoss() {
     };
 
     getProfitLoss();
-  }, []);
+  }, [selectedProject,selectedYear]);
   useEffect(() => {
     const getKpiData = async () => {
-      const { status, data } = await fetchKpiData();
+      const { status, data } = await fetchKpiData(
+        // format(startDate, "yyyy-MM-dd"),
+        // format(endDate, "yyyy-MM-dd"),
+        startDate,
+        endDate,
+        selectedProject
+      );
       if (status === 200) {
         setFetchedKpiData(data);
       } else {
@@ -73,29 +101,29 @@ export default function ProfitLoss() {
     };
 
     getKpiData();
-  }, []);
+  }, [selectedProject,selectedYear]);
   useEffect(() => {
     if (fetchedKpiData) {
       const updatedKpiDatas = [
         {
           title: "Total Revenue",
-          value: parseFloat(fetchedKpiData.total_revenue_current_month),
-          change: parseFloat(fetchedKpiData.percentage_change_in_revenue),
+          value: parseFloat(fetchedKpiData.actual_revenue),
+          change: parseFloat(fetchedKpiData.actual_revenue_percentage_change),
           period: "month",
           icon: <DollarSign className="w-4 h-4" />,
         },
         {
           title: "Total Profit",
-          value: parseFloat(fetchedKpiData.total_profit_current_month),
-          change: parseFloat(fetchedKpiData.percentage_change_in_profit),
+          value: parseFloat(fetchedKpiData.actual_profit),
+          change: parseFloat(fetchedKpiData.actual_profit_percentage_change),
           period: "month",
           icon: <Activity />,
         },
 
         {
           title: "Total Expense",
-          value: fetchedKpiData.total_expenses_current_month,
-          change: parseFloat(fetchedKpiData.percentage_change_in_expenses),
+          value: fetchedKpiData.actual_cost,
+          change: parseFloat(fetchedKpiData.actual_cost_percentage_change),
           period: "month",
           icon: <CreditCard />,
         },
@@ -104,16 +132,57 @@ export default function ProfitLoss() {
     }
   }, [fetchedKpiData]); // This will trigger whenever kpiData is fetched
 
+
+
+  useEffect(() => {
+    const fetchProjectsWIthClockifyId=async()=>{
+        try{
+        const response=await getClockifyIdProjects(true);
+        
+        setClockifyProjects(response)
+        
+    
+    
+        } catch (error) {
+        console.error("Error fetching projects:", error);
+    }
+    }
+    fetchProjectsWIthClockifyId();
+}, []);
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <Card>
         <CardHeader className="flex-row justify-between items-center">
-          <CardTitle>
+          <CardTitle className="flex justify-between w-full">
+            <div>
             Revenue Projection
             <div className="text-sm font-normal text-muted-foreground">
               Capture and track all cost streams associated with each project in
               this table.
             </div>
+            </div>
+            <div className="flex gap-2">
+          <ComboboxProjectsWrapper
+              clockifyProjects={clockifyProjects}
+              selectedProject={selectedProject}
+              onProjectSelect={setSelectedProject}
+            />
+        {/* <DateRangePicker
+          // numberOfMonths={2}
+          onDateChange={handleDateChange}
+          initialStartDate={startDate}
+          initialEndDate={endDate}
+          isMonthPicker={true}
+        /> */}
+
+        <YearPicker
+                initialYear={new Date().getFullYear()}
+                selectedYear={selectedYear}
+                onYearSelect={setSelectedYear}
+              />
+
+        </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="w-full h-[600px] flex justify-between">

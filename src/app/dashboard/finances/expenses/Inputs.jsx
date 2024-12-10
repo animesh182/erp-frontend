@@ -59,6 +59,7 @@ export const formInputs = [
             <SelectLabel>Status</SelectLabel>
             <SelectItem value="Paid">Paid</SelectItem>
             <SelectItem value="Pending">Pending</SelectItem>
+            <SelectItem value="Budget">Budget</SelectItem>
             <SelectItem value="Cancelled">Cancelled</SelectItem>
           </SelectGroup>
         </SelectContent>

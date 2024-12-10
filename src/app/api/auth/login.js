@@ -13,7 +13,7 @@ export async function login(formData) {
       }
     );
 
-    const { access_token, refresh_token, is_employee,is_admin,user_details,first_time_login} = response;
+    const { access_token, refresh_token, is_employee,is_admin,user_details,first_time_login,clockify_user_id,clockify_api_key} = response;
     if(access_token && refresh_token)
     // Set the access token cookie using js-cookie
     {
@@ -32,7 +32,7 @@ export async function login(formData) {
       path: "/",
     })}
 
-    return { status: 200, message: "Logged In Successfully" ,is_employee,is_admin,user_details,first_time_login};
+    return { status: 200, message: "Logged In Successfully" ,is_employee,is_admin,user_details,first_time_login,clockify_user_id,clockify_api_key};
   } catch (error) {
     // Clear the tokens if login fails (invalid credentials)
     Cookies.remove("access_token", { path: "/" });

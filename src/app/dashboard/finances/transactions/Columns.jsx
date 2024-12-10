@@ -55,11 +55,15 @@ export const columns = [
       const { status } = row.original;
       return (
         <Badge
-          className={`${
-            status?.toLowerCase() === "paid"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
+        className={`${
+          status === "Paid"
+            ? "bg-green-100 text-green-800"
+            : status === "Pending"
+            ? "bg-yellow-100 text-yellow-800"
+            : status==="Cancelled"
+            ? "bg-red-100 text-red-800"
+            : "bg-orange-200 text-orange-800"
+        }`}
         >
           {status ? status : "No Data"} {/* Show "No Data" */}
         </Badge>

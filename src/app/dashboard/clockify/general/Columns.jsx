@@ -109,10 +109,11 @@ export const columns = (barChartUser,startDate,endDate) => [
     accessorKey: "time_tracked",
     header: `Total Time Tracked (${startDate}-${endDate})`,
     cell: ({ row }) => {
-      const { user_name } = row.original;
+      const { user_id,user_name } = row.original;
+
       return (
         <div className="min-w-96">
-          <ClockifyBarChart userName={user_name} selected={barChartUser} />
+          <ClockifyBarChart userName={user_name} userId={user_id} selected={barChartUser} />
         </div>
       );
     },

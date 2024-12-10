@@ -1,11 +1,11 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
+import {  X } from "lucide-react";
 import MultiLineNameCell from "@/components/MultiLineNameCell";
 import TeamAvatars from "@/components/TeamAvatars";
 import { Progress } from "@/components/ui/progress";
 
-const ProjectDetailsSidebar = ({ project }) => {
+const ProjectDetailsSidebar = ({ project, onClose}) => {
   const teamMembers = project.all_user_projects.map((user) => ({
     name: user.user_name,
     image: null, // You can replace this with a proper avatar URL if available
@@ -20,6 +20,7 @@ const ProjectDetailsSidebar = ({ project }) => {
         Edit
       </Button> */}
         {/* change to assign employee */}
+        <X onClick={onClose} className=" cursor-pointer"/>
       </div>
       <div className="text-muted-foreground text-pretty text-sm">
         {project.description}

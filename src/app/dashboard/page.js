@@ -19,97 +19,16 @@ import EmployeeMonthlyHours from "@/components/charts/EmployeeMonthlyHours";
 import KpiCard from "@/components/kpicard";
 import ProfitLossChart from "@/components/charts/ProfitLoss";
 import DateRangePicker from "@/components/DateRangePicker";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import fetchReourceUtil from "@/app/api/dashboard/fetchResourceUtil";
 import { useRouter } from "next/navigation";
+import { getClockifyIdProjects } from "../api/projects/getProjects";
+import ComboboxProjectsWrapper from "@/components/ProjectComboBoxWrapper";
+import ProfitAnalysisMargin from "@/components/ProfitAnalysisMargin";
+import { Separator } from "@/components/ui/separator";
 
-export const profitLossData = [
-  {
-    name: "Jan",
-    totalIncome: 400000,
-    expenses: 100000,
-    netIncome: 300000, // Actual profit amount
-    profitPercentage: 79, // Profit as a percentage
-  },
-  {
-    name: "Feb",
-    totalIncome: 180000,
-    expenses: 120000,
-    netIncome: 60000,
-    profitPercentage: 33.33,
-  },
-  {
-    name: "Mar",
-    totalIncome: 200000,
-    expenses: 100000,
-    netIncome: 100000,
-    profitPercentage: 50,
-  },
-  {
-    name: "Apr",
-    totalIncome: 300000,
-    expenses: 150000,
-    netIncome: 150000,
-    profitPercentage: 50,
-  },
-  {
-    name: "May",
-    totalIncome: 350000,
-    expenses: 100000,
-    netIncome: 250000,
-    profitPercentage: 71,
-  },
-  {
-    name: "Jun",
-    totalIncome: 400000,
-    expenses: 150000,
-    netIncome: 250000,
-    profitPercentage: 63,
-  },
-  {
-    name: "Jul",
-    totalIncome: 500000,
-    expenses: 100000,
-    netIncome: 400000,
-    profitPercentage: 80,
-  },
-  {
-    name: "Aug",
-    totalIncome: 450000,
-    expenses: 150000,
-    netIncome: 300000,
-    profitPercentage: 67,
-  },
-  {
-    name: "Sep",
-    totalIncome: 500000,
-    expenses: 100000,
-    netIncome: 400000,
-    profitPercentage: 80,
-  },
-  {
-    name: "Oct",
-    totalIncome: 600000,
-    expenses: 150000,
-    netIncome: 450000,
-    profitPercentage: 75,
-    isProjected: true,
-  },
-  {
-    name: "Nov",
-    // totalIncome: 700000,
-    // expenses: 100000,
-    // netIncome: 600000,
-    // profitPercentage: 86,
-  },
-  {
-    name: "Dec",
-    // totalIncome: 550000,
-    // expenses: 150000,
-    // netIncome: 400000,
-    // profitPercentage: 73,
-  },
-];
+
+
 
 export default function Dashboard() {
   const [profitLoss, setProfitLoss] = useState([]);
@@ -119,10 +38,10 @@ export default function Dashboard() {
   const [ongoingProjects, setOngoingProjects] = useState([]);
   const [completedProjects, setCompletedProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const[clockifyProjects,setClockifyProjects]=useState()
+   const [selectedProject, setSelectedProject] = useState("");
 
-  // Get first day of current month
   const initialStartDate = startOfMonth(new Date());
-  // Get last day of current month
   const initialEndDate = endOfMonth(new Date());
 
   const [startDate, setStartDate] = useState(
@@ -133,7 +52,7 @@ export default function Dashboard() {
   const router = useRouter();
   useEffect(() => {
     const getProfitLoss = async () => {
-      const { status, data } = await fetchProfitLoss();
+      const { status, data } = await fetchProfitLoss(selectedProject);
       if (status === 200) {
         // Transform the data into the required format
         const transformedData = data.monthly_totals.map((monthData) => {
@@ -172,16 +91,16 @@ export default function Dashboard() {
         console.error("Failed to fetch profit-loss data");
       }
     };
-
     getProfitLoss();
-  }, []);
+  }, [selectedProject]);
 
   // console.log(profitLoss);
   useEffect(() => {
     const getKpiData = async () => {
       const { status, data } = await fetchKpiData(
         format(startDate, "yyyy-MM-dd"),
-        format(endDate, "yyyy-MM-dd")
+        format(endDate, "yyyy-MM-dd"),
+        selectedProject
       );
       if (status === 200) {
         setFetchedKpiData(data);
@@ -190,9 +109,6 @@ export default function Dashboard() {
       }
     };
 
-    getKpiData();
-  }, [startDate, endDate]);
-  useEffect(() => {
     const getResourceUtilData = async () => {
       const { status, data } = await fetchReourceUtil(
         format(startDate, "yyyy-MM-dd"),
@@ -217,89 +133,104 @@ export default function Dashboard() {
     };
 
     getResourceUtilData();
-  }, [startDate, endDate]);
-
-  useEffect(() => {
-    const getOngoingProjects = async () => {
-      const { status, data } = await fetchOngoingProjects();
-      if (status === 200) {
-        setOngoingProjects(data.ongoing_projects);
-        setCompletedProjects(data.completed_projects);
-        // console.log(data, "data");
-      } else {
-        console.error("Failed to fetch ongoing projects data");
-      }
-    };
-
-    getOngoingProjects();
-  }, []);
+    getKpiData();
+  }, [startDate, endDate,selectedProject]);
 
   useEffect(() => {
     if (fetchedKpiData) {
-      const updatedKpiDatas = [
-        {
-          title: "Total Revenue",
-          value: parseFloat(fetchedKpiData.total_revenue_current_month),
-          change: parseFloat(fetchedKpiData.percentage_change_in_revenue),
-          period: "month",
-          icon: <DollarSign className="w-4 h-4" />,
-        },
-        {
-          title: "Total Profit",
-          value: parseFloat(fetchedKpiData.total_profit_current_month),
-          change: parseFloat(fetchedKpiData.percentage_change_in_profit),
-          period: "month",
-          icon: <Activity />,
-        },
-        {
-          title: "Projects",
-          value: fetchedKpiData.num_projects_current_month,
-          change: parseFloat(fetchedKpiData.percentage_change_in_num_projects),
-          period: "month",
-          icon: <Users />,
-          isMoney: false,
-        },
-        {
-          title: "Employees",
-          value: fetchedKpiData.num_employees,
-          change: parseFloat(fetchedKpiData.employees_percentage_change),
-          period: "month",
-          icon: <CreditCard />,
-          isMoney: false,
-        },
-        {
-          title: "Invoiced Revenue",
-          value: parseFloat(
-            fetchedKpiData.total_invoiced_revenue_current_month
-          ),
-          change: parseFloat(fetchedKpiData.invoiced_revenue_percentage_change),
-          period: "month",
-          icon: <DollarSign />,
-        },
-        {
-          title: "Total Expense",
-          value: fetchedKpiData.total_expenses_current_month,
-          change: parseFloat(fetchedKpiData.percentage_change_in_expenses),
-          period: "month",
-          icon: <CreditCard />,
-        },
-        {
-          title: "Expected Cost",
-          value: "N/A",
-          change: "N/A",
-          period: "month",
-          icon: <CreditCard />,
-          isMoney: false,
-        },
-        {
-          title: "Expected Liquidity",
-          value: "N/A",
-          change: "N/A",
-          period: "month",
-          icon: <CreditCard />,
-          isMoney: false,
-        },
-      ];
+      const updatedKpiDatas = {
+        totalActualData: [
+          {
+            title: "Actual Revenue",
+            value: parseFloat(fetchedKpiData.actual_revenue),
+            change: parseFloat(fetchedKpiData.actual_revenue_percentage_change),
+            period: "month",
+            icon: <DollarSign className="w-4 h-4" />,
+          },
+          {
+            title: "Actual Expense",
+            value: fetchedKpiData.actual_cost,
+            change: parseFloat(fetchedKpiData.actual_cost_percentage_change),
+            period: "month",
+            icon: <CreditCard />,
+          },
+          {
+            title: "Actual Profit",
+            value: parseFloat(fetchedKpiData.actual_profit),
+            change: parseFloat(fetchedKpiData.actual_profit_percentage_change),
+            period: "month",
+            icon: <Activity />,
+          },
+        ],
+        invoicedData: [
+          {
+            title: "Invoiced Revenue",
+            value: parseFloat(fetchedKpiData.invoiced_revenue),
+            change: parseFloat(fetchedKpiData.invoiced_revenue_percentage_change),
+            period: "month",
+            icon: <DollarSign />,
+          },
+          {
+            title: "Invoiced Cost",
+            value: parseFloat(fetchedKpiData.invoiced_cost),
+            change: parseFloat(fetchedKpiData.invoiced_cost_percentage_change),
+            period: "month",
+            icon: <DollarSign />,
+          },
+          {
+            title: "Invoiced profit",
+            value: parseFloat(fetchedKpiData.invoiced_profit),
+            change: parseFloat(fetchedKpiData.invoiced_profit_percentage_change),
+            period: "month",
+            icon: <DollarSign />,
+          },
+        ],
+        budgetedData: [
+          {
+            title: "Budgeted Revenue",
+            value: parseFloat(fetchedKpiData.budgeted_revenue),
+            change: parseFloat(fetchedKpiData.budgeted_revenue_percentage_change),
+            period: "month",
+            icon: <CreditCard />,
+            isMoney: false,
+          },
+          {
+            title: "Budgeted Expense",
+            value: parseFloat(fetchedKpiData.budgeted_cost),
+            change: parseFloat(fetchedKpiData.budgeted_cost_percentage_change),
+            period: "month",
+            icon: <CreditCard />,
+            isMoney: false,
+          },
+          {
+            title: "Budgeted Profit",
+            value: parseFloat(fetchedKpiData.budgeted_profit),
+            change: parseFloat(fetchedKpiData.budgeted_profit_percentage_change),
+            period: "month",
+            icon: <CreditCard />,
+            isMoney: false,
+          },
+        ],
+        otherData: [
+          {
+            title: "Projects",
+            value: fetchedKpiData.num_projects,
+            change: parseFloat(fetchedKpiData.projects_percentage_change),
+            period: "month",
+            icon: <Users />,
+            isMoney: false,
+          },
+          {
+            title: "Employees",
+            value: fetchedKpiData.num_employees,
+            change: parseFloat(fetchedKpiData.employees_percentage_change),
+            period: "month",
+            icon: <CreditCard />,
+            isMoney: false,
+          },
+        ],
+      };
+      
       setKpiValues(updatedKpiDatas); // Setting the new kpiDatas array
       setLoading(false);
     }
@@ -310,10 +241,70 @@ export default function Dashboard() {
     setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
   };
 
+
+
+  const renderKpiSection = (sectionData, skeletonCount) => {
+    return (
+      <div className="space-y-2  w-11/12">
+        {kpiValues?.[sectionData] && kpiValues[sectionData].length > 0
+          ? kpiValues[sectionData].map((data, index) => (
+     
+              <KpiCard
+                key={index}
+                title={data.title}
+                value={data.value}
+                change={data.change}
+                period={data.period}
+                icon={data.icon}
+                isMoney={data.isMoney}
+                isTrend={data.isTrend}
+                isSmall={true}
+              />
+           
+            ))
+          : [...Array(skeletonCount)].map((_, index) => <KpiSkeleton key={index} isSmall={true} />)}
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    const fetchProjectsWIthClockifyId=async()=>{
+        try{
+        const response=await getClockifyIdProjects(true);
+        
+        setClockifyProjects(response)
+        
+    
+    
+        } catch (error) {
+        console.error("Error fetching projects:", error);
+    }
+    }
+    const getOngoingProjects = async () => {
+      const { status, data } = await fetchOngoingProjects();
+      if (status === 200) {
+        setOngoingProjects(data.ongoing_projects);
+        setCompletedProjects(data.completed_projects);
+        console.log(data, "datasdasa");
+      } else {
+        console.error("Failed to fetch ongoing projects data");
+      }
+    };
+
+    getOngoingProjects();
+    fetchProjectsWIthClockifyId();
+}, []);
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Home</h1>
+        <div className="flex gap-2">
+          <ComboboxProjectsWrapper
+              clockifyProjects={clockifyProjects}
+              selectedProject={selectedProject}
+              onProjectSelect={setSelectedProject}
+            />
         <DateRangePicker
           // numberOfMonths={2}
           onDateChange={handleDateChange}
@@ -321,82 +312,32 @@ export default function Dashboard() {
           initialEndDate={endDate}
           isMonthPicker={true}
         />
-      </div>
-      <div className="flex flex-1 flex-col gap-4 md:gap-8 ">
-        <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
-          {kpiValues && kpiValues.length > 0
-            ? kpiValues.map((data, index) => (
-                <div key={index}>
-                  <KpiCard
-                    title={data.title}
-                    value={data.value}
-                    change={data.change}
-                    period={data.period}
-                    icon={data.icon}
-                    isMoney={data.isMoney}
-                    isTrend={data.isTrend}
-                  />
-                </div>
-              ))
-            : // Render skeletons based on expected number of KPI cards
-              [...Array(8)].map((_, index) => (
-                <div key={index}>
-                  <KpiSkeleton />
-                </div>
-              ))}
         </div>
       </div>
-      <div className="grid grid-cols-5 gap-x-6 select-none">
-        <Card className="col-span-5 lg:col-span-3 h-full">
-          <CardHeader className="flex-row justify-between items-center">
-            <CardTitle>
-              Profit & Loss
-              <div className="text-sm font-normal text-muted-foreground">
-                This chart provides a financial overview of the company
-              </div>
-            </CardTitle>
-            <Button
-              onClick={() => router.push("/dashboard/finances/projection")}
-            >
-              View More
-            </Button>
-          </CardHeader>
-          <CardContent className="p-0 w-full h-[600px]">
-            <ProfitLossChart data={profitLoss} />
-          </CardContent>
-        </Card>
-        <Card className="col-span-5 lg:col-span-2 h-full">
-          <CardHeader className="flex-row justify-between items-center pb-0 ">
-            <CardTitle>
-              Project Financial Status
-              <div className="text-sm font-normal text-muted-foreground">
-                This chart provides a financial health of specific projects
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="w-full h-5/6 overflow-hidden px-4 flex justify-center">
-            <Tabs
-              defaultValue="ongoing"
-              className="w-full h-full flex flex-col"
-            >
-              <TabsList className="self-end">
-                <TabsTrigger value="ongoing" className="text-xs">
-                  Ongoing
-                </TabsTrigger>
-                <TabsTrigger value="completed" className="text-xs">
-                  Completed
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="ongoing" className="h-full">
-                <ProjectBudgetChart rawData={ongoingProjects} />
-              </TabsContent>
-              <TabsContent value="completed" className="h-full">
-                <ProjectBudgetChart rawData={completedProjects} />
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+      <div className="flex flex-1 flex-col gap-4 md:gap-8 ">
+      <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
+        
+          <div className="space-y-2">
+            <h2 className="font-semibold text-xl text-center ">Actual</h2>
+            {renderKpiSection('totalActualData', 3)}
+          </div> 
+
+          <div className="space-y-2">
+          <h2 className="font-semibold text-xl text-center ">Invoiced</h2>
+            {renderKpiSection('invoicedData', 2)}
+            </div>
+            <div className="space-y-2">
+            <h2 className="font-semibold text-xl text-center">Budgeted</h2>
+            {renderKpiSection('budgetedData', 3)}
+            </div>
+          <div className="space-y-2">
+          <h2 className="font-semibold text-xl text-center">Others</h2>
+          {renderKpiSection('otherData', 2)}
+          </div>
+        </div>
+
       </div>
+      <ProfitAnalysisMargin profitLoss={profitLoss} ongoingProjects={ongoingProjects} completedProjects={completedProjects}/>
       <div className="grid grid-cols-5 gap-x-6 select-none">
         <Card className="col-span-5 select-none w-full overflow-hidden">
           <CardHeader className="flex-row justify-between items-center">
