@@ -138,72 +138,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (fetchedKpiData) {
-<<<<<<< HEAD
-      const updatedKpiDatas = [
-        {
-          title: "Total Revenue",
-          value: parseFloat(fetchedKpiData.total_revenue_current_month),
-          change: parseFloat(fetchedKpiData.percentage_change_in_revenue),
-          period: "month",
-          icon: <DollarSign className="w-4 h-4" />,
-        },
-        {
-          title: "Total Profit",
-          value: parseFloat(fetchedKpiData.total_profit_current_month),
-          change: parseFloat(fetchedKpiData.percentage_change_in_profit),
-          period: "month",
-          icon: <Activity />,
-        },
-        {
-          title: "Projects",
-          value: fetchedKpiData.num_projects_current_month,
-          change: parseFloat(fetchedKpiData.percentage_change_in_num_projects),
-          period: "month",
-          icon: <Users />,
-          isMoney: false,
-        },
-        {
-          title: "Employees",
-          value: fetchedKpiData.num_employees,
-          change: parseFloat(fetchedKpiData.employees_percentage_change),
-          period: "month",
-          icon: <CreditCard />,
-          isMoney: false,
-        },
-        {
-          title: "Invoiced Revenue",
-          value: parseFloat(
-            fetchedKpiData.total_invoiced_revenue_current_month
-          ),
-          change: parseFloat(fetchedKpiData.invoiced_revenue_percentage_change),
-          period: "month",
-          icon: <DollarSign />,
-        },
-        {
-          title: "Total Expense",
-          value: fetchedKpiData.total_expenses_current_month,
-          change: parseFloat(fetchedKpiData.percentage_change_in_expenses),
-          period: "month",
-          icon: <CreditCard />,
-        },
-        {
-          title: "Expected Cost",
-          value: fetchedKpiData.total_expected_cost,
-          change: parseFloat(fetchedKpiData.expected_cost_percentage_change),
-          period: "month",
-          icon: <CreditCard />,
-          // isMoney: false,
-        },
-        {
-          title: "Expected Liquidity",
-          value: fetchedKpiData.total_expected_liquidity,
-          change: parseFloat(fetchedKpiData.expected_liquidity_percentage_change),
-          period: "month",
-          icon: <CreditCard />,
-          // isMoney: false,
-        },
-      ];
-=======
       const updatedKpiDatas = {
         totalActualData: [
           {
@@ -297,7 +231,6 @@ export default function Dashboard() {
         ],
       };
       
->>>>>>> employee-sankalpa
       setKpiValues(updatedKpiDatas); // Setting the new kpiDatas array
       setLoading(false);
     }
