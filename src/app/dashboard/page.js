@@ -26,6 +26,7 @@ import { getClockifyIdProjects } from "../api/projects/getProjects";
 import ComboboxProjectsWrapper from "@/components/ProjectComboBoxWrapper";
 import ProfitAnalysisMargin from "@/components/ProfitAnalysisMargin";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 
 
 
@@ -53,7 +54,21 @@ export default function Dashboard() {
   useEffect(() => {
     const getProfitLoss = async () => {
       const { status, data } = await fetchProfitLoss(selectedProject);
-      if (status === 200) {
+      const monthAbbreviations = {
+        January: "Jan",
+        February: "Feb",
+        March: "Mar",
+        April: "Apr",
+        May: "May",
+        June: "Jun",
+        July: "Jul",
+        August: "Aug",
+        September: "Sep",
+        October: "Oct",
+        November: "Nov",
+        December: "Dec",
+      };
+      if (status === 200 && Array.isArray(data.monthly_totals)) {
         // Transform the data into the required format
         const transformedData = data.monthly_totals.map((monthData) => {
           const { month, net_income, expenses, profit } = monthData;
@@ -62,20 +77,6 @@ export default function Dashboard() {
             net_income > 0 ? (profit / net_income) * 100 : 0;
 
           // Map month names to abbreviations
-          const monthAbbreviations = {
-            January: "Jan",
-            February: "Feb",
-            March: "Mar",
-            April: "Apr",
-            May: "May",
-            June: "Jun",
-            July: "Jul",
-            August: "Aug",
-            September: "Sep",
-            October: "Oct",
-            November: "Nov",
-            December: "Dec",
-          };
 
           return {
             name: monthAbbreviations[month], // Abbreviated month names
@@ -89,6 +90,15 @@ export default function Dashboard() {
         setProfitLoss(transformedData); // Set the transformed data to state
       } else {
         console.error("Failed to fetch profit-loss data");
+        toast.error("Failed to fetch profit-loss data ")
+        const defaultData = Object.values(monthAbbreviations).map((month) => ({
+          name: month,
+          totalIncome: 0,
+          expenses: 0,
+          profit: 0,
+          profitPercentage: 0,
+        }));
+        setProfitLoss(defaultData)
       }
     };
     getProfitLoss();
@@ -112,7 +122,8 @@ export default function Dashboard() {
     const getResourceUtilData = async () => {
       const { status, data } = await fetchReourceUtil(
         format(startDate, "yyyy-MM-dd"),
-        format(endDate, "yyyy-MM-dd")
+        format(endDate, "yyyy-MM-dd"),
+        selectedProject
       );
 
       if (status === 200) {
@@ -135,6 +146,7 @@ export default function Dashboard() {
     getResourceUtilData();
     getKpiData();
   }, [startDate, endDate,selectedProject]);
+
 
   useEffect(() => {
     if (fetchedKpiData) {
