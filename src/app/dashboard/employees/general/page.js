@@ -255,6 +255,7 @@ export default function Employees() {
                     levelOptions={levelOptions}
                     roleOptions={roleOptions}
                     setEmployeeDetails={setSelectedEmployee}
+                    onRefresh={refreshComponent}
                   />
                 </TabsContent>
                 <TabsContent value="projects">

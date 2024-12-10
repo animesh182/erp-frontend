@@ -63,6 +63,7 @@ export default function ProjectDetails() {
     }
   }, [id]);
 
+
   const onDeleteRow = async (resourceId) => {
     try {
       await deleteResourceUtilization(resourceId);

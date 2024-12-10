@@ -77,7 +77,7 @@ export default function EmployeeMonthlyHours({ rawData }) {
   if (!rawData) return <>Loading...</>;
   const CustomYAxisTick = ({ x, y, payload }) => {
     // console.log(payload, "payload");
-    const remainingHours = calculateRemainingHours(rawData[payload.index]);
+    const remainingHours = calculateRemainingHours(rawData[payload.index]).toFixed(2);
     const truncatedName = payload.value.split(" ").slice(0, 2).join(" ");
     return (
       <g transform={`translate(${x},${y})`}>
@@ -105,6 +105,8 @@ export default function EmployeeMonthlyHours({ rawData }) {
       </g>
     );
   };
+
+
   return (
     <ChartContainer className="h-[800px] w-full" config={chartConfig}>
       <BarChart
