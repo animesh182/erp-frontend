@@ -5,7 +5,7 @@ export async function fetchProfitLoss(project,selectedYear= getYear(new Date()))
   try {
     const response = await apiClient(
       // `${process.env.NEXT_PUBLIC_API_URL}api/profit_loss_report/?year=${currentYear}`
-      `${process.env.NEXT_PUBLIC_API_URL}api/profit_loss_report/?year=${selectedYear}&project=${project}`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/profit_loss_report/?year=${selectedYear}&project=${project}`
     );
     // Return the response data
     return { status: 200, data: response };

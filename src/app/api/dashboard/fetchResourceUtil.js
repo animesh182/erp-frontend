@@ -6,7 +6,7 @@ export default async function fetchResourceUtil(startDate, endDate) {
     // Construct the URL conditionally based on the existence of startDate and endDate
     const url = `${
       process.env.NEXT_PUBLIC_API_URL
-    }api/user_projects_utilization${
+    }/api/user_projects_utilization${
       startDate && endDate ? `?start_date=${startDate}&end_date=${endDate}` : ""
     }`;
 

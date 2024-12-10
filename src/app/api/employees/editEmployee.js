@@ -27,7 +27,7 @@ export async function editEmployee(employeeId, employeeData) {
 
   try {
     const response = await apiClient(
-        `${process.env.NEXT_PUBLIC_API_URL}api/users/${employeeId}/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${employeeId}/`,
         {
           method: "PATCH",
           body: JSON.stringify(transformedData),
