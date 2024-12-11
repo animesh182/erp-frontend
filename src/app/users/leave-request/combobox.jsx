@@ -22,7 +22,6 @@ import { cn } from "@/lib/utils";
 export default function ComboboxEmployees({ employeeNames, onSelectEmployee }) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
 
   // Remove duplicate names
   const uniqueEmployeeNames = [...new Set(employeeNames)];

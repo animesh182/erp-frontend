@@ -37,8 +37,7 @@ const formSchema = z.object({
 export default function Page() {
   const { setClockifyUserData } = useClockify();
   const router = useRouter();
-
-
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -49,25 +48,19 @@ export default function Page() {
   });
 
   async function onSubmit(values) {
+    setIsLoading(true);
     try {
       const response = await login(values);
       if (response.status === 200) {
-        console.log(response,"responese")
-        if(response.is_admin)
-        {toast.success("Login successful!");
-        
-
-
+        console.log(response, "responese");
+        if (response.is_admin) {
+          toast.success("Login successful!");
 
           const res = response.user_details;
           setClockifyUserData(res);
 
-
-
-        router.push("/dashboard")
-      }
-        else if(response.is_employee){
-          
+          router.push("/dashboard");
+        } else if (response.is_employee) {
           toast.success("Please Login as Employee!");
           router.push("/users");
         }
@@ -76,6 +69,8 @@ export default function Page() {
       }
     } catch (error) {
       toast.error("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -127,11 +122,13 @@ export default function Page() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col">
-              <Button type="submit" className="w-full">
-                Sign in
+              <Button disabled={isLoading} type="submit" className="w-full">
+                {isLoading ? "Logging in..." : "Sign in"}
               </Button>
-              <br/>
-              <Link href="/users" className="text-sm "><u>Sign in as Employee</u></Link>
+              <br />
+              <Link href="/users" className="text-sm ">
+                <u>Sign in as Employee</u>
+              </Link>
             </CardFooter>
           </form>
         </Form>

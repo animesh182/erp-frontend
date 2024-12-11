@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Check, ChevronsUpDown } from 'lucide-react';
-import React, { useMemo, useState } from 'react'
 import { cn } from "@/lib/utils";
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { useState } from 'react';
 
 
 export default function ComboboxProjects({ projectNames, onSelectProject,prop }) {

@@ -16,7 +16,6 @@ import { EditRowSheet } from "./EditRowSheet";
 import DeleteDialog from "./DeleteDialog";
 
 const TableActionsDropdown = ({ formInputs, rowData }) => {
-  console.log(rowData, "rowData");
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 

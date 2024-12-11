@@ -1,21 +1,20 @@
 "use client";
 import { fetchProfitLoss } from "@/app/api/dashboard/fetchProfitLoss";
 import { fetchKpiData } from "@/app/api/kpiData/fetchKpiData";
+import { getClockifyIdProjects } from "@/app/api/projects/getProjects";
+import ProfitLossChart from "@/components/charts/ProfitLoss";
+import KpiCard from "@/components/kpicard";
+import ComboboxProjectsWrapper from "@/components/ProjectComboBoxWrapper";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
-import { useState, useEffect } from "react";
-import ProfitLossChart from "@/components/charts/ProfitLoss";
-import { DollarSign, CreditCard, Activity } from "lucide-react";
-import KpiCard from "@/components/kpicard";
-import ComboboxProjectsWrapper from "@/components/ProjectComboBoxWrapper";
-import { format } from "date-fns";
-import { getClockifyIdProjects } from "@/app/api/projects/getProjects";
 import YearPicker from "@/components/YearPicker";
+import { format } from "date-fns";
+import { Activity, CreditCard, DollarSign } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 

@@ -1,9 +1,7 @@
 "use client";
 
-import { login } from '@/app/api/auth/login';
-import LoginTextHeader, {
-  LoginTextFooter,
-} from "@/components/EmployeeDetails/LoginText";
+import { login } from "@/app/api/auth/login";
+import LoginTextHeader from "@/components/EmployeeDetails/LoginText";
 import EmployeeLoginFooter from "@/components/EmployeeLoginFooter";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,24 +38,21 @@ const EmployeeLogin = () => {
   });
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const[signUPLink,setSignUpLink]=useState("")
+  const [signUPLink, setSignUpLink] = useState("");
 
-  async function  onEmailSubmit(values) {
-    
-    
+  async function onEmailSubmit(values) {
     const email = encodeURIComponent(values.email);
     const formData = {
-      email: values.email || "", 
+      email: values.email || "",
       password: "",
-  };
-  
+    };
+
     try {
       const response = await login(formData);
-      
+
       if (response.status === 200 && response.first_time_login) {
-    
         // toast.success("First time logged in user detected");
-     
+
         router.push(`/users/employee-new-password?email=${email}`);
       } else {
         // toast.error(response.message || "An error occurred. Please try again.");
@@ -66,26 +61,22 @@ const EmployeeLogin = () => {
       }
     } catch (error) {
       toast.error("An error occurred. Please try again.");
-      console.log(error,"error")
+      console.log(error, "error");
     }
   }
 
+  // const onSignUpClick = () => {
+  //   const email = form.getValues("email");
+  //   const emailIsValid = formSchema.shape.email.safeParse(email).success;
 
-
-
-  const onSignUpClick = () => {
-    const email = form.getValues("email");
-    const emailIsValid = formSchema.shape.email.safeParse(email).success;
-
-    if (emailIsValid) {
-      const encodedEmail = encodeURIComponent(email);
-      const linkHref=`/users/email-verify?email=${encodedEmail}`;
-      setSignUpLink(linkHref)
-    } else {
-      toast.error("Please enter a valid email before signing up.");
-    }
-  };
-
+  //   if (emailIsValid) {
+  //     const encodedEmail = encodeURIComponent(email);
+  //     const linkHref = `/users/email-verify?email=${encodedEmail}`;
+  //     setSignUpLink(linkHref);
+  //   } else {
+  //     toast.error("Please enter a valid email before signing up.");
+  //   }
+  // };
 
   return (
     <Form {...form}>
@@ -111,7 +102,6 @@ const EmployeeLogin = () => {
                               field.onChange(e);
                               setEmail(e.target.value);
                             }}
-
                           />
                         </FormControl>
                         <FormMessage />
@@ -128,7 +118,7 @@ const EmployeeLogin = () => {
             </CardContent>
             <CardFooter className="w-1/2 pt-20 pl-24 flex items-end justify-end text-justify">
               <CardDescription className="text-xs leading-4 hidden lg:block">
-                <LoginTextFooter />
+                {/* <LoginTextFooter /> */}
               </CardDescription>
             </CardFooter>
           </Card>

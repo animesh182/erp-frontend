@@ -1,16 +1,14 @@
-import React from 'react'
 import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
-    CardTitle,
-  } from "@/components/ui/card";
-  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from './ui/button';
-import ProjectBudgetChart from './charts/ProjectBudget';
-import ProfitLossChart from './charts/ProfitLoss';
+    CardTitle
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "next/navigation";
+import ProfitLossChart from './charts/ProfitLoss';
+import ProjectBudgetChart from './charts/ProjectBudget';
+import { Button } from './ui/button';
 function ProfitAnalysisMargin({
     profitLoss,
     ongoingProjects,

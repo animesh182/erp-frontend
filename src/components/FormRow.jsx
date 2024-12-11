@@ -1,11 +1,10 @@
 "use client";
-import { useFormContext, Controller } from "react-hook-form";
-import { TableCell, TableRow } from "@/components/ui/table";
-import React, { useEffect, useState } from "react";
+import { DatePicker } from "@/components/DatePicker";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { DatePicker } from "@/components/DatePicker";
-import { SimpleDatePicker } from "./SimpleDatePicker";
+import { TableCell, TableRow } from "@/components/ui/table";
+import { useEffect, useState } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 import { ProjectSelect } from "./ProjectSelect";
 
 export function FormRow({ formInputs, onAddRow, projectOptions }) {

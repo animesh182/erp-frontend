@@ -9,6 +9,7 @@ export default function KpiCard({
   icon,
   isMoney = true,
   isTrend = true,
+  isPercentage = false,
   iconSize = "w-4 h-4", // Default size for icons
   hasSubText = true,
   isSmall=false
@@ -25,8 +26,7 @@ export default function KpiCard({
       </CardHeader>
       <CardContent >
         <div className="text-2xl font-bold">
-          {/* {isMoney ? `${formatAmountToNOK(value)}` : value} */}
-         {value}
+          {isMoney ? `${formatAmountToNOK(value)}` : isPercentage? `${value}%` : value}
         </div>
         <p className="text-xs text-muted-foreground">
           {/* {hasSubText && isTrend ? `${change}% from last ${period}` : period} */}

@@ -14,7 +14,6 @@ import { CreditCard, DollarSign, Download } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
 
 export default function Payroll() {
   const methods = useForm();
@@ -129,24 +128,14 @@ export default function Payroll() {
     setEndDate(endDate);
   };
 
-  const handleSheetDownload = () => {
-    const worksheetData = data.map((item) => ({
-      id: item.id,
-      Name: item.name || "No Name",
-      "Project Name": item.projectName || "No Project",
-      Invoice: item.invoice,
-      "Invoice Issued Date": item.invoiceIssuedDate,
-      "Paid Date": item.paidDate || "Not Paid",
-      Status: item.status,
-      Type: item.type,
-      Amount: item.amount,
-    }));
+  const  handleSheetDownload = async () => {
+    console.log('bhutro')
+    try{
+      const response = await getExcelPayroll();
+    }
+    catch{
 
-    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Payroll");
-
-    XLSX.writeFile(workbook, "payroll_sheet.xlsx");
+    }
   };
 
   const onEditRow = async (editedData) => {

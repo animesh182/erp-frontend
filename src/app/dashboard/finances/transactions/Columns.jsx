@@ -1,9 +1,7 @@
 "use client";
-import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { formatAmountToNOK, prettifyText } from "@/lib/utils";
+import { formatAmountToNOK } from "@/lib/utils";
 import { format } from "date-fns";
-import { MoreHorizontal } from "lucide-react";
 
 export const columns = [
   {
