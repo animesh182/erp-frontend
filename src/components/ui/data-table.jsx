@@ -53,13 +53,15 @@ function DataTable({
   isMonthPicker = false,
 }) {
   const [sorting, setSorting] = useState([]);
-  const [selectedTab, setSelectedTab] = useState("All");
   const [searchValue, setSearchValue] = useState("");
   const pathname = usePathname();
   const router = useRouter();
   const isProjectPage = pathname === "/dashboard/projects";
   const isUsersPage = pathname === "/users/dashboard";
   const isTransactionPage = pathname === "/dashboard/finances/transactions";
+  // const [selectedTab, setSelectedTab] = useState("All");
+  const [selectedTab, setSelectedTab] = useState(isProjectPage ? "Ongoing" : "All");
+
 
 
 
@@ -231,9 +233,9 @@ function DataTable({
              
                 : isTransactionPage
                 ? row.original.transactionType === "Expense"
-                  ? "bg-[#dc9d9c]" // Light red for expense
+                  ? "bg-[#dc9d9c]/50" // Light red for expense
                   : row.original.transactionType === "Revenue"
-                  ? "bg-[#78ae78]" // Light green for revenue
+                  ? "bg-[#78ae78]/50" // Light green for revenue
                   : ""
                 : ""
             }

@@ -106,13 +106,11 @@ export default function Transactions() {
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <h2 className="text-lg font-semibold">Overview</h2>
-
-      <div className="flex gap-4 w-full">
-        {/* Use dynamic KPI data in the KpiCard components */}
+      {/* <h2 className="text-lg font-semibold">Overview</h2> 
+       <div className="flex gap-4 w-full">
         <KpiCard
           title="Total Revenue"
-          value={Number(kpiData.total_revenue)} // Pass the raw number
+          value={Number(kpiData.total_revenue)} 
           change={Number(kpiData.changeInRevenue)} // Pass the raw percentage number
           icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
           period={"month"}
@@ -131,7 +129,7 @@ export default function Transactions() {
           icon={<Activity className="h-4 w-4 text-muted-foreground" />}
           period={"month"}
         />
-      </div>
+      </div> */}
 
       {/* DataTable for Transactions */}
       <DataTable

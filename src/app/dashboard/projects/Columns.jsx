@@ -61,7 +61,6 @@ export const projectColumns = (clients) => [
     header: "Status",
     cell: ({ row }) => {
       const { project_status } = row.original; // Access the full row data
-      console.log(project_status,"prorpo")
       return (
         <Badge
           className={`${

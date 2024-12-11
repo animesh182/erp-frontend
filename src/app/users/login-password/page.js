@@ -121,7 +121,7 @@ const EmployeeLoginPassword = () => {
                     <FormItem>
                       <FormLabel className="text-sm text-[#020617] font-medium tracking-tight">Enter Password</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter a new password" {...field} type="password" />
+                        <Input placeholder="Enter your password" {...field} type="password" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -129,7 +129,7 @@ const EmployeeLoginPassword = () => {
                 />
  
 
-            <Link href={`/users/email-verify?email=${paramEmail}`} className='text-[#020617] text-xs tracking-tight'><u>Forgot Password?</u></Link>
+            <Link href={`/users/email-verify?email=${paramEmail}`} className='text-secondary-foreground text-xs tracking-tight'><u>Forgot Password?</u></Link>
         <Button className="w-full text-sm" type="submit">Confirm</Button>
   
     

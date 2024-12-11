@@ -29,6 +29,37 @@ const colorPalette = [
   "#4682B4",
 ];
 
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-1.5 py-0.5 text-xs shadow-xl">
+        <p style={{ fontWeight: "bold", marginBottom: "5px" }}>{label}</p>
+        {payload.map((entry, index) => {
+          const maxHour=7
+        const value=entry.value*maxHour/100;      //to convert back to normal value
+          return(
+          <div key={`item-${index}`} className="flex items-center gap-1">
+          <div
+                          className=
+                            "shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg] h-2.5 w-2.5"
+                          
+                          style={{
+                            "--color-bg": entry.fill,
+                            "--color-border": entry.fill,
+                          }}
+                        />
+            <span style={{ flexGrow: 1 }}>{entry.name}</span>
+            <span>{value}</span>
+            <span>({entry.value.toFixed(3)}%)</span>
+          </div>
+        )})}
+      </div>
+    );
+  }
+  return null;
+};
+
 function calculateRemainingHours(item, maxHours = 8) {
   const totalCompleted = Object.keys(item)
     .filter((key) => key !== "name")
@@ -36,7 +67,7 @@ function calculateRemainingHours(item, maxHours = 8) {
   return maxHours - totalCompleted;
 }
 
-function convertHoursToPercentage(data = [], maxHours = 8) {
+function convertHoursToPercentage(data = [], maxHours = 7) {
   if (!Array.isArray(data)) {
     return []; // Return an empty array if data is not an array
   }
@@ -73,7 +104,6 @@ function generateChartConfig(rawData) {
 export default function EmployeeMonthlyHours({ rawData }) {
   const chartConfig = useMemo(() => generateChartConfig(rawData), [rawData]);
   const data = useMemo(() => convertHoursToPercentage(rawData), [rawData]);
-
   if (!rawData) return <>Loading...</>;
   const CustomYAxisTick = ({ x, y, payload }) => {
     // console.log(payload, "payload");
@@ -142,7 +172,7 @@ export default function EmployeeMonthlyHours({ rawData }) {
           tickLine={true}
           // width={20}
         />
-        <ChartTooltip content={<ChartTooltipContent />} />
+        <ChartTooltip content={<CustomTooltip/>} />
         <ChartLegend content={<ChartLegendContent />} />
         {Object.keys(chartConfig).map((key, index, array) => {
           return (
