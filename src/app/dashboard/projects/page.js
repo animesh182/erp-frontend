@@ -11,13 +11,13 @@ import { formInputs } from "./Inputs";
 import { EditProjectSheet } from "@/components/EditProjectSheet";
 import { toast } from "sonner";
 import { AddClientDialog } from "@/components/AddClientDialog";
-import { getProjects } from "@/app/api/getProjects";
 import { getClients } from "@/app/api/projects/getClients";
 
 import { createProject } from "@/app/api/projects/createProject";
 import { editProject } from "@/app/api/projects/editProject";
 import { createClient } from "@/app/api/projects/createClient";
 import { deleteProject } from "@/app/api/projects/deleteProject";
+import { getProjectDetails } from "@/app/api/projects/getProjects";
 
 export default function Projects() {
   const methods = useForm();
@@ -46,7 +46,7 @@ export default function Projects() {
   useEffect(() => {
     const getProjectsFromApi = async () => {
       try {
-        const { status, data } = await getProjects();
+        const { status, data } = await getProjectDetails();
         if (status === 200) {
           console.log(data, "projects");
           setProjects(data);

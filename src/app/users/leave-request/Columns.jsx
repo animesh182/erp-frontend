@@ -1,13 +1,7 @@
 "use client";
-import React from "react";
-import { Badge } from "@/components/ui/badge";
-import { formatAmountToNOK, prettifyText } from "@/lib/utils";
-import { format } from "date-fns";
-import { MoreHorizontal } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { util } from "zod";
-import ProjectTableActionsDropdown from "@/components/ProjectTableActionsDropdown";
 import LeaveRequestDropDown from "@/components/LeaveRequestDropDown";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
 
 
 

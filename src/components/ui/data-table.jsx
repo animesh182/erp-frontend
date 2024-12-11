@@ -233,9 +233,9 @@ function DataTable({
              
                 : isTransactionPage
                 ? row.original.transactionType === "Expense"
-                  ? "bg-[#dc9d9c]/50" // Light red for expense
+                  ? "bg-[#dc9d9c]/35" // Light red for expense
                   : row.original.transactionType === "Revenue"
-                  ? "bg-[#78ae78]/50" // Light green for revenue
+                  ? "bg-[#78ae78]/35" // Light green for revenue
                   : ""
                 : ""
             }

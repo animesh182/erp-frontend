@@ -50,8 +50,8 @@ const CustomTooltip = ({ active, payload, label }) => {
                           }}
                         />
             <span style={{ flexGrow: 1 }}>{entry.name}</span>
-            <span>{value}</span>
-            <span>({entry.value.toFixed(3)}%)</span>
+            <span>{value.toFixed(2)}</span>
+            <span>({entry.value.toFixed(2)}%)</span>
           </div>
         )})}
       </div>

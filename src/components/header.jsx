@@ -1,7 +1,10 @@
 "use client";
-import React from "react";
+import { useLogout } from "@/app/api/auth/logout";
+import { CircleUser } from "lucide-react";
+import { usePathname } from "next/navigation";
 import MobileSidebar from "./mobilesidebar";
-import { Input } from "./ui/input";
+import { ModeToggle } from "./modetoggle";
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,12 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
-import { CircleUser, Search } from "lucide-react";
-import { ModeToggle } from "./modetoggle";
-import Link from "next/link";
-import { useLogout } from "@/app/api/auth/logout";
-import { usePathname } from "next/navigation";
 import UserMobileSidebar from "./UserMobileSideBar";
 
 export default function Header() {

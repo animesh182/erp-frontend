@@ -1,21 +1,20 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
-import DataTable from "@/components/ui/data-table";
-import { CreditCard, DollarSign, Download } from "lucide-react";
-import { columns } from "@/app/dashboard/finances/payroll/Columns";
-import { formatAmountToNOK } from "@/lib/utils";
-import KpiCard from "@/components/kpicard";
-import { toast } from "sonner";
-import { format, startOfMonth, endOfMonth } from "date-fns";
-import { useForm, FormProvider } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { UploadSheetDialog } from "@/components/UploadSheetDialog";
-import { fetchPayroll } from "@/app/api/payroll";
-import { updatePayroll } from "@/app/api/update_payroll";
-import { getPayrollKpi } from "@/app/api/finances/payroll/getPayrollKpi";
-import * as XLSX from "xlsx";
-import { KpiSkeleton } from "@/components/Skeletons";
 import { deletePayroll } from "@/app/api/finances/payroll/deletePayroll";
+import { fetchPayroll } from "@/app/api/finances/payroll/getPayroll";
+import { getPayrollKpi } from "@/app/api/finances/payroll/getPayrollKpi";
+import { updatePayroll } from "@/app/api/finances/payroll/updatePayroll";
+import { columns } from "@/app/dashboard/finances/payroll/Columns";
+import KpiCard from "@/components/kpicard";
+import { KpiSkeleton } from "@/components/Skeletons";
+import { Button } from "@/components/ui/button";
+import DataTable from "@/components/ui/data-table";
+import { UploadSheetDialog } from "@/components/UploadSheetDialog";
+import { endOfMonth, format, startOfMonth } from "date-fns";
+import { CreditCard, DollarSign, Download } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 export default function Payroll() {
   const methods = useForm();

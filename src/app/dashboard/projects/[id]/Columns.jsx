@@ -2,7 +2,6 @@
 
 import MultiLineNameCell from "@/components/MultiLineNameCell";
 import SimpleTableActionsDropdown from "@/components/SimpleTableActionsDropdown";
-import { deleteResourceUtilization } from "@/app/api/projects/deleteResourceUtilization";
 import { format } from "date-fns";
 
 

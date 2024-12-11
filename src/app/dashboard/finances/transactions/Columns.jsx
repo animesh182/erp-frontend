@@ -103,17 +103,5 @@ export const columns = [
         ? formatAmountToNOK(amount)
         : "No Data"; // Show "No Data" if the amount is null or undefined
     },
-  },
-  {
-    accessorKey: "actions",
-    header: "",
-    cell: ({}) => {
-      return (
-        <div className="flex items-center">
-          <MoreHorizontal className="cursor-pointer" />
-        </div>
-      );
-    },
-    enableSorting: false,
-  },
+  }
 ];

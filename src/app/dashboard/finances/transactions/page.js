@@ -1,12 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { columns } from "./Columns";
-import DataTable from "@/components/ui/data-table";
-import KpiCard from "@/components/kpicard";
-import { Activity, CreditCard, DollarSign } from "lucide-react";
-import { format, startOfMonth, endOfMonth } from "date-fns";
 import { getTransactions } from "@/app/api/transactions/getTransactions";
-import { fetchTransactionKpi } from "@/app/api/finances/transaction/fetchTransactionKpi";
+import DataTable from "@/components/ui/data-table";
+import { endOfMonth, format, startOfMonth } from "date-fns";
+import { useEffect, useState } from "react";
+import { columns } from "./Columns";
+import { fetchTransactionKpi } from "@/app/api/kpiData/fetchTransactionKpi";
 
 export default function Transactions() {
   // Get first day of current month

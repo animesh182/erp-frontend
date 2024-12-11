@@ -1,5 +1,10 @@
 "use client";
 
+import { login } from '@/app/api/auth/login';
+import LoginTextHeader, {
+  LoginTextFooter,
+} from "@/components/EmployeeDetails/LoginText";
+import EmployeeLoginFooter from "@/components/EmployeeLoginFooter";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,15 +12,6 @@ import {
   CardDescription,
   CardFooter,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import React, { useEffect, useState } from "react";
-import google from "../../../public/google.svg";
-import Image from "next/image";
-import EmployeeLoginFooter from "@/components/EmployeeLoginFooter";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { login } from '@/app/api/auth/login';
 import {
   Form,
   FormControl,
@@ -24,12 +20,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import LoginTextHeader, {
-  LoginTextFooter,
-} from "@/components/EmployeeDetails/LoginText";
-import Link from "next/link";
-import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const formSchema = z.object({
   email: z.string().email(),

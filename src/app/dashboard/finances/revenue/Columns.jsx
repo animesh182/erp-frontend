@@ -1,9 +1,7 @@
 "use client";
-import React from "react";
+import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
 import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { Badge } from "@/components/ui/badge";
-import { formatAmountToNOK, prettifyText } from "@/lib/utils";
-import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
 import { format } from "date-fns";
 
 export const columns = [

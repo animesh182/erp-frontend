@@ -1,34 +1,26 @@
 "use client";
 
-import Link from "next/link";
-import React, { useState } from "react";
-import { Button } from "./ui/button";
 import {
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  CreditCard,
+  DollarSign,
+  FolderClock,
+  History,
   Home,
   LineChart,
   Package,
-  ShoppingCart,
-  Users,
-  ChevronDown,
-  ChevronRight,
-  CreditCard,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Clock,
-  UserCheck,
   PieChart,
-  FolderClock,
-  History
+  ShoppingCart,
+  TrendingDown,
+  TrendingUp,
+  UserCheck,
+  Users
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { CompanyIcon } from "./companyicon";
 
 export const navItems = [

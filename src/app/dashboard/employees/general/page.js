@@ -1,4 +1,4 @@
-"use client"; // Ensure this is at the top of the file
+"use client"; 
 
 import React, { useState, useEffect, useCallback } from "react";
 import { columns } from "./Columns";

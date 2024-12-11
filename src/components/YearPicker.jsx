@@ -1,7 +1,7 @@
     "use client";
 
-    import React, { useState, useEffect } from "react";
-    import { Select, SelectItem, SelectTrigger, SelectContent } from "@/components/ui/select";
+    import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+import { useEffect } from "react";
 
     export default function YearPicker({ 
     initialYear = new Date().getFullYear(), 

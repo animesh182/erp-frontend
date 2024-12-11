@@ -1,32 +1,26 @@
 "use client";
-import { fetchProfitLoss } from "../api/dashboard/fetchProfitLoss";
-import { fetchOngoingProjects } from "../api/dashboard/getFinancialStatus";
-import { Button } from "@/components/ui/button";
+import fetchReourceUtil from "@/app/api/dashboard/fetchResourceUtil";
+import { fetchKpiData } from "@/app/api/kpiData/fetchKpiData";
+import EmployeeMonthlyHours from "@/components/charts/EmployeeMonthlyHours";
+import DateRangePicker from "@/components/DateRangePicker";
+import KpiCard from "@/components/kpicard";
+import ProfitAnalysisMargin from "@/components/ProfitAnalysisMargin";
+import ComboboxProjectsWrapper from "@/components/ProjectComboBoxWrapper";
+import { KpiSkeleton, RectangleSkeleton } from "@/components/Skeletons";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
-import { format, startOfMonth, endOfMonth } from "date-fns";
-import { KpiSkeleton, RectangleSkeleton } from "@/components/Skeletons";
-import { fetchKpiData } from "@/app/api/fetchKpiData";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { endOfMonth, format, startOfMonth } from "date-fns";
 import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
-import ProjectBudgetChart from "@/components/charts/ProjectBudget";
-import EmployeeMonthlyHours from "@/components/charts/EmployeeMonthlyHours";
-import KpiCard from "@/components/kpicard";
-import ProfitLossChart from "@/components/charts/ProfitLoss";
-import DateRangePicker from "@/components/DateRangePicker";
-import { useState, useEffect, useMemo } from "react";
-import fetchReourceUtil from "@/app/api/dashboard/fetchResourceUtil";
 import { useRouter } from "next/navigation";
-import { getClockifyIdProjects } from "../api/projects/getProjects";
-import ComboboxProjectsWrapper from "@/components/ProjectComboBoxWrapper";
-import ProfitAnalysisMargin from "@/components/ProfitAnalysisMargin";
-import { Separator } from "@/components/ui/separator";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { fetchProfitLoss } from "../api/dashboard/fetchProfitLoss";
+import { fetchOngoingProjects } from "../api/dashboard/getFinancialStatus";
+import { getClockifyIdProjects } from "../api/projects/getProjects";
 
 
 

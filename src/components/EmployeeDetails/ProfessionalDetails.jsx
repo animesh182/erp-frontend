@@ -1,13 +1,5 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
-import { Avatar, AvatarImage } from '../ui/avatar'
-import { Button } from '../ui/button'
-import { Input } from '../ui/input'
-import { Upload } from 'lucide-react'
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import {
     Form,
     FormControl,
@@ -15,8 +7,13 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-  } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+} from "@/components/ui/form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 
 

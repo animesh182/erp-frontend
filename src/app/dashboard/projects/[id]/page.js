@@ -7,12 +7,12 @@ import ProjectDetailsSidebar from "./ProjectDetailsSidebar";
 import TableTitle from "@/components/TableTitle";
 import SimpleDataTable from "@/components/ui/simple-data-table";
 import { columns } from "./Columns";
-import { getProjectById } from "@/app/api/getProjects";
 import { deleteResourceUtilization } from "@/app/api/projects/deleteResourceUtilization";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import TabFilters from "@/components/TabFilters";
 import { isAfter } from "date-fns";
+import { getProjectById } from "@/app/api/projects/getProjects";
 
 export default function ProjectDetails() {
   const [project, setProject] = useState(null);
