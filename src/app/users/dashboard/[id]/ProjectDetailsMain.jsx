@@ -1,10 +1,8 @@
-import React from "react";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import ProjectHealth from "@/components/ProjectHealth";
-import { CalendarDaysIcon, Clock, Dot } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
-import KpiCard from "@/components/kpicard";
+import { CalendarDaysIcon, Clock, Dot } from "lucide-react";
 
 const ProjectDetailsMain = ({ project }) => {
   console.log(project);

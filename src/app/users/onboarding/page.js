@@ -1,19 +1,18 @@
 "use client";
 
-import { Card, CardContent} from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card';
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
 import EmployeeLoginFooter from '@/components/EmployeeLoginFooter';
 
+import { createEmployee } from '@/app/api/employees/createEmployee';
+import { getRoles } from '@/app/api/role/getRoles';
 import BasicDetails from '@/components/EmployeeDetails/BasicDetails';
 import PersonalDetails from '@/components/EmployeeDetails/PersonalDetails';
 import ProfessionalDetails from '@/components/EmployeeDetails/ProfessionalDetails';
 import { ChevronLeft } from 'lucide-react';
-import { createEmployee } from '@/app/api/employees/createEmployee';
 import { toast } from 'sonner';
-import { getRoles } from '@/app/api/role/getRoles';
-import { getLevels } from '@/app/api/level/getLevels';
 
 
 

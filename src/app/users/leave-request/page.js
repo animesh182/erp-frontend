@@ -1,18 +1,17 @@
 "use client";
 
-import React, { Suspense, useCallback, useEffect, useState } from "react";
-import DataTable from "@/components/ui/data-table";
-import { columns } from "./Columns";
-import { Button } from "@/components/ui/button";
-import { Filter, PlusCircle } from "lucide-react";
-import { RequestForLeaveSheet } from "@/components/EditLeaveSheet"; // Import the form component
-import { getEmployeeLeaveRequestById } from "@/app/api/employees/getEmployeeLeaveRequest";
 import { createEmployeeLeaveRequest } from "@/app/api/employees/createEmployeeLeaveRequest";
-import { useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 import { deleteLeaveRequestById } from "@/app/api/employees/deleteLeaveRequest";
-import { updateLeaveRequestStatus } from "@/app/api/employees/approveLeaveRequest";
-import { getTypeOfLeave } from "@/app/api/getTypeOfLeave";
+import { getEmployeeLeaveRequestById } from "@/app/api/employees/getEmployeeLeaveRequest";
+import { RequestForLeaveSheet } from "@/components/EditLeaveSheet"; // Import the form component
+import { Button } from "@/components/ui/button";
+import DataTable from "@/components/ui/data-table";
+import { Filter, PlusCircle } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { columns } from "./Columns";
+import { getTypeOfLeave } from "@/app/api/typeOfLeave/getTypeOfLeave";
 
 const LeaveRequest = () => {
   const [data, setData] = useState([

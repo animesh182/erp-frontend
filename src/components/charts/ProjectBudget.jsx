@@ -68,7 +68,6 @@ function RenderLegend() {
 }
 
 export default function ProjectBudgetChart({ rawData }) {
- 
   const updatedChartData = calculateCostExhaustedPercentage(rawData);
 
   // Dynamically generate chart config
@@ -109,7 +108,10 @@ export default function ProjectBudgetChart({ rawData }) {
           type="category"
           tick={({ x, y, payload }) => {
             const label = payload.value;
-            const truncatedLabel = label.split(" ").slice(0, 2).join(" ");
+            let truncatedLabel = label.split(" ")[0];
+            if (truncatedLabel.length > 10) {
+              truncatedLabel = truncatedLabel.substring(0, 10) + "-";
+            }
             return (
               <text
                 x={x}

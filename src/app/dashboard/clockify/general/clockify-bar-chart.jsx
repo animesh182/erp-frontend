@@ -2,10 +2,10 @@
 
 "use client";
 
-import React, { useMemo } from "react";
-import { Bar, BarChart, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
-import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { formatDuration } from "@/lib/utils";
+import React, { useMemo } from "react";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 // Chart configuration
 const chartConfig = {
@@ -61,7 +61,7 @@ const CustomTooltip = ({ payload, label }) => {
 
 
 const ClockifyBarChart = ({ userName,userId, selected }) => {
-  const chartInfo = useMemo(() => {
+  const chartInfo = useMemo(() => {   //memo used to avoid unnecessary rendering of the chart caused by live tracking removing it will cause the bar to render non-stop
     if (!Array.isArray(selected)) {
       return null;
     }

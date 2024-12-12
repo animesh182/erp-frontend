@@ -1,13 +1,13 @@
 "use client"
 import { getUserReportSummary, REPORT_TYPES } from '@/app/api/clockify/getUserReportSummary';
 import DateRangePicker from '@/components/DateRangePicker';
-import KpiCard from '@/components/kpicard'
-import { subDays } from 'date-fns';
-import { DollarSign, Hourglass, ListOrdered } from 'lucide-react';
-import React, { useEffect, useState } from 'react'
+import KpiCard from '@/components/kpicard';
 import DataTable from '@/components/ui/data-table';
-import { columns } from './Columns';
 import { formatClockifyDate } from '@/lib/utils';
+import { startOfMonth } from 'date-fns';
+import { DollarSign, Hourglass, ListOrdered } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { columns } from './Columns';
 
 
 const ClockifyHistory = () => {
@@ -15,7 +15,7 @@ const ClockifyHistory = () => {
   const [numberOfEntries, setNumberOfEntries] = useState(0);
   const [kpiData, setKpiData] = useState();
   const initialEndDate = new Date(); 
-  const initialStartDate = subDays(initialEndDate, 28);
+  const initialStartDate = startOfMonth(initialEndDate) 
   const [startDate, setStartDate] = useState(initialStartDate);
   const [endDate, setEndDate] = useState(initialEndDate);
   const [isFirstLoad, setIsFirstLoad] = useState(true); 
@@ -93,6 +93,7 @@ const ClockifyHistory = () => {
         title="Total Time"
         value={` ${formatDuration(kpiData[0]?.totalTime)} hours`} // Pass the raw number
         icon={<Hourglass className="h-4 w-4 text-muted-foreground" />}
+        isMoney={false}
       />
       <KpiCard
         title="Number of Time Entries"

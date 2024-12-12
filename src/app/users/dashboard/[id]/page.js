@@ -1,14 +1,13 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import TableTitle from "@/components/TableTitle";
 import SimpleDataTable from "@/components/ui/simple-data-table";
+import { useParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
-import {  getProjectById } from "@/app/api/getProjects";
-import ProjectDetailsMain from "./ProjectDetailsMain";
-import ProjectDetailsSidebar from "@/app/dashboard/projects/[id]/ProjectDetailsSidebar";
+import { getProjectById } from "@/app/api/projects/getProjects";
 import { columns } from "./Columns";
+import ProjectDetailsMain from "./ProjectDetailsMain";
 
 
 

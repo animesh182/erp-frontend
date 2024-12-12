@@ -3,7 +3,7 @@ import { apiClient } from "@/lib/utils";
 export async function fetchOngoingProjects() {
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}api/ongoing_projects/`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/ongoing_projects/`
     );
 
     // Transform the response data

@@ -1,11 +1,8 @@
 "use client";
 
-import MultiLineNameCell from "@/components/MultiLineNameCell";
-import SimpleTableActionsDropdown from "@/components/SimpleTableActionsDropdown";
-import { formatAmountToNOK } from "@/lib/utils";
-import { deleteEmployeeById } from "@/app/api/employees/deleteEmployeeById";
-import { toast } from "sonner";
 import EmployeeTableActionsDropdown from "@/components/EmployeeTableActionsDropdown";
+import MultiLineNameCell from "@/components/MultiLineNameCell";
+import { formatAmountToNOK } from "@/lib/utils";
 export const columns = [
   {
     accessorKey: "employeeName",

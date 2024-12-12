@@ -1,23 +1,19 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
-import DataTable from "@/components/ui/data-table";
-import { CreditCard, DollarSign, Download } from "lucide-react";
+import { deletePayroll } from "@/app/api/finances/payroll/deletePayroll";
+import { fetchPayroll } from "@/app/api/finances/payroll/getPayroll";
+import { getPayrollKpi } from "@/app/api/finances/payroll/getPayrollKpi";
+import { updatePayroll } from "@/app/api/finances/payroll/updatePayroll";
 import { columns } from "@/app/dashboard/finances/payroll/Columns";
 import KpiCard from "@/components/kpicard";
-import { toast } from "sonner";
-import { format, startOfMonth, endOfMonth } from "date-fns";
-import { useForm, FormProvider } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { UploadSheetDialog } from "@/components/UploadSheetDialog";
-import { fetchPayroll } from "@/app/api/payroll";
-import { updatePayroll } from "@/app/api/update_payroll";
-import { getPayrollKpi } from "@/app/api/finances/payroll/getPayrollKpi";
-import { getExcelPayroll } from "@/app/api/finances/payroll/getExcelPayroll";
-
-import * as XLSX from "xlsx";
 import { KpiSkeleton } from "@/components/Skeletons";
-import { deletePayroll } from "@/app/api/finances/payroll/deletePayroll";
-import { formInputs } from "./Inputs";
+import { Button } from "@/components/ui/button";
+import DataTable from "@/components/ui/data-table";
+import { UploadSheetDialog } from "@/components/UploadSheetDialog";
+import { endOfMonth, format, startOfMonth } from "date-fns";
+import { CreditCard, DollarSign, Download } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function Payroll() {
   const methods = useForm();
@@ -132,11 +128,14 @@ export default function Payroll() {
     setEndDate(endDate);
   };
 
-  const handleSheetDownload = async () => {
-    console.log("bhutro");
-    try {
+  const  handleSheetDownload = async () => {
+    console.log('bhutro')
+    try{
       const response = await getExcelPayroll();
-    } catch {}
+    }
+    catch{
+
+    }
   };
 
   const onEditRow = async (editedData) => {
@@ -184,7 +183,7 @@ export default function Payroll() {
           <Download className="h-4 w-4" />
           Get Payroll Sheet
         </Button>
-        <UploadSheetDialog />
+        <UploadSheetDialog onRefresh={refreshComponent}/>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
         {kpiValues && kpiValues.length > 0
@@ -214,10 +213,8 @@ export default function Payroll() {
           data={data}
           isTableAddFormEnabled={false}
           onEditRow={onEditRow}
-          formInputs={formInputs}
           onDeleteRow={onDeleteRow}
           initialStartDate={startDate}
-          projectOptions={[]}
           initialEndDate={endDate}
           onDateChange={handleDateChange}
           loading={loading}

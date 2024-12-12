@@ -1,53 +1,49 @@
 "use client";
+import { useLogout } from "@/app/api/auth/logout";
 import {
-  Home,
-  LineChart,
-  Package,
-  ShoppingCart,
-  Users,
-  CreditCard,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  ChevronRight, // Import ChevronRight
-  CircleUser,
-  ChevronUp,
-  Clock,
-  UserCheck,
-  PieChart,
-  FolderClock,
-  History
-} from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarFooter,
-} from "@/components/ui/sidebar";
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-} from "@/components/ui/collapsible";
-import { CompanyIcon } from "./companyicon";
-import Link from "next/link";
-import { useLogout } from "@/app/api/auth/logout";
-import { Button } from "./ui/button";
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem
+} from "@/components/ui/sidebar";
+import {
+  ChevronRight,
+  ChevronUp,
+  CircleUser,
+  Clock,
+  CreditCard,
+  DollarSign,
+  FolderClock,
+  History,
+  Home,
+  LineChart,
+  Package,
+  PieChart,
+  ShoppingCart,
+  TrendingDown,
+  TrendingUp,
+  UserCheck,
+  Users
+} from "lucide-react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CompanyIcon } from "./companyicon";
 // Menu items
 export const navItems = [
   {

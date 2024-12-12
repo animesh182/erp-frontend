@@ -6,10 +6,8 @@ import ProjectTableActionsDropdown from "@/components/ProjectTableActionsDropdow
 import TeamAvatars from "@/components/TeamAvatars";
 import { Badge } from "@/components/ui/badge";
 import { ProgressTrackingCell } from "@/components/ui/ProgressTrackingCell";
-import { apiClient, formatAmountToNOK } from "@/lib/utils";
-import { prettifyText } from "@/lib/utils";
+import { formatAmountToNOK, prettifyText } from "@/lib/utils";
 import { format } from "date-fns";
-import { toast } from "sonner";
 export const projectColumns = (clients) => [
   {
     accessorKey: "name",
@@ -61,7 +59,6 @@ export const projectColumns = (clients) => [
     header: "Status",
     cell: ({ row }) => {
       const { project_status } = row.original; // Access the full row data
-      console.log(project_status,"prorpo")
       return (
         <Badge
           className={`${

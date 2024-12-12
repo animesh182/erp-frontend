@@ -12,6 +12,7 @@ import { getProjects } from "@/app/api/projects/getProjects";
 import { formInputs } from "./Inputs";
 import { editRevenue } from "@/app/api/revenue/editRevenue";
 import { deleteRevenue } from "@/app/api/revenue/deleteRevenue";
+import { UploadSheetDialog } from "@/components/UploadSheetDialog";
 
 export default function Revenue() {
   const methods = useForm();
@@ -105,6 +106,9 @@ export default function Revenue() {
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+         <div className="w-full flex justify-end">
+        <UploadSheetDialog className="" isRevenue={true} onRefresh={refreshComponent}/>
+      </div>
       <FormProvider {...methods}>
         <DataTable
           title={"Revenue"}

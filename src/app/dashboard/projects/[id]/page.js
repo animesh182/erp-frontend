@@ -7,12 +7,13 @@ import ProjectDetailsSidebar from "./ProjectDetailsSidebar";
 import TableTitle from "@/components/TableTitle";
 import SimpleDataTable from "@/components/ui/simple-data-table";
 import { columns } from "./Columns";
-import { getProjectById } from "@/app/api/getProjects";
 import { deleteResourceUtilization } from "@/app/api/projects/deleteResourceUtilization";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import TabFilters from "@/components/TabFilters";
 import { isAfter } from "date-fns";
+import { getProjectById } from "@/app/api/projects/getProjects";
+import DateRangePicker from "@/components/DateRangePicker";
 
 export default function ProjectDetails() {
   const [project, setProject] = useState(null);
@@ -63,6 +64,7 @@ export default function ProjectDetails() {
     }
   }, [id]);
 
+
   const onDeleteRow = async (resourceId) => {
     try {
       await deleteResourceUtilization(resourceId);
@@ -87,6 +89,9 @@ export default function ProjectDetails() {
 
   return (
     <main className="p-6 min-h-screen space-y-4">
+      <div className="flex justify-end">
+      <DateRangePicker/>
+      </div>
       <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
         <ProjectDetailsMain project={project} />
         {!isDescriptionOpen && (

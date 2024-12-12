@@ -127,10 +127,18 @@ function SimpleDataTable({ columns, data, onRowSelect, onDeleteRow }) {
               </PaginationItem>
             ))}
             <PaginationItem>
-              <PaginationNext
+              {/* <PaginationNext
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
-              />
+              /> */}
+              <PaginationNext
+              onClick={() => {
+                if (table.getCanNextPage()) {
+                  table.nextPage();
+                }
+              }}
+              disabled={!table.getCanNextPage()}
+            />
             </PaginationItem>
           </PaginationContent>
         </Pagination>

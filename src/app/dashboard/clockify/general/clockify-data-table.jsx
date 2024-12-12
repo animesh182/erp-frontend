@@ -1,12 +1,9 @@
 "use client";
-import React, { useState, useMemo, createContext, useEffect } from "react";
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getSortedRowModel,
-} from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import DateRangePicker from "@/components/DateRangePicker";
+import { FormRow } from "@/components/FormRow";
+import TabFilters from "@/components/TabFilters";
+import TableTitle from "@/components/TableTitle";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -15,11 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FormRow } from "@/components/FormRow";
-import TableTitle from "@/components/TableTitle";
-import DateRangePicker from "@/components/DateRangePicker";
-import TabFilters from "@/components/TabFilters";
-import { Button } from "@/components/ui/button";
+import {
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
+import { createContext, useMemo, useState } from "react";
 
 export const EditRowContext = createContext(null); 
 
@@ -45,7 +45,7 @@ function ClockifyDataTable({
 }) {
   const [sorting, setSorting] = useState([]);
   const [selectedTab, setSelectedTab] = useState("All");
-  const filteredData = useMemo(() => {
+  const filteredData = useMemo(() => {    //memo used here as not using memo causes the component to render infinitely causing page to die
     let filtered = data;
   
     if (selectedTab !== "All") {
@@ -68,6 +68,10 @@ function ClockifyDataTable({
   
     return filtered;
   }, [data, selectedTab, filterColumn]);
+
+
+
+
   
 
   const table = useReactTable({

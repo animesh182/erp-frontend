@@ -1,4 +1,6 @@
-import { fetchKpiData } from "../../fetchKpiData";
+import { fetchKpiData } from "./fetchKpiData";
+
+
 
 export async function fetchTransactionKpi(startDate, endDate) {
   try {

@@ -1,21 +1,20 @@
 
-import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react'
-import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input';
-import { DollarSign } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { createTimeEntry, stopTimeEntry } from '@/app/api/clockify/createTimeEntry';
-import { toast } from 'sonner';
-import { convertDateToTime, convertTimeToDate, formatDuration } from '@/lib/utils';
 import { getTimeEntryById } from '@/app/api/clockify/getTimeEntryById';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { updateTimeEntry } from '@/app/api/clockify/updateTimeEntry';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import ComboboxProjects from './ProjectComboBox';
+import { convertDateToTime, convertTimeToDate, formatDuration } from '@/lib/utils';
+import { DollarSign } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 // import { clockifyProjects} from '@/app/dashboard/clockify/general/page';
 import { ACTIVE_USERS_TYPES, getActiveUsers } from '@/app/api/clockify/getActiveUsers';
-import { useClockify } from './ClockifyContext';
 import { getClockifyIdProjects } from '@/app/api/projects/getProjects';
+import { useClockify } from './ClockifyContext';
 import ComboboxProjectsWrapper from './ProjectComboBoxWrapper';
 
 

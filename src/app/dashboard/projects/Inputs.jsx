@@ -87,7 +87,7 @@ export const formInputs = [
     ),
     name: "project_status",
     required: true,
-    filterValues: ["All", "Not Started", "In Progress", "Done"],
+    filterValues: ["All", "Not Started", "Ongoing", "Done"],
   },
   {
     component: (

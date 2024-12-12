@@ -2,7 +2,6 @@
 
 import MultiLineNameCell from "@/components/MultiLineNameCell";
 import SimpleTableActionsDropdown from "@/components/SimpleTableActionsDropdown";
-import { deleteResourceUtilization } from "@/app/api/projects/deleteResourceUtilization";
 import { format } from "date-fns";
 
 
@@ -32,7 +31,7 @@ export const columns = [
     cell: ({ row }) => {
       const { utilization } = row.original;
       const daysInMonth=24
-      const monthlyUtlization=utilization*24
+      const monthlyUtlization=(utilization*24).toFixed(2)
       return (
         <div>
           {monthlyUtlization} <span className="text-xs font-medium">hrs/month</span>

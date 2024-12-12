@@ -1,6 +1,6 @@
 "use client";
-import React, { useContext, useState, useCallback, useEffect } from "react";
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
+import { useCallback, useContext, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EditRowContext } from "./ui/data-table";
 
@@ -12,8 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EditProjectSheet } from "./EditProjectSheet";
 import DeleteDialog from "./DeleteDialog";
+import { EditProjectSheet } from "./EditProjectSheet";
 
 const ProjectTableActionsDropdown = ({ rowData, clients }) => {
   const [isOpen, setIsOpen] = useState(false);

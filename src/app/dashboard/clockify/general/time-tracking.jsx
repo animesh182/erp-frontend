@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { CircleDot } from "lucide-react";
 import { formatDuration } from "@/lib/utils";
+import { CircleDot } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const TimeCell = ({ initialTime, status }) => {
   // Parse the initial time and set the state

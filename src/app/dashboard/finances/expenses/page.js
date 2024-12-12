@@ -106,7 +106,7 @@ export default function Expenses() {
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="w-full flex justify-end">
-        <UploadSheetDialog className="" isExpense={true}/>
+        <UploadSheetDialog className="" isExpense={true} onRefresh={refreshComponent}/>
       </div>
       <FormProvider {...methods}>
         <DataTable

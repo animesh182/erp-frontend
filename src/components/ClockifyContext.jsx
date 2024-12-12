@@ -1,5 +1,7 @@
+
 "use client"
 import React, { createContext, useContext, useEffect, useState } from "react";
+import Cookies from 'js-cookie';
 
 const ClockifyContext = createContext();
 
@@ -10,20 +12,30 @@ export function useClockify() {
 export function ClockifyProvider({ children }) {
   const [clockifyUserData, setClockifyUserData] = useState(null);
 
-
+  // Load data from cookies on initial render
   useEffect(() => {
-    const storedData = sessionStorage.getItem("clockifyUserData");
+    const storedData = Cookies.get('clockifyUserData');
     if (storedData) {
-      setClockifyUserData(JSON.parse(storedData)); // Retrieve and set the data
+      try {
+        setClockifyUserData(JSON.parse(storedData));
+      } catch (error) {
+        console.error('Error parsing stored Clockify user data:', error);
+      }
     }
   }, []);
 
-  // Store data in sessionStorage whenever it changes
+  // Store data in cookies whenever it changes
   useEffect(() => {
     if (clockifyUserData) {
-      sessionStorage.setItem("clockifyUserData", JSON.stringify(clockifyUserData));
+      Cookies.set('clockifyUserData', JSON.stringify(clockifyUserData), { 
+        expires: 7, //so thtat cookie expires in 7 days
+      });
+    } else {
+      // Remove cookie if data is null
+      Cookies.remove('clockifyUserData');
     }
   }, [clockifyUserData]);
+
   return (
     <ClockifyContext.Provider value={{ clockifyUserData, setClockifyUserData }}>
       {children}

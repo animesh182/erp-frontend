@@ -1,9 +1,7 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import {  X } from "lucide-react";
 import MultiLineNameCell from "@/components/MultiLineNameCell";
 import TeamAvatars from "@/components/TeamAvatars";
 import { Progress } from "@/components/ui/progress";
+import { X } from "lucide-react";
 
 const ProjectDetailsSidebar = ({ project, onClose}) => {
   const teamMembers = project.all_user_projects.map((user) => ({

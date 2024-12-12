@@ -4,7 +4,7 @@ import { apiClient } from "@/lib/utils";
 export async function getEmployees() {
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}api/users/employee-details/`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/employee-details/`
     );
     return { status: 200, data: response.data };
   } catch (error) {
@@ -19,7 +19,7 @@ export async function getEmployees() {
 export async function getRoles() {
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}api/roles/`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/roles/`
     );
     return { status: 200, data: response };
   } catch (error) {
@@ -32,7 +32,7 @@ export async function getRoles() {
 export async function getSalaryPayementHistory() {
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}api/invoiced_salary/`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/invoiced_salary/`
     );
     return { status: 200, data: response };
   } catch (error) {
@@ -45,7 +45,7 @@ export async function getSalaryPayementHistory() {
 export async function getLevels() {
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}api/levels/`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/levels/`
     );
     return { status: 200, data: response };
   } catch (error) {
