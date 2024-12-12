@@ -82,6 +82,7 @@ export const columns = (barChartUser,startDate,endDate) => [
     header: "Time",
     cell: ({ row }) => {
       const { time, status } = row.original;
+
       return <TimeCell initialTime={time} status={status} />;
     },
     enableSorting: false,

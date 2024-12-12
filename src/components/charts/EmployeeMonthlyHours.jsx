@@ -1,21 +1,19 @@
 "use client";
 
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
   Bar,
   BarChart,
-  YAxis,
-  XAxis,
-  ResponsiveContainer,
   CartesianGrid,
+  XAxis,
+  YAxis
 } from "recharts";
 
 import {
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
+  ChartTooltip
 } from "@/components/ui/chart";
 import { UserCircleIcon } from "lucide-react";
 const colorPalette = [

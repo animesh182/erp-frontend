@@ -1,25 +1,20 @@
 "use client";
 
 import {
+  ChartContainer,
+  ChartTooltip
+} from "@/components/ui/chart";
+import {
   Bar,
   BarChart,
-  XAxis,
-  YAxis,
   Cell,
   LabelList,
-  ResponsiveContainer,
   Legend,
+  XAxis,
+  YAxis
 } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
-} from "@/components/ui/chart";
 
 import { formatAmountDecimalToNOK } from "@/lib/utils";
-import { useTheme } from "next-themes";
 
 // Function to calculate the cost exhausted percentage for each project
 function calculateCostExhaustedPercentage(data) {

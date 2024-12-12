@@ -2,6 +2,7 @@
 
 import { editEmployee } from "@/app/api/employees/editEmployee";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
+import { DetailsSkeleton, TitleSkeleton } from "@/components/Skeletons";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatAmountToNOK } from "@/lib/utils";
@@ -9,8 +10,6 @@ import { format } from "date-fns";
 import { Edit } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { apiClient } from "@/lib/utils";
-import { TitleSkeleton, DetailsSkeleton } from "@/components/Skeletons";
 
 const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions,setEmployeeDetails,onRefresh }) => {
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);

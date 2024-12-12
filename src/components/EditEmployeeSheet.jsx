@@ -1,20 +1,19 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
+import { DatePicker } from "@/components/DatePicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
-import { DatePicker } from "@/components/DatePicker";
-import { prettifyText, cn } from "@/lib/utils";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { cn, prettifyText } from "@/lib/utils";
+import React from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 export function EditEmployeeSheet({
   isOpen,
