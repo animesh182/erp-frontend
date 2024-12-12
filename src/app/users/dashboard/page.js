@@ -131,7 +131,6 @@ const UsersHome = () => {
 
   const date = new Date();
   const clockifyDate = formatClockifyDate(date);
-
   useEffect(() => {
     const getEmployeeDetails = async () => {
       try {
@@ -149,10 +148,11 @@ const UsersHome = () => {
         console.error("Error fetching employee details:", error);
       }
     };
+
     const getEmployeeKpiData = async () => {
       try {
         const data = await getEmployeeKpi(userId);
-
+        
         if (data) {
           setKpiInfo(data);
         } else {
@@ -165,7 +165,6 @@ const UsersHome = () => {
     getEmployeeDetails();
     getEmployeeKpiData();
   }, [userId]);
-
   useEffect(() => {
     const fetchUserTimeEntries = async () => {
       try {
@@ -258,9 +257,7 @@ const UsersHome = () => {
       icon: <DollarSign className="w-4 h-4" />,
     },
   ];
-
   const clockifyData = processTimeEntries(timeEntries);
-
   //replace with clockify id of user when backend is ready
   const clockifyUserId = "671639ea898fb01147870ac8";
 
