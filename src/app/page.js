@@ -27,7 +27,7 @@ import { useForm } from "react-hook-form";
 import { login } from "@/app/api/auth/login";
 import { toast } from "sonner";
 import Link from "next/link";
-import { useClockify } from "@/components/ClockifyContext";
+import { useClockify } from "@/context/clockifyContext/ClockifyContext";
 
 const formSchema = z.object({
   email: z.string().email(),

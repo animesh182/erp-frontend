@@ -11,11 +11,10 @@ import { convertDateToTime, convertTimeToDate, formatDuration } from '@/lib/util
 import { DollarSign } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-// import { clockifyProjects} from '@/app/dashboard/clockify/general/page';
 import { ACTIVE_USERS_TYPES, getActiveUsers } from '@/app/api/clockify/getActiveUsers';
 import { getClockifyIdProjects } from '@/app/api/projects/getProjects';
-import { useClockify } from './ClockifyContext';
 import ComboboxProjectsWrapper from './ProjectComboBoxWrapper';
+import { useClockify } from '@/context/clockifyContext/ClockifyContext';
 
 
 const ClockifyTimeEntry = React.memo(() => {

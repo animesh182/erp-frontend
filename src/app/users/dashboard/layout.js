@@ -1,8 +1,8 @@
 "use client"
-import { useClockify } from "@/components/ClockifyContext";
 import Header from "@/components/header";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/UserSideBar";
+import { useClockify } from "@/context/clockifyContext/ClockifyContext";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 

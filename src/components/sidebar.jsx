@@ -125,7 +125,7 @@ export const navItems = [
 ];
 
 
-export default function AppSidebar() {
+export default function AppSidebar({userName}) {
   const logout = useLogout();
   const theme = useTheme();
   console.log(theme);
@@ -232,7 +232,7 @@ export default function AppSidebar() {
                 <SidebarMenuButton className="">
                   <CircleUser className="h-5 w-5" />
                   <span className="sr-only">Toggle user menu</span>
-                  Rahul Kayastha
+                {userName}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

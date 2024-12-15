@@ -27,7 +27,7 @@ import LoginTextHeader, {
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { login } from "@/app/api/auth/login";
-import { useClockify } from "@/components/ClockifyContext";
+import { useClockify } from "@/context/clockifyContext/ClockifyContext";
 
 export default function EmployeeLoginPasswordPage() {
   return (
