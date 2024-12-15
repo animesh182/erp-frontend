@@ -67,7 +67,7 @@ export const columns = [
       
         <>
           {utilization ? 
-                      (<ProgressBar value={utilization}/>)
+                      (<ProgressBar value={utilization.toFixed(2)}/>)
 
            : "N/A"}
         </>

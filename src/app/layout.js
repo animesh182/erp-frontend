@@ -5,6 +5,7 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { ThemeProvider } from "@/components/themeprovider";
 import { Toaster } from "@/components/ui/sonner";
+// import { ClockifyProvider } from "@/context/clockifyContext/ClockifyContext";
 import { ClockifyProvider } from "@/components/ClockifyContext";
 
 export const metadata = {

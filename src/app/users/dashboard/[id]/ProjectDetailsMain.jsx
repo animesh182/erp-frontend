@@ -99,7 +99,7 @@ const ProjectDetailsMain = ({ project }) => {
             <div className="flex items-center gap-2 justify-start w-full">
               {/* <span className="text-green-500 text-sm">↑</span> */}
               <p className="text-3xl font-bold text-foreground">
-                {totalHoursWorked} hours
+                {totalHoursWorked.toFixed(2)} hours
               </p>
             </div>
           </div>

@@ -98,6 +98,7 @@ const ClockifyHistory = () => {
       <KpiCard
         title="Number of Time Entries"
         value={(kpiData[0]?.entriesCount)} // Pass the raw number
+        isMoney={false}
         // change={Number(kpiData.changeInExpenses)} // Pass the raw percentage number
         icon={<ListOrdered className="h-4 w-4 text-muted-foreground" />}
     

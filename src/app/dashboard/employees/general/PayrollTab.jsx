@@ -6,7 +6,6 @@ import { Separator } from "@/components/ui/separator";
 
 const PayrollTab = ({ payrollData }) => {
   const data = payrollData;
-  // console.log(data);
   const columns = [
     {
       accessorKey: "name",

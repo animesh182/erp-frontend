@@ -16,7 +16,6 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 
 export default function CardLayout({ projects }) {
-  console.log(projects, "projects");
   const router = useRouter();
 
   const handleCardClick = (projectId) => {

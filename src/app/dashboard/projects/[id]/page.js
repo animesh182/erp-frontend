@@ -90,7 +90,7 @@ export default function ProjectDetails() {
   return (
     <main className="p-6 min-h-screen space-y-4">
       <div className="flex justify-end">
-      <DateRangePicker/>
+      {/* <DateRangePicker /> */}
       </div>
       <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
         <ProjectDetailsMain project={project} />

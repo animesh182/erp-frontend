@@ -5,18 +5,18 @@ import { fetchKpiData } from "./fetchKpiData";
 export async function fetchTransactionKpi(startDate, endDate) {
   try {
     // Call the existing fetchKpiData function to get the KPI data
-    const response = await fetchKpiData(startDate, endDate);
+    const response = await fetchKpiData(startDate, endDate,null);
 
     if (response.status === 200 && response.data) {
       const kpiData = response.data;
 
       // Extract the necessary fields
-      const profit = kpiData.total_profit_current_month;
-      const expenses = kpiData.total_expenses_current_month;
-      const revenue = kpiData.total_revenue_current_month;
-      const changeInProfit = kpiData.percentage_change_in_profit;
-      const changeInExpenses = kpiData.percentage_change_in_expenses;
-      const changeInRevenue = kpiData.percentage_change_in_revenue;
+      const profit = kpiData.actual_profit;
+      const expenses = kpiData.actual_cost;
+      const revenue = kpiData.actual_revenue;
+      const changeInProfit = kpiData.actual_profit_percentage_change;
+      const changeInExpenses = kpiData.actual_cost_percentage_change;
+      const changeInRevenue = kpiData.actual_revenue_percentage_change;
 
       // Return the extracted data
       return {

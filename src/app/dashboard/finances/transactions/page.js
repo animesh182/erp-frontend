@@ -5,6 +5,8 @@ import { endOfMonth, format, startOfMonth } from "date-fns";
 import { useEffect, useState } from "react";
 import { columns } from "./Columns";
 import { fetchTransactionKpi } from "@/app/api/kpiData/fetchTransactionKpi";
+import KpiCard from "@/components/kpicard";
+import { Activity, CreditCard, DollarSign } from "lucide-react";
 
 export default function Transactions() {
   // Get first day of current month
@@ -34,47 +36,47 @@ export default function Transactions() {
   const [error, setError] = useState(null);
 
   // Fetch KPI data dynamically
-  useEffect(() => {
-    if (startDate && endDate) {
-      const getKpiData = async () => {
-        try {
-          // Fetch KPI data
-          const kpiResponse = await fetchTransactionKpi(
-            format(startDate, "yyyy-MM-dd"),
-            format(endDate, "yyyy-MM-dd")
-          );
+  // useEffect(() => {
+  //   if (startDate && endDate) {
+  //     const getKpiData = async () => {
+  //       try {
+  //         // Fetch KPI data
+  //         const kpiResponse = await fetchTransactionKpi(
+  //           format(startDate, "yyyy-MM-dd"),
+  //           format(endDate, "yyyy-MM-dd")
+  //         );
 
-          if (kpiResponse.status === 200) {
-            // Set KPI data from the response
-            const {
-              revenue,
-              expenses,
-              profit,
-              changeInRevenue,
-              changeInExpenses,
-              changeInProfit,
-            } = kpiResponse.data;
-            setKpiData({
-              total_revenue: revenue,
-              total_expenses: expenses,
-              total_profit: profit,
-              changeInRevenue,
-              changeInExpenses,
-              changeInProfit,
-            });
-          } else {
-            console.error("Failed to fetch KPI data");
-            setError(kpiResponse.message || "Error fetching KPI data");
-          }
-        } catch (error) {
-          console.error("Error fetching KPI data:", error);
-          setError("An error occurred while fetching KPI data");
-        }
-      };
+  //         if (kpiResponse.status === 200) {
+  //           // Set KPI data from the response
+  //           const {
+  //             revenue,
+  //             expenses,
+  //             profit,
+  //             changeInRevenue,
+  //             changeInExpenses,
+  //             changeInProfit,
+  //           } = kpiResponse.data;
+  //           setKpiData({
+  //             total_revenue: revenue,
+  //             total_expenses: expenses,
+  //             total_profit: profit,
+  //             changeInRevenue,
+  //             changeInExpenses,
+  //             changeInProfit,
+  //           });
+  //         } else {
+  //           console.error("Failed to fetch KPI data");
+  //           setError(kpiResponse.message || "Error fetching KPI data");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error fetching KPI data:", error);
+  //         setError("An error occurred while fetching KPI data");
+  //       }
+  //     };
 
-      getKpiData();
-    }
-  }, [startDate, endDate]); // Re-run when date changes
+  //     getKpiData();
+  //   }
+  // }, [startDate, endDate]); // Re-run when date changes
 
   // Fetch transaction data
   useEffect(() => {
@@ -104,8 +106,8 @@ export default function Transactions() {
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      {/* <h2 className="text-lg font-semibold">Overview</h2> 
-       <div className="flex gap-4 w-full">
+      {/* <h2 className="text-lg font-semibold">Overview</h2>  */}
+       {/* <div className="flex gap-4 w-full">
         <KpiCard
           title="Total Revenue"
           value={Number(kpiData.total_revenue)} 

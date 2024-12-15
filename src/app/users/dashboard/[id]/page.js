@@ -58,8 +58,6 @@ function EmployeeProjectDetails() {
 
   if (!project) return <div>No project found</div>;
 
-  
-  console.log(project,"coliulaskdnkjabsd")
 
   return (
     
