@@ -75,7 +75,7 @@ export function RequestForLeaveSheet({ isOpen, onClose, onSubmit,data }) {
           </Button>
         </PopoverTrigger>
         <PopoverContent className="p-4 w-full space-y-2 max-h-52 overflow-y-auto">
-          {data.map((item) => (
+          {data?.map((item) => (
             <div
               key={item.id}
               onClick={() => {

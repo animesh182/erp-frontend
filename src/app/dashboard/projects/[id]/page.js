@@ -16,6 +16,7 @@ import { getProjectById } from "@/app/api/projects/getProjects";
 import DateRangePicker from "@/components/DateRangePicker";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function ProjectDetails() {
   const [project, setProject] = useState(null);
@@ -137,7 +138,9 @@ export default function ProjectDetails() {
           data={filteredResources}
           onDeleteRow={onDeleteRow}
         /> */}
+        <Card>
              <Tabs defaultValue="utilization" className="mt-10">
+              <CardHeader>
   <TabsList className="flex justify-start w-fit gap-4 h-fit">
     <TabsTrigger value="utilization" className="flex items-center gap-2">
     <h2 className="text-lg font-semibold">Resource Utilization</h2>
@@ -149,17 +152,21 @@ export default function ProjectDetails() {
     <h2 className="text-lg font-semibold">Resource Expense</h2>
     </TabsTrigger>
   </TabsList>
-
+  </CardHeader>
+  <CardContent>
   <TabsContent value="utilization" className="mt-4">
+    <div className="flex justify-between">
     <TableTitle
       subtitle="List of all employees in the project"
       // totalItemCount={filteredResources.length}
     />
+    
            <TabFilters
           filterValues={filterValues}
           selectedTab={selectedTab}
           setSelectedTab={setSelectedTab}
         />
+        </div>
     <SimpleDataTable
       columns={columns}
       data={filteredResources}
@@ -175,7 +182,9 @@ export default function ProjectDetails() {
       Expense data will be available soon.
     </div>
   </TabsContent>
+  </CardContent>
 </Tabs>
+</Card>
 
       </div>
     </main>

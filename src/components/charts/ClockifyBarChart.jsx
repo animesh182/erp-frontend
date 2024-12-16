@@ -78,7 +78,7 @@ function ClockifyBarChart({chartConfig,chartData}) {
       radius={[5, 0, 0, 5]}
       label={({  y, value ,height}) => (
         <text
-          x={950}  // Position the label outside the bar to the right
+          x={960}  // Position the label outside the bar to the right
           y={y + height / 2}  // Center the label vertically along the bar
           fontSize={12}
           // fill="#FFFFFF"

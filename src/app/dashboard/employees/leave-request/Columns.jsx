@@ -4,6 +4,7 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import LeaveRequestDropDown from "@/components/LeaveRequestDropDown";
+import { UpdateStatus } from "./UpdateStatus";
 
 export const columns = (handleStatusUpdate) => [
   {
@@ -80,19 +81,20 @@ export const columns = (handleStatusUpdate) => [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const { status } = row.original;
+      const { status ,id } = row.original;
       return (
-        <Badge
-          className={`${
-            status?.toLowerCase() === "approved"
-            ? "bg-green-100 text-green-800"
-            : status?.toLowerCase() === "pending"
-            ? "bg-orange-300 text-orange-600"
-            : "bg-red-100 text-red-800"
-          }`}
-        >
-          {status ? status : "No Data"}
-        </Badge>
+        // <Badge
+        //   className={`${
+        //     status?.toLowerCase() === "approved"
+        //     ? "bg-green-100 text-green-800"
+        //     : status?.toLowerCase() === "pending"
+        //     ? "bg-orange-300 text-orange-600"
+        //     : "bg-red-100 text-red-800"
+        //   }`}
+        // >
+        //   {status ? status : "No Data"}
+        // </Badge>
+        <UpdateStatus status={status} onStatusUpdate={handleStatusUpdate}  id={id} />
       );
     },
     enableSorting: false,
@@ -122,7 +124,6 @@ export const columns = (handleStatusUpdate) => [
         <div className="flex items-center">
           <LeaveRequestDropDown 
             rowData={rowData} 
-            onStatusUpdate={handleStatusUpdate} 
           />
         </div>
       );

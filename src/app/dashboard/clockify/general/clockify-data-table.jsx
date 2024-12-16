@@ -3,6 +3,7 @@ import { FormRow } from "@/components/FormRow";
 import TabFilters from "@/components/TabFilters";
 import TableTitle from "@/components/TableTitle";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -17,7 +18,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Search } from "lucide-react";
 import { createContext, useMemo, useState } from "react";
 
 export const EditRowContext = createContext(null); 
@@ -35,15 +36,13 @@ function ClockifyDataTable({
   onAddRow,
   formInputs,
   filterColumn,
-  onDateChange,
-  initialStartDate,
-  initialEndDate,
   projectOptions,
   onDeleteRow,
   userId,
 }) {
   const [sorting, setSorting] = useState([]);
   const [selectedTab, setSelectedTab] = useState("All");
+    const [searchValue, setSearchValue] = useState("");
   const filteredData = useMemo(() => {    //memo used here as not using memo causes the component to render infinitely causing page to die
     let filtered = data;
   
@@ -64,9 +63,17 @@ function ClockifyDataTable({
         return false;
       });
     }
+    if (searchValue) {
+      filtered = filtered.filter(
+        (row) =>
+          row.user_name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          (row.project_name &&
+            row.project_name.toLowerCase().includes(searchValue.toLowerCase()))
+      );
+    }
   
     return filtered;
-  }, [data, selectedTab, filterColumn]);
+  }, [data, selectedTab, filterColumn , searchValue]);
 
 
 
@@ -117,12 +124,24 @@ function ClockifyDataTable({
           <div className="p-5 text-left border rounded-md">
             {/* <div className="w-full flex items-start justify-between"> */}
             <div className="w-full lg:flex md:flex items-start justify-between flex-col">
+              <div className="flex justify-between w-full">
               <TableTitle
                 title={title}
                 subtitle={subtitle}
                 totalItemCount={ table.getRowCount()}
                 
               />
+                <div className="relative w-full mr-4">
+                <Search className="absolute top-1/4 left-3 transform -translate-y-1/2" />
+                <Input
+                  type="search"
+                  placeholder="Search.."
+                  className="pl-12"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                />
+              </div>
+              </div>
               <div className="lg:flex md:flex" >
               {tabs.map((tab) => (
               <Button
