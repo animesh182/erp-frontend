@@ -13,6 +13,7 @@ import { formatClockifyDate } from "@/lib/utils";
 import { format, startOfMonth } from "date-fns";
 import ClockifyDataTable from "./clockify-data-table";
 import { columns } from "./Columns";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 
 
 
@@ -41,14 +42,12 @@ const Clockify = () => {
   const [barChartUser, setBarChartUser] = useState(null);
   const[employeeClockifyDetails,setEmployeeClockifyDetails]=useState()
   const[clockifyProjects,setClockifyProjects]=useState()
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
+  const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
 
-  const handleDateChange = (startDate, endDate) => {
-    setStartDate(startDate);
-    setEndDate(endDate);
+  const handleDateChange = (newStartDate, newEndDate) => {
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
   };
-
 
 
 

@@ -7,17 +7,18 @@ import { columns } from "./Columns";
 import { fetchTransactionKpi } from "@/app/api/kpiData/fetchTransactionKpi";
 import KpiCard from "@/components/kpicard";
 import { Activity, CreditCard, DollarSign } from "lucide-react";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 
 export default function Transactions() {
   // Get first day of current month
-  const initialStartDate = startOfMonth(new Date());
-  // Get last day of current month
-  const initialEndDate = endOfMonth(new Date());
+  // const initialStartDate = startOfMonth(new Date());
+  // // Get last day of current month
+  // const initialEndDate = endOfMonth(new Date());
 
-  const [startDate, setStartDate] = useState(
-    format(initialStartDate, "yyyy-MM-dd")
-  );
-  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
+  // const [startDate, setStartDate] = useState(
+  //   format(initialStartDate, "yyyy-MM-dd")
+  // );
+  // const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
 
   // State to hold transaction data
   const [data, setData] = useState([]);
@@ -34,6 +35,12 @@ export default function Transactions() {
 
   // State to handle error
   const [error, setError] = useState(null);
+    const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
+  
+    const handleDateChange = (newStartDate, newEndDate) => {
+      setStartDate(newStartDate);
+      setEndDate(newEndDate);
+    };
 
   // Fetch KPI data dynamically
   // useEffect(() => {
@@ -99,10 +106,10 @@ export default function Transactions() {
     }
   };
 
-  const handleDateChange = (startDate, endDate) => {
-    setStartDate(startDate);
-    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
-  };
+  // const handleDateChange = (startDate, endDate) => {
+  //   setStartDate(startDate);
+  //   setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
+  // };
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">

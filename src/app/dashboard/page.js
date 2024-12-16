@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { fetchProfitLoss } from "../api/dashboard/fetchProfitLoss";
 import { fetchOngoingProjects } from "../api/dashboard/getFinancialStatus";
 import { getClockifyIdProjects } from "../api/projects/getProjects";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 
 export default function Dashboard() {
   const [profitLoss, setProfitLoss] = useState([]);
@@ -33,13 +34,14 @@ export default function Dashboard() {
   const [clockifyProjects, setClockifyProjects] = useState();
   const [selectedProject, setSelectedProject] = useState("");
 
-  const initialStartDate = startOfMonth(new Date());
-  const initialEndDate = endOfMonth(new Date());
+  // const initialStartDate = startOfMonth(new Date());
+  // const initialEndDate = endOfMonth(new Date());
 
-  const [startDate, setStartDate] = useState(
-    format(initialStartDate, "yyyy-MM-dd")
-  );
-  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
+  // const [startDate, setStartDate] = useState(
+  //   format(initialStartDate, "yyyy-MM-dd")
+  // );
+  // const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
+  const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
 
   const router = useRouter();
   useEffect(() => {
@@ -246,9 +248,13 @@ export default function Dashboard() {
     }
   }, [fetchedKpiData]); // This will trigger whenever kpiData is fetched
 
-  const handleDateChange = (startDate, endDate) => {
-    setStartDate(startDate);
-    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
+  // const handleDateChange = (startDate, endDate) => {
+  //   setStartDate(startDate);
+  //   setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
+  // };
+  const handleDateChange = (newStartDate, newEndDate) => {
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
   };
 
   const renderKpiSection = (sectionData, skeletonCount) => {

@@ -9,6 +9,7 @@ import { KpiSkeleton } from "@/components/Skeletons";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 import { endOfMonth, format, startOfMonth } from "date-fns";
 import { CreditCard, DollarSign, Download } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -18,18 +19,24 @@ import { toast } from "sonner";
 export default function Payroll() {
   const methods = useForm();
   // Get first day of current month
-  const initialStartDate = startOfMonth(new Date());
-  // Get last day of current month
-  const initialEndDate = endOfMonth(new Date());
+  // const initialStartDate = startOfMonth(new Date());
+  // // Get last day of current month
+  // const initialEndDate = endOfMonth(new Date());
 
-  const [startDate, setStartDate] = useState(
-    format(initialStartDate, "yyyy-MM-dd")
-  );
-  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
+  // const [startDate, setStartDate] = useState(
+  //   format(initialStartDate, "yyyy-MM-dd")
+  // );
+  // const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [kpiValues, setKpiValues] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+    const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
+  
+    const handleDateChange = (newStartDate, newEndDate) => {
+      setStartDate(newStartDate);
+      setEndDate(newEndDate);
+    };
 
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
@@ -123,10 +130,10 @@ export default function Payroll() {
     }
   };
 
-  const handleDateChange = (startDate, endDate) => {
-    setStartDate(startDate);
-    setEndDate(endDate);
-  };
+  // const handleDateChange = (startDate, endDate) => {
+  //   setStartDate(startDate);
+  //   setEndDate(endDate);
+  // };
 
   const  handleSheetDownload = async () => {
     console.log('bhutro')

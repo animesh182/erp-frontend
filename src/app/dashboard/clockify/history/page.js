@@ -8,22 +8,29 @@ import { startOfMonth } from 'date-fns';
 import { DollarSign, Hourglass, ListOrdered } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { columns } from './Columns';
+import { useDateRange } from '@/context/dateRangeContext/DateRangeContext';
 
 
 const ClockifyHistory = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [numberOfEntries, setNumberOfEntries] = useState(0);
   const [kpiData, setKpiData] = useState();
-  const initialEndDate = new Date(); 
-  const initialStartDate = startOfMonth(initialEndDate) 
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
+  // const initialEndDate = new Date(); 
+  // const initialStartDate = startOfMonth(initialEndDate) 
+  // const [startDate, setStartDate] = useState(initialStartDate);
+  // const [endDate, setEndDate] = useState(initialEndDate);
   const [isFirstLoad, setIsFirstLoad] = useState(true); 
 
-  const handleDateChange = (startDate, endDate) => {
-    setStartDate(startDate);
-    setEndDate(endDate);
+  const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
+
+  const handleDateChange = (newStartDate, newEndDate) => {
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
   };
+  // const handleDateChange = (startDate, endDate) => {
+  //   setStartDate(startDate);
+  //   setEndDate(endDate);
+  // };
 
 
   const fetchClockifyUsersReport = async (pageSize) => {
@@ -74,7 +81,7 @@ const ClockifyHistory = () => {
 
     <div className="flex justify-between">
       <h2 className="font-semibold text-2xl">Punch Clock History</h2>
-      {initialStartDate && initialEndDate && handleDateChange && (
+      {/* {initialStartDate && initialEndDate && handleDateChange && ( */}
                 <div>
                   <DateRangePicker
                     onDateChange={handleDateChange}
@@ -82,7 +89,7 @@ const ClockifyHistory = () => {
                     initialEndDate={endDate}
                   />
                 </div>
-              )}
+              {/* )} */}
               
               
 </div>

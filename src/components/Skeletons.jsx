@@ -21,7 +21,8 @@ export function RectangleSkeleton() {
 export function ProjectPageSkeletonCard() {
   return (
     <div className="flex flex-col space-y-3">
-      <Skeleton className="h-[400px] w-[1400px] rounded-xl" />
+      <Skeleton className="h-screen w-full rounded-xl" />
+      {/* <Skeleton className="h-[400px] w-[1400px] rounded-xl" /> */}
       {/* <div className="space-y-2">
         <Skeleton className="h-96 w-[850px]" />
         <Skeleton className="h-96 w-[850px]" />

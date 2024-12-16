@@ -6,6 +6,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/themeprovider";
 import { Toaster } from "@/components/ui/sonner";
 import { ClockifyProvider } from "@/context/clockifyContext/ClockifyContext";
+import { DateRangeProvider } from "@/context/dateRangeContext/DateRangeContext";
 
 export const metadata = {
   title: "Avinto",
@@ -22,9 +23,11 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
+           <DateRangeProvider>
           <ClockifyProvider>
           {children}
           </ClockifyProvider>
+          </DateRangeProvider>
           <Toaster />
         </ThemeProvider>
       </body>

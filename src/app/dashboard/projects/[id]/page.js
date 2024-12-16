@@ -14,6 +14,8 @@ import TabFilters from "@/components/TabFilters";
 import { isAfter } from "date-fns";
 import { getProjectById } from "@/app/api/projects/getProjects";
 import DateRangePicker from "@/components/DateRangePicker";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 
 export default function ProjectDetails() {
   const [project, setProject] = useState(null);
@@ -22,6 +24,12 @@ export default function ProjectDetails() {
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState('Ongoing');
   const { id } = useParams();
+    const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
+  
+    const handleDateChange = (newStartDate, newEndDate) => {
+      setStartDate(newStartDate);
+      setEndDate(newEndDate);
+    };
 
   // Function to determine resource status
   const getResourceStatus = (endDate) => {
@@ -90,7 +98,13 @@ export default function ProjectDetails() {
   return (
     <main className="p-6 min-h-screen space-y-4">
       <div className="flex justify-end">
-      {/* <DateRangePicker /> */}
+          <DateRangePicker
+                // numberOfMonths={2}
+                onDateChange={handleDateChange}
+                initialStartDate={startDate}
+                initialEndDate={endDate}
+                isMonthPicker={true}
+              />
       </div>
       <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
         <ProjectDetailsMain project={project} />
@@ -106,8 +120,9 @@ export default function ProjectDetails() {
           />
         )}
       </div>
-      <div>
-        <TableTitle
+      <div className="">
+        
+        {/* <TableTitle
           title="Resource Utilization"
           subtitle="List of all employees in the project"
           totalItemCount={filteredResources.length}
@@ -121,7 +136,47 @@ export default function ProjectDetails() {
           columns={columns}
           data={filteredResources}
           onDeleteRow={onDeleteRow}
+        /> */}
+             <Tabs defaultValue="utilization" className="mt-10">
+  <TabsList className="flex justify-start w-fit gap-4 h-fit">
+    <TabsTrigger value="utilization" className="flex items-center gap-2">
+    <h2 className="text-lg font-semibold">Resource Utilization</h2>
+      <span className="text-muted-foreground text-xs bg-green-400 text-white font-semibold rounded-full px-2 py-0">
+            {filteredResources?.length}
+          </span>
+    </TabsTrigger>
+    <TabsTrigger value="expense">
+    <h2 className="text-lg font-semibold">Resource Expense</h2>
+    </TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="utilization" className="mt-4">
+    <TableTitle
+      subtitle="List of all employees in the project"
+      // totalItemCount={filteredResources.length}
+    />
+           <TabFilters
+          filterValues={filterValues}
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
         />
+    <SimpleDataTable
+      columns={columns}
+      data={filteredResources}
+      onDeleteRow={onDeleteRow}
+    />
+  </TabsContent>
+
+  <TabsContent value="expense" className="mt-4">
+    <TableTitle
+      subtitle="List of expense of all employees in the project"
+    />
+    <div className="text-lg font-medium text-center">
+      Expense data will be available soon.
+    </div>
+  </TabsContent>
+</Tabs>
+
       </div>
     </main>
   );

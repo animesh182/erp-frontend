@@ -19,6 +19,7 @@ import { createClient } from "@/app/api/projects/createClient";
 import { deleteProject } from "@/app/api/projects/deleteProject";
 import { getProjectDetails } from "@/app/api/projects/getProjects";
 import { ProjectPageSkeletonCard, TitleSkeleton } from "@/components/Skeletons";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 
 export default function Projects() {
   const methods = useForm();
@@ -30,12 +31,18 @@ export default function Projects() {
   const [loading, setLoading] = useState(true);
 
   // Initialize date states
-  const initialStartDate = startOfMonth(new Date());
-  const initialEndDate = endOfMonth(new Date());
-  const [startDate, setStartDate] = useState(
-    format(initialStartDate, "yyyy-MM-dd")
-  );
-  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
+  // const initialStartDate = startOfMonth(new Date());
+  // const initialEndDate = endOfMonth(new Date());
+  // const [startDate, setStartDate] = useState(
+  //   format(initialStartDate, "yyyy-MM-dd")
+  // );
+  // const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
+    const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
+  
+    const handleDateChange = (newStartDate, newEndDate) => {
+      setStartDate(newStartDate);
+      setEndDate(newEndDate);
+    };
 
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
@@ -86,10 +93,10 @@ export default function Projects() {
     getClientsFromApi();
   }, [refreshKey, startDate, endDate]);
 
-  const handleDateChange = (startDate, endDate) => {
-    setStartDate(startDate);
-    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
-  };
+  // const handleDateChange = (startDate, endDate) => {
+  //   setStartDate(startDate);
+  //   setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
+  // };
 
   const handleProjectAdd = () => {
     setIsSheetOpen(true);

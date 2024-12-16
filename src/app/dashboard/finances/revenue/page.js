@@ -13,22 +13,29 @@ import { formInputs } from "./Inputs";
 import { editRevenue } from "@/app/api/revenue/editRevenue";
 import { deleteRevenue } from "@/app/api/revenue/deleteRevenue";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 
 export default function Revenue() {
   const methods = useForm();
   // Get first day of current month
-  const initialStartDate = startOfMonth(new Date());
-  // Get last day of current month
-  const initialEndDate = endOfMonth(new Date());
+  // const initialStartDate = startOfMonth(new Date());
+  // // Get last day of current month
+  // const initialEndDate = endOfMonth(new Date());
 
-  const [startDate, setStartDate] = useState(
-    format(initialStartDate, "yyyy-MM-dd")
-  );
-  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
+  // const [startDate, setStartDate] = useState(
+  //   format(initialStartDate, "yyyy-MM-dd")
+  // );
+  // const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [projectOptions, setProjectOptions] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
+    const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
+  
+    const handleDateChange = (newStartDate, newEndDate) => {
+      setStartDate(newStartDate);
+      setEndDate(newEndDate);
+    };
 
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
@@ -66,10 +73,10 @@ export default function Revenue() {
     }
   };
 
-  const handleDateChange = (startDate, endDate) => {
-    setStartDate(startDate);
-    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
-  };
+  // const handleDateChange = (startDate, endDate) => {
+  //   setStartDate(startDate);
+  //   setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
+  // };
 
   const onAddRow = async (newRowData) => {
     try {

@@ -231,7 +231,7 @@ const UsersHome = () => {
       title: "Time Allocated",
       value: (
         <div className="text-2xl">
-          {kpiInfo.total_time_allocated}{" "}
+          {kpiInfo?.total_time_allocated?.toFixed(1)}{" "}
           <span className="text-muted-foreground text-base">/8 hours</span>
         </div>
       ),

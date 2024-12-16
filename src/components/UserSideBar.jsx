@@ -48,7 +48,6 @@ export const navItems = [
 export default function AppSidebar({ userId ,userName }) {
   const logout = useLogout();
   const theme = useTheme();
-  console.log(theme);
   const handleLogout = () => {
     logout();
   };

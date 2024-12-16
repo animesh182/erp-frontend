@@ -12,18 +12,25 @@ import { getProjects } from "@/app/api/projects/getProjects";
 import { editExpense } from "@/app/api/expense/editExpense";
 import { deleteExpense } from "@/app/api/expense/deleteExpense";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 
 export default function Expenses() {
   const methods = useForm();
   // Get first day of current month
-  const initialStartDate = startOfMonth(new Date());
-  // Get last day of current month
-  const initialEndDate = endOfMonth(new Date());
+  // const initialStartDate = startOfMonth(new Date());
+  // // Get last day of current month
+  // const initialEndDate = endOfMonth(new Date());
 
-  const [startDate, setStartDate] = useState(
-    format(initialStartDate, "yyyy-MM-dd")
-  );
-  const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
+  // const [startDate, setStartDate] = useState(
+  //   format(initialStartDate, "yyyy-MM-dd")
+  // );
+  // const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
+    const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
+  
+    const handleDateChange = (newStartDate, newEndDate) => {
+      setStartDate(newStartDate);
+      setEndDate(newEndDate);
+    };
   const [data, setData] = useState([]); // State to hold the fetched data
   const [loading, setLoading] = useState(true); // Loading state
   const [projectOptions, setProjectOptions] = useState([]);
@@ -65,10 +72,10 @@ export default function Expenses() {
     }
   };
 
-  const handleDateChange = (startDate, endDate) => {
-    setStartDate(startDate);
-    setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
-  };
+  // const handleDateChange = (startDate, endDate) => {
+  //   setStartDate(startDate);
+  //   setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
+  // };
 
   const onAddRow = async (newRowData) => {
     try {

@@ -1,5 +1,4 @@
 "use client";
-import DateRangePicker from "@/components/DateRangePicker";
 import { FormRow } from "@/components/FormRow";
 import TabFilters from "@/components/TabFilters";
 import TableTitle from "@/components/TableTitle";
@@ -140,15 +139,6 @@ function ClockifyDataTable({
               </Button>
             ))}
             </div>
-              {initialStartDate && initialEndDate && onDateChange && (
-                <div>
-                  <DateRangePicker
-                    onDateChange={onDateChange}
-                    initialStartDate={initialStartDate}
-                    initialEndDate={initialEndDate}
-                  />
-                </div>
-              )}
             </div>
 
             <div className="w-full">
