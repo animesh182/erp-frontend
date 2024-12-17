@@ -13,7 +13,7 @@ export function KpiSkeleton({
 export function RectangleSkeleton() {
   return (
     <div className="flex flex-col ">
-      <Skeleton className="h-20 w-32 rounded-xl" />
+      <Skeleton className="h-[600px] w-full rounded-xl" />
     </div>
   );
 }

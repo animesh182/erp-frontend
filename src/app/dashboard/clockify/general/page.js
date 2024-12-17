@@ -43,6 +43,7 @@ const Clockify = () => {
   const[employeeClockifyDetails,setEmployeeClockifyDetails]=useState()
   const[clockifyProjects,setClockifyProjects]=useState()
   const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
+  const[projectColor,setProjectColor]=useState()
 
   const handleDateChange = (newStartDate, newEndDate) => {
     setStartDate(newStartDate);
@@ -121,7 +122,13 @@ const fetchProjectsWIthClockifyId=async()=>{
             const topProjects = data.groupOne
             .sort((a, b) => b.duration - a.duration)
               setProjects(topProjects);
-          
+
+
+              setProjectColor(topProjects.map((project)=>{
+                return {projectName:project.name,
+                        projectColor:project.color
+                }
+              }))
           } else {
               console.log("No projects found");
           }
@@ -129,7 +136,6 @@ const fetchProjectsWIthClockifyId=async()=>{
           console.error("Error fetching projects:", error);
       }
   };
-
 
   const fetchClockifyUsersReport = async () => {
     try {
@@ -142,13 +148,12 @@ const fetchProjectsWIthClockifyId=async()=>{
   
       if (data) {
         setInactiveUsers(data.timeentries);
+        //to send projects color to data table 
       }
     } catch (error) {
       console.error("Error fetching users:", error);
     }
   };
-
-
 
   const fetchClockifyUsersProjectsReport = async () => {
     try {
@@ -228,7 +233,7 @@ const clockifyTimeEntryProp={
       
 
       <ClockifyDataTable
-  columns={columns(barChartUser,format(startDate, "LLL dd, y"),format(endDate,"LLL dd y"))} 
+  columns={columns(barChartUser,format(startDate, "LLL dd, y"),format(endDate,"LLL dd y"),projectColor)} 
   data={allUsers}
   title={"Team Activities"}
   filterColumn={"status"}

@@ -36,11 +36,14 @@ function ClockifyBarChart({chartConfig,chartData}) {
     const total = chartData.reduce((acc, data) => {
         return acc + data.value;  // Accumulate the durations
     }, 0);
+
+   const maxTextLength=35;
         const chartDataWithPercentage = chartData.map(entry => ({
         ...entry,
-          percentage: (entry.value / total) * 100, // Calculate percentage
-          remaining: 100 - (entry.value / total) * 100 ,// Remaining percentage for black color
-        combinedLabel: `${entry.name}    \u00A0\u00A0\u00A0\u00A0 ${formatDuration(entry.value)}`
+          percentage: (entry.value / total) * 100, 
+          remaining: 100 - (entry.value / total) * 100 ,
+        // combinedLabel: `${entry.name}    \u00A0\u00A0\u00A0\u00A0 ${formatDuration(entry.value)}`
+        combinedLabel: `${entry.name?.length>maxTextLength?entry.name.substring(0, maxTextLength):entry.name}    \u00A0\u00A0\u00A0\u00A0 ${formatDuration(entry.value)}`
         }));
     
   return (
