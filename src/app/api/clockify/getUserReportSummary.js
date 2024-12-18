@@ -5,52 +5,83 @@ const REPORT_TYPES = {
     DETAILED_ENTRIES: 'detailedEntries'
 };
   
-export async function getUserReportSummary(start, end, pageSize, messageType) {
+export async function getUserReportSummary(start, end, pageSize=1000, messageType) {
+    const safePageSize = pageSize > 1000 ? 1000 : pageSize;
+    let allEntries = [];
+    let page = 1;
+    let lastUserDetails = null;
+
     try {
-        const response = await fetch(
-            `https://reports.api.clockify.me/v1/workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_ID}/reports/detailed`,
-        {
-          method: 'POST',
-          headers: {
-            'X-Api-Key': process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            dateRangeStart: start || "2024-11-11T00:00:00Z",
-            dateRangeEnd: end || "2024-11-19T23:59:59Z",
-            detailedFilter: {
-                groups: ["USER"],
-                pageSize: pageSize,
-            },
-            sortColumn: "DURATION",
-            rounding: false,
-            amountShown: "HIDE_AMOUNT"
-        }),
-    }
-);
-  
-      if (!response.ok) {
-        throw new Error(`Failed to fetch user detail with status: ${response.status}`);
-    }
+        while (true) {
+            const response = await fetch(
+                `https://reports.api.clockify.me/v1/workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_ID}/reports/detailed`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'X-Api-Key': process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        dateRangeStart: start || "2024-11-11T00:00:00Z",
+                        dateRangeEnd: end || "2024-11-19T23:59:59Z",
+                        detailedFilter: {
+                            groups: ["USER"],
+                            pageSize: safePageSize,
+                            page: page
+                        },
+                        sortColumn: "DURATION",
+                        rounding: false,
+                        amountShown: "HIDE_AMOUNT"
+                    }),
+                }
+            );
     
-    const userDetails = await response.json();
-    
-    // Transform data based on messageType
-    switch (messageType) {
-        case REPORT_TYPES.INACTIVE_USERS:
-            return transformInactiveUsersData(userDetails);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch user detail with status: ${response.status}`);
+            }
+            
+            const userDetails = await response.json();
+            lastUserDetails = userDetails;
+            
+            // If no time entries, we've reached the end
+            if (!userDetails.timeentries || userDetails.timeentries.length === 0) {
+                break;
+            }
+            
+            // Accumulate entries
+            allEntries = allEntries.concat(userDetails.timeentries);
+            // Check if we've fetched fewer entries than the page size, indicating last page
+            if (userDetails.timeentries.length < safePageSize) {
+                break;
+            }
+            
+            page++;
+        }
+        // Create a comprehensive result object
+        const combinedUserDetails = {
+            timeentries: allEntries,
+            totals: lastUserDetails?.totals || null
+        }
+        
+        // Transform data based on messageType
+        switch (messageType) {
+            case REPORT_TYPES.INACTIVE_USERS:
+                return transformInactiveUsersData(combinedUserDetails);
             case REPORT_TYPES.PROJECT_SUMMARY:
-                return transformProjectSummaryData(userDetails);
-                case REPORT_TYPES.DETAILED_ENTRIES:
-                    return transformDetailedEntriesData(userDetails);
-                    default:
-                        return userDetails;
-                    }
-                } catch (error) {
-                    console.error("Error fetching user detail:", error);
-                    throw new Error("Failed to fetch user detail");
+                return transformProjectSummaryData(combinedUserDetails);
+            case REPORT_TYPES.DETAILED_ENTRIES:
+                return transformDetailedEntriesData(combinedUserDetails);
+            default:
+                return combinedUserDetails;
+        }
+    } catch (error) {
+        console.error("Error fetching user detail:", error);
+        throw new Error("Failed to fetch user detail");
     }
 }
+
+
+
 
 function transformInactiveUsersData(data) {
     if (!data?.timeentries?.length) return null;
@@ -77,7 +108,6 @@ function transformInactiveUsersData(data) {
 
 function transformProjectSummaryData(data) {
     if (!data?.timeentries?.length) return null;
-    
     const userProjectsMap = {};
     data.timeentries.forEach((entry) => {
         const { userName, projectName, projectColor, timeInterval,userId } = entry;
@@ -90,7 +120,7 @@ function transformProjectSummaryData(data) {
           projects: [],
         };
     }
-    
+
     const existingProject = userProjectsMap[userName].projects.find(
         (project) => project.projectName === projectName
     );
@@ -107,13 +137,11 @@ function transformProjectSummaryData(data) {
         });
     }
     });
-    
     return Object.values(userProjectsMap);
 }
 
 function transformDetailedEntriesData(data) {
     if (!data) return null;
-    
     return {
         totals: data.totals,
         timeentries: data.timeentries?.map(users => ({
@@ -182,3 +210,6 @@ function formatMillisecondsToHourDifference(startTime, endTime) {
         return seconds === 1 ? "1 second ago" : `${seconds} seconds ago`;
     }
 }
+
+
+

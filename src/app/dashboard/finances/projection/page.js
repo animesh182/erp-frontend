@@ -179,13 +179,7 @@ export default function ProfitLoss() {
               selectedProject={selectedProject}
               onProjectSelect={setSelectedProject}
             />
-        {/* <DateRangePicker
-          // numberOfMonths={2}
-          onDateChange={handleDateChange}
-          initialStartDate={startDate}
-          initialEndDate={endDate}
-          isMonthPicker={true}
-        /> */}
+
 
         <YearPicker
                 initialYear={new Date().getFullYear()}

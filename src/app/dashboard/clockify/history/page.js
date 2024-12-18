@@ -1,3 +1,4 @@
+
 "use client"
 import { getUserReportSummary, REPORT_TYPES } from '@/app/api/clockify/getUserReportSummary';
 import DateRangePicker from '@/components/DateRangePicker';
@@ -10,16 +11,11 @@ import { useEffect, useState } from 'react';
 import { columns } from './Columns';
 import { useDateRange } from '@/context/dateRangeContext/DateRangeContext';
 
-
 const ClockifyHistory = () => {
   const [allUsers, setAllUsers] = useState([]);
-  const [numberOfEntries, setNumberOfEntries] = useState(0);
-  const [kpiData, setKpiData] = useState();
-  // const initialEndDate = new Date(); 
-  // const initialStartDate = startOfMonth(initialEndDate) 
-  // const [startDate, setStartDate] = useState(initialStartDate);
-  // const [endDate, setEndDate] = useState(initialEndDate);
-  const [isFirstLoad, setIsFirstLoad] = useState(true); 
+  const [numberOfEntries, setNumberOfEntries] = useState(1000); // Default to 1000
+  const [kpiData, setKpiData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
 
@@ -27,113 +23,105 @@ const ClockifyHistory = () => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
   };
-  // const handleDateChange = (startDate, endDate) => {
-  //   setStartDate(startDate);
-  //   setEndDate(endDate);
-  // };
 
-
-  const fetchClockifyUsersReport = async (pageSize) => {
+  const fetchClockifyUsersReport = async (pageSize = 1000) => {
     try {
+      setIsLoading(true);
       if (startDate && endDate) {
         const data = await getUserReportSummary(
           formatClockifyDate(startDate),
           formatClockifyDate(endDate),
-          pageSize,
+          1000,
           REPORT_TYPES.DETAILED_ENTRIES
         );
   
         if (data) {
           setKpiData(data.totals);
+          setAllUsers(data.timeentries);
           
-          if (isFirstLoad) {
-            const entriesCount = data.totals?.[0]?.entriesCount || 0;
-            setNumberOfEntries(entriesCount);
-            setIsFirstLoad(false);
-          } else {
-            setAllUsers(data.timeentries);
-          }
+          // Update number of entries if not set or if different
+          const entriesCount = data.totals?.entriesCount || pageSize;
+          setNumberOfEntries(entriesCount);
         }
       }
     } catch (error) {
       console.error("Error fetching users:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Refetch when date range changes
   useEffect(() => {
-    fetchClockifyUsersReport();
-  }, []); 
-
-  useEffect(() => {
-    if (numberOfEntries !== null && !isFirstLoad) {
-      fetchClockifyUsersReport(numberOfEntries); 
+    if (startDate && endDate) {
+      fetchClockifyUsersReport(numberOfEntries);
     }
-  }, [endDate,numberOfEntries]);
+  }, [endDate]);
 
-
-
-    const formatDuration = (durationInSeconds) => {
+  const formatDuration = (durationInSeconds) => {
     const hours = Math.floor(durationInSeconds / 3600).toString().padStart(2, "0");
-            return `${hours}`;
+    return `${hours}`;
   };
+
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-
-    <div className="flex justify-between">
-      <h2 className="font-semibold text-2xl">Punch Clock History</h2>
-      {/* {initialStartDate && initialEndDate && handleDateChange && ( */}
-                <div>
-                  <DateRangePicker
-                    onDateChange={handleDateChange}
-                    initialStartDate={startDate}
-                    initialEndDate={endDate}
-                  />
-                </div>
-              {/* )} */}
-              
-              
-</div>
-
-    <div className="flex gap-4 w-full">
-{ kpiData &&  ( 
-  <>  <KpiCard
-        title="Total Time"
-        value={` ${formatDuration(kpiData[0]?.totalTime)} hours`} // Pass the raw number
-        icon={<Hourglass className="h-4 w-4 text-muted-foreground" />}
-        isMoney={false}
-      />
-      <KpiCard
-        title="Number of Time Entries"
-        value={(kpiData[0]?.entriesCount)} // Pass the raw number
-        isMoney={false}
-        // change={Number(kpiData.changeInExpenses)} // Pass the raw percentage number
-        icon={<ListOrdered className="h-4 w-4 text-muted-foreground" />}
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
     
-      />
-      <KpiCard
-        title="Total Amount"
-        value={Number(kpiData[0]?.totalAmount)} // Pass the raw number
-        // change={Number(kpiData.changeInProfit)} // Pass the raw percentage number
-        icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
-      />
-      </>)}
+        <div className="flex justify-between">
+          <h2 className="font-semibold text-2xl">Punch Clock History</h2>
+          {/* {initialStartDate && initialEndDate && handleDateChange && ( */}
+                    <div>
+                      <DateRangePicker
+                        onDateChange={handleDateChange}
+                        initialStartDate={startDate}
+                        initialEndDate={endDate}
+                      />
+                    </div>
+                  {/* )} */}
+                  
+                  
     </div>
-    <div className=''>
-    {allUsers && (
-
-
-
-  <DataTable
-        title="Time Entries"
-        subtitle="The table captures time entries of all users associated with the company"
-        columns={columns()}
-        data={allUsers}
-        // maxHeight="max-h-[1000px]"
-      />
-)}
-</div>
-    </main>
-  )
+    
+        <div className="flex gap-4 w-full">
+    { kpiData &&  ( 
+      <>  <KpiCard
+            title="Total Time"
+            value={` ${formatDuration(kpiData[0]?.totalTime)} hours`} // Pass the raw number
+            icon={<Hourglass className="h-4 w-4 text-muted-foreground" />}
+            isMoney={false}
+          />
+          <KpiCard
+            title="Number of Time Entries"
+            value={(kpiData[0]?.entriesCount)} // Pass the raw number
+            isMoney={false}
+            // change={Number(kpiData.changeInExpenses)} // Pass the raw percentage number
+            icon={<ListOrdered className="h-4 w-4 text-muted-foreground" />}
+        
+          />
+          <KpiCard
+            title="Total Amount"
+            value={Number(kpiData[0]?.totalAmount)} // Pass the raw number
+            // change={Number(kpiData.changeInProfit)} // Pass the raw percentage number
+            icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
+          />
+          </>)}
+        </div>
+        <div className=''>
+        {allUsers && (
+    
+    
+    
+      <DataTable
+            title="Time Entries"
+            subtitle="The table captures time entries of all users associated with the company"
+            columns={columns()}
+            data={allUsers}
+            // maxHeight="max-h-[1000px]"
+          />
+    )}
+    </div>
+        </main>
+      )
+    
 }
 
 export default ClockifyHistory

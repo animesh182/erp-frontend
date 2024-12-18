@@ -22,7 +22,7 @@ const LatestActivityCell = ({ latest_activity, project_name ,projectColor}) => {
     : fullText;
 
   const isTruncated = fullText.length > 50;
-  const matchedProject = projectColor.find(
+  const matchedProject = projectColor?.find(
     (project) => project.projectName === project_name
   );
 
@@ -120,7 +120,6 @@ export const columns = (barChartUser,startDate,endDate,projectColor) => [
     header: `Total Time Tracked (${startDate}-${endDate})`,
     cell: ({ row }) => {
       const { user_id,user_name } = row.original;
-
       return (
         <div className="min-w-96">
           <ClockifyBarChart userName={user_name} userId={user_id} selected={barChartUser} />

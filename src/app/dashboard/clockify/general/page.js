@@ -147,6 +147,7 @@ const fetchProjectsWIthClockifyId=async()=>{
       );
   
       if (data) {
+
         setInactiveUsers(data.timeentries);
         //to send projects color to data table 
       }
@@ -154,7 +155,6 @@ const fetchProjectsWIthClockifyId=async()=>{
       console.error("Error fetching users:", error);
     }
   };
-
   const fetchClockifyUsersProjectsReport = async () => {
     try {
       const data = await getUserReportSummary(

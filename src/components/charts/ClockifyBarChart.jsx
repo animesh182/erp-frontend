@@ -37,7 +37,7 @@ function ClockifyBarChart({chartConfig,chartData}) {
         return acc + data.value;  // Accumulate the durations
     }, 0);
 
-   const maxTextLength=35;
+   const maxTextLength=25;
         const chartDataWithPercentage = chartData.map(entry => ({
         ...entry,
           percentage: (entry.value / total) * 100, 

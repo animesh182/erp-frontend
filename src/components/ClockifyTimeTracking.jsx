@@ -229,7 +229,6 @@ const ClockifyTimeEntry = React.memo(() => {
         fetchProjectsWithClockifyId();
     }, []);
 
-console.log(clockifyUserData,"sad")
     return (
         <>
         {clockifyUserData ? (

@@ -41,12 +41,48 @@ export default function Dashboard() {
   //   format(initialStartDate, "yyyy-MM-dd")
   // );
   // const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
-  const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-
+    const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
   const router = useRouter();
   useEffect(() => {
-    const getProfitLoss = async () => {
-      const { status, data } = await fetchProfitLoss(selectedProject);
+    const getKpiData = async () => {
+      const { status, data } = await fetchKpiData(
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd"),
+        selectedProject
+      );
+      if (status === 200) {
+        setFetchedKpiData(data);
+      } else {
+        console.error("Failed to fetch KPIs data");
+      }
+    };
+
+    const getResourceUtilData = async () => {
+      const { status, data } = await fetchReourceUtil(
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd"),
+        selectedProject
+      );
+
+      if (status === 200) {
+        const transformedData = data.map((user) => {
+          const userProjects = {};
+          user.projects.forEach((project) => {
+            userProjects[project.project_name] = project.utilization;
+          });
+          return {
+            name: user.user_name || "Unknown",
+            ...userProjects,
+          };
+        });
+        setResourceUtilData(transformedData);
+      } else {
+        console.error("Failed to fetch KPI data");
+      }
+    };
+
+        const getProfitLoss = async () => {
+      const { status, data } = await fetchProfitLoss(selectedProject,startDate.getFullYear());
       const monthAbbreviations = {
         January: "Jan",
         February: "Feb",
@@ -95,46 +131,6 @@ export default function Dashboard() {
       }
     };
     getProfitLoss();
-  }, [selectedProject]);
-
-  // console.log(profitLoss);
-  useEffect(() => {
-    const getKpiData = async () => {
-      const { status, data } = await fetchKpiData(
-        format(startDate, "yyyy-MM-dd"),
-        format(endDate, "yyyy-MM-dd"),
-        selectedProject
-      );
-      if (status === 200) {
-        setFetchedKpiData(data);
-      } else {
-        console.error("Failed to fetch KPIs data");
-      }
-    };
-
-    const getResourceUtilData = async () => {
-      const { status, data } = await fetchReourceUtil(
-        format(startDate, "yyyy-MM-dd"),
-        format(endDate, "yyyy-MM-dd"),
-        selectedProject
-      );
-
-      if (status === 200) {
-        const transformedData = data.map((user) => {
-          const userProjects = {};
-          user.projects.forEach((project) => {
-            userProjects[project.project_name] = project.utilization;
-          });
-          return {
-            name: user.user_name || "Unknown",
-            ...userProjects,
-          };
-        });
-        setResourceUtilData(transformedData);
-      } else {
-        console.error("Failed to fetch KPI data");
-      }
-    };
 
     getResourceUtilData();
     getKpiData();
@@ -282,17 +278,10 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    const fetchProjectsWIthClockifyId = async () => {
-      try {
-        const response = await getClockifyIdProjects(true);
 
-        setClockifyProjects(response);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      }
-    };
     const getOngoingProjects = async () => {
-      const { status, data } = await fetchOngoingProjects();
+      const { status, data } = await fetchOngoingProjects( format(startDate, "yyyy-MM-dd"),
+      format(endDate, "yyyy-MM-dd"),);
       if (status === 200) {
         setOngoingProjects(data.ongoing_projects);
         setCompletedProjects(data.completed_projects);
@@ -303,8 +292,21 @@ export default function Dashboard() {
     };
 
     getOngoingProjects();
+
+  }, [startDate,endDate]);
+
+  useEffect(()=>{
+    const fetchProjectsWIthClockifyId = async () => {
+      try {
+        const response = await getClockifyIdProjects(true);
+
+        setClockifyProjects(response);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
     fetchProjectsWIthClockifyId();
-  }, []);
+  },[])
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">

@@ -1,9 +1,9 @@
 import { apiClient } from "@/lib/utils";
 
-export async function fetchOngoingProjects() {
+export async function fetchOngoingProjects(startDate,endDate) {
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/ongoing_projects/`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/ongoing_projects/?start_date=${startDate}&end_date=${endDate}`
     );
 
     // Transform the response data
