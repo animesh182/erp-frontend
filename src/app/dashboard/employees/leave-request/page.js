@@ -10,15 +10,40 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { columns } from "./Columns";
 import { formInputs } from "./Inputs";
+import { LargeTitleSkeleton, ProjectPageSkeletonCard, TitleSkeleton } from "@/components/Skeletons";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { RequestForLeaveSheet } from "@/components/EditLeaveSheet";
+import { createEmployeeLeaveRequest } from "@/app/api/employees/createEmployeeLeaveRequest";
+import { useClockify } from "@/context/clockifyContext/ClockifyContext";
+import { getTypeOfLeave } from "@/app/api/typeOfLeave/getTypeOfLeave";
 
 const LeaveRequest = () => {
   const [employeeLeaveRequest, setEmployeeLeaveRequest] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedEmployee, setSelectedEmployee] = useState("");
-
+  const [loading, setLoading] = useState(true);
+  const [isSheetOpen, setSheetOpen] = useState(false);
+  const[typeOfLeave,setTypeOfLeave]=useState([])
+  const {clockifyUserData}=useClockify()
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
   }, []);
+
+    const handleAddLeaveRequest = async (formData) => {
+      if(clockifyUserData && clockifyUserData.id)
+      try {
+        const response = await createEmployeeLeaveRequest(formData, clockifyUserData.id);
+        toast.success("Leave Request added successfully");
+        refreshComponent();
+        setSheetOpen(false);
+      } catch (error) {
+        toast.error("Failed to create leave request");
+        console.error("Error creating leave request:", error.message);
+      }
+  
+      setSheetOpen(false);
+    };
 
   useEffect(() => {
     const getLeaveRecords = async () => {
@@ -33,8 +58,28 @@ const LeaveRequest = () => {
       } catch (error) {
         console.error("Error fetching employee details:", error);
       }
+      finally{
+        setLoading(false)
+      }
     };
 
+         const getLeaveTypes = async () => {
+            try {
+              const data = await getTypeOfLeave();
+      
+              if (data) {
+                setTypeOfLeave(data);
+              } else {
+                console.error("Failed to fetch leave data");
+              }
+            } catch (error) {
+              console.error("Error fetching leave types:", error);
+            }
+          };
+      
+          
+        
+          getLeaveTypes();
     getLeaveRecords();
   }, [refreshKey]);
 
@@ -91,24 +136,44 @@ const LeaveRequest = () => {
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2 items-center">
+      <Button
+          className="flex items-center justify-center gap-3 py-2 h-8"
+          onClick={() => setSheetOpen(true)}
+        >
+          <PlusCircle className="w-4" />
+          Request
+        </Button>
         <ComboboxEmployees 
           employeeNames={employeeNames} 
           onSelectEmployee={handleSelectEmployee}
         />
       </div>
+          {loading?
+                 <div className="space-y-4"> 
+                   <TitleSkeleton/>
+                   <ProjectPageSkeletonCard/>
+                   </div>
+                 :
       <DataTable
         title={"Leave Request"}
         subtitle={
           selectedEmployee 
             ? `Leave Requests for ${selectedEmployee}` 
-            : "View the list of employees assigned to the project along with their time utilization."
+            : "View the list of leave requests of employees ."
         }
         columns={columns(handleStatusUpdate)}
         data={transformedData}
         onDeleteRow={onDeleteLeaveRequest}
         formInputs={formInputs}
         filterColumn={"status"}
+      />
+}
+      <RequestForLeaveSheet
+        isOpen={isSheetOpen}
+        onClose={() => setSheetOpen(false)}
+        onSubmit={handleAddLeaveRequest}
+        data={typeOfLeave.data}
       />
     </main>
   );

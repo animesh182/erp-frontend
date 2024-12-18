@@ -80,3 +80,10 @@ export function TitleSkeleton() {
     </div>
   );
 }
+export function LargeTitleSkeleton() {
+  return (
+    <div className="flex flex-col ">
+      <Skeleton className="h-10 w-[400px] rounded-lg" />
+    </div>
+  );
+}

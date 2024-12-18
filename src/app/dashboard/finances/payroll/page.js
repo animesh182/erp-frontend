@@ -5,7 +5,7 @@ import { getPayrollKpi } from "@/app/api/finances/payroll/getPayrollKpi";
 import { updatePayroll } from "@/app/api/finances/payroll/updatePayroll";
 import { columns } from "@/app/dashboard/finances/payroll/Columns";
 import KpiCard from "@/components/kpicard";
-import { KpiSkeleton } from "@/components/Skeletons";
+import { KpiSkeleton, ProjectPageSkeletonCard } from "@/components/Skeletons";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
@@ -213,6 +213,9 @@ export default function Payroll() {
       </div>
 
       <FormProvider {...methods}>
+         {loading?
+                  <ProjectPageSkeletonCard/>
+                :
         <DataTable
           title={"Payroll"}
           subtitle="View and manage comprehensive salary details of all employees"
@@ -227,6 +230,7 @@ export default function Payroll() {
           loading={loading}
           isMonthPicker={true}
         />
+         }
       </FormProvider>
     </main>
   );

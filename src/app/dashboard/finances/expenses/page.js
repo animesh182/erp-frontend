@@ -1,18 +1,19 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
-import DataTable from "@/components/ui/data-table";
-import { columns } from "@/app/dashboard/finances/expenses/Columns";
-import { toast } from "sonner";
-import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
-import { format, startOfMonth, endOfMonth } from "date-fns";
-import { useForm, FormProvider } from "react-hook-form";
-import { getExpense } from "@/app/api/expense/getExpense";
 import { createExpense } from "@/app/api/expense/createExpense";
-import { getProjects } from "@/app/api/projects/getProjects";
-import { editExpense } from "@/app/api/expense/editExpense";
 import { deleteExpense } from "@/app/api/expense/deleteExpense";
+import { editExpense } from "@/app/api/expense/editExpense";
+import { getExpense } from "@/app/api/expense/getExpense";
+import { getProjects } from "@/app/api/projects/getProjects";
+import { columns } from "@/app/dashboard/finances/expenses/Columns";
+import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
+import { LargeTitleSkeleton, ProjectPageSkeletonCard } from "@/components/Skeletons";
+import DataTable from "@/components/ui/data-table";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { format } from "date-fns";
+import { useCallback, useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function Expenses() {
   const methods = useForm();
@@ -56,10 +57,12 @@ export default function Expenses() {
       );
       // console.log(fetchedData, "data");
       setData(fetchedData);
-      setLoading(false);
+      // setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setLoading(false);
+      // setLoading(false);
+    } finally{
+      setLoading(false)
     }
   };
 
@@ -116,6 +119,12 @@ export default function Expenses() {
         <UploadSheetDialog className="" isExpense={true} onRefresh={refreshComponent}/>
       </div>
       <FormProvider {...methods}>
+         {loading?
+                <div className="space-y-4"> 
+                  <LargeTitleSkeleton/>
+                  <ProjectPageSkeletonCard/>
+                  </div>
+                :
         <DataTable
           title={"Expenses"}
           subtitle={"List of all expenses in the company"}
@@ -134,6 +143,7 @@ export default function Expenses() {
           isMonthPicker={true}
           loading={loading}
         />
+         }
       </FormProvider>
     </main>
   );

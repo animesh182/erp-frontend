@@ -8,6 +8,7 @@ import { fetchTransactionKpi } from "@/app/api/kpiData/fetchTransactionKpi";
 import KpiCard from "@/components/kpicard";
 import { Activity, CreditCard, DollarSign } from "lucide-react";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { ProjectPageSkeletonCard } from "@/components/Skeletons";
 
 export default function Transactions() {
   // Get first day of current month
@@ -22,7 +23,7 @@ export default function Transactions() {
 
   // State to hold transaction data
   const [data, setData] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(true);
   // State to hold dynamic KPI data
   const [kpiData, setKpiData] = useState({
     total_revenue: "0",
@@ -103,6 +104,8 @@ export default function Transactions() {
       setData(fetchedData);
     } catch (error) {
       console.error("Error fetching transactions:", error);
+    } finally{
+      setIsLoading(false)
     }
   };
 
@@ -138,7 +141,9 @@ export default function Transactions() {
         />
       </div> */}
 
-      {/* DataTable for Transactions */}
+      {isLoading ? (
+    <ProjectPageSkeletonCard/>
+    ) : (
       <DataTable
         title="Transactions"
         subtitle="The table captures all cost streams associated with the company"
@@ -149,6 +154,9 @@ export default function Transactions() {
         initialEndDate={endDate}
         isMonthPicker={true}
       />
+    )}
+
+
     </main>
   );
 }

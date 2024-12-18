@@ -14,6 +14,7 @@ import { editRevenue } from "@/app/api/revenue/editRevenue";
 import { deleteRevenue } from "@/app/api/revenue/deleteRevenue";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { LargeTitleSkeleton, ProjectPageSkeletonCard } from "@/components/Skeletons";
 
 export default function Revenue() {
   const methods = useForm();
@@ -55,11 +56,13 @@ export default function Revenue() {
         format(endDate, "yyyy-MM-dd")
       );
       setData(fetchedData);
-      setLoading(false);
+      // setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to fetch revenue data");
-      setLoading(false);
+      // setLoading(false);
+    } finally{
+      setLoading(false)
     }
   };
 
@@ -117,6 +120,12 @@ export default function Revenue() {
         <UploadSheetDialog className="" isRevenue={true} onRefresh={refreshComponent}/>
       </div>
       <FormProvider {...methods}>
+        {loading?
+        <div className="space-y-4"> 
+          <LargeTitleSkeleton/>
+          <ProjectPageSkeletonCard/>
+          </div>
+        :
         <DataTable
           title={"Revenue"}
           subtitle={"List of all revenue in the company"}
@@ -135,6 +144,7 @@ export default function Revenue() {
           isMonthPicker={true}
           loading={loading}
         />
+}
       </FormProvider>
     </main>
   );

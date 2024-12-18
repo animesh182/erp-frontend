@@ -55,7 +55,8 @@
 
     return (
         <Dialog>
-        <DialogTrigger asChild>
+        <DialogTrigger >
+          
             <Badge className={`${color} cursor-pointer`}>
             {status || "No Data"}
             </Badge>

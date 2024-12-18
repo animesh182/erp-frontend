@@ -168,7 +168,7 @@ const LeaveRequest = () => {
       <DataTable
         title={"Leave Request"}
         subtitle={
-          "View the list of employees assigned to the project along with their time utilization."
+          "View your list of leave requests."
         }
         columns={columns}
         data={transformedData}

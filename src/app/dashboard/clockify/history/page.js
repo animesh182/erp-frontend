@@ -4,12 +4,12 @@ import { getUserReportSummary, REPORT_TYPES } from '@/app/api/clockify/getUserRe
 import DateRangePicker from '@/components/DateRangePicker';
 import KpiCard from '@/components/kpicard';
 import DataTable from '@/components/ui/data-table';
+import { useDateRange } from '@/context/dateRangeContext/DateRangeContext';
 import { formatClockifyDate } from '@/lib/utils';
-import { startOfMonth } from 'date-fns';
 import { DollarSign, Hourglass, ListOrdered } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { columns } from './Columns';
-import { useDateRange } from '@/context/dateRangeContext/DateRangeContext';
+import { KpiSkeleton, ProjectPageSkeletonCard } from '@/components/Skeletons';
 
 const ClockifyHistory = () => {
   const [allUsers, setAllUsers] = useState([]);
@@ -81,9 +81,17 @@ const ClockifyHistory = () => {
                   
     </div>
     
-        <div className="flex gap-4 w-full">
-    { kpiData &&  ( 
-      <>  <KpiCard
+         {/* <div className="flex gap-4 w-full"> */}
+        <div className="grid grid-cols-3 gap-4">
+    { isLoading ?
+     [...Array(3)].map((_, index) => (
+      <div key={index} >
+        <KpiSkeleton />
+      </div>
+    ))
+    :  ( 
+      <>
+      <KpiCard
             title="Total Time"
             value={` ${formatDuration(kpiData[0]?.totalTime)} hours`} // Pass the raw number
             icon={<Hourglass className="h-4 w-4 text-muted-foreground" />}
@@ -106,7 +114,8 @@ const ClockifyHistory = () => {
           </>)}
         </div>
         <div className=''>
-        {allUsers && (
+        {isLoading ?
+        <ProjectPageSkeletonCard/> :
     
     
     
@@ -117,7 +126,8 @@ const ClockifyHistory = () => {
             data={allUsers}
             // maxHeight="max-h-[1000px]"
           />
-    )}
+    }
+
     </div>
         </main>
       )
