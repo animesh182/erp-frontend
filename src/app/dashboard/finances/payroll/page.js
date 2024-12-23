@@ -1,5 +1,6 @@
 "use client";
 import { deletePayroll } from "@/app/api/finances/payroll/deletePayroll";
+import { getExcelPayroll } from "@/app/api/finances/payroll/getExcelPayroll";
 import { fetchPayroll } from "@/app/api/finances/payroll/getPayroll";
 import { getPayrollKpi } from "@/app/api/finances/payroll/getPayrollKpi";
 import { updatePayroll } from "@/app/api/finances/payroll/updatePayroll";
@@ -136,12 +137,11 @@ export default function Payroll() {
   // };
 
   const  handleSheetDownload = async () => {
-    console.log('bhutro')
     try{
       const response = await getExcelPayroll();
     }
-    catch{
-
+    catch{(error)
+      console.error("Error downloading the payroll sheet!")
     }
   };
 
