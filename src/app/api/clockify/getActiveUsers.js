@@ -56,7 +56,6 @@ function transformTimerEntryData(data, { clockifyUserData, clockifyProjects }) {
   //       u.userId === user.userId
   //   )
   // );
-
     const filteredData = data.filter(
     (user) => user.userId === clockifyUserData.clockify_user_id
   );
@@ -105,3 +104,24 @@ function transformUserListData(data, { employeeClockifyDetails, clockifyProjects
 }
 
 export { ACTIVE_USERS_TYPES };
+
+
+
+export const fetchActiveUserss = async (items) => {
+  const response = await fetch(
+    `https://api.clockify.me/api/v1/workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_ID}/time-entries/status/in-progress?page-size=${items}`,
+    {
+      method: 'GET',
+      headers: {
+        'X-Api-Key': process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch active users: ${response.status}`);
+  }
+
+  return response.json();
+};

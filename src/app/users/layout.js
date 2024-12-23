@@ -1,10 +1,14 @@
+"use client"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 
 export default function DashboardLayout({ children }) {
+  const queryclient= new QueryClient();
     return (
      <>
-    
-     {children}
+      <QueryClientProvider client={queryclient}>
+       {children}
+       </QueryClientProvider>
      </>
       );
     }

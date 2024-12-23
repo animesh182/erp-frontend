@@ -2,89 +2,56 @@
 
 "use client";
 
-import { deleteLeaveRequestById } from "@/app/api/employees/deleteLeaveRequest";
-import { getEmployeeLeaveRequest } from "@/app/api/employees/getEmployeeLeaveRequest";
+import { useEmployeeLeaveRequest, useTypeOfLeaves } from "@/app/hooks/employees/useEmployeeLeaveRequest";
+import { useAddLeaveRequest, useDeleteLeaveRequest, useUpdateLeaveRequestStatus } from "@/app/services/useEmployeeServices";
 import ComboboxEmployees from "@/app/users/leave-request/combobox";
+import { RequestForLeaveSheet } from "@/components/EditLeaveSheet";
+import { ProjectPageSkeletonCard, TitleSkeleton } from "@/components/Skeletons";
+import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useClockify } from "@/context/clockifyContext/ClockifyContext";
+import { PlusCircle } from "lucide-react";
+import { useCallback, useState } from "react";
 import { columns } from "./Columns";
 import { formInputs } from "./Inputs";
-import { LargeTitleSkeleton, ProjectPageSkeletonCard, TitleSkeleton } from "@/components/Skeletons";
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
-import { RequestForLeaveSheet } from "@/components/EditLeaveSheet";
-import { createEmployeeLeaveRequest } from "@/app/api/employees/createEmployeeLeaveRequest";
-import { useClockify } from "@/context/clockifyContext/ClockifyContext";
-import { getTypeOfLeave } from "@/app/api/typeOfLeave/getTypeOfLeave";
 
 const LeaveRequest = () => {
-  const [employeeLeaveRequest, setEmployeeLeaveRequest] = useState([]);
+  // const [employeeLeaveRequest, setEmployeeLeaveRequest] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedEmployee, setSelectedEmployee] = useState("");
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [isSheetOpen, setSheetOpen] = useState(false);
-  const[typeOfLeave,setTypeOfLeave]=useState([])
+  // const[typeOfLeave,setTypeOfLeave]=useState([])
   const {clockifyUserData}=useClockify()
+
+  const{data:employeeLeaveRequest,isLoading:loading}=useEmployeeLeaveRequest()
+  const{data:typeOfLeave}=useTypeOfLeaves()
+
+
+
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
   }, []);
 
-    const handleAddLeaveRequest = async (formData) => {
-      if(clockifyUserData && clockifyUserData.id)
-      try {
-        const response = await createEmployeeLeaveRequest(formData, clockifyUserData.id);
-        toast.success("Leave Request added successfully");
-        refreshComponent();
-        setSheetOpen(false);
-      } catch (error) {
-        toast.error("Failed to create leave request");
-        console.error("Error creating leave request:", error.message);
-      }
-  
+
+
+  const { mutate: updateStatus } = useUpdateLeaveRequestStatus();
+  const { mutate: onDeleteLeaveRequest } = useDeleteLeaveRequest();
+  const { mutate: addLeaveRequest } = useAddLeaveRequest({
+    onSuccess: () => {
       setSheetOpen(false);
-    };
+    }
+  });
 
-  useEffect(() => {
-    const getLeaveRecords = async () => {
-      try {
-        const data = await getEmployeeLeaveRequest();
-
-        if (data) {
-          setEmployeeLeaveRequest(data);
-        } else {
-          console.error("Failed to fetch employee data");
-        }
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      }
-      finally{
-        setLoading(false)
-      }
-    };
-
-         const getLeaveTypes = async () => {
-            try {
-              const data = await getTypeOfLeave();
-      
-              if (data) {
-                setTypeOfLeave(data);
-              } else {
-                console.error("Failed to fetch leave data");
-              }
-            } catch (error) {
-              console.error("Error fetching leave types:", error);
-            }
-          };
-      
-          
-        
-          getLeaveTypes();
-    getLeaveRecords();
-  }, [refreshKey]);
-
-  const transformedData = employeeLeaveRequest
-    .filter(leaveRequest => 
+  const handleAddLeaveRequest = (formData) => {
+    if (clockifyUserData?.id) {
+      addLeaveRequest({ 
+        formData: { ...formData, status: "Pending" },
+        userId: clockifyUserData.id 
+      });
+    }
+  };
+  const transformedData = employeeLeaveRequest.filter(leaveRequest => 
       !selectedEmployee || leaveRequest.username === selectedEmployee
     )
     .map((leaveRequest) => {
@@ -108,25 +75,9 @@ const LeaveRequest = () => {
     });
 
   const handleStatusUpdate = useCallback((id, newStatus) => {
-    setEmployeeLeaveRequest(prevData => 
-      prevData.map(item => 
-        item.id === id 
-          ? { ...item, status: newStatus }
-          : item
-      )
-    );
-  }, []);
+    updateStatus({ id, newStatus });
+  }, [updateStatus]);
 
-  const onDeleteLeaveRequest = async (leaveRequestId) => {
-    try {
-      const response = await deleteLeaveRequestById(leaveRequestId);
-      toast.success("Leave request deleted successfully");
-      refreshComponent();
-    } catch (error) {
-      toast.error("There was an error deleting the leave request");
-      console.error("There was an error deleting the leave request:", error);
-    }
-  };
 
   const employeeNames = [...new Set(employeeLeaveRequest.map((emp) => emp.username))];
 
@@ -150,11 +101,11 @@ const LeaveRequest = () => {
         />
       </div>
           {loading?
-                 <div className="space-y-4"> 
-                   <TitleSkeleton/>
-                   <ProjectPageSkeletonCard/>
-                   </div>
-                 :
+                  <div className="space-y-4"> 
+                    <TitleSkeleton/>
+                    <ProjectPageSkeletonCard/>
+                    </div>
+                  :
       <DataTable
         title={"Leave Request"}
         subtitle={

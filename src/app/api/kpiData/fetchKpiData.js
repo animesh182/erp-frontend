@@ -4,8 +4,9 @@ import { apiClient } from "@/lib/utils";
     try {
         if (startDate && endDate) {
         console.log("fetching data from", startDate, "to", endDate, "api");
+        const encodedProject = encodeURIComponent(project);
         const response = await apiClient(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/finance_kpis/?start_date=${startDate}&end_date=${endDate}&project=${project}`
+            `${process.env.NEXT_PUBLIC_API_URL}/api/finance_kpis/?start_date=${startDate}&end_date=${endDate}&project=${encodedProject}`
         );
         // Return the response data
         return { status: 200, data: response };

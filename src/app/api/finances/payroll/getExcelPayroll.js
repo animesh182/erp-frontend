@@ -2,7 +2,6 @@
 import Cookies from "js-cookie";
 
 export async function getExcelPayroll() {
-    console.log('hi')
       let token = Cookies.get("access_token");
       console.log('token',token)
 

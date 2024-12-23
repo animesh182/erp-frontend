@@ -20,12 +20,14 @@ import { deleteProject } from "@/app/api/projects/deleteProject";
 import { getProjectDetails } from "@/app/api/projects/getProjects";
 import { ProjectPageSkeletonCard, TitleSkeleton } from "@/components/Skeletons";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { useProjectDetails } from "@/app/hooks/projects/useProjects";
+import { useClients } from "@/app/hooks/client/useClients";
 
 export default function Projects() {
   const methods = useForm();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [projects, setProjects] = useState([]);
-  const [clients, setClients] = useState([]);
+  // const [projects, setProjects] = useState([]);
+  // const [clients, setClients] = useState([]);
   const [isCardLayout, setIsCardLayout] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -38,7 +40,8 @@ export default function Projects() {
   // );
   // const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-  
+    const{data:projects}=useProjectDetails()
+    const{data:clients}=useClients()
     const handleDateChange = (newStartDate, newEndDate) => {
       setStartDate(newStartDate);
       setEndDate(newEndDate);
@@ -56,47 +59,6 @@ export default function Projects() {
     }
   };
 
-  useEffect(() => {
-    const getProjectsFromApi = async () => {
-      try {
-        const { status, data } = await getProjectDetails();
-        if (status === 200) {
-          setProjects(data);
-        } else {
-          console.error("Failed to fetch project data");
-          toast.error("Failed to fetch project data");
-        }
-      } catch (error) {
-        console.error("Error fetching project details:", error);
-        toast.error("Error fetching project details");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const getClientsFromApi = async () => {
-      try {
-        const { status, data } = await getClients();
-        if (status === 200) {
-          setClients(data);
-        } else {
-          console.error("Failed to fetch client data");
-          toast.error("Failed to fetch client data");
-        }
-      } catch (error) {
-        console.error("Error fetching client details:", error);
-        toast.error("Error fetching client details");
-      }
-    };
-
-    getProjectsFromApi();
-    getClientsFromApi();
-  }, [refreshKey, startDate, endDate]);
-
-  // const handleDateChange = (startDate, endDate) => {
-  //   setStartDate(startDate);
-  //   setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
-  // };
 
   const handleProjectAdd = () => {
     setIsSheetOpen(true);

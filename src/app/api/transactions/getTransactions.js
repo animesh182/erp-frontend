@@ -10,23 +10,24 @@ export async function getTransactions(startDate, endDate) {
     );
     // console.log(response, "transactions");
     // Format the fetched data to match the required format
-    const formattedData = response.map((transaction) => ({
-      id: transaction.id,
-      name: transaction.name || "N/A",
-      projectName: transaction.project || "N/A",
-      invoice_no: transaction.invoice_no || "N/A",
-      invoiceIssuedDate: transaction.issued_date || null,
-      paidDate: transaction.payment_date || null,
-      status: transaction.payment_status || "N/A",
-      type: transaction.payment_type || "N/A",
-      amount: transaction.amount || "N/A",
-      transactionType: transaction.transaction_type || "N/A",
-      payment: transaction.payment || "0.00",
-      currency: transaction.currency || null,
-      createdAt: transaction.created_at || null,
-    }));
+    // const formattedData = response.map((transaction) => ({
+    //   id: transaction.id,
+    //   name: transaction.name || "N/A",
+    //   projectName: transaction.project || "N/A",
+    //   invoice_no: transaction.invoice_no || "N/A",
+    //   invoiceIssuedDate: transaction.issued_date || null,
+    //   paidDate: transaction.payment_date || null,
+    //   status: transaction.payment_status || "N/A",
+    //   type: transaction.payment_type || "N/A",
+    //   amount: transaction.amount || "N/A",
+    //   transactionType: transaction.transaction_type || "N/A",
+    //   payment: transaction.payment || "0.00",
+    //   currency: transaction.currency || null,
+    //   createdAt: transaction.created_at || null,
+    // }));
 
-    return formattedData;
+    // return formattedData;
+    return response;
   } catch (error) {
     throw new Error(error.message || "Failed to fetch transactions");
   }

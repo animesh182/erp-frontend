@@ -83,17 +83,6 @@ export const columns = (handleStatusUpdate) => [
     cell: ({ row }) => {
       const { status ,id } = row.original;
       return (
-        // <Badge
-        //   className={`${
-        //     status?.toLowerCase() === "approved"
-        //     ? "bg-green-100 text-green-800"
-        //     : status?.toLowerCase() === "pending"
-        //     ? "bg-orange-300 text-orange-600"
-        //     : "bg-red-100 text-red-800"
-        //   }`}
-        // >
-        //   {status ? status : "No Data"}
-        // </Badge>
         <UpdateStatus status={status} onStatusUpdate={handleStatusUpdate}  id={id} />
       );
     },

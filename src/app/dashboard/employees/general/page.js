@@ -20,17 +20,24 @@ import { getLevels } from "@/app/api/level/getLevels";
 import { getProjects } from "@/app/api/projects/getProjects";
 import { getEmployees } from "@/app/api/employees/getEmployees";
 import { deleteEmployeeById } from "@/app/api/employees/deleteEmployeeById";
+import { useRoles } from "@/app/hooks/employees/useRoles";
+import { useProjects } from "@/app/hooks/projects/useProjects";
+import { useLevels } from "@/app/hooks/employees/useLevels";
+import { useEmployees } from "@/app/hooks/employees/useEmployees";
 
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeTab, setActiveTab] = useState("employeeDetails");
-  const [employeeDetails, setEmployeeDetails] = useState(null);
-  const [roleOptions, setRoleOptions] = useState([]);
-  const [levelOptions, setLevelOptions] = useState([]);
-  const [projectOptions, setProjectOptions] = useState([]);
+  // const [employeeDetails, setEmployeeDetails] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const{data:roleOptions}=useRoles()
+  const{data:projectOptions}=useProjects(true)
+  const{data:levelOptions}=useLevels()
+
+  const{data:employeeDetails}=useEmployees(true)
+  
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
   }, []);
@@ -83,53 +90,7 @@ export default function Employees() {
     },
   ]);
 
-  const fetchRoles = async () => {
-    try {
-      const roles = await getRoles();
-      setRoleOptions(roles);
-    } catch (error) {
-      console.error("Error fetching roles:", error);
-    }
-  };
 
-  const fetchProjects = async () => {
-    try {
-      const projects = await getProjects(true);
-      setProjectOptions(projects);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    }
-  };
-
-  const fetchLevels = async () => {
-    try {
-      const levels = await getLevels();
-      setLevelOptions(levels);
-    } catch (error) {
-      console.error("Error fetching levels:", error);
-    }
-  };
-
-  useEffect(() => {
-    const getEmployeeDetails = async () => {
-      try {
-        const { status, data } = await getEmployees();
-        if (status === 200) {
-          setEmployeeDetails(data);
-        
-        } else {
-          console.error("Failed to fetch employee data");
-        }
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      } 
-    };
-
-    getEmployeeDetails();
-    fetchRoles();
-    fetchLevels();
-    fetchProjects();
-  }, [refreshKey]);
 
   const handleEmployeeAdd = () => {
     setIsSheetOpen(true);
@@ -274,6 +235,7 @@ export default function Employees() {
           </div>
         </div>
       </div>
+      
       <EditEmployeeSheet
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}

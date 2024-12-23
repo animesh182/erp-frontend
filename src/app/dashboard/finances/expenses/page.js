@@ -6,6 +6,8 @@ import { getExpense } from "@/app/api/expense/getExpense";
 import { getProjects } from "@/app/api/projects/getProjects";
 import { columns } from "@/app/dashboard/finances/expenses/Columns";
 import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
+import { useExpense } from "@/app/hooks/finances/useExpense";
+import { useProjects } from "@/app/hooks/projects/useProjects";
 import { LargeTitleSkeleton, ProjectPageSkeletonCard } from "@/components/Skeletons";
 import DataTable from "@/components/ui/data-table";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
@@ -17,68 +19,20 @@ import { toast } from "sonner";
 
 export default function Expenses() {
   const methods = useForm();
-  // Get first day of current month
-  // const initialStartDate = startOfMonth(new Date());
-  // // Get last day of current month
-  // const initialEndDate = endOfMonth(new Date());
-
-  // const [startDate, setStartDate] = useState(
-  //   format(initialStartDate, "yyyy-MM-dd")
-  // );
-  // const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
   
     const handleDateChange = (newStartDate, newEndDate) => {
       setStartDate(newStartDate);
       setEndDate(newEndDate);
     };
-  const [data, setData] = useState([]); // State to hold the fetched data
-  const [loading, setLoading] = useState(true); // Loading state
-  const [projectOptions, setProjectOptions] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
 
+    const{data:projectOptions}=useProjects(true)
+    const{data,isLoading:loading}=useExpense(format(startDate, "yyyy-MM-dd"),format(endDate, "yyyy-MM-dd"))
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
   }, []);
 
-  useEffect(() => {
-    if (startDate && endDate) {
-      fetchData(startDate, endDate);
-    }
-    fetchProjects();
-  }, [startDate, endDate, refreshKey]);
-
-  const fetchData = async (startDate, endDate) => {
-    // console.log("Fetching data from:", startDate, "to:", endDate);
-    try {
-      const fetchedData = await getExpense(
-        format(startDate, "yyyy-MM-dd"),
-        format(endDate, "yyyy-MM-dd")
-      );
-      // console.log(fetchedData, "data");
-      setData(fetchedData);
-      // setLoading(false);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      // setLoading(false);
-    } finally{
-      setLoading(false)
-    }
-  };
-
-  const fetchProjects = async () => {
-    try {
-      const projects = await getProjects(true);
-      setProjectOptions(projects);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    }
-  };
-
-  // const handleDateChange = (startDate, endDate) => {
-  //   setStartDate(startDate);
-  //   setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
-  // };
 
   const onAddRow = async (newRowData) => {
     try {

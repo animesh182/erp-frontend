@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/utils";
 
-export async function getProjects(formatData = false) {
+export async function getProjects() {
   try {
     const response = await apiClient(
       `${process.env.NEXT_PUBLIC_API_URL}/api/project`,
@@ -8,16 +8,6 @@ export async function getProjects(formatData = false) {
         method: "GET",
       }
     );
-
-    if (formatData) {
-      // Format the fetched data to match the required format
-      const formattedData = response.data.map((project) => ({
-        id: project.id,
-        name: project.name,
-      }));
-      return formattedData;
-    }
-
     return response;
   } catch (error) {
     throw new Error(error.message || "Failed to fetch projects");
@@ -27,7 +17,7 @@ export async function getProjects(formatData = false) {
 
 
 
-export async function getClockifyIdProjects(getAllProjects=false) {
+export async function getClockifyIdProjectsss(getAllProjects=false) {
   try {
     const response = await apiClient(
       `${process.env.NEXT_PUBLIC_API_URL}/api/project/project_clockify_id_list/`,
@@ -73,6 +63,22 @@ export async function getClockifyIdProjects(getAllProjects=false) {
     throw new Error(error.message || "Failed to fetch projects with clockify id");
   }
 }
+
+export async function getClockifyIdProjects() {
+  try {
+    const response = await apiClient(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/project/project_clockify_id_list/`,
+      {
+        method: "GET",
+      }
+    );
+    return response.data; // Just return raw data
+  } catch (error) {
+    throw new Error(error.message || "Failed to fetch projects with clockify ID");
+  }
+}
+
+
 
 
 export async function getProjectDetails() {

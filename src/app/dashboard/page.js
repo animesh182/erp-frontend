@@ -1,6 +1,4 @@
 "use client";
-import fetchReourceUtil from "@/app/api/dashboard/fetchResourceUtil";
-import { fetchKpiData } from "@/app/api/kpiData/fetchKpiData";
 import EmployeeMonthlyHours from "@/components/charts/EmployeeMonthlyHours";
 import DateRangePicker from "@/components/DateRangePicker";
 import KpiCard from "@/components/kpicard";
@@ -13,128 +11,32 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import { endOfMonth, format, startOfMonth } from "date-fns";
-import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { fetchProfitLoss } from "../api/dashboard/fetchProfitLoss";
-import { fetchOngoingProjects } from "../api/dashboard/getFinancialStatus";
-import { getClockifyIdProjects } from "../api/projects/getProjects";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { format } from "date-fns";
+import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useOngoingProjects } from "../hooks/dashboard/useOngoingProjects";
+import { useProfitLoss } from "../hooks/dashboard/useProfitLoss";
+import { useResourceUtil } from "../hooks/dashboard/useResourceUtil";
+import { useKpi } from "../hooks/kpiData/useKpiData";
+import { useClockifyProjects } from "../hooks/projects/useClockifyProjects";
 
 export default function Dashboard() {
-  const [profitLoss, setProfitLoss] = useState([]);
-  const [resourceUtilData, setResourceUtilData] = useState();
-  const [fetchedKpiData, setFetchedKpiData] = useState();
+  // const [profitLoss, setProfitLoss] = useState([]);
   const [kpiValues, setKpiValues] = useState();
-  const [ongoingProjects, setOngoingProjects] = useState([]);
-  const [completedProjects, setCompletedProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [clockifyProjects, setClockifyProjects] = useState();
+  // const [clockifyProjects, setClockifyProjects] = useState();
   const [selectedProject, setSelectedProject] = useState("");
 
-  // const initialStartDate = startOfMonth(new Date());
-  // const initialEndDate = endOfMonth(new Date());
-
-  // const [startDate, setStartDate] = useState(
-  //   format(initialStartDate, "yyyy-MM-dd")
-  // );
-  // const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-  const router = useRouter();
-  useEffect(() => {
-    const getKpiData = async () => {
-      const { status, data } = await fetchKpiData(
-        format(startDate, "yyyy-MM-dd"),
-        format(endDate, "yyyy-MM-dd"),
-        selectedProject
-      );
-      if (status === 200) {
-        setFetchedKpiData(data);
-      } else {
-        console.error("Failed to fetch KPIs data");
-      }
-    };
-
-    const getResourceUtilData = async () => {
-      const { status, data } = await fetchReourceUtil(
-        format(startDate, "yyyy-MM-dd"),
-        format(endDate, "yyyy-MM-dd"),
-        selectedProject
-      );
-
-      if (status === 200) {
-        const transformedData = data.map((user) => {
-          const userProjects = {};
-          user.projects.forEach((project) => {
-            userProjects[project.project_name] = project.utilization;
-          });
-          return {
-            name: user.user_name || "Unknown",
-            ...userProjects,
-          };
-        });
-        setResourceUtilData(transformedData);
-      } else {
-        console.error("Failed to fetch KPI data");
-      }
-    };
-
-        const getProfitLoss = async () => {
-      const { status, data } = await fetchProfitLoss(selectedProject,startDate.getFullYear());
-      const monthAbbreviations = {
-        January: "Jan",
-        February: "Feb",
-        March: "Mar",
-        April: "Apr",
-        May: "May",
-        June: "Jun",
-        July: "Jul",
-        August: "Aug",
-        September: "Sep",
-        October: "Oct",
-        November: "Nov",
-        December: "Dec",
-      };
-      if (status === 200 && Array.isArray(data.monthly_totals)) {
-        // Transform the data into the required format
-        const transformedData = data.monthly_totals.map((monthData) => {
-          const { month, net_income, expenses, profit } = monthData;
-          // Calculate profit percentage
-          const profitPercentage =
-            net_income > 0 ? (profit / net_income) * 100 : 0;
-
-          // Map month names to abbreviations
-
-          return {
-            name: monthAbbreviations[month], // Abbreviated month names
-            totalIncome: net_income,
-            expenses,
-            profit,
-            profitPercentage, // This now properly reflects negative profit cases
-          };
-        });
-
-        setProfitLoss(transformedData); // Set the transformed data to state
-      } else {
-        console.error("Failed to fetch profit-loss data");
-        toast.error("Failed to fetch profit-loss data ");
-        const defaultData = Object.values(monthAbbreviations).map((month) => ({
-          name: month,
-          totalIncome: 0,
-          expenses: 0,
-          profit: 0,
-          profitPercentage: 0,
-        }));
-        setProfitLoss(defaultData);
-      }
-    };
-    getProfitLoss();
-
-    getResourceUtilData();
-    getKpiData();
-  }, [startDate, endDate, selectedProject]);
+  
+    const formattedStartDate=format(startDate, "yyyy-MM-dd")
+    const formattedEndDate=format(endDate, "yyyy-MM-dd")
+    const { data:fetchedKpiData,error:kpiError,isError:kpiIsError,isLoading:kpiIsLoading } = useKpi( formattedStartDate,formattedEndDate, selectedProject);
+    const { data:resourceUtilData, error:utilError,isError:utilIsError, isLoading:utilIsLoading } = useResourceUtil(  formattedStartDate,formattedEndDate, selectedProject);
+    const { data:profitLoss, error:profitLossError,isError:profitLossIsError, isLoading:profitLossIsLoading } = useProfitLoss(  selectedProject,startDate?.getFullYear());
+    const { data:projects, error:projectsError,isError:projectsIsError, isLoading:projectsIsLoading } = useOngoingProjects(formattedStartDate,formattedEndDate);
+    const { data:clockifyProjects, error:clockifyProjectsError,isError:clockifyProjectsIsError, isLoading:clockifyProjectsIsLoading } = useClockifyProjects(true);
 
   useEffect(() => {
     if (fetchedKpiData) {
@@ -244,10 +146,6 @@ export default function Dashboard() {
     }
   }, [fetchedKpiData]); // This will trigger whenever kpiData is fetched
 
-  // const handleDateChange = (startDate, endDate) => {
-  //   setStartDate(startDate);
-  //   setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
-  // };
   const handleDateChange = (newStartDate, newEndDate) => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
@@ -277,36 +175,6 @@ export default function Dashboard() {
     );
   };
 
-  useEffect(() => {
-
-    const getOngoingProjects = async () => {
-      const { status, data } = await fetchOngoingProjects( format(startDate, "yyyy-MM-dd"),
-      format(endDate, "yyyy-MM-dd"),);
-      if (status === 200) {
-        setOngoingProjects(data.ongoing_projects);
-        setCompletedProjects(data.completed_projects);
-        console.log(data, "datasdasa");
-      } else {
-        console.error("Failed to fetch ongoing projects data");
-      }
-    };
-
-    getOngoingProjects();
-
-  }, [startDate,endDate]);
-
-  useEffect(()=>{
-    const fetchProjectsWIthClockifyId = async () => {
-      try {
-        const response = await getClockifyIdProjects(true);
-
-        setClockifyProjects(response);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      }
-    };
-    fetchProjectsWIthClockifyId();
-  },[])
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
@@ -348,11 +216,12 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      {profitLoss && projects &&
       <ProfitAnalysisMargin
         profitLoss={profitLoss}
-        ongoingProjects={ongoingProjects}
-        completedProjects={completedProjects}
-      />
+        ongoingProjects={projects.ongoingProjects}
+        completedProjects={projects.completedProjects}
+      />}
       <div className="grid grid-cols-5 gap-x-6 select-none">
         <Card className="col-span-5 select-none w-full overflow-hidden">
           <CardHeader className="flex-row justify-between items-center">
@@ -377,3 +246,6 @@ export default function Dashboard() {
     </main>
   );
 }
+
+
+
