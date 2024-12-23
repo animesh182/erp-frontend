@@ -27,58 +27,81 @@ const colorPalette = [
   "#4682B4",
 ];
 
-
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
+    const rawData = payload[0]?.payload.raw; // Access raw data from payload
     return (
       <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-1.5 py-0.5 text-xs shadow-xl">
         <p style={{ fontWeight: "bold", marginBottom: "5px" }}>{label}</p>
         {payload.map((entry, index) => {
-          const maxHour=7
-        const value=entry.value*maxHour/100;      //to convert back to normal value
-          return(
-          <div key={`item-${index}`} className="flex items-center gap-1">
-          <div
-                          className=
-                            "shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg] h-2.5 w-2.5"
-                          
-                          style={{
-                            "--color-bg": entry.fill,
-                            "--color-border": entry.fill,
-                          }}
-                        />
-            <span style={{ flexGrow: 1 }}>{entry.name}</span>
-            <span>{value.toFixed(2)}</span>
-            <span>({entry.value.toFixed(2)}%)</span>
-          </div>
-        )})}
+          const rawValue = rawData[entry.name] || 0; // Get raw value for the key
+          const percentageValue = entry.value; // Percentage value from processed data
+          return (
+            <div key={`item-${index}`} className="flex items-center gap-1">
+              <div
+                className="shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg] h-2.5 w-2.5"
+                style={{
+                  "--color-bg": entry.fill,
+                  "--color-border": entry.fill,
+                }}
+              />
+              <span style={{ flexGrow: 1 }}>{entry.name}</span>
+              <span>{rawValue.toFixed(2)} hrs</span> {/* Raw value */}
+              <span>({percentageValue.toFixed(2)}%)</span> {/* Percentage */}
+            </div>
+          );
+        })}
       </div>
     );
   }
   return null;
 };
 
-function calculateRemainingHours(item, maxHours = 8) {
+
+function calculateRemainingHours(item, maxHours = 7) {
   const totalCompleted = Object.keys(item)
     .filter((key) => key !== "name")
     .reduce((sum, key) => sum + item[key], 0);
   return maxHours - totalCompleted;
 }
 
-function convertHoursToPercentage(data = [], maxHours = 7) {
+
+// function convertHoursToPercentage(data = [], maxHours = 7) {
+//   if (!Array.isArray(data)) {
+//     return []; // Return an empty array if data is not an array
+//   }
+//   return data.map((item) => {
+//     const convertedItem = { ...item };
+//     Object.keys(item).forEach((key) => {
+//       if (key !== "name") {
+//         convertedItem[key] = (item[key] / maxHours) * 100; // Convert to percentage
+//       }
+//     });
+//     return convertedItem;
+//   });
+// }
+function convertHoursToPercentage(data = []) {
   if (!Array.isArray(data)) {
     return []; // Return an empty array if data is not an array
   }
+
   return data.map((item) => {
-    const convertedItem = { ...item };
+    const totalHours = Object.keys(item)
+      .filter((key) => key !== "name")
+      .reduce((sum, key) => sum + item[key], 0);
+
+    const convertedItem = { ...item, raw: { ...item } }; // Add raw data for tooltip access
+
     Object.keys(item).forEach((key) => {
       if (key !== "name") {
-        convertedItem[key] = (item[key] / maxHours) * 100; // Convert to percentage
+        convertedItem[key] = (item[key] / totalHours) * 100;
       }
     });
+
     return convertedItem;
   });
 }
+
 function generateChartConfig(rawData) {
   const projectNames = new Set();
   rawData.forEach((user) => {
@@ -102,6 +125,8 @@ function generateChartConfig(rawData) {
 export default function EmployeeMonthlyHours({ rawData }) {
   const chartConfig = useMemo(() => generateChartConfig(rawData), [rawData]);
   const data = useMemo(() => convertHoursToPercentage(rawData), [rawData]);
+
+
   if (!rawData) return <>Loading...</>;
   const CustomYAxisTick = ({ x, y, payload }) => {
     // console.log(payload, "payload");
@@ -133,7 +158,6 @@ export default function EmployeeMonthlyHours({ rawData }) {
       </g>
     );
   };
-
 
   return (
     <ChartContainer className="h-[800px] w-full" config={chartConfig}>
