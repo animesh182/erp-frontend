@@ -11,7 +11,7 @@
             DialogTitle,
             DialogTrigger,
             } from "@/components/ui/dialog"
-            import { useCallback, useState } from "react";
+            import { useCallback, useEffect, useState } from "react";
 
             const STATUS_CONFIG = {
             approved: { 
@@ -37,6 +37,9 @@
             export function UpdateStatus({ status, onStatusUpdate, id }) {
                 const [stat, setStat] = useState(status);
 
+                useEffect(() => {
+                    setStat(status);
+                }, [status]);
                 const handleStatusUpdate = useCallback(
                     (newStatus) => {
                     onStatusUpdate(id, newStatus);
@@ -52,7 +55,6 @@
             return (
                 <Dialog>
                 <DialogTrigger >
-                
                     <Badge className={`${color} cursor-pointer`}>
                     {stat || "No Data"}
                     </Badge>

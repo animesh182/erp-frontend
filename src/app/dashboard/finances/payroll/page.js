@@ -1,23 +1,19 @@
 "use client";
-import { deletePayroll } from "@/app/api/finances/payroll/deletePayroll";
 import { getExcelPayroll } from "@/app/api/finances/payroll/getExcelPayroll";
-import { fetchPayroll } from "@/app/api/finances/payroll/getPayroll";
-import { getPayrollKpi } from "@/app/api/finances/payroll/getPayrollKpi";
-import { updatePayroll } from "@/app/api/finances/payroll/updatePayroll";
 import { columns } from "@/app/dashboard/finances/payroll/Columns";
 import { usePayroll } from "@/app/hooks/finances/usePayroll";
 import { usePayrollKpi } from "@/app/hooks/kpiData/usePayrollKpi";
+import { useDeletePayroll, useEditPayroll } from "@/app/services/usePayrollServices";
 import KpiCard from "@/components/kpicard";
 import { KpiSkeleton, ProjectPageSkeletonCard } from "@/components/Skeletons";
 import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
-import { endOfMonth, format, startOfMonth } from "date-fns";
-import { CreditCard, DollarSign, Download } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { format } from "date-fns";
+import { Download } from "lucide-react";
+import { useCallback, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 export default function Payroll() {
   const methods = useForm();
@@ -27,7 +23,8 @@ export default function Payroll() {
 
     const{data,isLoading:loading}=usePayroll(  format(startDate, "yyyy-MM-dd"), format(endDate, "yyyy-MM-dd"))
     const{data:kpiValues}=usePayrollKpi()
-  
+    const{mutate:editPayroll}=useEditPayroll()
+    const{mutate:deletePayroll}=useDeletePayroll()
     const handleDateChange = (newStartDate, newEndDate) => {
       setStartDate(newStartDate);
       setEndDate(newEndDate);
@@ -48,41 +45,54 @@ export default function Payroll() {
   };
 
   const onEditRow = async (editedData) => {
-    try {
-      console.log("Edited data:", editedData);
+  //   try {
 
-      const updatedSalary = await updatePayroll(editedData.id, {
-        description: editedData.name,
-        invoice_issued_date: editedData.invoiceIssuedDate,
-        payment_date: editedData.paidDate,
-        payment_status: editedData.status === "paid" ? "Paid" : "Pending",
-        type: editedData.type,
-        amount: editedData.amount,
-      });
+  //     const updatedSalary = await updatePayroll(editedData.id, {
+  //       description: editedData.name,
+  //       invoice_issued_date: editedData.invoiceIssuedDate,
+  //       payment_date: editedData.paidDate,
+  //       payment_status: editedData.status === "paid" ? "Paid" : "Pending",
+  //       type: editedData.type,
+  //       amount: editedData.amount,
+  //     });
 
-      setData((prevData) =>
-        prevData.map((row) =>
-          row.id === updatedSalary.id ? updatedSalary : row
-        )
-      );
+  //     setData((prevData) =>
+  //       prevData.map((row) =>
+  //         row.id === updatedSalary.id ? updatedSalary : row
+  //       )
+  //     );
 
-      toast.success("Row updated successfully");
-      refreshComponent();
-    } catch (error) {
-      toast.error("Failed to update row");
-      console.error("Error updating row:", error.message);
-    }
-  };
+  //     toast.success("Row updated successfully");
+  //     refreshComponent();
+  //   } catch (error) {
+  //     toast.error("Failed to update row");
+  //     console.error("Error updating row:", error.message);
+  //   }
+  // }
+            try {
+              editPayroll(
+                {
+                  id: editedData.id,
+                  formData: { ...editedData},
+                },
+                {
+                  onSuccess: (updatedSalary) => {
+                    setData((prevData) =>
+                      prevData.map((row) =>
+                        row.id === updatedSalary.id ? updatedSalary : row
+                      )
+                    );
+                    refreshComponent();
+                  }
+                }
+              );
+            } catch (error) {
+              console.error("Error while updating row:", error.message);
+            }
+          };
 
   const onDeleteRow = async (id) => {
-    try {
-      await deletePayroll(id);
-      toast.success("Payroll deleted successfully");
-      refreshComponent();
-    } catch (error) {
-      toast.error("Failed to delete payroll");
-      console.error("Error deleting payroll:", error);
-    }
+    deletePayroll(id)
   };
 
   return (
@@ -115,7 +125,7 @@ export default function Payroll() {
       </div>
 
       <FormProvider {...methods}>
-         {loading?
+          {loading?
                   <ProjectPageSkeletonCard/>
                 :
         <DataTable

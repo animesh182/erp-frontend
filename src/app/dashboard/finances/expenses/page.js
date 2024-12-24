@@ -1,26 +1,21 @@
 "use client";
-import { createExpense } from "@/app/api/expense/createExpense";
-import { deleteExpense } from "@/app/api/expense/deleteExpense";
-import { editExpense } from "@/app/api/expense/editExpense";
-import { getExpense } from "@/app/api/expense/getExpense";
-import { getProjects } from "@/app/api/projects/getProjects";
 import { columns } from "@/app/dashboard/finances/expenses/Columns";
 import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
 import { useExpense } from "@/app/hooks/finances/useExpense";
 import { useProjects } from "@/app/hooks/projects/useProjects";
+import { useAddExpense, useDeleteExpense, useEditExpense } from "@/app/services/useExpenseServices";
 import { LargeTitleSkeleton, ProjectPageSkeletonCard } from "@/components/Skeletons";
 import DataTable from "@/components/ui/data-table";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 import { format } from "date-fns";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "sonner";
 
 export default function Expenses() {
   const methods = useForm();
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-  
+
     const handleDateChange = (newStartDate, newEndDate) => {
       setStartDate(newStartDate);
       setEndDate(newEndDate);
@@ -29,42 +24,40 @@ export default function Expenses() {
 
     const{data:projectOptions}=useProjects(true)
     const{data,isLoading:loading}=useExpense(format(startDate, "yyyy-MM-dd"),format(endDate, "yyyy-MM-dd"))
+    const{mutate:createExpense}=useAddExpense()
+    const{mutate:editExpense}=useEditExpense()
+    const{mutate:deleteExpense}=useDeleteExpense()
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
   }, []);
 
 
-  const onAddRow = async (newRowData) => {
-    try {
-      await createExpense(newRowData);
-      toast.success("New expense added");
-      refreshComponent();
-    } catch (error) {
-      toast.error("Failed to add new expense");
-      console.error("Error adding new expense:", error);
-    }
-  };
+    const onAddRow = async (newRowData) => {
+      createExpense(newRowData,
+      { onSuccess: () => {
+        refreshComponent()
+      }}
+      )
+    };
 
   const onEditRow = async (editedData) => {
-    try {
-      await editExpense(editedData.id, editedData);
-      toast.success("Expense updated successfully");
-      refreshComponent();
-    } catch (error) {
-      toast.error("Failed to update expense");
-      console.error("Error updating expense:", error);
-    }
+
+    const expenseId=editedData?.id
+    editExpense({
+      expenseId,
+      expenseData: editedData, 
+    },
+    { onSuccess: () => {
+      refreshComponent()
+      }});
   };
 
   const onDeleteRow = async (rowId) => {
-    try {
-      await deleteExpense(rowId);
-      toast.success("Expense deleted successfully");
-      refreshComponent();
-    } catch (error) {
-      toast.error("Failed to delete expense");
-      console.error("Error deleting expense:", error);
-    }
+    deleteExpense({expenseId:rowId},
+      { onSuccess: () => {
+        refreshComponent()
+        }}
+    )
   };
 
   return (
@@ -73,7 +66,7 @@ export default function Expenses() {
         <UploadSheetDialog className="" isExpense={true} onRefresh={refreshComponent}/>
       </div>
       <FormProvider {...methods}>
-         {loading?
+          {loading?
                 <div className="space-y-4"> 
                   <LargeTitleSkeleton/>
                   <ProjectPageSkeletonCard/>

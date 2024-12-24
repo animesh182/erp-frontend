@@ -14,18 +14,7 @@ import { columns } from "./Columns";
 import { getTypeOfLeave } from "@/app/api/typeOfLeave/getTypeOfLeave";
 
 const LeaveRequest = () => {
-  const [data, setData] = useState([
-    {
-      leaveReason: "Sick leave (Illness or Injury)",
-      startedLeaveDate: "2024-07-01",
-      endedLeaveDate: "2024-07-05",
-      numberOfLeaveDays: 5,
-      typeOfLeave: "Full Day",
-      status: "Approved",
-      detailedExplanation:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    },
-  ]);
+
 
   const [employeeLeaveRequest, setEmployeeLeaveRequest] = useState([]);
   const[typeOfLeave,setTypeOfLeave]=useState([])

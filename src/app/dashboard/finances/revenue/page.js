@@ -1,10 +1,8 @@
 "use client"; // This marks the component as a Client Component
 
-import { createRevenue } from "@/app/api/revenue/createRevenue";
-import { deleteRevenue } from "@/app/api/revenue/deleteRevenue";
-import { editRevenue } from "@/app/api/revenue/editRevenue";
 import { useRevenue } from "@/app/hooks/finances/useRevenue";
 import { useProjects } from "@/app/hooks/projects/useProjects";
+import { useAddRevenue, useDeleteRevenue, useEditRevenue } from "@/app/services/useRevenueServices";
 import { LargeTitleSkeleton, ProjectPageSkeletonCard } from "@/components/Skeletons";
 import DataTable from "@/components/ui/data-table";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
@@ -12,7 +10,6 @@ import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 import { format } from "date-fns";
 import { useCallback, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { columns } from "./Columns";
 import { formInputs } from "./Inputs";
 
@@ -22,6 +19,10 @@ export default function Revenue() {
   const [refreshKey, setRefreshKey] = useState(0);
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
   
+
+      const{mutate:createRevenue}=useAddRevenue()
+        const{mutate:editRevenue}=useEditRevenue()
+        const{mutate:deleteRevenue}=useDeleteRevenue()
     const handleDateChange = (newStartDate, newEndDate) => {
       setStartDate(newStartDate);
       setEndDate(newEndDate);
@@ -35,36 +36,38 @@ export default function Revenue() {
 
 
   const onAddRow = async (newRowData) => {
-    try {
-      await createRevenue(newRowData);
-      toast.success("New revenue added");
-      refreshComponent();
-    } catch (error) {
-      toast.error("Failed to add new revenue");
-      console.error("Error adding new revenue:", error);
-    }
+    createRevenue(newRowData,
+      { onSuccess: () => {
+        refreshComponent()
+      }}
+      )
   };
 
   const onEditRow = async (editedData) => {
-    try {
-      await editRevenue(editedData.id, editedData);
-      toast.success("Revenue updated successfully");
-      refreshComponent();
-    } catch (error) {
-      console.error("Error updating revenue:", error);
-      toast.error("Failed to update revenue");
-    }
+    const revenueId=editedData?.id
+    editRevenue({
+      revenueId,
+      revenueData: editedData, 
+    },
+    { onSuccess: () => {
+      refreshComponent()
+      }});
   };
 
   const onDeleteRow = async (rowId) => {
-    try {
-      await deleteRevenue(rowId);
-      toast.success("Revenue deleted successfully");
-      refreshComponent();
-    } catch (error) {
-      console.error("Error deleting revenue:", error);
-      toast.error("Failed to delete revenue");
-    }
+    // try {
+    //   await deleteRevenue(rowId);
+    //   toast.success("Revenue deleted successfully");
+    //   refreshComponent();
+    // } catch (error) {
+    //   console.error("Error deleting revenue:", error);
+    //   toast.error("Failed to delete revenue");
+    // }
+    deleteRevenue({revenueId:rowId},
+      { onSuccess: () => {
+        refreshComponent()
+        }}
+    )
   };
 
   return (

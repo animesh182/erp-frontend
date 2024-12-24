@@ -1,6 +1,7 @@
 "use client";
 
 import { editEmployee } from "@/app/api/employees/editEmployee";
+import { useEditEmployee } from "@/app/services/useEmployeeServices";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
 import { DetailsSkeleton, TitleSkeleton } from "@/components/Skeletons";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,7 @@ import { toast } from "sonner";
 
 const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions,setEmployeeDetails,onRefresh }) => {
   const [isEditSheetOpen, setIsEditSheetOpen] = useState(false);
-
+  const{mutate:editEmployee}=useEditEmployee()
   if (!employeeDetails) {
     return (
       <div className="flex flex-col space-y-4 p-6">
@@ -101,19 +102,18 @@ const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions,setEmpl
   const handleEditEmployee = async (formData) => {
     try {
       const employeeId = employeeDetails.id; 
-      const response = await editEmployee(employeeId, formData);
-      if (response.success) {
-              toast.success(response.success);
-              setEmployeeDetails((prevDetails) => ({
-                ...prevDetails,
-                ...formData,
-              }));
+        const updatedEmployee =  editEmployee({ employeeId, formData });
+
+        if (updatedEmployee.success) {
+          setEmployeeDetails((prevDetails) => ({
+            ...prevDetails,
+            ...formData,
+          }));
               if(onRefresh){
                 onRefresh()
               }
             }
     } catch (error) {
-      toast.error(error.message || "There was an error adding the employee");
     }
   };
 

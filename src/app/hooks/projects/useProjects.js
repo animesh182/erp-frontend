@@ -1,4 +1,4 @@
-import { getProjectDetails, getProjects } from '@/app/api/projects/getProjects';
+import { getProjectById, getProjectDetails, getProjects } from '@/app/api/projects/getProjects';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -46,3 +46,22 @@ import { toast } from 'sonner';
             },
             });
         };
+
+            export const useProjectById = (projectId) => {
+                return useQuery({
+                queryKey: ["project", projectId], // Include projectId in the key for uniqueness
+                queryFn: async () => {
+                    const response = await getProjectById(projectId);
+                    if (response.status === 200) {
+                    return response.data.data;
+                    } else {
+                    throw new Error(response.message || "Failed to fetch project data");
+                    }
+                },
+                onError: (error) => {
+                    toast.error(error.message || "Error fetching project details");
+                    console.error("Error fetching project details:", error);
+                },
+                enabled: !!projectId, 
+                });
+            };

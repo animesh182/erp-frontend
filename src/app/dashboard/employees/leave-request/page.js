@@ -11,31 +11,26 @@ import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
 import { useClockify } from "@/context/clockifyContext/ClockifyContext";
 import { PlusCircle } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { columns } from "./Columns";
 import { formInputs } from "./Inputs";
 
 const LeaveRequest = () => {
-  // const [employeeLeaveRequest, setEmployeeLeaveRequest] = useState([]);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [selectedEmployee, setSelectedEmployee] = useState("");
-  // const [loading, setLoading] = useState(true);
   const [isSheetOpen, setSheetOpen] = useState(false);
-  // const[typeOfLeave,setTypeOfLeave]=useState([])
   const {clockifyUserData}=useClockify()
-
+  
   const{data:employeeLeaveRequest,isLoading:loading}=useEmployeeLeaveRequest()
   const{data:typeOfLeave}=useTypeOfLeaves()
-
-
-
+  const [refreshKey, setRefreshKey] = useState(0);
   const refreshComponent = useCallback(() => {
     setRefreshKey((prevKey) => prevKey + 1);
   }, []);
 
 
 
-  const { mutate: updateStatus } = useUpdateLeaveRequestStatus();
+  const { mutate: updateStatus } = useUpdateLeaveRequestStatus()
+  
   const { mutate: onDeleteLeaveRequest } = useDeleteLeaveRequest();
   const { mutate: addLeaveRequest } = useAddLeaveRequest({
     onSuccess: () => {
@@ -75,8 +70,14 @@ const LeaveRequest = () => {
     });
 
   const handleStatusUpdate = useCallback((id, newStatus) => {
-    updateStatus({ id, newStatus });
-  }, [updateStatus]);
+    updateStatus({ id, newStatus },
+      {
+        onSuccess: () => {
+          refreshComponent()
+        }
+      }
+    );
+  }, [updateStatus,refreshComponent]);
 
 
   const employeeNames = [...new Set(employeeLeaveRequest.map((emp) => emp.username))];

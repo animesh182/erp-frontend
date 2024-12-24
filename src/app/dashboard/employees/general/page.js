@@ -24,6 +24,7 @@ import { useRoles } from "@/app/hooks/employees/useRoles";
 import { useProjects } from "@/app/hooks/projects/useProjects";
 import { useLevels } from "@/app/hooks/employees/useLevels";
 import { useEmployees } from "@/app/hooks/employees/useEmployees";
+import { useCreateEmployee, useDeleteEmployee } from "@/app/services/useEmployeeServices";
 
 export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -35,6 +36,7 @@ export default function Employees() {
   const{data:roleOptions}=useRoles()
   const{data:projectOptions}=useProjects(true)
   const{data:levelOptions}=useLevels()
+
 
   const{data:employeeDetails}=useEmployees(true)
   
@@ -90,7 +92,8 @@ export default function Employees() {
     },
   ]);
 
-
+const{mutate:addEmployee}=useCreateEmployee()
+const{mutate:deleteEmployee}=useDeleteEmployee()
 
   const handleEmployeeAdd = () => {
     setIsSheetOpen(true);
@@ -98,14 +101,8 @@ export default function Employees() {
 
   const onAddEmployee = async (formData) => {
     try {
-      const response = await createEmployee(formData);
-      toast.success("Employee added successfully");
-
-      const newEmployee = {
-        id: response.id,
-        ...formData,
-      };
-      setPayments([...payments, newEmployee]);
+      const newEmployee =  addEmployee({formData});
+      setPayments((prevPayments) => [...prevPayments, newEmployee]);
       setIsSheetOpen(false);
       refreshComponent();
     } catch (error) {
@@ -116,12 +113,10 @@ export default function Employees() {
 
   const onDeleteEmployee = async (id) => {
     try {
-      const response = await deleteEmployeeById(id);
-      toast.success("Employee deleted successfully");
+      deleteEmployee(id)
       refreshComponent();
     } catch (error) {
       console.error("Error deleting employee:", error);
-      toast.error("Failed to delete employee");
     }
   };
 

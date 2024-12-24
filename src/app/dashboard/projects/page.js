@@ -1,27 +1,21 @@
 "use client";
-import DataTable from "@/components/ui/data-table";
-import { LayoutGridIcon, List, PlusCircle } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
-import { projectColumns } from "./Columns";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import CardLayout from "./CardLayout";
-import { Button } from "@/components/ui/button";
-import { useForm, FormProvider } from "react-hook-form";
-import { formInputs } from "./Inputs";
-import { EditProjectSheet } from "@/components/EditProjectSheet";
-import { toast } from "sonner";
-import { AddClientDialog } from "@/components/AddClientDialog";
-import { getClients } from "@/app/api/projects/getClients";
-import { format, startOfMonth, endOfMonth } from "date-fns";
-import { createProject } from "@/app/api/projects/createProject";
-import { editProject } from "@/app/api/projects/editProject";
-import { createClient } from "@/app/api/projects/createClient";
-import { deleteProject } from "@/app/api/projects/deleteProject";
-import { getProjectDetails } from "@/app/api/projects/getProjects";
-import { ProjectPageSkeletonCard, TitleSkeleton } from "@/components/Skeletons";
-import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
-import { useProjectDetails } from "@/app/hooks/projects/useProjects";
 import { useClients } from "@/app/hooks/client/useClients";
+import { useProjectDetails } from "@/app/hooks/projects/useProjects";
+import { useCreateClient } from "@/app/services/useClientServices";
+import { useCreateProject, useDeleteProject, useEditProject } from "@/app/services/useProjectServices";
+import { AddClientDialog } from "@/components/AddClientDialog";
+import { EditProjectSheet } from "@/components/EditProjectSheet";
+import { ProjectPageSkeletonCard, TitleSkeleton } from "@/components/Skeletons";
+import { Button } from "@/components/ui/button";
+import DataTable from "@/components/ui/data-table";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { LayoutGridIcon, List, PlusCircle } from "lucide-react";
+import { useCallback, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import CardLayout from "./CardLayout";
+import { projectColumns } from "./Columns";
+import { formInputs } from "./Inputs";
 
 export default function Projects() {
   const methods = useForm();
@@ -42,6 +36,11 @@ export default function Projects() {
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
     const{data:projects}=useProjectDetails()
     const{data:clients}=useClients()
+
+    const{mutate:createProject}=useCreateProject()
+    const{mutate:editProject}=useEditProject()
+    const{mutate:deleteProject}=useDeleteProject()
+    const{mutate:createClient}=useCreateClient()
     const handleDateChange = (newStartDate, newEndDate) => {
       setStartDate(newStartDate);
       setEndDate(newEndDate);
@@ -66,50 +65,46 @@ export default function Projects() {
 
   const onAddProject = async (formData) => {
     try {
-      const response = await createProject(formData);
-      toast.success("Project added successfully");
-      refreshComponent();
-      setIsSheetOpen(false);
+      createProject({formData},
+        {   onSuccess: () => {
+              refreshComponent();
+              setIsSheetOpen(false);
+        }
+  }
+  )
     } catch (error) {
-      toast.error("Failed to add project");
       console.error("Error adding project:", error.message);
     }
   };
 
   const onEditProject = async (projectId, formData) => {
     try {
-      await editProject(projectId, formData);
-      toast.success("Project updated successfully");
-      refreshComponent();
-      setIsSheetOpen(false);
+      editProject({projectId,formData},
+        {   onSuccess: () => {
+          refreshComponent();
+          setIsSheetOpen(false);
+        }}
+      )
     } catch (error) {
-      toast.error("Failed to update project");
       console.error("Error updating project:", error.message);
     }
   };
 
   const onDeleteProject = async (projectId) => {
     try {
-      const response = await deleteProject(projectId);
-      if (response && response.message) {
-        toast.success(response.message);
+        deleteProject(projectId,
+          {   onSuccess: () => {
+        
         refreshComponent();
       }
+    })
     } catch (error) {
-      toast.error("There was an error deleting the project");
       console.error("There was an error deleting the project:", error);
     }
   };
 
   const handleClientAdd = async (formData) => {
-    try {
-      await createClient(formData);
-      toast.success("Client added successfully");
-      refreshComponent();
-    } catch (error) {
-      toast.error("There was an error adding the client");
-      console.error("Error adding client:", error.message);
-    }
+    createClient(formData)
   };
 
   return (

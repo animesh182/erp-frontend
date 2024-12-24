@@ -83,7 +83,7 @@ export const columns = (handleStatusUpdate) => [
     cell: ({ row }) => {
       const { status ,id } = row.original;
       return (
-        <UpdateStatus status={status} onStatusUpdate={handleStatusUpdate}  id={id} />
+        <UpdateStatus status={status} onStatusUpdate={handleStatusUpdate}  id={id}  />
       );
     },
     enableSorting: false,

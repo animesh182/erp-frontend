@@ -1,17 +1,15 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import React, { useState, useEffect } from "react";
-import { PlusCircle } from "lucide-react";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
-import AssignProjectForm from "./AssignProjectForm";
+import { useAssignProject, useDeleteAssignedProject, useEditAssignedProjects } from "@/app/services/useAssignProjectsServices";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
-import { ProjectCard } from "@/components/ProjectCard";
-import { assignProject } from "@/app/api/employees/assignProject";
-import { toast } from "sonner";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { deleteAssignedProject } from "@/app/api/employees/deleteAssignedProject";
-import { editAssignedProject } from "@/app/api/employees/editAssignedProject";
 import DeleteDialog from "@/components/DeleteDialog";
+import { ProjectCard } from "@/components/ProjectCard";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PlusCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import AssignProjectForm from "./AssignProjectForm";
 
 const ProjectsTab = ({
   employeeId,
@@ -26,7 +24,9 @@ const ProjectsTab = ({
   const [selectedProject, setSelectedProject] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
-
+  const{mutate:assignProjects}=useAssignProject()
+  const{mutate:editAssignedProjects}=useEditAssignedProjects()
+  const{mutate:deleteAssignedProject}=useDeleteAssignedProject()
   useEffect(() => {
     setLocalEmployeeProjects(employeeProjects || []);
   }, [employeeProjects]);
@@ -38,38 +38,45 @@ const ProjectsTab = ({
 
   const onAssignProject = async (values) => {
     try {
-      const response = await assignProject(employeeId, values);
-      console.log("Project assigned successfully:", response);
-      toast.success("Project assigned successfully");
-      setIsSheetOpen(false);
-
-      // Update the local state with the new project
-      setLocalEmployeeProjects((prevProjects) => [
-        ...prevProjects,
-        {
-          project_title: values.projectTitle,
-          project_name: values.projectName,
-          project_status: "Ongoing",
-          start_date: values.startDate,
-          end_date: values.endDate,
-          completion: 0,
-          utilization: values.utilization,
-          days_involved: 0,
-        },
-      ]);
+      assignProjects(
+          { 
+            employeeId, 
+            projectData: values 
+          },
+          {
+            onSuccess: () => {
+              setIsSheetOpen(false)
+              setLocalEmployeeProjects((prevProjects) => [
+                ...prevProjects,
+                {
+                  project_title: values.projectTitle,
+                  project_name: values.projectName,
+                  project_status: "Ongoing",
+                  start_date: values.startDate,
+                  end_date: values.endDate,
+                  completion: 0,
+                  utilization: values.utilization,
+                  days_involved: 0,
+                },
+              ]);
+            },
+          }
+        );
     } catch (error) {
       console.error("Failed to assign project:", error);
-      toast.error(error.message || "Failed to assign project");
     }
   };
 
   const onEditProject = async (userProjectId, values) => {
     try {
-      const response = await editAssignedProject(userProjectId, values);
-      toast.success("Project edited successfully");
+      editAssignedProjects(
+        {
+          userProjectId,
+          projectData: values
+        },
+      {
+        onSuccess: () => {
       setIsSheetOpen(false);
-
-      // Update local state with edited project data
       setLocalEmployeeProjects((prevProjects) =>
         prevProjects.map((project) =>
           project.user_project_id === userProjectId
@@ -84,7 +91,10 @@ const ProjectsTab = ({
             : project
         )
       );
-    } catch (error) {
+    }
+    })
+  }
+    catch (error) {
       toast.error(error.message || "Failed to edit project");
     }
   };
@@ -93,21 +103,18 @@ const ProjectsTab = ({
     setProjectToDelete(project);
     setIsDeleteDialogOpen(true);
   };
-
-  const onDeleteProject = async (userProjectId) => {
-    try {
-      const response = await deleteAssignedProject(userProjectId);
-      toast.success("Project deleted successfully");
-      setIsDeleteDialogOpen(false);
-      // Update local state to remove the deleted project
-      setLocalEmployeeProjects((prevProjects) =>
-        prevProjects.filter(
-          (project) => project.user_project_id !== userProjectId
-        )
-      );
-    } catch (error) {
-      toast.error(error.message || "Failed to delete project");
-    }
+  const onDeleteProject = (userProjectId) => {
+    deleteAssignedProject(userProjectId, {
+      onSuccess: () => {
+        setIsDeleteDialogOpen(false);
+        setLocalEmployeeProjects((prevProjects) =>
+          prevProjects.filter((project) => project.user_project_id !== userProjectId)
+        );
+      },
+      onError: (error) => {
+        console.error(error.message || "Failed to delete project");
+      },
+    });
   };
 
   if (!localEmployeeProjects) {

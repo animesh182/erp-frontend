@@ -9,11 +9,7 @@ export async function deleteAssignedProject(userProjectId) {
       }
     );
 
-    if (result === true) {
       return { success: true, message: "Project deleted successfully" };
-    } else {
-      throw new Error("Unexpected response from server");
-    }
   } catch (error) {
     console.error("Error deleting project:", error);
     return {

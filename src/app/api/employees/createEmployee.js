@@ -1,7 +1,6 @@
 import { apiClient } from "@/lib/utils";
 
 export async function createEmployee(employeeData) {
-  console.log(employeeData, "employeeData");
 
   // Transform the employeeData structure
   const transformedData = {

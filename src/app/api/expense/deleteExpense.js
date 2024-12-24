@@ -1,6 +1,6 @@
 import { deleteApiClient } from "@/lib/utils";
 
-export async function deleteExpense(expenseId) {
+export async function deleteExpense({expenseId}) {
   try {
     const result = await deleteApiClient(
       `${process.env.NEXT_PUBLIC_API_URL}/api/expense/${expenseId}`,

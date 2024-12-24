@@ -232,7 +232,7 @@ export function EditProjectSheet({
               children: (
                 <>
                   <SelectItem value="Not Started">Not Started</SelectItem>
-                  <SelectItem value="In Progress">Ongoing</SelectItem>
+                  <SelectItem value="Ongoing">Ongoing</SelectItem>
                   <SelectItem value="Done">Done</SelectItem>
                 </>
               ),
