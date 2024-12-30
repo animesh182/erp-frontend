@@ -21,7 +21,15 @@ import { toast } from "sonner";
 const formSchema = z.object({
   projectName: z.string().min(1, "Project is required"),
   role: z.string().min(1, "Role is required"),
-  timeAllocatedPerDay: z.coerce.number().int().min(1).max(12).positive(),
+  // timeAllocatedPerDay: z.coerce.number().int().min(1).max(12).positive(),
+  timeAllocatedPerDay: z.coerce
+  .number()
+  .min(0.1, "Time must be greater than 0.1")
+  .max(12, "Time cannot exceed 8 hours")
+  .refine((val) => val <= 8 && val >= 0.1, {
+    message: "Time must be between 0.1 and 8 hours",
+  }),
+
   startDate: z.string(),
   endDate: z.string().nullable().optional(),
 });
@@ -166,6 +174,8 @@ const AssignProjectForm = ({
 
           required: true,
         })}
+  
+
         {renderField("startDate", DatePicker, { required: true })}
         {renderField("endDate", DatePicker)}
 

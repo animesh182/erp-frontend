@@ -23,6 +23,9 @@ export default function ComboboxProjects({ projectNames, onSelectProject,prop })
       }
     };
 
+    const truncate = (text, length) => 
+      text.length > length ? text.substring(0, length) + "..." : text;
+
     return (
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
@@ -30,13 +33,21 @@ export default function ComboboxProjects({ projectNames, onSelectProject,prop })
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-[180px] justify-between"
+            className="w-[250px] justify-between"
           >
-            {value ? uniqueprojectNames.find((name) => name === value) :prop?prop: "Select project"}
+            {/* {value ? uniqueprojectNames.find((name) => name === value)?.substring(0, 25) :prop?prop: "Select project"} */}
+
+          {
+            value 
+              ? truncate(uniqueprojectNames.find((name) => name === value) || "", 25) 
+              : prop  
+              ? truncate(prop, 25) 
+              : "Select project"
+          }
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
+        <PopoverContent className="w-[250px] p-0">
           <Command>
             <CommandInput placeholder="Search project..." />
             <CommandList>

@@ -153,7 +153,7 @@ export default function Dashboard() {
 
   const renderKpiSection = (sectionData, skeletonCount) => {
     return (
-      <div className="space-y-2  w-11/12">
+      <div className="space-y-2  w-full">
         {kpiValues?.[sectionData] && kpiValues[sectionData].length > 0 && !kpiIsLoading
           ? kpiValues[sectionData].map((data, index) => (
               <KpiCard
@@ -196,21 +196,21 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-4 md:gap-8 ">
-        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-2">
+        <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4 ">
+          <div className="space-y-2 w-11/12">
             <h2 className="font-semibold text-xl text-center ">Actual</h2>
             {renderKpiSection("totalActualData", 3)}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 w-11/12">
             <h2 className="font-semibold text-xl text-center ">Invoiced</h2>
             {renderKpiSection("invoicedData", 3)}
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 w-11/12">
             <h2 className="font-semibold text-xl text-center">Budgeted</h2>
             {renderKpiSection("budgetedData", 3)}
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 w-11/12">
             <h2 className="font-semibold text-xl text-center">Others</h2>
             {renderKpiSection("otherData", 2)}
           </div>
