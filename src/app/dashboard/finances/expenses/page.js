@@ -2,8 +2,6 @@
 import { createExpense } from "@/app/api/expense/createExpense";
 import { deleteExpense } from "@/app/api/expense/deleteExpense";
 import { editExpense } from "@/app/api/expense/editExpense";
-import { getExpense } from "@/app/api/expense/getExpense";
-import { getProjects } from "@/app/api/projects/getProjects";
 import { columns } from "@/app/dashboard/finances/expenses/Columns";
 import { formInputs } from "@/app/dashboard/finances/expenses/Inputs";
 import { useExpense } from "@/app/hooks/finances/useExpense";
@@ -13,7 +11,6 @@ import DataTable from "@/components/ui/data-table";
 import { UploadSheetDialog } from "@/components/UploadSheetDialog";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 import { format } from "date-fns";
-import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -25,20 +22,15 @@ export default function Expenses() {
       setStartDate(newStartDate);
       setEndDate(newEndDate);
     };
-  const [refreshKey, setRefreshKey] = useState(0);
 
     const{data:projectOptions}=useProjects(true)
-    const{data,isLoading:loading}=useExpense(format(startDate, "yyyy-MM-dd"),format(endDate, "yyyy-MM-dd"))
-  const refreshComponent = useCallback(() => {
-    setRefreshKey((prevKey) => prevKey + 1);
-  }, []);
-
+    const{data,isLoading:loading,refetch:refetchExpense}=useExpense(format(startDate, "yyyy-MM-dd"),format(endDate, "yyyy-MM-dd"))
 
   const onAddRow = async (newRowData) => {
     try {
       await createExpense(newRowData);
       toast.success("New expense added");
-      refreshComponent();
+      refetchExpense()
     } catch (error) {
       toast.error("Failed to add new expense");
       console.error("Error adding new expense:", error);
@@ -49,7 +41,7 @@ export default function Expenses() {
     try {
       await editExpense(editedData.id, editedData);
       toast.success("Expense updated successfully");
-      refreshComponent();
+      refetchExpense()
     } catch (error) {
       toast.error("Failed to update expense");
       console.error("Error updating expense:", error);
@@ -60,7 +52,7 @@ export default function Expenses() {
     try {
       await deleteExpense(rowId);
       toast.success("Expense deleted successfully");
-      refreshComponent();
+      refetchExpense()
     } catch (error) {
       toast.error("Failed to delete expense");
       console.error("Error deleting expense:", error);
@@ -70,10 +62,10 @@ export default function Expenses() {
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="w-full flex justify-end">
-        <UploadSheetDialog className="" isExpense={true} onRefresh={refreshComponent}/>
+        <UploadSheetDialog className="" isExpense={true} onRefresh={refetchExpense}/>
       </div>
       <FormProvider {...methods}>
-         {loading?
+        {loading?
                 <div className="space-y-4"> 
                   <LargeTitleSkeleton/>
                   <ProjectPageSkeletonCard/>
@@ -97,7 +89,7 @@ export default function Expenses() {
           isMonthPicker={true}
           loading={loading}
         />
-         }
+        }
       </FormProvider>
     </main>
   );

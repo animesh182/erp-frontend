@@ -15,10 +15,6 @@ import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { EditEmployeeSheet } from "@/components/EditEmployeeSheet";
 import { createEmployee } from "@/app/api/employees/createEmployee";
-import { getRoles } from "@/app/api/role/getRoles";
-import { getLevels } from "@/app/api/level/getLevels";
-import { getProjects } from "@/app/api/projects/getProjects";
-import { getEmployees } from "@/app/api/employees/getEmployees";
 import { deleteEmployeeById } from "@/app/api/employees/deleteEmployeeById";
 import { useRoles } from "@/app/hooks/employees/useRoles";
 import { useProjects } from "@/app/hooks/projects/useProjects";
@@ -29,18 +25,13 @@ export default function Employees() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [activeTab, setActiveTab] = useState("employeeDetails");
-  // const [employeeDetails, setEmployeeDetails] = useState(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+
 
   const{data:roleOptions}=useRoles()
   const{data:projectOptions}=useProjects(true)
   const{data:levelOptions}=useLevels()
 
-  const{data:employeeDetails}=useEmployees(true)
-  
-  const refreshComponent = useCallback(() => {
-    setRefreshKey((prevKey) => prevKey + 1);
-  }, []);
+  const{data:employeeDetails,refetch:refetchEmployee}=useEmployees(true)
 
   const [payments, setPayments] = useState([
     {
@@ -107,7 +98,7 @@ export default function Employees() {
       };
       setPayments([...payments, newEmployee]);
       setIsSheetOpen(false);
-      refreshComponent();
+      refetchEmployee()
     } catch (error) {
       toast.error(error.message || "Failed to add employee");
       console.error("Error adding employee:", error);
@@ -118,7 +109,7 @@ export default function Employees() {
     try {
       const response = await deleteEmployeeById(id);
       toast.success("Employee deleted successfully");
-      refreshComponent();
+      refetchEmployee()
     } catch (error) {
       console.error("Error deleting employee:", error);
       toast.error("Failed to delete employee");
@@ -216,7 +207,7 @@ export default function Employees() {
                     levelOptions={levelOptions}
                     roleOptions={roleOptions}
                     setEmployeeDetails={setSelectedEmployee}
-                    onRefresh={refreshComponent}
+                    onRefresh={refetchEmployee}
                   />
                 </TabsContent>
                 <TabsContent value="projects">

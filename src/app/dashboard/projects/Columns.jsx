@@ -58,7 +58,7 @@ export const projectColumns = (clients) => [
     accessorKey: "project_status",
     header: "Status",
     cell: ({ row }) => {
-      const { project_status } = row.original; // Access the full row data
+      const { project_status } = row.original;// Access the full row data
       return (
         <Badge
           className={`${
@@ -79,7 +79,7 @@ export const projectColumns = (clients) => [
     accessorKey: "team",
     header: "Team",
     cell: ({ row }) => {
-      const { teamMembersImage, all_user_projects } = row.original; // Access the full row data
+      const {  all_user_projects } = row.original; // Access the full row data
       const teamMembers = all_user_projects.map((user) => ({
         name: user.user_name,
         image: null, // You can replace this with a proper avatar URL if available

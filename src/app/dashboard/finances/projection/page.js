@@ -5,6 +5,7 @@ import { useClockifyProjects } from "@/app/hooks/projects/useClockifyProjects";
 import ProfitLossChart from "@/components/charts/ProfitLoss";
 import KpiCard from "@/components/kpicard";
 import ComboboxProjectsWrapper from "@/components/ProjectComboBoxWrapper";
+import { RectangleSkeleton } from "@/components/Skeletons";
 import {
   Card,
   CardContent,
@@ -31,8 +32,6 @@ function getYearDateRange(year = new Date().getFullYear()) {
   return { startDate, endDate };
 }
 export default function ProfitLoss() {
-
-  // const [fetchedKpiData, setFetchedKpiData] = useState();
   const [kpiValues, setKpiValues] = useState();
    const [selectedProject, setSelectedProject] = useState("");
   const[selectedYear,setSelectedYear]=useState()
@@ -73,10 +72,9 @@ export default function ProfitLoss() {
     }
   }, [fetchedKpiData]); // This will trigger whenever kpiData is fetched
 
-  if(isLoading)return<div>loading...</div>
-
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+      {isLoading?<RectangleSkeleton isSmall={false}/> :
       <Card>
         <CardHeader className="flex-row justify-between items-center">
           <CardTitle className="flex justify-between w-full">
@@ -128,6 +126,7 @@ export default function ProfitLoss() {
           </div>
         </CardContent>
       </Card>
+}
     </main>
   );
 }

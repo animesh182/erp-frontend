@@ -19,7 +19,20 @@ export const columns = [
     accessorKey: "project_role",
     header: "Role",
     enableSorting: false,
+    cell: ({ row }) => {
+      const { user_role } = row.original;
+      return (
+        <div>
+        {user_role}
+        </div>
+      );
+    },
   },
+  // {
+  //   accessorKey: "project_role",
+  //   header: "Role",
+  //   enableSorting: false,
+  // },
   {
     accessorKey: "utilization",
     header: "Time Allocated",

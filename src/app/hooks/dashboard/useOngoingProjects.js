@@ -1,8 +1,9 @@
 
 import { fetchOngoingProjects } from '@/app/api/dashboard/getFinancialStatus';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
     export const useOngoingProjects = (startDate, endDate) => {
+        const queryClient = useQueryClient();
     return useQuery({
         queryKey: ["ongoingProjects", { startDate, endDate }],
         queryFn: async () => {
@@ -17,6 +18,14 @@ import { useQuery } from '@tanstack/react-query';
             throw new Error("Failed to fetch ongoing projects data");
             }
         },
-        // enabled: !!startDate && !!endDate, // Only fetch if dates are provided
-        });
-    };
+            //for animation instead of loading
+            // placeholderData: (previousData) => {
+            //     const currentData = queryClient.getQueryData(["ongoingProjects", { startDate, endDate }]);
+            //     return currentData || previousData || {
+            //     ongoingProjects: [],
+            //     completedProjects: []
+            //     };
+            // },
+            keepPreviousData: true,
+            });
+        };

@@ -1,9 +1,8 @@
 
+
 "use client";
-import React from "react";
-import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
 import LeaveRequestDropDown from "@/components/LeaveRequestDropDown";
+import { format } from "date-fns";
 import { UpdateStatus } from "./UpdateStatus";
 
 export const columns = (handleStatusUpdate) => [
@@ -83,6 +82,7 @@ export const columns = (handleStatusUpdate) => [
     cell: ({ row }) => {
       const { status ,id } = row.original;
       return (
+
         <UpdateStatus status={status} onStatusUpdate={handleStatusUpdate}  id={id} />
       );
     },

@@ -1,5 +1,6 @@
 
             "use client"
+            import { updateLeaveRequestStatus } from "@/app/api/employees/approveLeaveRequest";
             import { Badge } from "@/components/ui/badge"
             import { Button } from "@/components/ui/button"
             import {
@@ -11,8 +12,9 @@
             DialogTitle,
             DialogTrigger,
             } from "@/components/ui/dialog"
-            import { useCallback, useState } from "react";
-
+            import { useCallback } from "react";
+            import { toast } from "sonner";
+        
             const STATUS_CONFIG = {
             approved: { 
                 color: "bg-green-100 text-green-800", 
@@ -33,28 +35,30 @@
                 description: "Do you want to Approve or Decline the leave request?"
             }
             };
-
+        
             export function UpdateStatus({ status, onStatusUpdate, id }) {
-                const [stat, setStat] = useState(status);
-
-                const handleStatusUpdate = useCallback(
-                    (newStatus) => {
-                    onStatusUpdate(id, newStatus);
-                    setStat(newStatus)
-
-
-                    },
-                    [id, onStatusUpdate]
-                );
-            const normalizedStatus = stat?.toLowerCase() || "pending";
+            const handleStatusUpdate = useCallback(async (newStatus) => {
+                try {
+                const response = await updateLeaveRequestStatus(newStatus, id);
+                if (response?.message) {
+                    toast.success(response.message);
+                    onStatusUpdate?.(id, newStatus);
+                }
+                } catch (error) {
+                toast.error(`Failed to ${newStatus.toLowerCase()} leave request.`);
+                console.error(`Error ${newStatus.toLowerCase()} leave request:`, error);
+                }
+            }, [id, onStatusUpdate]);
+        
+            const normalizedStatus = status?.toLowerCase() || "pending";
             const { color, actions, description } = STATUS_CONFIG[normalizedStatus];
-
+        
             return (
                 <Dialog>
                 <DialogTrigger >
                 
                     <Badge className={`${color} cursor-pointer`}>
-                    {stat || "No Data"}
+                    {status || "No Data"}
                     </Badge>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
@@ -78,4 +82,3 @@
                 </Dialog>
             )
             }
-

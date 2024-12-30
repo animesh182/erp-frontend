@@ -1,9 +1,9 @@
 
-
 "use client";
 
+import { createEmployeeLeaveRequest } from "@/app/api/employees/createEmployeeLeaveRequest";
+import { deleteLeaveRequestById } from "@/app/api/employees/deleteLeaveRequest";
 import { useEmployeeLeaveRequest, useTypeOfLeaves } from "@/app/hooks/employees/useEmployeeLeaveRequest";
-import { useAddLeaveRequest, useDeleteLeaveRequest, useUpdateLeaveRequestStatus } from "@/app/services/useEmployeeServices";
 import ComboboxEmployees from "@/app/users/leave-request/combobox";
 import { RequestForLeaveSheet } from "@/components/EditLeaveSheet";
 import { ProjectPageSkeletonCard, TitleSkeleton } from "@/components/Skeletons";
@@ -12,46 +12,36 @@ import DataTable from "@/components/ui/data-table";
 import { useClockify } from "@/context/clockifyContext/ClockifyContext";
 import { PlusCircle } from "lucide-react";
 import { useCallback, useState } from "react";
+import { toast } from "sonner";
 import { columns } from "./Columns";
 import { formInputs } from "./Inputs";
 
 const LeaveRequest = () => {
-  // const [employeeLeaveRequest, setEmployeeLeaveRequest] = useState([]);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [selectedEmployee, setSelectedEmployee] = useState("");
-  // const [loading, setLoading] = useState(true);
   const [isSheetOpen, setSheetOpen] = useState(false);
-  // const[typeOfLeave,setTypeOfLeave]=useState([])
   const {clockifyUserData}=useClockify()
-
-  const{data:employeeLeaveRequest,isLoading:loading}=useEmployeeLeaveRequest()
-  const{data:typeOfLeave}=useTypeOfLeaves()
-
+  const{data:typeOfLeave,refetch:refetchType}=useTypeOfLeaves()
+  const{data:employeeLeaveRequest=[],isLoading:loading,refetch}=useEmployeeLeaveRequest()
 
 
-  const refreshComponent = useCallback(() => {
-    setRefreshKey((prevKey) => prevKey + 1);
-  }, []);
-
-
-
-  const { mutate: updateStatus } = useUpdateLeaveRequestStatus();
-  const { mutate: onDeleteLeaveRequest } = useDeleteLeaveRequest();
-  const { mutate: addLeaveRequest } = useAddLeaveRequest({
-    onSuccess: () => {
+    const handleAddLeaveRequest = async (formData) => {
+      if(clockifyUserData && clockifyUserData.id)
+      try {
+        const response = await createEmployeeLeaveRequest(formData, clockifyUserData.id);
+        toast.success("Leave Request added successfully");
+        refetch()
+        refetchType()
+        setSheetOpen(false);
+      } catch (error) {
+        toast.error("Failed to create leave request");
+        console.error("Error creating leave request:", error.message);
+      }
+  
       setSheetOpen(false);
-    }
-  });
+    };
 
-  const handleAddLeaveRequest = (formData) => {
-    if (clockifyUserData?.id) {
-      addLeaveRequest({ 
-        formData: { ...formData, status: "Pending" },
-        userId: clockifyUserData.id 
-      });
-    }
-  };
-  const transformedData = employeeLeaveRequest.filter(leaveRequest => 
+  const transformedData = employeeLeaveRequest
+    .filter(leaveRequest => 
       !selectedEmployee || leaveRequest.username === selectedEmployee
     )
     .map((leaveRequest) => {
@@ -75,9 +65,19 @@ const LeaveRequest = () => {
     });
 
   const handleStatusUpdate = useCallback((id, newStatus) => {
-    updateStatus({ id, newStatus });
-  }, [updateStatus]);
+    refetch()
+  }, []);
 
+  const onDeleteLeaveRequest = async (leaveRequestId) => {
+    try {
+      const response = await deleteLeaveRequestById(leaveRequestId);
+      toast.success("Leave request deleted successfully");
+     refetch()
+    } catch (error) {
+      toast.error("There was an error deleting the leave request");
+      console.error("There was an error deleting the leave request:", error);
+    }
+  };
 
   const employeeNames = [...new Set(employeeLeaveRequest.map((emp) => emp.username))];
 

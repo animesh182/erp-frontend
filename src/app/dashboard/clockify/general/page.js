@@ -1,24 +1,22 @@
+
 "use client"
-import { getClockifyProjectSummary } from "@/app/api/clockify/getClockifyProjects";
 import PieChartwithBarChart from "@/components/charts/PieChartwithBarChart";
 import { useEffect, useState } from "react";
 
-import { ACTIVE_USERS_TYPES, getActiveUsers } from "@/app/api/clockify/getActiveUsers";
-import { getUserReportSummary, REPORT_TYPES } from "@/app/api/clockify/getUserReportSummary";
-import { getEmployees } from "@/app/api/employees/getEmployees";
-import { getClockifyIdProjects } from "@/app/api/projects/getProjects";
+import { ACTIVE_USERS_TYPES } from "@/app/api/clockify/getActiveUsers";
+import { REPORT_TYPES } from "@/app/api/clockify/getUserReportSummary";
+import { useActiveUsers } from "@/app/hooks/clockify/useActiveUsers";
+import { useClockifyProjectSummary } from "@/app/hooks/clockify/useClockifyProjects";
+import { useUserReportSummary } from "@/app/hooks/clockify/useUserReportSummary";
+import { useEmployees } from "@/app/hooks/employees/useEmployees";
+import { useClockifyProjects } from "@/app/hooks/projects/useClockifyProjects";
 import ClockifyTimeEntry from "@/components/ClockifyTimeTracking";
 import DateRangePicker from "@/components/DateRangePicker";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 import { formatClockifyDate } from "@/lib/utils";
 import { format, startOfMonth } from "date-fns";
 import ClockifyDataTable from "./clockify-data-table";
 import { columns } from "./Columns";
-import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
-import { useEmployees } from "@/app/hooks/employees/useEmployees";
-import { useActiveUsers } from "@/app/hooks/clockify/useActiveUsers";
-import { useClockifyProjects } from "@/app/hooks/projects/useClockifyProjects";
-import { useClockifyProjectSummary } from "@/app/hooks/clockify/useClockifyProjects";
-import { useUserReportSummary } from "@/app/hooks/clockify/useUserReportSummary";
 
 
 
@@ -38,36 +36,64 @@ function combineUniqueUsers(activeUsers, inactiveUsers) {
 }
 
 const Clockify = () => {
+  const [projects, setProjects] = useState();
   const[allUsers,setAllUsers]=useState()
   const initialEndDate = new Date(); 
   const initialStartDate = startOfMonth(initialEndDate) 
   const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-  // const[projectColor,setProjectColor]=useState()
-  const date=new Date()
-  const oneMonthAgo = new Date(date);  
-  oneMonthAgo.setMonth(date.getMonth() - 1);
-  const oneDayAfter = new Date(date);  
-  oneDayAfter.setDate(date.getDate() + 1);
-
-      const { data:clockifyProjects, error:clockifyProjectsError,isError:clockifyProjectsIsError, isLoading:clockifyProjectsIsLoading } = useClockifyProjects(false);
-  const{data:employeeClockifyDetails}=useEmployees()
-  const{data:activeUsers}=useActiveUsers(employeeClockifyDetails?.length, ACTIVE_USERS_TYPES.USER_LIST, {
-    employeeClockifyDetails,
-      clockifyProjects
-  });
-
-  const{data:clockifyProjectSummary}=useClockifyProjectSummary(formatClockifyDate(startDate),formatClockifyDate(endDate))
-  const { projects, projectColor } = clockifyProjectSummary || {};
-
-  const{data:inactiveUsers}=useUserReportSummary(  formatClockifyDate(oneMonthAgo),formatClockifyDate(oneDayAfter),pageSize,REPORT_TYPES.INACTIVE_USERS)
-  const{data:barChartUser}=useUserReportSummary(  formatClockifyDate(oneMonthAgo),formatClockifyDate(oneDayAfter),pageSize,REPORT_TYPES.PROJECT_SUMMARY)
-
+  const[projectColor,setProjectColor]=useState()
 
   const handleDateChange = (newStartDate, newEndDate) => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
   };
 
+  const{data:clockifyProjects}=useClockifyProjects(true)
+const{data:employeeClockifyDetails}=useEmployees()
+  const { data:activeUsers,isLoading} = useActiveUsers({
+    items: employeeClockifyDetails?.length,
+    type: ACTIVE_USERS_TYPES.USER_LIST,
+    additionalData: {   employeeClockifyDetails,
+      clockifyProjects}, // Pass additional data if needed
+});
+
+const { data } = useClockifyProjectSummary({
+  startDate: formatClockifyDate(startDate),
+  endDate: formatClockifyDate(endDate),
+});
+
+
+const { data: { timeentries: inactiveUsers } = {} } = useUserReportSummary({
+  start: formatClockifyDate(startDate),
+  end: formatClockifyDate(endDate),
+  pageSize,
+  messageType: REPORT_TYPES.INACTIVE_USERS,
+});
+const { data:barChartUser} = useUserReportSummary({
+  start: formatClockifyDate(startDate),
+  end: formatClockifyDate(endDate),
+  pageSize,
+  messageType: REPORT_TYPES.PROJECT_SUMMARY,
+});
+
+
+
+const date=new Date()
+const oneMonthAgo = new Date(date);  
+oneMonthAgo.setMonth(date.getMonth() - 1);
+const oneDayAfter = new Date(date);  
+oneDayAfter.setDate(date.getDate() + 1);
+
+  useEffect(() => {
+    if (data && data.groupOne) {
+        const colors = data.groupOne.map((project) => ({
+            projectName: project.name,
+            projectColor: project.color,
+        }));
+        setProjectColor(colors);
+        setProjects(data.groupOne)
+    }
+  }, [data]);
 
 useEffect(() => {
 
@@ -102,9 +128,9 @@ const clockifyTimeEntryProp={
         <>
       <div>
         <PieChartwithBarChart className="" chartData={projects.map((project, index) => ({
-            name: project.projectName,
+            name: project.name,
             value: (project.duration),
-            color: project.projectColor
+            color: project.color
             
           }))} />
       </div>

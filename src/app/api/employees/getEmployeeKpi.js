@@ -5,6 +5,7 @@ export async function getEmployeeKpi(userId) {
       const response = await apiClient(
         `${process.env.NEXT_PUBLIC_API_URL}/api/user_dashboard_kpis/${userId}/`
       );
+      console.log(response,"resres")
       return  response;
     } catch (error) {
       return {

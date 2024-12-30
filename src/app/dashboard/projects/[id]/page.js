@@ -1,38 +1,38 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { deleteResourceUtilization } from "@/app/api/projects/deleteResourceUtilization";
+import { useProjectById } from "@/app/hooks/projects/useProjects";
+import DateRangePicker from "@/components/DateRangePicker";
+import TabFilters from "@/components/TabFilters";
+import TableTitle from "@/components/TableTitle";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import SimpleDataTable from "@/components/ui/simple-data-table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { isAfter } from "date-fns";
 import { useParams } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { columns } from "./Columns";
 import ProjectDetailsMain from "./ProjectDetailsMain";
 import ProjectDetailsSidebar from "./ProjectDetailsSidebar";
-import TableTitle from "@/components/TableTitle";
-import SimpleDataTable from "@/components/ui/simple-data-table";
-import { columns } from "./Columns";
-import { deleteResourceUtilization } from "@/app/api/projects/deleteResourceUtilization";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import TabFilters from "@/components/TabFilters";
-import { isAfter } from "date-fns";
-import { getProjectById } from "@/app/api/projects/getProjects";
-import DateRangePicker from "@/components/DateRangePicker";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { KpiSkeleton, ProjectPageSkeletonCard, RectangleSkeleton, SimpleSkeleton } from "@/components/Skeletons";
 
 export default function ProjectDetails() {
-  const [project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState('Ongoing');
   const { id } = useParams();
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-  
+    const{data:project,isLoading:loading,refetch:refetchProject}=useProjectById(id)
     const handleDateChange = (newStartDate, newEndDate) => {
       setStartDate(newStartDate);
       setEndDate(newEndDate);
     };
+  
 
-  // Function to determine resource status
+
   const getResourceStatus = (endDate) => {
     if (!endDate) return "Ongoing"; // No end date means ongoing
     
@@ -52,39 +52,18 @@ export default function ProjectDetails() {
     });
   };
 
-  useEffect(() => {
-    if (id) {
-      const fetchProjectDetails = async () => {
-        try {
-          const { status, data } = await getProjectById(id);
-          if (status === 200 && data) {
-            setProject(data.data);
-          } else {
-            setError(`Error: ${data.message}`);
-          }
-        } catch (err) {
-          setError("Failed to fetch project details");
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchProjectDetails();
-    }
-  }, [id]);
-
 
   const onDeleteRow = async (resourceId) => {
     try {
       await deleteResourceUtilization(resourceId);
       toast.success("Resource utilization deleted successfully");
+      refetchProject()
     } catch (error) {
       toast.error("Error deleting resource utilization");
       console.error("Error deleting resource utilization:", error);
     }
   };
 
-  // Filter values as simple string array
   const filterValues = [ 'Ongoing', 'Completed'];
 
   // Filter the resources based on selected tab
@@ -92,23 +71,36 @@ export default function ProjectDetails() {
     ? filterResourcesByStatus(project.all_user_projects, selectedTab) 
     : [];
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!project) return <div>No project found</div>;
+
 
   return (
-    <main className="p-6 min-h-screen space-y-4">
-      <div className="flex justify-end">
-          <DateRangePicker
-                // numberOfMonths={2}
-                onDateChange={handleDateChange}
-                initialStartDate={startDate}
-                initialEndDate={endDate}
-                isMonthPicker={true}
-              />
-      </div>
-      <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
-        <ProjectDetailsMain project={project} />
+
+
+              <main className="p-6 min-h-screen space-y-4">
+                <div className="flex justify-end">
+                    <DateRangePicker
+                          // numberOfMonths={2}
+                          onDateChange={handleDateChange}
+                          initialStartDate={startDate}
+                          initialEndDate={endDate}
+                          isMonthPicker={true}
+                        />
+                </div>
+                <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
+                {loading ? (
+            <div className="w-2/3 space-y-6">
+              <RectangleSkeleton isSmall />
+              <div className="flex gap-2">
+                {[...Array(4)].map((_, i) => (
+                  <SimpleSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+          )
+
+          
+          :
+              <ProjectDetailsMain project={project} />}
         {!isDescriptionOpen && (
           <Button onClick={() => setIsDescriptionOpen(true)} variant="outline">
             Description
@@ -121,23 +113,9 @@ export default function ProjectDetails() {
           />
         )}
       </div>
+      {loading?<ProjectPageSkeletonCard/>:
       <div className="">
         
-        {/* <TableTitle
-          title="Resource Utilization"
-          subtitle="List of all employees in the project"
-          totalItemCount={filteredResources.length}
-        />
-        <TabFilters
-          filterValues={filterValues}
-          selectedTab={selectedTab}
-          setSelectedTab={setSelectedTab}
-        />
-        <SimpleDataTable
-          columns={columns}
-          data={filteredResources}
-          onDeleteRow={onDeleteRow}
-        /> */}
         <Card>
              <Tabs defaultValue="utilization" className="mt-10">
               <CardHeader>
@@ -186,7 +164,7 @@ export default function ProjectDetails() {
 </Tabs>
 </Card>
 
-      </div>
+      </div>}
     </main>
   );
 }

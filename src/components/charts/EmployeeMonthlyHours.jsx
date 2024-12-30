@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import { useMemo } from "react";
@@ -16,69 +18,97 @@ import {
   ChartTooltip
 } from "@/components/ui/chart";
 import { UserCircleIcon } from "lucide-react";
+// const colorPalette = [
+//   "#4A90E2",
+//   "#E47CF5",
+//   "#F5A623",
+//   "#50E3C2",
+//   "#FF7F50",
+//   "#B22222",
+//   "#DAA520",
+//   "#4682B4",
+// ];
 const colorPalette = [
-  "#4A90E2",
-  "#E47CF5",
-  "#F5A623",
-  "#50E3C2",
-  "#FF7F50",
-  "#B22222",
-  "#DAA520",
-  "#4682B4",
+  "#7FB3D5", // Medium Blue
+  "#B39DDB", // Soft Purple
+  "#F5B041", // Warm Orange
+  "#48C9B0", // Teal
+  "#F1948A", // Coral Pink
+  "#E74C3C", // Vibrant Red
+  "#F4D03F", // Golden Yellow
+  "#5499C7", // Sky Blue
+  "#52BE80", // Medium Green
+  "#EC7063", // Soft Salmon
+  "#D7BDE2", // Lavender
+  "#F7DC6F", // Light Gold
+  "#76D7C4", // Bright Cyan
+  "#FAD7A0", // Peach
+  "#D98880", // Dusty Rose
+  "#A3E4D7", // Aqua
 ];
 
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
+    const rawData = payload[0]?.payload.raw; // Access raw data from payload
     return (
       <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-1.5 py-0.5 text-xs shadow-xl">
         <p style={{ fontWeight: "bold", marginBottom: "5px" }}>{label}</p>
         {payload.map((entry, index) => {
-          const maxHour=7
-        const value=entry.value*maxHour/100;      //to convert back to normal value
-          return(
-          <div key={`item-${index}`} className="flex items-center gap-1">
-          <div
-                          className=
-                            "shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg] h-2.5 w-2.5"
-                          
-                          style={{
-                            "--color-bg": entry.fill,
-                            "--color-border": entry.fill,
-                          }}
-                        />
-            <span style={{ flexGrow: 1 }}>{entry.name}</span>
-            <span>{value.toFixed(2)}</span>
-            <span>({entry.value.toFixed(2)}%)</span>
-          </div>
-        )})}
+          const rawValue = rawData[entry.name] || 0; // Get raw value for the key
+          const percentageValue = entry.value; // Percentage value from processed data
+          return (
+            <div key={`item-${index}`} className="flex items-center gap-1">
+              <div
+                className="shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg] h-2.5 w-2.5"
+                style={{
+                  "--color-bg": entry.fill,
+                  "--color-border": entry.fill,
+                }}
+              />
+              <span style={{ flexGrow: 1 }}>{entry.name}</span>
+              <span>{rawValue.toFixed(2)} hrs</span> {/* Raw value */}
+              <span>({percentageValue.toFixed(2)}%)</span> {/* Percentage */}
+            </div>
+          );
+        })}
       </div>
     );
   }
   return null;
 };
 
-function calculateRemainingHours(item, maxHours = 8) {
+
+function calculateRemainingHours(item, maxHours = 7) {
   const totalCompleted = Object.keys(item)
     .filter((key) => key !== "name")
     .reduce((sum, key) => sum + item[key], 0);
   return maxHours - totalCompleted;
 }
 
-function convertHoursToPercentage(data = [], maxHours = 7) {
+
+function convertHoursToPercentage(data = []) {
   if (!Array.isArray(data)) {
     return []; // Return an empty array if data is not an array
   }
+
   return data.map((item) => {
-    const convertedItem = { ...item };
+    const totalHours = Object.keys(item)
+      .filter((key) => key !== "name")
+      .reduce((sum, key) => sum + item[key], 0);
+
+    const convertedItem = { ...item, raw: { ...item } }; // Add raw data for tooltip access
+
     Object.keys(item).forEach((key) => {
       if (key !== "name") {
-        convertedItem[key] = (item[key] / maxHours) * 100; // Convert to percentage
+        convertedItem[key] = (item[key] / totalHours) * 100;
       }
     });
+
     return convertedItem;
   });
 }
+
 function generateChartConfig(rawData) {
   const projectNames = new Set();
   rawData.forEach((user) => {
@@ -102,6 +132,8 @@ function generateChartConfig(rawData) {
 export default function EmployeeMonthlyHours({ rawData }) {
   const chartConfig = useMemo(() => generateChartConfig(rawData), [rawData]);
   const data = useMemo(() => convertHoursToPercentage(rawData), [rawData]);
+
+
   if (!rawData) return <>Loading...</>;
   const CustomYAxisTick = ({ x, y, payload }) => {
     // console.log(payload, "payload");
@@ -133,7 +165,6 @@ export default function EmployeeMonthlyHours({ rawData }) {
       </g>
     );
   };
-
 
   return (
     <ChartContainer className="h-[800px] w-full" config={chartConfig}>

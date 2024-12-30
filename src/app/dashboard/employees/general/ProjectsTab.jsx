@@ -30,7 +30,6 @@ const ProjectsTab = ({
   useEffect(() => {
     setLocalEmployeeProjects(employeeProjects || []);
   }, [employeeProjects]);
-
   const openSheet = (project = null) => {
     setSelectedProject(project);
     setIsSheetOpen(true);
@@ -42,8 +41,8 @@ const ProjectsTab = ({
       console.log("Project assigned successfully:", response);
       toast.success("Project assigned successfully");
       setIsSheetOpen(false);
-
-      // Update the local state with the new project
+      console.log(values,"valuse")
+      // Update t he local state with the new project
       setLocalEmployeeProjects((prevProjects) => [
         ...prevProjects,
         {
@@ -53,7 +52,7 @@ const ProjectsTab = ({
           start_date: values.startDate,
           end_date: values.endDate,
           completion: 0,
-          utilization: values.utilization,
+          utilization: values.timeAllocatedPerDay,
           days_involved: 0,
         },
       ]);

@@ -47,8 +47,6 @@ function transformTimerEntryData(data, { clockifyUserData, clockifyProjects }) {
     });
     return null;
   }
-
-
   // const filteredData = data.filter(
   //   (user) => users.some(
   //     // (u) => u.userName === clockifyTimeEntryProp.userName &&
@@ -82,14 +80,12 @@ function transformTimerEntryData(data, { clockifyUserData, clockifyProjects }) {
 
 function transformUserListData(data, { employeeClockifyDetails, clockifyProjects }) {
   if (!data?.length) return null;
-  const validClockifyProjects = clockifyProjects.filter((project) => project.projectId); //excluded the project with projectId= null
+  // const validClockifyProjects = clockifyProjects.filter((project) => project.clockify_id); 
+  const validClockifyProjects = clockifyProjects.filter((project) => project.projectId); 
   return data
     .map((user) => {
       const matchedUser = employeeClockifyDetails.find((u) => u.userId === user.userId);
       const matchedProjects =validClockifyProjects.find((project) => project.projectId === user.projectId);
-      // if (!matchedProjects) return null;
-
-
       return {
         user_name: matchedUser?.userName || "Unknown User",
         user_email: matchedUser?.userEmail || "Unknown User",

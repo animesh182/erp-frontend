@@ -5,7 +5,7 @@ import { apiClient } from "@/lib/utils";
         const response = await apiClient(
         `${process.env.NEXT_PUBLIC_API_URL}/api/invoiced_salary/${id}/`, // Use the appropriate API endpoint and method
         {
-            method: "PUT", // Use PUT or PATCH depending on the API spec
+            method: "PATCH", // Use PUT or PATCH depending on the API spec
             headers: {
             "Content-Type": "application/json",
             },

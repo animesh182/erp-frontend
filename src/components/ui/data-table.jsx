@@ -62,17 +62,11 @@ function DataTable({
   // const [selectedTab, setSelectedTab] = useState("All");
   const [selectedTab, setSelectedTab] = useState(isProjectPage ? "Ongoing" : "All");
 
-
-
-
- 
-
   // Memoize filtered data
   const filteredData = useMemo(() => {
     let filtered = data;
-
     if (selectedTab !== "All") {
-    
+      console.log(`Filtering by ${filterColumn} === ${selectedTab}`);
       filtered = filtered.filter((row) => row[filterColumn] === selectedTab);
     }
 
@@ -132,7 +126,6 @@ function DataTable({
 
   
   
-
 
   return (
     <EditRowContext.Provider value={{ onEditRow, onDeleteRow }}>

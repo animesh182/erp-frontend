@@ -4,7 +4,7 @@ import DateRangePicker from "@/components/DateRangePicker";
 import KpiCard from "@/components/kpicard";
 import ProfitAnalysisMargin from "@/components/ProfitAnalysisMargin";
 import ComboboxProjectsWrapper from "@/components/ProjectComboBoxWrapper";
-import { KpiSkeleton, RectangleSkeleton } from "@/components/Skeletons";
+import { KpiSkeleton, ProfitAnalysisMarginSkeleton, RectangleSkeleton } from "@/components/Skeletons";
 import {
   Card,
   CardContent,
@@ -32,11 +32,11 @@ export default function Dashboard() {
   
     const formattedStartDate=format(startDate, "yyyy-MM-dd")
     const formattedEndDate=format(endDate, "yyyy-MM-dd")
-    const { data:fetchedKpiData,error:kpiError,isError:kpiIsError,isLoading:kpiIsLoading } = useKpi( formattedStartDate,formattedEndDate, selectedProject);
-    const { data:resourceUtilData, error:utilError,isError:utilIsError, isLoading:utilIsLoading } = useResourceUtil(  formattedStartDate,formattedEndDate, selectedProject);
-    const { data:profitLoss, error:profitLossError,isError:profitLossIsError, isLoading:profitLossIsLoading } = useProfitLoss(  selectedProject,startDate?.getFullYear());
-    const { data:projects, error:projectsError,isError:projectsIsError, isLoading:projectsIsLoading } = useOngoingProjects(formattedStartDate,formattedEndDate);
-    const { data:clockifyProjects, error:clockifyProjectsError,isError:clockifyProjectsIsError, isLoading:clockifyProjectsIsLoading } = useClockifyProjects(true);
+    const { data:fetchedKpiData,isLoading:kpiIsLoading } = useKpi( formattedStartDate,formattedEndDate, selectedProject);
+    const { data:resourceUtilData,isLoading:utilIsLoading } = useResourceUtil(  formattedStartDate,formattedEndDate, selectedProject);
+    const { data:profitLoss,isLoading :profitLossIsLoading } = useProfitLoss(  selectedProject,startDate?.getFullYear());
+    const { data:projects,isLoading :projectsIsLoading } = useOngoingProjects(formattedStartDate,formattedEndDate);
+    const { data:clockifyProjects, isLoading:clockifyProjectsIsLoading } = useClockifyProjects(true);
 
   useEffect(() => {
     if (fetchedKpiData) {
@@ -154,7 +154,7 @@ export default function Dashboard() {
   const renderKpiSection = (sectionData, skeletonCount) => {
     return (
       <div className="space-y-2  w-11/12">
-        {kpiValues?.[sectionData] && kpiValues[sectionData].length > 0
+        {kpiValues?.[sectionData] && kpiValues[sectionData].length > 0 && !kpiIsLoading
           ? kpiValues[sectionData].map((data, index) => (
               <KpiCard
                 key={index}
@@ -169,7 +169,7 @@ export default function Dashboard() {
               />
             ))
           : [...Array(skeletonCount)].map((_, index) => (
-              <KpiSkeleton key={index} isSmall={true} />
+              <KpiSkeleton key={index} isSmall={false} />
             ))}
       </div>
     );
@@ -204,7 +204,7 @@ export default function Dashboard() {
 
           <div className="space-y-2">
             <h2 className="font-semibold text-xl text-center ">Invoiced</h2>
-            {renderKpiSection("invoicedData", 2)}
+            {renderKpiSection("invoicedData", 3)}
           </div>
           <div className="space-y-2">
             <h2 className="font-semibold text-xl text-center">Budgeted</h2>
@@ -216,12 +216,16 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-      {profitLoss && projects &&
-      <ProfitAnalysisMargin
-        profitLoss={profitLoss}
-        ongoingProjects={projects.ongoingProjects}
-        completedProjects={projects.completedProjects}
-      />}
+
+      {(profitLossIsLoading || projectsIsLoading) ? (
+    <ProfitAnalysisMarginSkeleton/>
+  ) : (
+    <ProfitAnalysisMargin
+      profitLoss={profitLoss || []}
+      ongoingProjects={projects?.ongoingProjects || []}
+      completedProjects={projects?.completedProjects || []}
+    />
+  )}
       <div className="grid grid-cols-5 gap-x-6 select-none">
         <Card className="col-span-5 select-none w-full overflow-hidden">
           <CardHeader className="flex-row justify-between items-center">
@@ -233,7 +237,7 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="w-full h-full min-h-[800px]">
-            {resourceUtilData && resourceUtilData.length > 0 ? (
+            {!utilIsLoading && resourceUtilData?.length > 0 ? (
               <EmployeeMonthlyHours rawData={resourceUtilData} />
             ) : resourceUtilData && resourceUtilData.length === 0 ? (
               <div className="text-3xl font-semibold">No Data Available</div>
@@ -246,6 +250,3 @@ export default function Dashboard() {
     </main>
   );
 }
-
-
-

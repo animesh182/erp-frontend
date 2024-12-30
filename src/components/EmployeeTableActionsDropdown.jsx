@@ -14,7 +14,6 @@ import {
 import DeleteDialog from "./DeleteDialog";
 
 const EmployeeTableActionsDropdown = ({ rowData }) => {
-  console.log(rowData, "rowData");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { onDeleteRow } = useContext(SimpleDataTableContext);
 

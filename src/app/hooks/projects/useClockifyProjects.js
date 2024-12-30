@@ -13,32 +13,64 @@ import { useQuery } from "@tanstack/react-query";
             }));
         }
 
-        const projectsById = new Map();
+    //     const projectsById = new Map();
 
-        data.forEach((project) => {
-            if (!projectsById.has(project.clockify_id)) {
+    //     data.forEach((project) => {
+    //         if (!projectsById.has(project.clockify_id)) {
+    //         projectsById.set(project.clockify_id, [project]);
+    //         } else {
+    //         projectsById.get(project.clockify_id).push(project);
+    //         }
+    //     });
+
+    //     const formattedData = Array.from(projectsById.values()).map((projects) => {
+    //         if (projects.length > 1) {
+    //         const firstName = projects[0].name.split(" ")[0];
+    //         return {
+    //             projectId: projects[0].clockify_id,
+    //             projectName: firstName,
+    //         };
+    //         } else {
+    //         return {
+    //             projectId: projects[0].clockify_id,
+    //             projectName: projects[0].name,
+    //         };
+    //         }
+    //     });
+
+    //     return formattedData;
+    //     },
+    // });
+    // };
+
+    const filteredProjects = data.filter(project => project.clockify_id);
+
+    const projectsById = new Map();
+
+    filteredProjects.forEach((project) => {
+        if (!projectsById.has(project.clockify_id)) {
             projectsById.set(project.clockify_id, [project]);
-            } else {
+        } else {
             projectsById.get(project.clockify_id).push(project);
-            }
-        });
+        }
+    });
 
-        const formattedData = Array.from(projectsById.values()).map((projects) => {
-            if (projects.length > 1) {
+    const formattedData = Array.from(projectsById.values()).map((projects) => {
+        if (projects.length > 1) {
             const firstName = projects[0].name.split(" ")[0];
             return {
                 projectId: projects[0].clockify_id,
                 projectName: firstName,
             };
-            } else {
+        } else {
             return {
                 projectId: projects[0].clockify_id,
                 projectName: projects[0].name,
             };
-            }
-        });
-
-        return formattedData;
-        },
+        }
     });
-    };
+
+    return formattedData;
+},
+});
+};
