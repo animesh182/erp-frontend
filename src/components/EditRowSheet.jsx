@@ -1,6 +1,6 @@
 "use client";
 import { prettifyText, cn } from "@/lib/utils";
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
@@ -23,14 +23,14 @@ export function EditRowSheet({
     handleSubmit,
     reset,
     watch,
-    formState: { errors },
+    formState: { errors,isValid  },
   } = useFormContext();
 
 
   const invoiceIssuedDate = watch("invoiceIssuedDate");
   const status = watch("status");
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen && rowData) {
       const defaultValues = formInputs.reduce((acc, input) => {
         if (input.name && input.name !== "actions") {
@@ -212,9 +212,10 @@ export function EditRowSheet({
               </div>
             );
           })}
-          <Button type="submit">Save Changes</Button>
+          <Button type="submit" disabled={!isValid}>Save Changes</Button>
         </form>
       </SheetContent>
     </Sheet>
   );
 }
+

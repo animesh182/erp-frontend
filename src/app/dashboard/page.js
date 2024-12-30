@@ -12,14 +12,16 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { ChartLineDown, ChartLineUp, FileArrowDown, FileArrowUp, HandArrowDown, HandArrowUp, HandCoins, Invoice } from "@phosphor-icons/react";
 import { format } from "date-fns";
-import { Activity, CreditCard, DollarSign, Users } from "lucide-react";
+import { DollarSign, Package2, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useOngoingProjects } from "../hooks/dashboard/useOngoingProjects";
 import { useProfitLoss } from "../hooks/dashboard/useProfitLoss";
 import { useResourceUtil } from "../hooks/dashboard/useResourceUtil";
 import { useKpi } from "../hooks/kpiData/useKpiData";
 import { useClockifyProjects } from "../hooks/projects/useClockifyProjects";
+// import { Invoice } from "@phosphor-icons/react";
 
 export default function Dashboard() {
   // const [profitLoss, setProfitLoss] = useState([]);
@@ -47,21 +49,21 @@ export default function Dashboard() {
             value: parseFloat(fetchedKpiData.actual_revenue),
             change: parseFloat(fetchedKpiData.actual_revenue_percentage_change),
             period: "month",
-            icon: <DollarSign className="w-4 h-4" />,
+            icon: <DollarSign/>,
           },
           {
             title: "Actual Expense",
             value: fetchedKpiData.actual_cost,
             change: parseFloat(fetchedKpiData.actual_cost_percentage_change),
             period: "month",
-            icon: <CreditCard />,
+            icon: <ChartLineDown  />,
           },
           {
             title: "Actual Profit",
             value: parseFloat(fetchedKpiData.actual_profit),
             change: parseFloat(fetchedKpiData.actual_profit_percentage_change),
             period: "month",
-            icon: <Activity />,
+            icon: <ChartLineUp />,
           },
         ],
         invoicedData: [
@@ -72,14 +74,14 @@ export default function Dashboard() {
               fetchedKpiData.invoiced_revenue_percentage_change
             ),
             period: "month",
-            icon: <DollarSign />,
+            icon: <Invoice/>,
           },
           {
             title: "Invoiced Cost",
             value: parseFloat(fetchedKpiData.invoiced_cost),
             change: parseFloat(fetchedKpiData.invoiced_cost_percentage_change),
             period: "month",
-            icon: <DollarSign />,
+            icon: <FileArrowDown />,
           },
           {
             title: "Invoiced profit",
@@ -88,7 +90,7 @@ export default function Dashboard() {
               fetchedKpiData.invoiced_profit_percentage_change
             ),
             period: "month",
-            icon: <DollarSign />,
+            icon: <FileArrowUp />,
           },
         ],
         budgetedData: [
@@ -99,7 +101,7 @@ export default function Dashboard() {
               fetchedKpiData.budgeted_revenue_percentage_change
             ),
             period: "month",
-            icon: <CreditCard />,
+            icon: <HandCoins />,
             isMoney: true,
           },
           {
@@ -107,7 +109,7 @@ export default function Dashboard() {
             value: parseFloat(fetchedKpiData.budgeted_cost),
             change: parseFloat(fetchedKpiData.budgeted_cost_percentage_change),
             period: "month",
-            icon: <CreditCard />,
+            icon: <HandArrowDown />,
             isMoney: true,
           },
           {
@@ -117,7 +119,7 @@ export default function Dashboard() {
               fetchedKpiData.budgeted_profit_percentage_change
             ),
             period: "month",
-            icon: <CreditCard />,
+            icon: <HandArrowUp />,
             isMoney: true,
           },
         ],
@@ -127,7 +129,7 @@ export default function Dashboard() {
             value: fetchedKpiData.num_projects,
             change: parseFloat(fetchedKpiData.projects_percentage_change),
             period: "month",
-            icon: <Users />,
+            icon: <Package2 />,
             isMoney: false,
           },
           {
@@ -135,7 +137,7 @@ export default function Dashboard() {
             value: fetchedKpiData.num_employees,
             change: parseFloat(fetchedKpiData.employees_percentage_change),
             period: "month",
-            icon: <CreditCard />,
+            icon: <Users />,
             isMoney: false,
           },
         ],

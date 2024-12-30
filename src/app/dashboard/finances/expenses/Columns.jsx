@@ -4,7 +4,7 @@ import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK } from "@/lib/utils";
 import { format } from "date-fns";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 export const columns = [
   {
     accessorKey: "name",
@@ -36,28 +36,56 @@ export const columns = [
     },
     enableSorting: true,
   },
-  {
+{
     accessorKey: "status",
-    header: "Status",
+    header: ({ column }) => {
+      return (
+        <Select
+          onValueChange={(value) => {
+            if (value === "all") {
+              column.setFilterValue(undefined); // Clear filter for "all"
+            } else {
+              column.setFilterValue(value); // Set filter for specific value
+            }
+          }}
+          defaultValue="all"
+        >
+          <SelectTrigger className="w-32">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            {statusOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      );
+    },
     cell: ({ row }) => {
-      const { status } = row.original; // Access the full row data
+      const { status } = row.original; // Access the `status` value for this row
       return (
         <Badge
-        className={`${
-          status === "Paid"
-            ? "bg-green-100 text-green-800"
-            : status === "Pending"
-            ? "bg-yellow-100 text-yellow-800"
-            : status==="Cancelled"
-            ? "bg-red-100 text-red-800"
-            : "bg-orange-200 text-orange-800"
-        }`}
+          className={`${
+            status === "Paid"
+              ? "bg-green-100 text-green-800"
+              : status === "Pending"
+              ? "bg-yellow-100 text-yellow-800"
+              : status === "Cancelled"
+              ? "bg-red-100 text-red-800"
+              : "bg-orange-200 text-orange-800"
+          }`}
         >
-          {status}
+          {status || "No Data"} {/* Show "No Data" if status is empty */}
         </Badge>
       );
     },
-    enableSorting: false,
+    enableSorting: false, // Disable sorting for this column
+    filterFn: (row, columnId, filterValue) => {
+      if (!filterValue) return true; // Show all rows when no filter is selected
+      return row.getValue(columnId) === filterValue; // Only show rows that match the selected status
+    },
   },
   {
     accessorKey: "paidDate",
@@ -70,7 +98,7 @@ export const columns = [
         </span>
       );
     },
-    enableSorting: false,
+    enableSorting: true,
   },
   {
     accessorKey: "costType",
@@ -94,7 +122,7 @@ export const columns = [
   {
     accessorKey: "amount",
     header: "Amount",
-    enableSorting: false,
+    enableSorting: true,
     cell: ({ row }) => {
       const { amount } = row.original;
       return formatAmountToNOK(amount);
@@ -114,4 +142,14 @@ export const columns = [
     },
     enableSorting: false,
   },
+];
+
+
+
+const statusOptions = [
+  { label: 'All', value: 'all' },
+  { label: 'Paid', value: 'Paid' },
+  { label: 'Pending', value: 'Pending' },
+  { label: 'Budget', value: 'Budget' },
+  { label: 'Cancelled', value: 'Cancelled' }
 ];

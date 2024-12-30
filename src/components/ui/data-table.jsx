@@ -6,6 +6,7 @@ import {
   getPaginationRowModel,
   useReactTable,
   getSortedRowModel,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 import {
   Pagination,
@@ -94,6 +95,7 @@ function DataTable({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     manualPagination: false, // You are not fetching data for each page separately
     initialState: {
       pagination: {
