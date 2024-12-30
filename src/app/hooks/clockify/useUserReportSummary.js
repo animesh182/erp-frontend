@@ -2,6 +2,7 @@
 import { fetchUserReportSummaryy,fetchUserReportSummary, fetchTotalCount, getUserReportSummary } from "@/app/api/clockify/getUserReportSummary";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 
 
@@ -15,6 +16,18 @@ const REPORT_TYPES = {
 };
 
 export function useUserReportSummary({ start, end, pageSize, messageType }) {
+    const now=new Date()
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const oneYearInMs = 365 * 24 * 60 * 60 * 1000; // One year in milliseconds
+    const isDateRangeValid = endDate - startDate <= oneYearInMs;
+    const isStartDateValid = startDate <= now; 
+    // if (!isDateRangeValid) {
+    //     toast.error("Date range cannot exceed one year.");
+    // }
+    // if (!isStartDateValid) {
+    //     toast.error("Start date cannot be in the future.");
+    // }
     return useQuery({
         queryKey: ["userReportSummary", start, end, pageSize, messageType],
             queryFn: async () => {
@@ -22,7 +35,8 @@ export function useUserReportSummary({ start, end, pageSize, messageType }) {
                 if(response)
                     return response
             },
-        enabled: !!start && !!end,
+        // enabled: !!start && !!end ,
+        enabled: !!start && !!end && isDateRangeValid && isStartDateValid,
         onError: (error) => console.error("Error in useQuery:", error),
     });
 }

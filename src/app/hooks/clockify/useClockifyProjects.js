@@ -3,32 +3,44 @@ import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 
-export function useClockifyProjectSummary({ startDate, endDate }) {
-  return useQuery({
-      queryKey: ["clockifyProjectSummary", startDate, endDate],
-      queryFn: async () => {
-          return await getClockifyProjectSummary(
-              startDate,
-              endDate
-          );
-      },
-      enabled: !!startDate && !!endDate,
-      select: (data) => {
-          // Perform sorting in React Query's `select` transformation
-          if (data && data.groupOne) {
-              const sortedProjects = data.groupOne.sort((a, b) => b.duration - a.duration);
-              return {
-                  ...data,
-                  groupOne: sortedProjects,
-              };
-          }
-          return data;
-      },
-      onError: (error) => {
-          toast.error("Error fetching Clockify Projects Summary:", error);
-      },
-  });
-}
+    export function useClockifyProjectSummary({ startDate, endDate }) {
+        const now = new Date();
+        const start = new Date(startDate);
+    const end = new Date(endDate);
+    const oneYearInMs = 365 * 24 * 60 * 60 * 1000; // One year in milliseconds
+    const isDateRangeValid = end - start <= oneYearInMs;
+    const isStartDateValid = start <= now;
+    if (!isDateRangeValid) {
+        toast.error("Date range cannot exceed one year.");
+    }
+    if (!isStartDateValid) {
+        toast.error("Start date cannot be in the future.");
+    }
+    return useQuery({
+        queryKey: ["clockifyProjectSummary", startDate, endDate],
+        queryFn: async () => {
+            return await getClockifyProjectSummary(
+                startDate,
+                endDate
+            );
+        },
+        enabled: !!startDate && !!endDate && isDateRangeValid && isStartDateValid,
+        select: (data) => {
+            // Perform sorting in React Query's `select` transformation
+            if (data && data.groupOne) {
+                const sortedProjects = data.groupOne.sort((a, b) => b.duration - a.duration);
+                return {
+                    ...data,
+                    groupOne: sortedProjects,
+                };
+            }
+            return data;
+        },
+        onError: (error) => {
+            toast.error("Error fetching Clockify Projects Summary:", error);
+        },
+    });
+    }
 
 
 // export function useClockifyProjectSummary({ startDate, endDate }) {
