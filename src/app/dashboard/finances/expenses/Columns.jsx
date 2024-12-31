@@ -64,7 +64,7 @@ export const columns = [
       );
     },
     cell: ({ row }) => {
-      const { status } = row.original; // Access the `status` value for this row
+      const { status } = row.original;
       return (
         <Badge
           className={`${
@@ -77,14 +77,14 @@ export const columns = [
               : "bg-orange-200 text-orange-800"
           }`}
         >
-          {status || "No Data"} {/* Show "No Data" if status is empty */}
+          {status || "No Data"} 
         </Badge>
       );
     },
-    enableSorting: false, // Disable sorting for this column
+    enableSorting: false,
     filterFn: (row, columnId, filterValue) => {
-      if (!filterValue) return true; // Show all rows when no filter is selected
-      return row.getValue(columnId) === filterValue; // Only show rows that match the selected status
+      if (!filterValue) return true;
+      return row.getValue(columnId) === filterValue;
     },
   },
   {

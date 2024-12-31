@@ -10,12 +10,11 @@ export function KpiSkeleton({
   );
 }
 
-export function RectangleSkeleton(isSmall=false) {
-
+export function RectangleSkeleton({isSmall=false}) {
+  console.log(isSmall,"small")
   return (
     <div className="flex flex-col ">
       <Skeleton className={`${isSmall? "h-[300px]": "h-[600px]"} w-full rounded-xl`} />
-
       {/* <Skeleton className="h-[600px] w-full rounded-xl" /> */}
     </div>
   );

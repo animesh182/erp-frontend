@@ -16,6 +16,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner';
 import ComboboxProjectsWrapper from './ProjectComboBoxWrapper';
 import { useTimeEntryById } from '@/app/hooks/clockify/useTimeEntryById';
+import { SimpleSkeleton } from './Skeletons';
 
 
 const ClockifyTimeEntry = React.memo(() => {
@@ -204,13 +205,14 @@ const handleTimeChange = useCallback((newTime) => {
 return (
     <>
         {clockifyUserData ? (
-        <Card className="p-2 flex items-center justify-between">
+        <Card className="p-2 md:flex lg:flex  items-center justify-between">
             <Input
-                className="w-7/12"
+                className="md:w-7/12 lg:w-7/12 w-full"
                 placeholder="What are you working on..."
                 onChange={(e) => setDescription(e.target.value)}
                 value={description}
                 />
+                <div className='p-2 flex items-center justify-between md:w-5/12 lg:w-5/12 w-full'> 
                 <ComboboxProjectsWrapper
             clockifyProjects={clockifyProjects}
             selectedProject={selectedProject}
@@ -262,8 +264,11 @@ return (
                 >
                 {start ? "Start" : "Stop"}
             </Button>
+            </div>
         </Card>
-        ):("Loading....")}
+        ):
+        <SimpleSkeleton/>
+        }
         </>
     );
 });

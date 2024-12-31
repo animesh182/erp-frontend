@@ -7,9 +7,11 @@ import { useQuery } from "@tanstack/react-query";
         queryFn: getClockifyIdProjects,
         select: (data) => {
         if (getAllProjects) {
+
             return data.map((project) => ({
             projectId: project.clockify_id,
             projectName: project.name,
+            id:project.id
             }));
         }
 

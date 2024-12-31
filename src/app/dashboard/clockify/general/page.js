@@ -17,6 +17,8 @@ import { formatClockifyDate } from "@/lib/utils";
 import { format, startOfMonth } from "date-fns";
 import ClockifyDataTable from "./clockify-data-table";
 import { columns } from "./Columns";
+import { ProjectPageSkeletonCard, RectangleSkeleton, SimpleSkeleton } from "@/components/Skeletons";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 
@@ -57,7 +59,7 @@ const{data:employeeClockifyDetails}=useEmployees()
       clockifyProjects}, // Pass additional data if needed
 });
 
-const { data } = useClockifyProjectSummary({
+const { data ,isLoading:clockifyProjectSummaryLoading} = useClockifyProjectSummary({
   startDate: formatClockifyDate(startDate),
   endDate: formatClockifyDate(endDate),
 });
@@ -124,7 +126,9 @@ const clockifyTimeEntryProp={
               
               
 </div>
-        {projects  && 
+        {!projects  ?
+        <RectangleSkeleton isSmall={false}/>
+        :
         <>
       <div>
         <PieChartwithBarChart className="" chartData={projects.map((project, index) => ({
@@ -137,8 +141,9 @@ const clockifyTimeEntryProp={
 
       </>
       }
+
               <ClockifyTimeEntry clockifyTimeEntryProp={clockifyTimeEntryProp}/>
-      {allUsers && (
+      {allUsers ? (
 
       
 
@@ -149,7 +154,9 @@ const clockifyTimeEntryProp={
   filterColumn={"status"}
   subtitle={"View detailed information about all team activities in this table."}
 />
-    )}
+    ):
+    <ProjectPageSkeletonCard/>
+    }
     </div>
   );
 };

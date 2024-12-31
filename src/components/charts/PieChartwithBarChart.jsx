@@ -19,7 +19,7 @@
   function PieChartwithBarChart({chartData}) {
     return (
       // <Card className="flex justify-between items-center gap-6 pr-6 w-full h-full">
-      <Card className="grid grid-cols-8 justify-between items-center gap-6 pr-6 w-fit h-fit">
+      <Card className="md:grid lg:grid hidden grid-cols-8 justify-between items-center gap-6 pr-6 w-fit h-fit">
 
   <div className="col-span-3 flex justify-center items-center h-full "> 
     <CardContent className="p-0 w-full h-full "> 
