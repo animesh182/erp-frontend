@@ -19,13 +19,15 @@ import { toast } from "sonner";
 import CardLayout from "./CardLayout";
 import { projectColumns } from "./Columns";
 import { formInputs } from "./Inputs";
+import { format } from "date-fns";
 
 export default function Projects() {
   const methods = useForm();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isCardLayout, setIsCardLayout] = useState(false);
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-    const{data:projects,isLoading:loading,refetch:refetchProject}=useProjectDetails()
+
+    const{data:projects,isLoading:loading,refetch:refetchProject}=useProjectDetails( format(startDate, "yyyy-MM-dd"),format(endDate, "yyyy-MM-dd"))
     
     const{data:clients,refetch:refetchClient}=useClients()
     const handleDateChange = (newStartDate, newEndDate) => {

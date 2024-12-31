@@ -17,9 +17,10 @@ import { toast } from 'sonner';
 import ComboboxProjectsWrapper from './ProjectComboBoxWrapper';
 import { useTimeEntryById } from '@/app/hooks/clockify/useTimeEntryById';
 import { SimpleSkeleton } from './Skeletons';
+import { useQueryClient } from '@tanstack/react-query';
 
 
-const ClockifyTimeEntry = React.memo(() => {
+const ClockifyTimeEntry = React.memo(({onRefresh }) => {
     const [selectedProject, setSelectedProject] = useState("");
     const [description, setDescription] = useState("");
     const [billable, setBillable] = useState(true);
@@ -31,10 +32,11 @@ const ClockifyTimeEntry = React.memo(() => {
     const intervalRef = useRef(null);
     const timerRef = useRef(0);
     const{clockifyUserData}=useClockify()
+    const queryClient = useQueryClient();
 
 
     const{data:clockifyProjects}=useClockifyProjects(false)
-    const { data: activeUsers ,isLoading} = useActiveUsers({
+    const { data: activeUsers ,refetch} = useActiveUsers({
         items: 30,
         type: ACTIVE_USERS_TYPES.TIMER_ENTRY,
         additionalData: { clockifyUserData, clockifyProjects },
@@ -119,7 +121,7 @@ const ClockifyTimeEntry = React.memo(() => {
             if (start) {
                 const response = await createTimeEntry(clockifyUserData.clockify_api_key,submitData);
                 setStart(false);
-                if (response.id) {
+                if (response.id) {  
                     const timeEntry = await getTimeEntryById(response.id);
                     
                     const matchedProjectWithId = clockifyProjects.find(
@@ -145,6 +147,7 @@ const ClockifyTimeEntry = React.memo(() => {
                         setTimer(elapsedTime);
                         startTimer();
                     }
+                    await onRefresh();
                 }
             } else {
                 const message = await stopTimeEntry(clockifyUserData.clockify_user_id,clockifyUserData.clockify_api_key, new Date().toISOString());
@@ -163,12 +166,15 @@ const ClockifyTimeEntry = React.memo(() => {
                 // Reset timer
                 timerRef.current = 0;
                 setTimer(0);
+
+                await onRefresh();
             }
+           
         } catch (error) {
             toast.error(error.message || "Failed to process time entry");
             console.error("Error handling time entry:", error);
         }
-    }, [start, submitData,  startTimer, stopTimer, clockifyProjects]);
+    }, [start, submitData,  startTimer, stopTimer, clockifyProjects,queryClient,onRefresh]);
     
     const handleUpdate = useCallback(async () => {
         const updateData = {
@@ -190,6 +196,7 @@ const ClockifyTimeEntry = React.memo(() => {
         startTimer();
     }
     toast.success(response.message || "Time entry has been updated!");
+    await onRefresh();
 } catch (error) {
     console.error("Error updating time entry:", error);
     toast.error(error.message || "Failed to update time entry");
@@ -201,11 +208,11 @@ const handleTimeChange = useCallback((newTime) => {
     setStartTime(updatedDate);
     setInputTime(newTime);
 }, []);
-
+    
 return (
     <>
         {clockifyUserData ? (
-        <Card className="p-2 md:flex lg:flex  items-center justify-between">
+        <Card className="p-2 gap-6 md:flex lg:flex  items-center justify-between">
             <Input
                 className="md:w-7/12 lg:w-7/12 w-full"
                 placeholder="What are you working on..."

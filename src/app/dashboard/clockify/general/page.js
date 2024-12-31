@@ -1,7 +1,7 @@
 
 "use client"
 import PieChartwithBarChart from "@/components/charts/PieChartwithBarChart";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { ACTIVE_USERS_TYPES } from "@/app/api/clockify/getActiveUsers";
 import { REPORT_TYPES } from "@/app/api/clockify/getUserReportSummary";
@@ -45,6 +45,12 @@ const Clockify = () => {
   const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
   const[projectColor,setProjectColor]=useState()
 
+  const date=new Date()
+const oneMonthAgo = new Date(date);  
+oneMonthAgo.setMonth(date.getMonth() - 1);
+const oneDayAfter = new Date(endDate);  
+oneDayAfter.setDate(date.getDate() + 1);
+
   const handleDateChange = (newStartDate, newEndDate) => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
@@ -52,7 +58,7 @@ const Clockify = () => {
 
   const{data:clockifyProjects}=useClockifyProjects(true)
 const{data:employeeClockifyDetails}=useEmployees()
-  const { data:activeUsers,isLoading} = useActiveUsers({
+  const { data:activeUsers, refetch: refetchActive } = useActiveUsers({
     items: employeeClockifyDetails?.length,
     type: ACTIVE_USERS_TYPES.USER_LIST,
     additionalData: {   employeeClockifyDetails,
@@ -65,12 +71,14 @@ const { data ,isLoading:clockifyProjectSummaryLoading} = useClockifyProjectSumma
 });
 
 
-const { data: { timeentries: inactiveUsers } = {} } = useUserReportSummary({
+const { data: { timeentries: inactiveUsers } = {} ,refetch: refetchInactive } = useUserReportSummary({
   start: formatClockifyDate(startDate),
-  end: formatClockifyDate(endDate),
+  end: formatClockifyDate(oneDayAfter),
+  // end: formatClockifyDate(endDate),
   pageSize,
   messageType: REPORT_TYPES.INACTIVE_USERS,
 });
+
 const { data:barChartUser} = useUserReportSummary({
   start: formatClockifyDate(startDate),
   end: formatClockifyDate(endDate),
@@ -78,13 +86,6 @@ const { data:barChartUser} = useUserReportSummary({
   messageType: REPORT_TYPES.PROJECT_SUMMARY,
 });
 
-
-
-const date=new Date()
-const oneMonthAgo = new Date(date);  
-oneMonthAgo.setMonth(date.getMonth() - 1);
-const oneDayAfter = new Date(date);  
-oneDayAfter.setDate(date.getDate() + 1);
 
   useEffect(() => {
     if (data && data.groupOne) {
@@ -105,10 +106,9 @@ useEffect(() => {
 }, [activeUsers, inactiveUsers]); 
 
 
-const clockifyTimeEntryProp={
-  clockifyUserId:process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY,
-  userName:"Animesh Adhikari"
-}
+const refreshTableData = useCallback(async () => {
+  await Promise.all([refetchActive(), refetchInactive()]);
+}, [refetchActive, refetchInactive]);
 
   return (
     <div className="grid grid-cols-1 p-6 gap-8">
@@ -142,7 +142,7 @@ const clockifyTimeEntryProp={
       </>
       }
 
-              <ClockifyTimeEntry clockifyTimeEntryProp={clockifyTimeEntryProp}/>
+<ClockifyTimeEntry onRefresh={refreshTableData} />
       {allUsers ? (
 
       

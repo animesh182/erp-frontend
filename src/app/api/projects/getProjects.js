@@ -81,28 +81,33 @@ export async function getClockifyIdProjects() {
 
 
 
-export async function getProjectDetails() {
+export async function getProjectDetails(startDate, endDate) {
   try {
-    const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/project/`
-    );
+    let url = `${process.env.NEXT_PUBLIC_API_URL}/api/project/`;
+    if (startDate && endDate) {
+      url += `?start_date=${startDate}&end_date=${endDate}`;
+    }
+
+    const response = await apiClient(url);
+
     return { status: 200, data: response.data };
   } catch (error) {
     return {
       status: error.status || 500,
-      message: error.message || "Failed to fetch the employee details",
+      message: error.message || "Failed to fetch the project details",
     };
   }
 }
 
-export async function getProjectById(projectId) {
-  try {
-    // Call the API endpoint for the specific project
-    const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/project/${projectId}`
-    );
 
-    // Return the response directly since it's not wrapped in a `data` field
+export async function getProjectById(projectId, startDate, endDate) {
+  try {
+    let url = `${process.env.NEXT_PUBLIC_API_URL}/api/project/${projectId}/`;
+    // If startDate and endDate are provided, include them in the URL
+    if (startDate && endDate) {
+      url += `?start_date=${startDate}&end_date=${endDate}`;
+    }
+    const response = await apiClient(url);
     return { status: 200, data: response };
   } catch (error) {
     return {

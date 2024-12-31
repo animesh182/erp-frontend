@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import SimpleDataTable from "@/components/ui/simple-data-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
-import { isAfter } from "date-fns";
+import { format, isAfter } from "date-fns";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -25,7 +25,7 @@ export default function ProjectDetails() {
   const [selectedTab, setSelectedTab] = useState('Ongoing');
   const { id } = useParams();
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-    const{data:project,isLoading:loading,refetch:refetchProject}=useProjectById(id)
+    const{data:project,isLoading:loading,refetch:refetchProject}=useProjectById(id ,  format(startDate, "yyyy-MM-dd"),format(endDate, "yyyy-MM-dd"))
     const handleDateChange = (newStartDate, newEndDate) => {
       setStartDate(newStartDate);
       setEndDate(newEndDate);

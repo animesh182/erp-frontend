@@ -26,11 +26,11 @@ import { toast } from 'sonner';
     });
     };
 
-        export const useProjectDetails = () => {
+        export const useProjectDetails = (startDate,endDate) => {
             return useQuery({
-            queryKey: ["projects"],
+            queryKey: ["projects",{startDate,endDate}],
             queryFn: async () => {
-                const response = await getProjectDetails();
+                const response = await getProjectDetails(startDate,endDate);
                 if (response.status === 200) {
                     console.log(response.data,"res")
                 return response?.data
@@ -81,11 +81,11 @@ import { toast } from 'sonner';
             //     });
             // };
             
-        export const useProjectById = (id) => {
+        export const useProjectById = (id,startDate,endDate) => {
             return useQuery({
-            queryKey: ["projectById",id],
+            queryKey: ["projectById",{id,startDate,endDate}],
             queryFn: async () => {
-                const response = await getProjectById(id);
+                const response = await getProjectById(id,startDate,endDate);
                 if (response.status === 200) {
                 return response.data.data;
                 } else {
