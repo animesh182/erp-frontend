@@ -147,7 +147,9 @@ const ClockifyTimeEntry = React.memo(({onRefresh }) => {
                         setTimer(elapsedTime);
                         startTimer();
                     }
-                    await onRefresh();
+                    if (onRefresh) {
+                        await onRefresh();
+                    }
                 }
             } else {
                 const message = await stopTimeEntry(clockifyUserData.clockify_user_id,clockifyUserData.clockify_api_key, new Date().toISOString());
@@ -167,7 +169,9 @@ const ClockifyTimeEntry = React.memo(({onRefresh }) => {
                 timerRef.current = 0;
                 setTimer(0);
 
-                await onRefresh();
+                if (onRefresh) {
+                    await onRefresh();
+                }
             }
            
         } catch (error) {
@@ -196,7 +200,9 @@ const ClockifyTimeEntry = React.memo(({onRefresh }) => {
         startTimer();
     }
     toast.success(response.message || "Time entry has been updated!");
-    await onRefresh();
+    if (onRefresh) {
+        await onRefresh();
+    }
 } catch (error) {
     console.error("Error updating time entry:", error);
     toast.error(error.message || "Failed to update time entry");
@@ -226,7 +232,7 @@ return (
             onProjectSelect={setSelectedProject}
             />
 
-
+            
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger>
@@ -244,7 +250,7 @@ return (
             {!start ? (
                 <Popover className="">
                     <PopoverTrigger>
-                        <div className="w-1/12">{formatDuration(timer)}</div>
+                        <div className="w-2/12">{formatDuration(timer)}</div>
                     </PopoverTrigger>
                     <PopoverContent className="flex items-center">
                         <p className='text-sm w-1/2'>Start Time:</p>
@@ -256,16 +262,15 @@ return (
                     </PopoverContent>
                 </Popover>
             ) : (
-                <div className="w-1/12">00:00:00</div>
+                <div className="w-2/12">00:00:00</div>
             )}
-            
             {!start && (
-                <Button variant="outline" onClick={handleUpdate}>
+                <Button variant="outline" onClick={handleUpdate} className='w-2/12'>
                     Update
                 </Button>
             )}
             <Button
-                className="w-1/12"
+                className="w-2/12"
                 variant={start ? "default" : "destructive"}
                 onClick={handleButtonClick}
                 >

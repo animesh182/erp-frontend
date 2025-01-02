@@ -41,7 +41,6 @@ const ProjectsTab = ({
       console.log("Project assigned successfully:", response);
       toast.success("Project assigned successfully");
       setIsSheetOpen(false);
-      console.log(values,"valuse")
       // Update t he local state with the new project
       setLocalEmployeeProjects((prevProjects) => [
         ...prevProjects,

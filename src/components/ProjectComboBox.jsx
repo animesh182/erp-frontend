@@ -33,7 +33,7 @@ export default function ComboboxProjects({ projectNames, onSelectProject,prop })
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-[250px] justify-between"
+            className="md:w-[250px] lg:w-[250px] w-32 justify-between"
           >
             {/* {value ? uniqueprojectNames.find((name) => name === value)?.substring(0, 25) :prop?prop: "Select project"} */}
 

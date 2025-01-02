@@ -43,7 +43,8 @@ export default function Payroll() {
       console.log("Edited data:", editedData);
 
       const updatedSalary = await updatePayroll(editedData.id, {
-        description: editedData.name,
+        name: editedData.name,
+        // description: editedData.name,
         invoice_issued_date: editedData.invoiceIssuedDate,
         payment_date: editedData.paidDate,
         payment_status: editedData.status === "paid" ? "Paid" : "Pending",

@@ -12,13 +12,12 @@ import { useEmployees } from "@/app/hooks/employees/useEmployees";
 import { useClockifyProjects } from "@/app/hooks/projects/useClockifyProjects";
 import ClockifyTimeEntry from "@/components/ClockifyTimeTracking";
 import DateRangePicker from "@/components/DateRangePicker";
+import { ProjectPageSkeletonCard, RectangleSkeleton } from "@/components/Skeletons";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 import { formatClockifyDate } from "@/lib/utils";
 import { format, startOfMonth } from "date-fns";
 import ClockifyDataTable from "./clockify-data-table";
 import { columns } from "./Columns";
-import { ProjectPageSkeletonCard, RectangleSkeleton, SimpleSkeleton } from "@/components/Skeletons";
-import { Skeleton } from "@/components/ui/skeleton";
 
 
 
@@ -50,7 +49,8 @@ const oneMonthAgo = new Date(date);
 oneMonthAgo.setMonth(date.getMonth() - 1);
 const oneDayAfter = new Date(endDate);  
 oneDayAfter.setDate(date.getDate() + 1);
-
+const endOfDay = new Date(date);
+endOfDay.setHours(23, 59, 59);
   const handleDateChange = (newStartDate, newEndDate) => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
@@ -72,9 +72,8 @@ const { data ,isLoading:clockifyProjectSummaryLoading} = useClockifyProjectSumma
 
 
 const { data: { timeentries: inactiveUsers } = {} ,refetch: refetchInactive } = useUserReportSummary({
-  start: formatClockifyDate(startDate),
-  end: formatClockifyDate(oneDayAfter),
-  // end: formatClockifyDate(endDate),
+  start: formatClockifyDate(oneMonthAgo),
+  end: formatClockifyDate(endOfDay),
   pageSize,
   messageType: REPORT_TYPES.INACTIVE_USERS,
 });
