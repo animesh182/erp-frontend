@@ -12,14 +12,14 @@ import { Button } from "@/components/ui/button";
 import DataTable from "@/components/ui/data-table";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { format } from "date-fns";
 import { LayoutGridIcon, List, PlusCircle } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import CardLayout from "./CardLayout";
 import { projectColumns } from "./Columns";
 import { formInputs } from "./Inputs";
-import { format } from "date-fns";
 
 export default function Projects() {
   const methods = useForm();

@@ -18,6 +18,7 @@ const ProjectsTab = ({
   projectOptions,
   roleOptions,
   employeeProjects,
+  refetchEmployee
 }) => {
   const [localEmployeeProjects, setLocalEmployeeProjects] = useState(
     employeeProjects || []
@@ -40,6 +41,7 @@ const ProjectsTab = ({
       const response = await assignProject(employeeId, values);
       console.log("Project assigned successfully:", response);
       toast.success("Project assigned successfully");
+      refetchEmployee()
       setIsSheetOpen(false);
       // Update t he local state with the new project
       setLocalEmployeeProjects((prevProjects) => [
@@ -97,6 +99,7 @@ const ProjectsTab = ({
       const response = await deleteAssignedProject(userProjectId);
       toast.success("Project deleted successfully");
       setIsDeleteDialogOpen(false);
+      refetchEmployee()
       // Update local state to remove the deleted project
       setLocalEmployeeProjects((prevProjects) =>
         prevProjects.filter(

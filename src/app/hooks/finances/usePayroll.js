@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query';
         return data.map((item) => ({
             id: item.id,
             name: item.name,
-            projectName: null,
+            // projectName: null,
             invoice: `#${item.id}`,
             invoiceIssuedDate: item.invoice_issued_date,
             paidDate: item.payment_date,

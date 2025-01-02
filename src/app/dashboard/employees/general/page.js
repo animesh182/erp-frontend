@@ -216,6 +216,7 @@ export default function Employees() {
                     projectOptions={projectOptions}
                     roleOptions={roleOptions}
                     employeeProjects={selectedEmployee?.user_projects}
+                    refetchEmployee={refetchEmployee}
                   />
                 </TabsContent>
                 <TabsContent value="payroll">

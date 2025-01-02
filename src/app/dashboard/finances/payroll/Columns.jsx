@@ -12,19 +12,19 @@ export const columns = [
     header: "Name",
     enableSorting: true,
   },
-  {
-    accessorKey: "projectName",
-    header: "Project Name",
-    enableSorting: true,
-    cell: ({ row }) => {
-      const { projectName } = row.original;
-      return (
-        <span className="capitalize flex justify-center">
-          {!!projectName ? projectName : "-"}
-        </span>
-      );
-    },
-  },
+  // {
+  //   accessorKey: "projectName",
+  //   header: "Project Name",
+  //   enableSorting: true,
+  //   cell: ({ row }) => {
+  //     const { projectName } = row.original;
+  //     return (
+  //       <span className="capitalize flex justify-center">
+  //         {!!projectName ? projectName : "-"}
+  //       </span>
+  //     );
+  //   },
+  // },
   {
     accessorKey: "invoice",
     header: "Invoice",

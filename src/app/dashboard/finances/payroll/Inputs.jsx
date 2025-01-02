@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProjectSelect } from "@/components/ProjectSelect";
+// import { ProjectSelect } from "@/components/ProjectSelect";
 
 const handleKeyDown = (e) => {
   if (e.key === "-" || e.key === "+" || e.key === "e" || e.key === "E") {
@@ -32,11 +32,11 @@ export const formInputs = [
     name: "name",
     required: true,
   },
-  {
-    component: <ProjectSelect />,
-    name: "projectName",
-    required: false,
-  },
+  // {
+  //   component: <ProjectSelect />,
+  //   name: "projectName",
+  //   required: false,
+  // },
   {
     component: <Input placeholder="Add" onChange={handleUppercaseChange} />,
     name: "invoice",

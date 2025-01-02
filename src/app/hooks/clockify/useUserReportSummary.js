@@ -22,12 +22,7 @@ export function useUserReportSummary({ start, end, pageSize, messageType }) {
     const oneYearInMs = 365 * 24 * 60 * 60 * 1000; // One year in milliseconds
     const isDateRangeValid = endDate - startDate <= oneYearInMs;
     const isStartDateValid = startDate <= now; 
-    // if (!isDateRangeValid) {
-    //     toast.error("Date range cannot exceed one year.");
-    // }
-    // if (!isStartDateValid) {
-    //     toast.error("Start date cannot be in the future.");
-    // }
+
     return useQuery({
         queryKey: ["userReportSummary", start, end, pageSize, messageType],
             queryFn: async () => {

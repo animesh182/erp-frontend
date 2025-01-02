@@ -1,9 +1,10 @@
 import { getClockifyProjectSummary } from '@/app/api/clockify/getClockifyProjects';
-import { useQuery } from '@tanstack/react-query';
+import { QueryClient, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 
     export function useClockifyProjectSummary({ startDate, endDate }) {
+        const queryClient=new QueryClient()
         const now = new Date();
         const start = new Date(startDate);
     const end = new Date(endDate);
@@ -12,6 +13,7 @@ import { toast } from 'sonner';
     const isStartDateValid = start <= now;
     if (!isDateRangeValid) {
         toast.error("Date range cannot exceed one year.");
+        
     }
     if (!isStartDateValid) {
         toast.error("Start date cannot be in the future.");
@@ -39,6 +41,7 @@ import { toast } from 'sonner';
         onError: (error) => {
             toast.error("Error fetching Clockify Projects Summary:", error);
         },
+    
     });
     }
 

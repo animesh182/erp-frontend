@@ -31,7 +31,6 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const { utilization } = row.original;
-      const daysInMonth=24
       const monthlyUtlization=(utilization*24).toFixed(2)
       return (
         <div>

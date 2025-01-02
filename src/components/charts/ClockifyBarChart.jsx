@@ -45,7 +45,6 @@ function ClockifyBarChart({chartConfig,chartData}) {
         // combinedLabel: `${entry.name}    \u00A0\u00A0\u00A0\u00A0 ${formatDuration(entry.value)}`
         combinedLabel: `${entry.name?.length>maxTextLength?entry.name.substring(0, maxTextLength):entry.name}    \u00A0\u00A0\u00A0\u00A0 ${formatDuration(entry.value)}`
         }));
-    
   return (
     <ChartContainer config={chartConfig} className="pt-3">
   <BarChart
@@ -67,7 +66,8 @@ function ClockifyBarChart({chartConfig,chartData}) {
       axisLine={false}
       className="font-medium text-xs"
       width={300}
-    />
+      interval={0}
+          />
 
     {/* <ChartTooltip content={<ChartTooltipContent />} /> */}
     <ChartTooltip
