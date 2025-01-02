@@ -3,21 +3,7 @@ import { QueryClient, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 
-    export function useClockifyProjectSummary({ startDate, endDate }) {
-        const queryClient=new QueryClient()
-        const now = new Date();
-        const start = new Date(startDate);
-    const end = new Date(endDate);
-    const oneYearInMs = 365 * 24 * 60 * 60 * 1000; // One year in milliseconds
-    const isDateRangeValid = end - start <= oneYearInMs;
-    const isStartDateValid = start <= now;
-    if (!isDateRangeValid) {
-        toast.error("Date range cannot exceed one year.");
-        
-    }
-    if (!isStartDateValid) {
-        toast.error("Start date cannot be in the future.");
-    }
+    export function useClockifyProjectSummary({ startDate, endDate,isValid=true }) {
     return useQuery({
         queryKey: ["clockifyProjectSummary", startDate, endDate],
         queryFn: async () => {
@@ -26,7 +12,7 @@ import { toast } from 'sonner';
                 endDate
             );
         },
-        enabled: !!startDate && !!endDate && isDateRangeValid && isStartDateValid,
+        enabled: !!startDate && !!endDate && isValid,
         select: (data) => {
             // Perform sorting in React Query's `select` transformation
             if (data && data.groupOne) {

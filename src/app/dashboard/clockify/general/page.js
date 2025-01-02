@@ -18,6 +18,31 @@ import { formatClockifyDate } from "@/lib/utils";
 import { format, startOfMonth } from "date-fns";
 import ClockifyDataTable from "./clockify-data-table";
 import { columns } from "./Columns";
+import { toast } from "sonner";
+
+
+
+const validateDateRange = (startDate, endDate) => {
+  const now = new Date();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const oneYearInMs = 365 * 24 * 60 * 60 * 1000;
+
+  const errors = [];
+  
+  if (end - start > oneYearInMs) {
+    errors.push("Date range cannot exceed one year.");
+  }
+  
+  if (start > now) {
+    errors.push("Start date cannot be in the future.");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
 
 
 
@@ -56,6 +81,12 @@ endOfDay.setHours(23, 59, 59);
     setEndDate(newEndDate);
   };
 
+  const { isValid, errors } = validateDateRange(startDate, endDate);
+  
+  useEffect(() => {
+    errors.forEach(error => toast.error(error));
+  }, [errors]);
+
   const{data:clockifyProjects}=useClockifyProjects(true)
 const{data:employeeClockifyDetails}=useEmployees()
   const { data:activeUsers, refetch: refetchActive } = useActiveUsers({
@@ -68,6 +99,7 @@ const{data:employeeClockifyDetails}=useEmployees()
 const { data ,isLoading:clockifyProjectSummaryLoading} = useClockifyProjectSummary({
   startDate: formatClockifyDate(startDate),
   endDate: formatClockifyDate(endDate),
+  isValid:isValid
 });
 
 
@@ -76,6 +108,7 @@ const { data: { timeentries: inactiveUsers } = {} ,refetch: refetchInactive } = 
   end: formatClockifyDate(endOfDay),
   pageSize,
   messageType: REPORT_TYPES.INACTIVE_USERS,
+  isValid:isValid
 });
 
 const { data:barChartUser} = useUserReportSummary({
@@ -83,6 +116,7 @@ const { data:barChartUser} = useUserReportSummary({
   end: formatClockifyDate(endDate),
   pageSize,
   messageType: REPORT_TYPES.PROJECT_SUMMARY,
+  isValid:isValid
 });
 
 
