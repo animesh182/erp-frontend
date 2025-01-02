@@ -14,35 +14,13 @@ import ClockifyTimeEntry from "@/components/ClockifyTimeTracking";
 import DateRangePicker from "@/components/DateRangePicker";
 import { ProjectPageSkeletonCard, RectangleSkeleton } from "@/components/Skeletons";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
-import { formatClockifyDate } from "@/lib/utils";
+import { formatClockifyDate, validateDateRange } from "@/lib/utils";
 import { format, startOfMonth } from "date-fns";
 import ClockifyDataTable from "./clockify-data-table";
 import { columns } from "./Columns";
 import { toast } from "sonner";
 
 
-
-const validateDateRange = (startDate, endDate) => {
-  const now = new Date();
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  const oneYearInMs = 365 * 24 * 60 * 60 * 1000;
-
-  const errors = [];
-  
-  if (end - start > oneYearInMs) {
-    errors.push("Date range cannot exceed one year.");
-  }
-  
-  if (start > now) {
-    errors.push("Start date cannot be in the future.");
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors
-  };
-};
 
 
 

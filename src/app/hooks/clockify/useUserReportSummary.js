@@ -15,7 +15,7 @@ const REPORT_TYPES = {
     DETAILED_ENTRIES: 'detailedEntries'
 };
 
-export function useUserReportSummary({ start, end, pageSize, messageType ,isValid}) {
+export function useUserReportSummary({ start, end, pageSize, messageType ,isValid=true}) {
 
     return useQuery({
         queryKey: ["userReportSummary", start, end, pageSize, messageType],
@@ -25,7 +25,10 @@ export function useUserReportSummary({ start, end, pageSize, messageType ,isVali
                     return response
             },
         enabled: !!start && !!end && isValid,
-        onError: (error) => console.error("Error in useQuery:", error),
+        // onError: (error) => console.error("Error in useQuery:", error),
+        onError: (error) => {
+            toast.error("Error fetching Clockify Projects Report:", error);
+        },
     });
 }
 

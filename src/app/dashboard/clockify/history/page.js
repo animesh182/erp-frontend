@@ -7,9 +7,11 @@ import KpiCard from '@/components/kpicard';
 import { KpiSkeleton, ProjectPageSkeletonCard } from '@/components/Skeletons';
 import DataTable from '@/components/ui/data-table';
 import { useDateRange } from '@/context/dateRangeContext/DateRangeContext';
-import { formatClockifyDate } from '@/lib/utils';
+import { formatClockifyDate, validateDateRange } from '@/lib/utils';
 import { DollarSign, Hourglass, ListOrdered } from 'lucide-react';
 import { columns } from './Columns';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 const ClockifyHistory = () => {
 
@@ -20,15 +22,24 @@ const ClockifyHistory = () => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
   };
+  
+  const { isValid, errors } = validateDateRange(startDate, endDate);
+
+  useEffect(() => {
+    errors.forEach(error => toast.error(error));
+  }, [errors]);
+
+
   const { data,isLoading} = useUserReportSummary({
     start: formatClockifyDate(startDate),
     end: formatClockifyDate(endDate),
     pageSize: 1000,
     messageType: REPORT_TYPES.DETAILED_ENTRIES,
+    isValid:isValid
 });
 
-const kpiData = data?.totals;
-const allUsers = data?.timeentries;
+const kpiData = data?.totals || [];
+const allUsers = data?.timeentries || [];
 
 
   const formatDuration = (durationInSeconds) => {
@@ -56,7 +67,7 @@ const allUsers = data?.timeentries;
     
          {/* <div className="flex gap-4 w-full"> */}
         <div className="grid grid-cols-3 gap-4">
-    { isLoading ?
+    { isLoading  ?
      [...Array(3)].map((_, index) => (
       <div key={index} >
         <KpiSkeleton />

@@ -101,7 +101,7 @@ export default function ProjectDetails() {
           
           :
               <ProjectDetailsMain project={project} />}
-        {!isDescriptionOpen && (
+        {!isDescriptionOpen && !loading && (
           <Button onClick={() => setIsDescriptionOpen(true)} variant="outline">
             Description
           </Button>
