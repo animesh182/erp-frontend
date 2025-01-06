@@ -1,10 +1,11 @@
 "use client";
-import { fetchProfitLoss } from "@/app/api/dashboard/fetchProfitLoss";
-import { fetchKpiData } from "@/app/api/kpiData/fetchKpiData";
-import { getClockifyIdProjects } from "@/app/api/projects/getProjects";
+import { useProfitLoss } from "@/app/hooks/dashboard/useProfitLoss";
+import { useKpi } from "@/app/hooks/kpiData/useKpiData";
+import { useClockifyProjects } from "@/app/hooks/projects/useClockifyProjects";
 import ProfitLossChart from "@/components/charts/ProfitLoss";
 import KpiCard from "@/components/kpicard";
 import ComboboxProjectsWrapper from "@/components/ProjectComboBoxWrapper";
+import { RectangleSkeleton } from "@/components/Skeletons";
 import {
   Card,
   CardContent,
@@ -15,7 +16,6 @@ import YearPicker from "@/components/YearPicker";
 import { format } from "date-fns";
 import { Activity, CreditCard, DollarSign } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 
 
@@ -32,87 +32,16 @@ function getYearDateRange(year = new Date().getFullYear()) {
   return { startDate, endDate };
 }
 export default function ProfitLoss() {
-  const [profitLoss, setProfitLoss] = useState([]);
-
-  const [fetchedKpiData, setFetchedKpiData] = useState();
   const [kpiValues, setKpiValues] = useState();
-  const[clockifyProjects,setClockifyProjects]=useState()
    const [selectedProject, setSelectedProject] = useState("");
   const[selectedYear,setSelectedYear]=useState()
   const { startDate, endDate } = getYearDateRange(selectedYear);
-  useEffect(() => {
-    const getProfitLoss = async () => {
-      const { status, data } = await fetchProfitLoss(selectedProject,selectedYear);
-      const monthAbbreviations = {
-        January: "Jan",
-        February: "Feb",
-        March: "Mar",
-        April: "Apr",
-        May: "May",
-        June: "Jun",
-        July: "Jul",
-        August: "Aug",
-        September: "Sep",
-        October: "Oct",
-        November: "Nov",
-        December: "Dec",
-      };
-      // if (status === 200) {
-      if (status === 200 && Array.isArray(data.monthly_totals)){
-        // Transform the data into the required format
-        const transformedData = data.monthly_totals.map((monthData) => {
-          const { month, net_income, expenses, profit } = monthData;
-          // Calculate profit percentage
-          const profitPercentage =
-            net_income > 0 ? (profit / net_income) * 100 : 0;
 
-          // Map month names to abbreviations
 
-          return {
-            name: monthAbbreviations[month], // Abbreviated month names
-            totalIncome: net_income,
-            expenses,
-            profit,
-            profitPercentage, // This now properly reflects negative profit cases
-          };
-        });
+  const{data:clockifyProjects}=useClockifyProjects(true)
+  const{data:fetchedKpiData}=useKpi( startDate,endDate,selectedProject)
+  const{data:profitLoss,isLoading}=useProfitLoss(selectedProject,selectedYear)
 
-        setProfitLoss(transformedData); // Set the transformed data to state
-      } else {
-        console.error("Failed to fetch profit-loss data");
-        toast.error("Failed to fetch profit-loss data ")
-        const defaultData = Object.values(monthAbbreviations).map((month) => ({
-          name: month,
-          totalIncome: 0,
-          expenses: 0,
-          profit: 0,
-          profitPercentage: 0,
-        }));
-        setProfitLoss(defaultData)
-        
-      }
-    };
-
-    getProfitLoss();
-  }, [selectedProject,selectedYear]);
-  useEffect(() => {
-    const getKpiData = async () => {
-      const { status, data } = await fetchKpiData(
-        // format(startDate, "yyyy-MM-dd"),
-        // format(endDate, "yyyy-MM-dd"),
-        startDate,
-        endDate,
-        selectedProject
-      );
-      if (status === 200) {
-        setFetchedKpiData(data);
-      } else {
-        console.error("Failed to fetch KPI data");
-      }
-    };
-
-    getKpiData();
-  }, [selectedProject,selectedYear]);
   useEffect(() => {
     if (fetchedKpiData) {
       const updatedKpiDatas = [
@@ -143,26 +72,9 @@ export default function ProfitLoss() {
     }
   }, [fetchedKpiData]); // This will trigger whenever kpiData is fetched
 
-
-
-  useEffect(() => {
-    const fetchProjectsWIthClockifyId=async()=>{
-        try{
-        const response=await getClockifyIdProjects(true);
-        
-        setClockifyProjects(response)
-        
-    
-    
-        } catch (error) {
-        console.error("Error fetching projects:", error);
-    }
-    }
-    fetchProjectsWIthClockifyId();
-}, []);
-
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+      {isLoading?<RectangleSkeleton isSmall={false}/> :
       <Card>
         <CardHeader className="flex-row justify-between items-center">
           <CardTitle className="flex justify-between w-full">
@@ -214,6 +126,7 @@ export default function ProfitLoss() {
           </div>
         </CardContent>
       </Card>
+}
     </main>
   );
 }

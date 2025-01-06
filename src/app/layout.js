@@ -9,7 +9,7 @@ import { ClockifyProvider } from "@/context/clockifyContext/ClockifyContext";
 import { DateRangeProvider } from "@/context/dateRangeContext/DateRangeContext";
 
 export const metadata = {
-  title: "Avinto",
+  title: "Avinto ERP",
   description: "ERP system for Avinto",
 };
 

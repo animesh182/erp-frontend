@@ -128,7 +128,6 @@ export const navItems = [
 export default function AppSidebar({userName}) {
   const logout = useLogout();
   const theme = useTheme();
-  console.log(theme);
   const handleLogout = () => {
     logout();
   };
@@ -204,10 +203,12 @@ export default function AppSidebar({userName}) {
                         </CollapsibleContent>
                       </>
                     ) : (
+                      // <SidebarMenuButton asChild >
                       <SidebarMenuButton asChild className={`  ${
                             isActive(item.href)
                               ? "bg-muted text-primary"
-                              : "text-muted-foreground hover:text-primary"
+                              : "hover:text-primary"
+                              // : "text-muted-foreground hover:text-primary"
                           }`}>
                         <a href={item.href}>
                           {item.icon}

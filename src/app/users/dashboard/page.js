@@ -1,8 +1,8 @@
 "use client";
 
-import { fetchTimeEntries } from "@/app/api/clockify/getUserTimeEntries";
-import { getEmployeeKpi } from "@/app/api/employees/getEmployeeKpi";
-import { getEmployeeProjects } from "@/app/api/employees/getEmployeeProjects";
+import { useUserTimeEntries } from "@/app/hooks/clockify/useUserTimeEntries";
+import { useEmployeeProjects } from "@/app/hooks/employees/useEmployeeProjects";
+import { useEmployeeKpi } from "@/app/hooks/kpiData/useEmployeeKpi";
 import DoughnutChart from "@/components/charts/PieChart";
 import ClockifyTimeEntry from "@/components/ClockifyTimeTracking";
 import KpiCard from "@/components/kpicard";
@@ -12,41 +12,6 @@ import { DollarSign } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { columns } from "./Columns";
-
-const dummyKPIInfo = [
-  {
-    title: "Total Projects Assigned",
-    value: "3",
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-  {
-    title: "Time Allocated",
-    value: (
-      <div className="text-2xl">
-        8 <span className="text-muted-foreground text-base">/8 hours</span>
-      </div>
-    ),
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-  {
-    title: "Total Sick Leave",
-    value: (
-      <div className="text-2xl">
-        4 <span className="text-muted-foreground text-base">/14 days</span>
-      </div>
-    ),
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-  {
-    title: "Total Vacation Leave",
-    value: (
-      <div className="text-2xl">
-        6 <span className="text-muted-foreground text-base">/12 days</span>
-      </div>
-    ),
-    icon: <DollarSign className="w-4 h-4" />,
-  },
-];
 
 const tabs = ["Current Projects", "Previous Projects"];
 
@@ -120,77 +85,30 @@ const DoughnutChartData = (timeEntries) => {
 };
 
 const UsersHome = () => {
-  const [employeeProjects, setEmployeeProjects] = useState([]);
-  const [kpiInfo, setKpiInfo] = useState([]);
   const searchParams = useSearchParams();
   const userId = searchParams.get("userId");
   const [selectedTab, setSelectedTab] = useState("Current Projects");
-  const [timeEntries, setTimeEntries] = useState(null);
+  // const [timeEntries, setTimeEntries] = useState(null);
   const [userData, setUserData] = useState({ email: "", name: "" });
-  // const userData = { email: "sankalpa351asdasdasda@gmail.com", name: "Sankalpa Joshi" };
-
   const date = new Date();
   const clockifyDate = formatClockifyDate(date);
 
-  useEffect(() => {
-    const getEmployeeDetails = async () => {
-      try {
-        const { data, status } = await getEmployeeProjects(userId);
-        if (status === 200) {
-          setEmployeeProjects(data);
-          setUserData({
-            email: data[0].user_email,
-            name: data[0].user_name,
-          });
-        } else {
-          console.error("Failed to fetch employee data");
-        }
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      }
-    };
-    const getEmployeeKpiData = async () => {
-      try {
-        const data = await getEmployeeKpi(userId);
+  const{data:employeeProjects,isLoading}=useEmployeeProjects(userId)
+  const { data: kpiInfo } = useEmployeeKpi(userId);
 
-        if (data) {
-          setKpiInfo(data);
-        } else {
-          console.error("Failed to fetch employee data");
-        }
-      } catch (error) {
-        console.error("Error fetching employee details:", error);
-      }
-    };
-    getEmployeeDetails();
-    getEmployeeKpiData();
-  }, [userId]);
+
 
   useEffect(() => {
-    const fetchUserTimeEntries = async () => {
-      try {
-        const data = await fetchTimeEntries(userData, clockifyDate);
-        if (data) {
-          const transformedData = data.map((entry) => ({
-            timeInterval: entry.timeInterval,
-            description: entry.description, // Include description if needed
-            projectId: entry.projectId, // Include projectId if needed
-          }));
-
-          setTimeEntries(transformedData);
-          console.log(timeEntries, "transformedData");
-        } else {
-          console.log("No time entries found");
-        }
-      } catch (error) {
-        console.error("Error fetching time entries:", error);
-      }
-    };
-
-    if (userData.email && userData.name) {
-      fetchUserTimeEntries();
+    if (employeeProjects && employeeProjects.length > 0) {
+      setUserData({
+        email: employeeProjects[0]?.user_email || '',
+        name: employeeProjects[0]?.user_name || '',
+      });
     }
-  }, [userData, clockifyDate]);
+  }, [userId,employeeProjects]);
+
+
+  const{data:timeEntries}=useUserTimeEntries(userData,clockifyDate)
 
   const filteredProjects = Array.isArray(employeeProjects)
     ? employeeProjects.filter((project) => {
@@ -224,7 +142,7 @@ const UsersHome = () => {
   const transformedKpiInfo = [
     {
       title: "Total Projects Assigned",
-      value: kpiInfo.total_projects_assigned,
+      value: kpiInfo?.total_projects_assigned,
       icon: <DollarSign className="w-4 h-4" />,
     },
     {
@@ -241,8 +159,8 @@ const UsersHome = () => {
       title: "Total Sick Leave",
       value: (
         <div className="text-2xl">
-          {kpiInfo.total_sick_leave}{" "}
-          <span className="text-muted-foreground text-base">/14 days</span>
+          {kpiInfo?.total_sick_leave}{" "}
+          <span className="text-muted-foreground text-base">/{kpiInfo?.allocated_sick_leave + " days" || "14 days"}</span>
         </div>
       ),
       icon: <DollarSign className="w-4 h-4" />,
@@ -251,8 +169,8 @@ const UsersHome = () => {
       title: "Total Vacation Leave",
       value: (
         <div className="text-2xl">
-          {kpiInfo.total_vacation_leave}{" "}
-          <span className="text-muted-foreground text-base">/12 days</span>
+          {kpiInfo?.total_vacation_leave}{" "}
+          <span className="text-muted-foreground text-base">/{kpiInfo?.allocated_vacation_leave + " days" || "12 days"}</span>
         </div>
       ),
       icon: <DollarSign className="w-4 h-4" />,

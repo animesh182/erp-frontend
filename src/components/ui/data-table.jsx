@@ -6,6 +6,7 @@ import {
   getPaginationRowModel,
   useReactTable,
   getSortedRowModel,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 import {
   Pagination,
@@ -62,17 +63,11 @@ function DataTable({
   // const [selectedTab, setSelectedTab] = useState("All");
   const [selectedTab, setSelectedTab] = useState(isProjectPage ? "Ongoing" : "All");
 
-
-
-
- 
-
   // Memoize filtered data
   const filteredData = useMemo(() => {
     let filtered = data;
-
     if (selectedTab !== "All") {
-    
+      console.log(`Filtering by ${filterColumn} === ${selectedTab}`);
       filtered = filtered.filter((row) => row[filterColumn] === selectedTab);
     }
 
@@ -100,6 +95,7 @@ function DataTable({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     manualPagination: false, // You are not fetching data for each page separately
     initialState: {
       pagination: {
@@ -132,7 +128,6 @@ function DataTable({
 
   
   
-
 
   return (
     <EditRowContext.Provider value={{ onEditRow, onDeleteRow }}>
@@ -235,7 +230,7 @@ function DataTable({
                 ? row.original.transactionType === "Expense"
                   ? "bg-[#dc9d9c]/35" // Light red for expense
                   : row.original.transactionType === "Revenue"
-                  ? "bg-[#78ae78]/35" // Light green for revenue
+                  ? "bg-[#e0f2f1]" // Light green for revenue
                   : ""
                 : ""
             }

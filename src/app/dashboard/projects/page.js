@@ -1,52 +1,39 @@
 "use client";
-import DataTable from "@/components/ui/data-table";
-import { LayoutGridIcon, List, PlusCircle } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
-import { projectColumns } from "./Columns";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import CardLayout from "./CardLayout";
-import { Button } from "@/components/ui/button";
-import { useForm, FormProvider } from "react-hook-form";
-import { formInputs } from "./Inputs";
-import { EditProjectSheet } from "@/components/EditProjectSheet";
-import { toast } from "sonner";
-import { AddClientDialog } from "@/components/AddClientDialog";
-import { getClients } from "@/app/api/projects/getClients";
-import { format, startOfMonth, endOfMonth } from "date-fns";
-import { createProject } from "@/app/api/projects/createProject";
-import { editProject } from "@/app/api/projects/editProject";
 import { createClient } from "@/app/api/projects/createClient";
+import { createProject } from "@/app/api/projects/createProject";
 import { deleteProject } from "@/app/api/projects/deleteProject";
-import { getProjectDetails } from "@/app/api/projects/getProjects";
+import { editProject } from "@/app/api/projects/editProject";
+import { useClients } from "@/app/hooks/client/useClients";
+import { useProjectDetails } from "@/app/hooks/projects/useProjects";
+import { AddClientDialog } from "@/components/AddClientDialog";
+import { EditProjectSheet } from "@/components/EditProjectSheet";
 import { ProjectPageSkeletonCard, TitleSkeleton } from "@/components/Skeletons";
+import { Button } from "@/components/ui/button";
+import DataTable from "@/components/ui/data-table";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { format } from "date-fns";
+import { LayoutGridIcon, List, PlusCircle } from "lucide-react";
+import { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import CardLayout from "./CardLayout";
+import { projectColumns } from "./Columns";
+import { formInputs } from "./Inputs";
 
 export default function Projects() {
   const methods = useForm();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [projects, setProjects] = useState([]);
-  const [clients, setClients] = useState([]);
   const [isCardLayout, setIsCardLayout] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  // Initialize date states
-  // const initialStartDate = startOfMonth(new Date());
-  // const initialEndDate = endOfMonth(new Date());
-  // const [startDate, setStartDate] = useState(
-  //   format(initialStartDate, "yyyy-MM-dd")
-  // );
-  // const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-  
+
+    const{data:projects,isLoading:loading,refetch:refetchProject}=useProjectDetails( format(startDate, "yyyy-MM-dd"),format(endDate, "yyyy-MM-dd"))
+    
+    const{data:clients,refetch:refetchClient}=useClients()
     const handleDateChange = (newStartDate, newEndDate) => {
       setStartDate(newStartDate);
       setEndDate(newEndDate);
     };
-
-  const refreshComponent = useCallback(() => {
-    setRefreshKey((prevKey) => prevKey + 1);
-  }, []);
 
   const handleToggleLayout = (value) => {
     if (value === "grid") {
@@ -56,47 +43,6 @@ export default function Projects() {
     }
   };
 
-  useEffect(() => {
-    const getProjectsFromApi = async () => {
-      try {
-        const { status, data } = await getProjectDetails();
-        if (status === 200) {
-          setProjects(data);
-        } else {
-          console.error("Failed to fetch project data");
-          toast.error("Failed to fetch project data");
-        }
-      } catch (error) {
-        console.error("Error fetching project details:", error);
-        toast.error("Error fetching project details");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const getClientsFromApi = async () => {
-      try {
-        const { status, data } = await getClients();
-        if (status === 200) {
-          setClients(data);
-        } else {
-          console.error("Failed to fetch client data");
-          toast.error("Failed to fetch client data");
-        }
-      } catch (error) {
-        console.error("Error fetching client details:", error);
-        toast.error("Error fetching client details");
-      }
-    };
-
-    getProjectsFromApi();
-    getClientsFromApi();
-  }, [refreshKey, startDate, endDate]);
-
-  // const handleDateChange = (startDate, endDate) => {
-  //   setStartDate(startDate);
-  //   setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
-  // };
 
   const handleProjectAdd = () => {
     setIsSheetOpen(true);
@@ -106,7 +52,7 @@ export default function Projects() {
     try {
       const response = await createProject(formData);
       toast.success("Project added successfully");
-      refreshComponent();
+      refetchProject()
       setIsSheetOpen(false);
     } catch (error) {
       toast.error("Failed to add project");
@@ -118,7 +64,7 @@ export default function Projects() {
     try {
       await editProject(projectId, formData);
       toast.success("Project updated successfully");
-      refreshComponent();
+      refetchProject()
       setIsSheetOpen(false);
     } catch (error) {
       toast.error("Failed to update project");
@@ -131,7 +77,7 @@ export default function Projects() {
       const response = await deleteProject(projectId);
       if (response && response.message) {
         toast.success(response.message);
-        refreshComponent();
+        refetchProject()
       }
     } catch (error) {
       toast.error("There was an error deleting the project");
@@ -143,7 +89,7 @@ export default function Projects() {
     try {
       await createClient(formData);
       toast.success("Client added successfully");
-      refreshComponent();
+      refetchClient();
     } catch (error) {
       toast.error("There was an error adding the client");
       console.error("Error adding client:", error.message);

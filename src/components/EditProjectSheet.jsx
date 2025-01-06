@@ -33,7 +33,7 @@ export function EditProjectSheet({
     handleSubmit,
     reset,
     watch,
-    formState: { errors },
+    formState: { errors,isValid },
   } = useForm({
     defaultValues: projectData || {}, // If editing, set default values
   });
@@ -232,7 +232,7 @@ export function EditProjectSheet({
               children: (
                 <>
                   <SelectItem value="Not Started">Not Started</SelectItem>
-                  <SelectItem value="In Progress">Ongoing</SelectItem>
+                  <SelectItem value="Ongoing">Ongoing</SelectItem>
                   <SelectItem value="Done">Done</SelectItem>
                 </>
               ),
@@ -259,7 +259,7 @@ export function EditProjectSheet({
             })}
           </div>
 
-          <Button type="submit">
+          <Button type="submit" disabled={!isValid}>
             {projectData ? "Save Changes" : "Add Project"}
           </Button>
         </form>

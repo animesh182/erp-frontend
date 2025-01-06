@@ -10,10 +10,12 @@ export function KpiSkeleton({
   );
 }
 
-export function RectangleSkeleton() {
+export function RectangleSkeleton({isSmall=false}) {
+  console.log(isSmall,"small")
   return (
     <div className="flex flex-col ">
-      <Skeleton className="h-[600px] w-full rounded-xl" />
+      <Skeleton className={`${isSmall? "h-[300px]": "h-[600px]"} w-full rounded-xl`} />
+      {/* <Skeleton className="h-[600px] w-full rounded-xl" /> */}
     </div>
   );
 }
@@ -85,5 +87,22 @@ export function LargeTitleSkeleton() {
     <div className="flex flex-col ">
       <Skeleton className="h-10 w-[400px] rounded-lg" />
     </div>
+  );
+}
+export function ProfitAnalysisMarginSkeleton() {
+  return (
+    <div className="grid grid-cols-5  justify-between gap-x-6 h-[600px]">
+      <Skeleton className="w-[] lg:col-span-3 h-full" />
+      <Skeleton className="col-span-5 lg:col-span-2 h-full" />
+    </div>
+  );
+}
+
+
+export function SimpleSkeleton() {
+  return (
+    // <div className="flex flex-col ">
+      <Skeleton className="h-[125px] w-full rounded-xl" />
+    // </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import { prettifyText, cn } from "@/lib/utils";
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
@@ -23,15 +23,14 @@ export function EditRowSheet({
     handleSubmit,
     reset,
     watch,
-    formState: { errors },
+    formState: { errors,isValid  },
   } = useFormContext();
 
-  console.log(rowData);
 
   const invoiceIssuedDate = watch("invoiceIssuedDate");
   const status = watch("status");
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen && rowData) {
       const defaultValues = formInputs.reduce((acc, input) => {
         if (input.name && input.name !== "actions") {
@@ -73,6 +72,27 @@ export function EditRowSheet({
     const Component = field.component.type;
     const hasError = errors[field.name];
 
+    // if (field.name !== "actions") {
+    //   if (Component === Input) {
+    //     return (
+    //       <Controller
+    //         name={field.name}
+    //         control={control}
+    //         rules={{ required: field.required }}
+    //         render={({ field: { onChange, value } }) => (
+    //           <Input
+    //             {...field.component.props}
+    //             value={value || ""}
+    //             onChange={onChange}
+    //             className={cn(
+    //               field.component.props?.className,
+    //               hasError && "ring-2 ring-red-500"
+    //             )}
+    //           />
+    //         )}
+    //       />
+    //     );
+    //   }
     if (field.name !== "actions") {
       if (Component === Input) {
         return (
@@ -84,7 +104,17 @@ export function EditRowSheet({
               <Input
                 {...field.component.props}
                 value={value || ""}
-                onChange={onChange}
+                onChange={(e) => {
+                  // If the input type is number, handle floating point
+                  if (field.component.props?.type === "number") {
+                    const numberValue = e.target.value === "" ? "" : parseFloat(e.target.value);
+                    onChange(numberValue);
+                  } else {
+                    onChange(e);
+                  }
+                }}
+                // Allow decimal point input for number fields
+                step={field.component.props?.type === "number" ? "any" : undefined}
                 className={cn(
                   field.component.props?.className,
                   hasError && "ring-2 ring-red-500"
@@ -101,7 +131,7 @@ export function EditRowSheet({
             control={control}
             name={field.name}
             rules={{ required: field.required }}
-            render={({ field: { onChange, value } }) => (
+            render={({ field: { onChange, value} }) => (
               <ProjectSelect
                 value={value}
                 onChange={onChange}
@@ -162,7 +192,17 @@ export function EditRowSheet({
         <Controller
           control={control}
           name={field.name}
-          rules={{ required: field.required }}
+          // rules={{ required: field.required }}
+          rules={{
+            required: field.required,
+            validate: (value) => {
+              console.log(value,"value")
+              if (field.required && (value === null || value === undefined || value === "" || value==="N/A")) {
+                return "This field is required";
+              }
+              return true;
+            }
+          }}
           render={({ field: { onChange, value } }) => (
             <Component
               {...field.component.props}
@@ -213,9 +253,11 @@ export function EditRowSheet({
               </div>
             );
           })}
-          <Button type="submit">Save Changes</Button>
+          <Button type="submit" disabled={!isValid} >Save Changes</Button>
+
         </form>
       </SheetContent>
     </Sheet>
   );
 }
+

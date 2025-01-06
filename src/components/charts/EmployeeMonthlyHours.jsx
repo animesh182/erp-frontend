@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import { useMemo } from "react";
@@ -16,16 +18,35 @@ import {
   ChartTooltip
 } from "@/components/ui/chart";
 import { UserCircleIcon } from "lucide-react";
+// const colorPalette = [
+//   "#4A90E2",
+//   "#E47CF5",
+//   "#F5A623",
+//   "#50E3C2",
+//   "#FF7F50",
+//   "#B22222",
+//   "#DAA520",
+//   "#4682B4",
+// ];
 const colorPalette = [
-  "#4A90E2",
-  "#E47CF5",
-  "#F5A623",
-  "#50E3C2",
-  "#FF7F50",
-  "#B22222",
-  "#DAA520",
-  "#4682B4",
+  "#7FB3D5", // Medium Blue
+  "#B39DDB", // Soft Purple
+  "#F5B041", // Warm Orange
+  "#48C9B0", // Teal
+  "#F1948A", // Coral Pink
+  "#E74C3C", // Vibrant Red
+  "#F4D03F", // Golden Yellow
+  "#5499C7", // Sky Blue
+  "#52BE80", // Medium Green
+  "#EC7063", // Soft Salmon
+  "#D7BDE2", // Lavender
+  "#F7DC6F", // Light Gold
+  "#76D7C4", // Bright Cyan
+  "#FAD7A0", // Peach
+  "#D98880", // Dusty Rose
+  "#A3E4D7", // Aqua
 ];
+
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -66,20 +87,6 @@ function calculateRemainingHours(item, maxHours = 7) {
 }
 
 
-// function convertHoursToPercentage(data = [], maxHours = 7) {
-//   if (!Array.isArray(data)) {
-//     return []; // Return an empty array if data is not an array
-//   }
-//   return data.map((item) => {
-//     const convertedItem = { ...item };
-//     Object.keys(item).forEach((key) => {
-//       if (key !== "name") {
-//         convertedItem[key] = (item[key] / maxHours) * 100; // Convert to percentage
-//       }
-//     });
-//     return convertedItem;
-//   });
-// }
 function convertHoursToPercentage(data = []) {
   if (!Array.isArray(data)) {
     return []; // Return an empty array if data is not an array

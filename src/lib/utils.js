@@ -248,13 +248,25 @@ export async function changeApprovalStatus(url, status, options = {}) {
 
 
 
+// export const formatClockifyDate = (date) => {
+//   console.log(date,"dateat")
+//   const year = date.getFullYear();
+//   const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+//   const day = String(date.getDate()).padStart(2, "0");
+//   const time = "T00:00:00Z";
+//   return `${year}-${month}-${day}${time}`;
+// };
 export const formatClockifyDate = (date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
   const day = String(date.getDate()).padStart(2, "0");
-  const time = "T00:00:00Z";
-  return `${year}-${month}-${day}${time}`;
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+  
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
 };
+
 
 
 export const formatDuration = (durationInSeconds) => {
@@ -287,3 +299,29 @@ export function convertTimeToDate(time) {
 
   return currentDate;
 }
+
+
+
+
+
+export const validateDateRange = (startDate, endDate) => {
+  const now = new Date();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const oneYearInMs = 365 * 24 * 60 * 60 * 1000;
+
+  const errors = [];
+  
+  if (end - start > oneYearInMs) {
+    errors.push("Date range cannot exceed one year.");
+  }
+  
+  if (start > now) {
+    errors.push("Start date cannot be in the future.");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};

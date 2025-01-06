@@ -16,7 +16,6 @@ import {
 import { formatAmountDecimalToNOK } from "@/lib/utils";
 import { useTheme } from "next-themes";
 export default function ProfitLossChart({ data }) {
-  console.log(data, "data");
   const { theme } = useTheme();
 
   function CustomTooltip({ active, payload, label }) {

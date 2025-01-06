@@ -42,7 +42,7 @@ export async function getUserReportSummary(start, end, pageSize=1000, messageTyp
             
             const userDetails = await response.json();
             lastUserDetails = userDetails;
-            
+      
             // If no time entries, we've reached the end
             if (!userDetails.timeentries || userDetails.timeentries.length === 0) {
                 break;
@@ -90,8 +90,8 @@ function transformInactiveUsersData(data) {
         const userId = inactiveUser.userId || inactiveUser.userName;
         if (!acc[userId] || new Date(inactiveUser.timeInterval.end) > new Date(acc[userId].timeInterval.end)) {
             acc[userId] = inactiveUser;
-      }
-      return acc;
+    }
+    return acc;
     }, {});
     return {
         timeentries: Object.values(latestUserData).map((inactiveUser) => ({
@@ -115,9 +115,9 @@ function transformProjectSummaryData(data) {
         
         if (!userProjectsMap[userName]) {
             userProjectsMap[userName] = {
-          userName,
-          userId,
-          projects: [],
+            userName,
+            userId,
+            projects: [],
         };
     }
 
@@ -182,7 +182,6 @@ function formatMillisecondsToHourDifference(startTime, endTime) {
         const minutes = Math.floor(seconds / 60);
         const hours = Math.floor(minutes / 60);
         const days = Math.floor(hours / 24);
-        
         if (days > 0) {
             return days === 1 ? "in 1 day" : `in ${days} days`;
         } else if (hours > 0) {
@@ -213,3 +212,73 @@ function formatMillisecondsToHourDifference(startTime, endTime) {
 
 
 
+export const fetchUserReportSummaryy = async (start, end, page = 1) => {
+    console.log(`Fetching page ${page}`);
+    
+    const response = await fetch(
+        `https://reports.api.clockify.me/v1/workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_ID}/reports/detailed`,
+        {
+            method: 'POST',
+            headers: {
+                'X-Api-Key': process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                dateRangeStart: start || "2024-11-11T00:00:00Z",
+                dateRangeEnd: end || "2024-11-19T23:59:59Z",
+                detailedFilter: {
+                    groups: ["USER"],
+                    pageSize: 1000, // Fixed page size due to API limitation
+                    page: page
+                },
+                sortColumn: "DURATION",
+                rounding: false,
+                amountShown: "HIDE_AMOUNT"
+            }),
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch user detail with status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return {
+        ...data,
+        currentPage: page
+    };
+};
+
+
+    export const fetchTotalCount = async (start, end) => {
+        const response = await fetch(
+            `https://reports.api.clockify.me/v1/workspaces/${process.env.NEXT_PUBLIC_WORKSPACE_ID}/reports/detailed`,
+            {
+                method: 'POST',
+                headers: {
+                    'X-Api-Key': process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    dateRangeStart: start || "2024-11-11T00:00:00Z",
+                    dateRangeEnd: end || "2024-11-19T23:59:59Z",
+                    detailedFilter: {
+                        groups: ["USER"],
+                        pageSize: 1,  // Minimum size to get totals
+                        page: 1
+                    },
+                    sortColumn: "DURATION",
+                    rounding: false,
+                    amountShown: "HIDE_AMOUNT"
+                }),
+            }
+        );
+    
+        if (!response.ok) {
+            throw new Error(`Failed to fetch total count with status: ${response.status}`);
+        }
+    
+        const data = await response.json();
+        return data.totals?.entriesCount || 0;
+    };
+    

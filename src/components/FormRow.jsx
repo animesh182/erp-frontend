@@ -3,9 +3,10 @@ import { DatePicker } from "@/components/DatePicker";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useEffect, useState } from "react";
+import { cloneElement, useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { ProjectSelect } from "./ProjectSelect";
+import { cn } from "@/lib/utils";
 
 export function FormRow({ formInputs, onAddRow, projectOptions }) {
   const {
@@ -14,7 +15,7 @@ export function FormRow({ formInputs, onAddRow, projectOptions }) {
     handleSubmit,
     reset,
     watch,
-    formState: { isSubmitSuccessful },
+    formState: { isSubmitSuccessful,isValid },
   } = useFormContext();
 
   const [isInitialized, setIsInitialized] = useState(false);
@@ -128,16 +129,30 @@ export function FormRow({ formInputs, onAddRow, projectOptions }) {
           )}
         />
       );
-    } else {
-      return (
-        <Component
-          onClick={handleSubmit(onSubmit)}
-          {...field.component.props}
-        />
-      );
-    }
-  };
-
+    } 
+  //   else {
+  //     return (
+  //       <Component
+  //         onClick={handleSubmit(onSubmit)}
+  //         {...field.component.props}
+  //       />
+  //     );
+  //   }
+  // };
+        else {
+          // Modify the button component to include disabled state and styling
+          return cloneElement(field.component, {
+            onClick: handleSubmit(onSubmit),
+            disabled: !isValid,
+            // className: cn(
+            //   field.component.props.className,
+            //   "transition-colors",
+            //   // !isValid && "bg-gray-300 hover:bg-gray-300 cursor-not-allowed opacity-50"
+            //   !isValid && "bg-secondary text-accent-foreground cursor-not-allowed opacity-50"
+            // )
+          });
+        }
+      };
   if (!isInitialized) {
     return null; // or return a loading indicator
   }

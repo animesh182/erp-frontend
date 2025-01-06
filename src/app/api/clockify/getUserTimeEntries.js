@@ -61,7 +61,6 @@ export async function findUserByEmailOrName(userData) {
         }
   
         const clockifyData = await timeEntriesResponse.json();
-        console.log("Clockify Time Entries:", clockifyData);
         return clockifyData;
       } else {
         toast.error("User not found by email or name")

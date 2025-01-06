@@ -1,19 +1,26 @@
-"use client"
-import { getClockifyProjectSummary } from "@/app/api/clockify/getClockifyProjects";
-import PieChartwithBarChart from "@/components/charts/PieChartwithBarChart";
-import { useEffect, useState } from "react";
 
-import { ACTIVE_USERS_TYPES, getActiveUsers } from "@/app/api/clockify/getActiveUsers";
-import { getUserReportSummary, REPORT_TYPES } from "@/app/api/clockify/getUserReportSummary";
-import { getEmployees } from "@/app/api/employees/getEmployees";
-import { getClockifyIdProjects } from "@/app/api/projects/getProjects";
+"use client"
+import PieChartwithBarChart from "@/components/charts/PieChartwithBarChart";
+import { useCallback, useEffect, useState } from "react";
+
+import { ACTIVE_USERS_TYPES } from "@/app/api/clockify/getActiveUsers";
+import { REPORT_TYPES } from "@/app/api/clockify/getUserReportSummary";
+import { useActiveUsers } from "@/app/hooks/clockify/useActiveUsers";
+import { useClockifyProjectSummary } from "@/app/hooks/clockify/useClockifyProjects";
+import { useUserReportSummary } from "@/app/hooks/clockify/useUserReportSummary";
+import { useEmployees } from "@/app/hooks/employees/useEmployees";
+import { useClockifyProjects } from "@/app/hooks/projects/useClockifyProjects";
 import ClockifyTimeEntry from "@/components/ClockifyTimeTracking";
 import DateRangePicker from "@/components/DateRangePicker";
-import { formatClockifyDate } from "@/lib/utils";
+import { ProjectPageSkeletonCard, RectangleSkeleton } from "@/components/Skeletons";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { formatClockifyDate, validateDateRange } from "@/lib/utils";
 import { format, startOfMonth } from "date-fns";
 import ClockifyDataTable from "./clockify-data-table";
 import { columns } from "./Columns";
-import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { toast } from "sonner";
+
+
 
 
 
@@ -34,157 +41,74 @@ function combineUniqueUsers(activeUsers, inactiveUsers) {
 
 const Clockify = () => {
   const [projects, setProjects] = useState();
-  const [activeUsers, setActiveUsers] = useState();
-  const [inactiveUsers, setInactiveUsers] = useState();
   const[allUsers,setAllUsers]=useState()
   const initialEndDate = new Date(); 
   const initialStartDate = startOfMonth(initialEndDate) 
-  const [barChartUser, setBarChartUser] = useState(null);
-  const[employeeClockifyDetails,setEmployeeClockifyDetails]=useState()
-  const[clockifyProjects,setClockifyProjects]=useState()
   const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
   const[projectColor,setProjectColor]=useState()
 
+  const date=new Date()
+const oneMonthAgo = new Date(date);  
+oneMonthAgo.setMonth(date.getMonth() - 1);
+const oneDayAfter = new Date(endDate);  
+oneDayAfter.setDate(date.getDate() + 1);
+const endOfDay = new Date(date);
+endOfDay.setHours(23, 59, 59);
   const handleDateChange = (newStartDate, newEndDate) => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
   };
 
-
-
-const fetchEmployeeDetails=async()=>{
-  try{
-    const response=await getEmployees();
-    const clockifyIds = response.data.map((employee) => ({
-      userId: employee.clockify_user_id,
-      userName: employee.full_name,
-      userEmail: employee.email, // Replace with the actual email field name
-    }));
-
-    setEmployeeClockifyDetails(clockifyIds);
-
-
-  } catch (error) {
-    console.error("Error fetching active users:", error);
-}
-}
-const fetchClockifyActiveUsers = async () => {
-  if(employeeClockifyDetails && clockifyProjects)
-  try {
-      const transformedData = await getActiveUsers(employeeClockifyDetails.length, ACTIVE_USERS_TYPES.USER_LIST, {
-        employeeClockifyDetails,
-          // users,
-          clockifyProjects
-      });
-      
-      if (transformedData) {
-          setActiveUsers(transformedData);
-      } else {
-          console.log("No active users found");
-      }
-  } catch (error) {
-      console.error("Error fetching active users:", error);
-  }
-};
-
-
-
-const date=new Date()
-const oneMonthAgo = new Date(date);  
-oneMonthAgo.setMonth(date.getMonth() - 1);
-const oneDayAfter = new Date(date);  
-oneDayAfter.setDate(date.getDate() + 1);
-
-// Ensure it's correctly adjusted to the previous day
-
-
-const fetchProjectsWIthClockifyId=async()=>{
-  try{
-    const response=await getClockifyIdProjects();
-    
-    setClockifyProjects(response)
+  const { isValid, errors } = validateDateRange(startDate, endDate);
   
+  useEffect(() => {
+    errors.forEach(error => toast.error(error));
+  }, [errors]);
+
+  const{data:clockifyProjects}=useClockifyProjects(true)
+const{data:employeeClockifyDetails}=useEmployees()
+  const { data:activeUsers, refetch: refetchActive } = useActiveUsers({
+    items: employeeClockifyDetails?.length,
+    type: ACTIVE_USERS_TYPES.USER_LIST,
+    additionalData: {   employeeClockifyDetails,
+      clockifyProjects}, // Pass additional data if needed
+});
+
+const { data ,isLoading:clockifyProjectSummaryLoading} = useClockifyProjectSummary({
+  startDate: formatClockifyDate(startDate),
+  endDate: formatClockifyDate(endDate),
+  isValid:isValid
+});
 
 
-  } catch (error) {
-    console.error("Error fetching projects:", error);
-}
-}
+const { data: { timeentries: inactiveUsers } = {} ,refetch: refetchInactive } = useUserReportSummary({
+  start: formatClockifyDate(oneMonthAgo),
+  end: formatClockifyDate(endOfDay),
+  pageSize,
+  messageType: REPORT_TYPES.INACTIVE_USERS,
+  isValid:isValid
+});
+
+const { data:barChartUser} = useUserReportSummary({
+  start: formatClockifyDate(startDate),
+  end: formatClockifyDate(endDate),
+  pageSize,
+  messageType: REPORT_TYPES.PROJECT_SUMMARY,
+  isValid:isValid
+});
 
 
-
-
-
-  const fetchClockifyProjectsReport = async () => {
-      try {
-          const data = await getClockifyProjectSummary(formatClockifyDate(startDate),formatClockifyDate(endDate));
-          if (data && data.groupOne) {
-            const topProjects = data.groupOne
-            .sort((a, b) => b.duration - a.duration)
-              setProjects(topProjects);
-
-
-              setProjectColor(topProjects.map((project)=>{
-                return {projectName:project.name,
-                        projectColor:project.color
-                }
-              }))
-          } else {
-              console.log("No projects found");
-          }
-      } catch (error) {
-          console.error("Error fetching projects:", error);
-      }
-  };
-
-  const fetchClockifyUsersReport = async () => {
-    try {
-      const data = await getUserReportSummary(
-        formatClockifyDate(oneMonthAgo),
-        formatClockifyDate(oneDayAfter),
-        pageSize,
-        REPORT_TYPES.INACTIVE_USERS
-      );
-  
-      if (data) {
-
-        setInactiveUsers(data.timeentries);
-        //to send projects color to data table 
-      }
-    } catch (error) {
-      console.error("Error fetching users:", error);
+  useEffect(() => {
+    if (data && data.groupOne) {
+        const colors = data.groupOne.map((project) => ({
+            projectName: project.name,
+            projectColor: project.color,
+        }));
+        setProjectColor(colors);
+        setProjects(data.groupOne)
     }
-  };
-  const fetchClockifyUsersProjectsReport = async () => {
-    try {
-      const data = await getUserReportSummary(
-        formatClockifyDate(startDate),
-        formatClockifyDate(endDate),
-        pageSize,
-        REPORT_TYPES.PROJECT_SUMMARY
-      );
-  
-      if (data) {
-        setBarChartUser(data);
-      }
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
+  }, [data]);
 
-
-
-useEffect(() => {
-  fetchEmployeeDetails()
-  fetchProjectsWIthClockifyId()
-  fetchClockifyProjectsReport();
-  fetchClockifyUsersProjectsReport()
-  fetchClockifyUsersReport()
-}, [endDate]);
-useEffect(()=>{
-  fetchClockifyActiveUsers();
-
-},[employeeClockifyDetails,clockifyProjects])
 useEffect(() => {
 
   if (activeUsers && inactiveUsers) {
@@ -193,10 +117,9 @@ useEffect(() => {
 }, [activeUsers, inactiveUsers]); 
 
 
-const clockifyTimeEntryProp={
-  clockifyUserId:process.env.NEXT_PUBLIC_CLOCKIFY_API_KEY,
-  userName:"Animesh Adhikari"
-}
+const refreshTableData = useCallback(async () => {
+  await Promise.all([refetchActive(), refetchInactive()]);
+}, [refetchActive, refetchInactive]);
 
   return (
     <div className="grid grid-cols-1 p-6 gap-8">
@@ -214,7 +137,9 @@ const clockifyTimeEntryProp={
               
               
 </div>
-        {projects  && 
+        {!projects  ?
+        <RectangleSkeleton isSmall={false}/>
+        :
         <>
       <div>
         <PieChartwithBarChart className="" chartData={projects.map((project, index) => ({
@@ -227,8 +152,9 @@ const clockifyTimeEntryProp={
 
       </>
       }
-              <ClockifyTimeEntry clockifyTimeEntryProp={clockifyTimeEntryProp}/>
-      {allUsers && (
+
+<ClockifyTimeEntry onRefresh={refreshTableData} />
+      {allUsers ? (
 
       
 
@@ -239,7 +165,9 @@ const clockifyTimeEntryProp={
   filterColumn={"status"}
   subtitle={"View detailed information about all team activities in this table."}
 />
-    )}
+    ):
+    <ProjectPageSkeletonCard/>
+    }
     </div>
   );
 };

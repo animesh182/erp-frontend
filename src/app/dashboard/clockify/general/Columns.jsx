@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import React, { useState } from "react";
 import ClockifyBarChart from "./clockify-bar-chart";
 import { Dot } from "lucide-react";
+import { useIsMobile } from "@/components/hooks/use-mobile";
 
 
 
@@ -31,7 +32,7 @@ const LatestActivityCell = ({ latest_activity, project_name ,projectColor}) => {
   return (
     <div>
       <p
-        className={`w-72 ${isTruncated ? "cursor-pointer" : ""}`}
+        className={`w-72 ${isTruncated ? "cursor-pointer" : ""} `}
         onClick={() => isTruncated && setIsExpanded(!isExpanded)}
         title={
           isTruncated
@@ -59,11 +60,15 @@ export const columns = (barChartUser,startDate,endDate,projectColor) => [
     accessorKey: "user_name",
     header: "Team Member",
     cell: ({ row }) => {
-      const { user_name, user_email } = row.original;
+      const { user_name, user_email ,project_name } = row.original;
+      const matchedProject = projectColor?.find(
+        (project) => project.projectName === project_name
+      );
       return (
         <div>
           <p>{user_name || "N/A"}</p>
-          <p className="text-muted-foreground text-sm">{user_email || "N/A"}</p>
+          <p className="text-muted-foreground text-sm hidden md:block">{user_email || "N/A"}</p>
+          <p className="text-sm md:hidden lg:hidden block" style={{ color: matchedProject?.projectColor }} >{project_name}</p>
         </div>
       );
     },
@@ -83,6 +88,7 @@ export const columns = (barChartUser,startDate,endDate,projectColor) => [
     );
   },
   enableSorting: false,
+  hideOnMobile:true
 },
 
 
@@ -114,6 +120,7 @@ export const columns = (barChartUser,startDate,endDate,projectColor) => [
       );
     },
     enableSorting: false,
+    hideOnMobile:true
   },
   {
     accessorKey: "time_tracked",
@@ -127,5 +134,6 @@ export const columns = (barChartUser,startDate,endDate,projectColor) => [
       );
     },
     enableSorting: false,
+    hideOnMobile:true
   },
 ];

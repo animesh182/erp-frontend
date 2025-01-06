@@ -24,7 +24,20 @@ export const columns = [
   {
     accessorKey: "utilization",
     header: "Time Allocated",
+    cell: ({ row }) => {
+      const { utilization } = row.original;
+      return <div>{utilization} hrs</div>;
+    },
     enableSorting: false,
+    cell: ({ row }) => {
+      const { utilization } = row.original;
+      const monthlyUtlization=(utilization*24).toFixed(2)
+      return (
+        <div>
+          {monthlyUtlization} <span className="text-xs font-medium">hrs/month</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "start_date",

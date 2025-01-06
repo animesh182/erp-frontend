@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/utils";
 
-export async function getProjects(formatData = false) {
+export async function getProjects() {
   try {
     const response = await apiClient(
       `${process.env.NEXT_PUBLIC_API_URL}/api/project`,
@@ -8,16 +8,6 @@ export async function getProjects(formatData = false) {
         method: "GET",
       }
     );
-
-    if (formatData) {
-      // Format the fetched data to match the required format
-      const formattedData = response.data.map((project) => ({
-        id: project.id,
-        name: project.name,
-      }));
-      return formattedData;
-    }
-
     return response;
   } catch (error) {
     throw new Error(error.message || "Failed to fetch projects");
@@ -27,7 +17,7 @@ export async function getProjects(formatData = false) {
 
 
 
-export async function getClockifyIdProjects(getAllProjects=false) {
+export async function getClockifyIdProjectsss(getAllProjects=false) {
   try {
     const response = await apiClient(
       `${process.env.NEXT_PUBLIC_API_URL}/api/project/project_clockify_id_list/`,
@@ -74,29 +64,50 @@ export async function getClockifyIdProjects(getAllProjects=false) {
   }
 }
 
-
-export async function getProjectDetails() {
+export async function getClockifyIdProjects() {
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/project/`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/project/project_clockify_id_list/`,
+      {
+        method: "GET",
+      }
     );
+    return response.data; // Just return raw data
+  } catch (error) {
+    throw new Error(error.message || "Failed to fetch projects with clockify ID");
+  }
+}
+
+
+
+
+export async function getProjectDetails(startDate, endDate) {
+  try {
+    let url = `${process.env.NEXT_PUBLIC_API_URL}/api/project/`;
+    if (startDate && endDate) {
+      url += `?start_date=${startDate}&end_date=${endDate}`;
+    }
+
+    const response = await apiClient(url);
+
     return { status: 200, data: response.data };
   } catch (error) {
     return {
       status: error.status || 500,
-      message: error.message || "Failed to fetch the employee details",
+      message: error.message || "Failed to fetch the project details",
     };
   }
 }
 
-export async function getProjectById(projectId) {
-  try {
-    // Call the API endpoint for the specific project
-    const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/project/${projectId}`
-    );
 
-    // Return the response directly since it's not wrapped in a `data` field
+export async function getProjectById(projectId, startDate, endDate) {
+  try {
+    let url = `${process.env.NEXT_PUBLIC_API_URL}/api/project/${projectId}/`;
+    // If startDate and endDate are provided, include them in the URL
+    if (startDate && endDate) {
+      url += `?start_date=${startDate}&end_date=${endDate}`;
+    }
+    const response = await apiClient(url);
     return { status: 200, data: response };
   } catch (error) {
     return {

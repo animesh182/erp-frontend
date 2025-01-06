@@ -1,43 +1,14 @@
 "use client";
-import { getTransactions } from "@/app/api/transactions/getTransactions";
-import DataTable from "@/components/ui/data-table";
-import { endOfMonth, format, startOfMonth } from "date-fns";
-import { useEffect, useState } from "react";
-import { columns } from "./Columns";
-import { fetchTransactionKpi } from "@/app/api/kpiData/fetchTransactionKpi";
-import KpiCard from "@/components/kpicard";
-import { Activity, CreditCard, DollarSign } from "lucide-react";
-import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { useTransaction } from "@/app/hooks/finances/useTransaction";
 import { ProjectPageSkeletonCard } from "@/components/Skeletons";
+import DataTable from "@/components/ui/data-table";
+import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
+import { format } from "date-fns";
+import { columns } from "./Columns";
 
 export default function Transactions() {
-  // Get first day of current month
-  // const initialStartDate = startOfMonth(new Date());
-  // // Get last day of current month
-  // const initialEndDate = endOfMonth(new Date());
-
-  // const [startDate, setStartDate] = useState(
-  //   format(initialStartDate, "yyyy-MM-dd")
-  // );
-  // const [endDate, setEndDate] = useState(format(initialEndDate, "yyyy-MM-dd"));
-
-  // State to hold transaction data
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  // State to hold dynamic KPI data
-  const [kpiData, setKpiData] = useState({
-    total_revenue: "0",
-    total_expenses: "0",
-    total_profit: "0",
-    changeInRevenue: "0",
-    changeInExpenses: "0",
-    changeInProfit: "0",
-  });
-
-  // State to handle error
-  const [error, setError] = useState(null);
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-  
+    const {data,isLoading}=useTransaction( format(startDate, "yyyy-MM-dd"),format(endDate, "yyyy-MM-dd"))
     const handleDateChange = (newStartDate, newEndDate) => {
       setStartDate(newStartDate);
       setEndDate(newEndDate);
@@ -87,32 +58,28 @@ export default function Transactions() {
   // }, [startDate, endDate]); // Re-run when date changes
 
   // Fetch transaction data
-  useEffect(() => {
-    if (startDate && endDate) {
-      fetchData(startDate, endDate);
-    }
-  }, [startDate, endDate]);
+  // useEffect(() => {
+  //   if (startDate && endDate) {
+  //     fetchData(startDate, endDate);
+  //   }
+  // }, [startDate, endDate]);
 
-  const fetchData = async (startDate, endDate) => {
-    console.log("Fetching data from:", startDate, "to:", endDate);
-    try {
-      const fetchedData = await getTransactions(
-        format(startDate, "yyyy-MM-dd"),
-        format(endDate, "yyyy-MM-dd")
-      );
-      console.log(fetchedData, "transactions data");
-      setData(fetchedData);
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-    } finally{
-      setIsLoading(false)
-    }
-  };
-
-  // const handleDateChange = (startDate, endDate) => {
-  //   setStartDate(startDate);
-  //   setEndDate(format(endOfMonth(new Date(endDate)), "yyyy-MM-dd"));
+  // const fetchData = async (startDate, endDate) => {
+  //   console.log("Fetching data from:", startDate, "to:", endDate);
+  //   try {
+  //     const fetchedData = await getTransactions(
+  //       format(startDate, "yyyy-MM-dd"),
+  //       format(endDate, "yyyy-MM-dd")
+  //     );
+  //     console.log(fetchedData, "transactions data");
+  //     setData(fetchedData);
+  //   } catch (error) {
+  //     console.error("Error fetching transactions:", error);
+  //   } finally{
+  //     setIsLoading(false)
+  //   }
   // };
+
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">

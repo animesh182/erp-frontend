@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { X } from "lucide-react";
 
 const ProjectDetailsSidebar = ({ project, onClose}) => {
-  const teamMembers = project.all_user_projects.map((user) => ({
+  const teamMembers = project.all_user_projects?.map((user) => ({
     name: user.user_name,
     image: null, // You can replace this with a proper avatar URL if available
   }));
