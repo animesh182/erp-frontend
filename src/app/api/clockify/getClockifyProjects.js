@@ -49,7 +49,7 @@ export async function getClockifyProjects() {
         if (!response.ok) {
             throw new Error(`Failed to fetch project summary with status: ${response.status}`);
         }
-
+        
         const projectSummary = await response.json();
         return projectSummary;
     } catch (error) {

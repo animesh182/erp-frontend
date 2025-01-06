@@ -3,10 +3,9 @@
 import TimeCell from "./time-tracking";
 
 import { Badge } from "@/components/ui/badge";
-import React, { useState } from "react";
-import ClockifyBarChart from "./clockify-bar-chart";
 import { Dot } from "lucide-react";
-import { useIsMobile } from "@/components/hooks/use-mobile";
+import { useState } from "react";
+import ClockifyBarChart from "./clockify-bar-chart";
 
 
 
@@ -46,7 +45,7 @@ const LatestActivityCell = ({ latest_activity, project_name ,projectColor}) => {
       </p>
       <div className="flex items-center mt-1">
       <Dot style={{ color: matchedProject?.projectColor }} />
-      <p className='text-sm' style={{ color: matchedProject?.projectColor }}>{project_name || "N/A"}</p>
+      <p className='text-sm' style={{ color: matchedProject?.projectColor || "gray"}}>{project_name || "N/A"}</p>
       </div>
     </div>
   );
@@ -64,11 +63,12 @@ export const columns = (barChartUser,startDate,endDate,projectColor) => [
       const matchedProject = projectColor?.find(
         (project) => project.projectName === project_name
       );
+
       return (
         <div>
           <p>{user_name || "N/A"}</p>
           <p className="text-muted-foreground text-sm hidden md:block">{user_email || "N/A"}</p>
-          <p className="text-sm md:hidden lg:hidden block" style={{ color: matchedProject?.projectColor }} >{project_name}</p>
+          <p className="text-sm md:hidden lg:hidden block" style={{ color: matchedProject?.projectColor || "gray" }} >{project_name}</p>
         </div>
       );
     },

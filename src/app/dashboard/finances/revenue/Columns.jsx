@@ -3,7 +3,6 @@ import { formInputs } from "@/app/dashboard/finances/revenue/Inputs";
 import TableActionsDropdown from "@/components/TableActionsDropdown";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const columns = [
   {
@@ -41,31 +40,7 @@ export const columns = [
 
   {
     accessorKey: "status",
-    header: ({ column }) => {
-      return (
-        <Select
-          onValueChange={(value) => {
-            if (value === "all") {
-              column.setFilterValue(undefined); // Clear filter for "all"
-            } else {
-              column.setFilterValue(value); // Set filter for specific value
-            }
-          }}
-          defaultValue="all"
-        >
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            {statusOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      );
-    },
+    header: "Status",
     cell: ({ row }) => {
       const { status } = row.original; // Access the `status` value for this row
       return (

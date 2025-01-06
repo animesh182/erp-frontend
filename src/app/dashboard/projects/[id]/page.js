@@ -18,6 +18,7 @@ import { columns } from "./Columns";
 import ProjectDetailsMain from "./ProjectDetailsMain";
 import ProjectDetailsSidebar from "./ProjectDetailsSidebar";
 import { KpiSkeleton, ProjectPageSkeletonCard, RectangleSkeleton, SimpleSkeleton } from "@/components/Skeletons";
+import { expenseColumns } from "./ExpenseColumns";
 
 export default function ProjectDetails() {
   const [error, setError] = useState(null);
@@ -156,9 +157,14 @@ export default function ProjectDetails() {
     <TableTitle
       subtitle="List of expense of all employees in the project"
     />
-    <div className="text-lg font-medium text-center">
+    {/* <div className="text-lg font-medium text-center">
       Expense data will be available soon.
-    </div>
+    </div> */}
+       <SimpleDataTable
+      columns={expenseColumns}
+      data={project?.invoices}
+      onDeleteRow={onDeleteRow}
+    />
   </TabsContent>
   </CardContent>
 </Tabs>
