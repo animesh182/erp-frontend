@@ -52,6 +52,7 @@ function DataTable({
   onDeleteRow,
   userId,
   isMonthPicker = false,
+  allDate=false
 }) {
   const [sorting, setSorting] = useState([]);
   const [searchValue, setSearchValue] = useState("");
@@ -160,16 +161,18 @@ function DataTable({
                   onChange={(e) => setSearchValue(e.target.value)}
                 />
               </div>}
-              {initialStartDate && initialEndDate && onDateChange && (
+              {/* {initialStartDate && initialEndDate && onDateChange && ( */}
+              {onDateChange && (
                 <div>
                   <DateRangePicker
                     onDateChange={onDateChange}
                     initialStartDate={initialStartDate}
                     initialEndDate={initialEndDate}
                     isMonthPicker={isMonthPicker}
+                    allDate={allDate}
                   />
                 </div>
-              )}
+              )} 
             </div>
 
             <div className="w-full">

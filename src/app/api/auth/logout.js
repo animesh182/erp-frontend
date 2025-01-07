@@ -8,6 +8,8 @@ export function useLogout() {
   const logout = () => {
     Cookies.remove("access_token");
     Cookies.remove("refresh_token");
+    Cookies.remove("clockifyUserData");
+
     router.push("/");
     return { message: "Logout successful" };
   };
