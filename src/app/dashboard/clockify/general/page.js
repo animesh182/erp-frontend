@@ -54,6 +54,10 @@ const oneDayAfter = new Date(endDate);
 oneDayAfter.setDate(date.getDate() + 1);
 const endOfDay = new Date(date);
 endOfDay.setHours(23, 59, 59);
+const endOfDate = new Date(endDate);
+endOfDate.setHours(23, 59, 59);
+
+
   const handleDateChange = (newStartDate, newEndDate) => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
@@ -74,9 +78,9 @@ const{data:employeeClockifyDetails}=useEmployees()
       clockifyProjects}, // Pass additional data if needed
 });
 
-const { data ,isLoading:clockifyProjectSummaryLoading} = useClockifyProjectSummary({
+const { data } = useClockifyProjectSummary({
   startDate: formatClockifyDate(startDate),
-  endDate: formatClockifyDate(endDate),
+  endDate: formatClockifyDate(endOfDate),
   isValid:isValid
 });
 
@@ -91,7 +95,7 @@ const { data: { timeentries: inactiveUsers } = {} ,refetch: refetchInactive } = 
 
 const { data:barChartUser} = useUserReportSummary({
   start: formatClockifyDate(startDate),
-  end: formatClockifyDate(endDate),
+  end: formatClockifyDate(endOfDate),
   pageSize,
   messageType: REPORT_TYPES.PROJECT_SUMMARY,
   isValid:isValid
@@ -100,6 +104,7 @@ const { data:barChartUser} = useUserReportSummary({
 
   useEffect(() => {
     if (data && data.groupOne) {
+      console.log(data,"datataa")
         const colors = data.groupOne.map((project) => ({
             projectName: project.name,
             projectColor: project.color,

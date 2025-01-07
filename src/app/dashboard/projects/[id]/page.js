@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import SimpleDataTable from "@/components/ui/simple-data-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
-import { format, isAfter } from "date-fns";
+import { endOfMonth, format, isAfter, startOfMonth } from "date-fns";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -18,6 +18,7 @@ import { columns } from "./Columns";
 import ProjectDetailsMain from "./ProjectDetailsMain";
 import ProjectDetailsSidebar from "./ProjectDetailsSidebar";
 import { KpiSkeleton, ProjectPageSkeletonCard, RectangleSkeleton, SimpleSkeleton } from "@/components/Skeletons";
+import { expenseColumns } from "./ExpenseColumns";
 
 export default function ProjectDetails() {
   const [error, setError] = useState(null);
@@ -25,7 +26,17 @@ export default function ProjectDetails() {
   const [selectedTab, setSelectedTab] = useState('Ongoing');
   const { id } = useParams();
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-    const{data:project,isLoading:loading,refetch:refetchProject}=useProjectById(id ,  format(startDate, "yyyy-MM-dd"),format(endDate, "yyyy-MM-dd"))
+      if (!startDate && !endDate) {
+          const currentDate = new Date();
+          const firstDayOfMonth = startOfMonth(currentDate);
+          setStartDate(firstDayOfMonth);
+          setEndDate(currentDate);
+        }
+
+        const formattedStartDate = startDate ? format(new Date(startDate), "yyyy-MM-dd") :  format(startOfMonth(new Date()), "yyyy-MM-dd");;
+        const formattedEndDate = endDate ? format(new Date(endDate), "yyyy-MM-dd") :  format(endOfMonth(new Date()), "yyyy-MM-dd");
+    const{data:project,isLoading:loading,refetch:refetchProject}=useProjectById(id ,  formattedStartDate,formattedEndDate)
+    // const{data:project,isLoading:loading,refetch:refetchProject}=useProjectById(id ,  format(startDate, "yyyy-MM-dd"),format(endDate, "yyyy-MM-dd"))
     const handleDateChange = (newStartDate, newEndDate) => {
       setStartDate(newStartDate);
       setEndDate(newEndDate);
@@ -156,9 +167,14 @@ export default function ProjectDetails() {
     <TableTitle
       subtitle="List of expense of all employees in the project"
     />
-    <div className="text-lg font-medium text-center">
+    {/* <div className="text-lg font-medium text-center">
       Expense data will be available soon.
-    </div>
+    </div> */}
+       <SimpleDataTable
+      columns={expenseColumns}
+      data={project?.invoices}
+      onDeleteRow={onDeleteRow}
+    />
   </TabsContent>
   </CardContent>
 </Tabs>

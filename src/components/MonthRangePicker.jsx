@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -15,6 +16,7 @@ const addMonths = (input, months) => {
   );
   return date;
 };
+
 const getDaysInMonth = (year, month) => new Date(year, month, 0).getDate();
 
 const MONTHS = [
@@ -50,7 +52,7 @@ const MONTHS = [
   ],
 ];
 
-const QUICK_SELECTORS = [
+const BASE_QUICK_SELECTORS = [
   {
     label: "This year",
     startMonth: new Date(new Date().getFullYear(), 0),
@@ -70,8 +72,14 @@ const QUICK_SELECTORS = [
     label: "Last 12 months",
     startMonth: new Date(addMonths(new Date(), -12)),
     endMonth: new Date(),
-  },
+  }
 ];
+
+const ALL_TIME_SELECTOR = {
+  label: "All Time",
+  startMonth: null,
+  endMonth: null
+};
 
 function MonthRangePicker({
   onMonthRangeSelect,
@@ -83,13 +91,26 @@ function MonthRangePicker({
   variant,
   minDate,
   maxDate,
-  quickSelectors,
-  showQuickSelectors,
+  quickSelectors: customQuickSelectors,
+  showQuickSelectors = true,
   className,
+  allDate = false,
   ...props
 }) {
+  const quickSelectors = React.useMemo(() => {
+    if (!showQuickSelectors) return [];
+    
+    const baseSelectors = customQuickSelectors || BASE_QUICK_SELECTORS;
+    
+    if (allDate && !baseSelectors.some(selector => selector.label === "All Time")) {
+      return [ALL_TIME_SELECTOR, ...baseSelectors];
+    }
+    
+    return baseSelectors;
+  }, [showQuickSelectors, customQuickSelectors, allDate]);
+
   return (
-    <div className={cn("min-w-[400px]  p-3", className)} {...props}>
+    <div className={cn("min-w-[400px] p-3", className)} {...props}>
       <div className="flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0">
         <div className="w-full">
           <MonthRangeCal
@@ -104,7 +125,7 @@ function MonthRangePicker({
             maxDate={maxDate}
             quickSelectors={quickSelectors}
             showQuickSelectors={showQuickSelectors}
-          ></MonthRangeCal>
+          />
         </div>
       </div>
     </div>
@@ -119,7 +140,7 @@ function MonthRangeCal({
   variant,
   minDate,
   maxDate,
-  quickSelectors = QUICK_SELECTORS,
+  quickSelectors = BASE_QUICK_SELECTORS,
   showQuickSelectors = true,
   onYearBackward,
   onYearForward,
@@ -326,12 +347,24 @@ function MonthRangeCal({
         </table>
       </div>
 
+     
       {showQuickSelectors ? (
         <div className=" flex flex-col gap-1 justify-center">
           {quickSelectors.map((s) => {
             return (
               <Button
                 onClick={() => {
+                  if (s.startMonth === null && s.endMonth === null) {
+                    // Handle "All Time" selection
+                    setRangePending(false);
+                    setEndLocked(true);
+                    if (onMonthRangeSelect) {
+                      onMonthRangeSelect({
+                        start: null,
+                        end: null,
+                      });
+                    }
+                  } else {
                   setStartYear(s.startMonth.getFullYear());
                   setStartMonth(s.startMonth.getMonth());
                   setEndYear(s.endMonth.getFullYear());
@@ -344,7 +377,7 @@ function MonthRangeCal({
                       end: s.endMonth,
                     });
                   if (s.onClick) s.onClick(s);
-                }}
+                }}}
                 key={s.label}
                 variant={s.variant ?? "outline"}
               >

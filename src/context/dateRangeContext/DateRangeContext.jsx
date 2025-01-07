@@ -8,6 +8,7 @@ export const DateRangeContext = createContext();
 export const DateRangeProvider = ({ children }) => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
         // Ensure this runs after hydration
@@ -19,25 +20,32 @@ export const DateRangeProvider = ({ children }) => {
 
         setStartDate(storedStartDate ? new Date(storedStartDate) : currentStartDate);
         setEndDate(storedEndDate ? new Date(storedEndDate) : currentEndDate);
+        setIsInitialized(true);
     }, []);
 
     useEffect(() => {
-        if (startDate && endDate) {
+        if (isInitialized && startDate && endDate) {
             sessionStorage.setItem("startDate", startDate.toISOString());
             sessionStorage.setItem("endDate", endDate.toISOString());
         }
-    }, [startDate, endDate]);
+    }, [startDate, endDate, isInitialized]);
 
     const updateDateRange = (newStartDate, newEndDate) => {
         setStartDate(newStartDate);
         setEndDate(newEndDate);
     };
 
-    // Render children only when dates are initialized
-    if (!startDate || !endDate) return null;
+    if (!isInitialized) return null;
 
     return (
-        <DateRangeContext.Provider value={{ startDate, endDate, setStartDate, setEndDate, updateDateRange }}>
+        <DateRangeContext.Provider value={{ 
+            startDate, 
+            endDate, 
+            updateDateRange,
+            setStartDate, 
+            setEndDate,
+            hasDateFilter: Boolean(startDate && endDate)
+        }}>
             {children}
         </DateRangeContext.Provider>
     );

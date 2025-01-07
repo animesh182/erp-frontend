@@ -150,7 +150,7 @@ export default function EmployeeMonthlyHours({ rawData }) {
             <UserCircleIcon className="h-8 w-8 pb-1.5" />
             <div className="flex flex-col w-full">
               <div className="font-semibold">{truncatedName}</div>
-              <div className="text-[10px]">
+              {/* <div className="text-[10px]">
                 {remainingHours < 0
                   ? `${Math.abs(remainingHours)} hours Overtime`
                   : `${remainingHours} ${
@@ -158,7 +158,7 @@ export default function EmployeeMonthlyHours({ rawData }) {
                         ? "hour available"
                         : "hours available"
                     }`}
-              </div>
+              </div> */}
             </div>
           </div>
         </foreignObject>

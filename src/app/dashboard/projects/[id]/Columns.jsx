@@ -35,7 +35,13 @@ export const columns = [
   // },
   {
     accessorKey: "utilization",
-    header: "Time Allocated",
+    // header: "Time Allocated",
+    header: ()=>(
+      <div className="">
+        Time Allocated
+        <p className="text-xs">(as per 24 days in a month)</p>
+      </div>
+    ),
     cell: ({ row }) => {
       const { utilization } = row.original;
       return <div>{utilization} hrs</div>;

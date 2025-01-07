@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { useDateRange } from "@/context/dateRangeContext/DateRangeContext";
 import { ChartLineDown, ChartLineUp, FileArrowDown, FileArrowUp, HandArrowDown, HandArrowUp, HandCoins, Invoice } from "@phosphor-icons/react";
-import { format } from "date-fns";
+import { endOfMonth, format, startOfMonth } from "date-fns";
 import { DollarSign, Package2, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useOngoingProjects } from "../hooks/dashboard/useOngoingProjects";
@@ -31,9 +31,20 @@ export default function Dashboard() {
   const [selectedProject, setSelectedProject] = useState("");
 
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-  
-    const formattedStartDate=format(startDate, "yyyy-MM-dd")
-    const formattedEndDate=format(endDate, "yyyy-MM-dd")
+
+
+    if (!startDate && !endDate) {
+      const currentDate = new Date();
+      const firstDayOfMonth = startOfMonth(currentDate);
+      setStartDate(firstDayOfMonth);
+      setEndDate(currentDate);
+    }
+    // const formattedStartDate=format(startDate, "yyyy-MM-dd")
+    // const formattedEndDate=format(endDate, "yyyy-MM-dd")
+    const formattedStartDate = startDate ? format(new Date(startDate), "yyyy-MM-dd") :  format(startOfMonth(new Date()), "yyyy-MM-dd");;
+    const formattedEndDate = endDate ? format(new Date(endDate), "yyyy-MM-dd") :  format(endOfMonth(new Date()), "yyyy-MM-dd");
+
+
     const { data:fetchedKpiData,isLoading:kpiIsLoading } = useKpi( formattedStartDate,formattedEndDate, selectedProject);
     const { data:resourceUtilData,isLoading:utilIsLoading } = useResourceUtil(  formattedStartDate,formattedEndDate, selectedProject);
     const { data:profitLoss,isLoading :profitLossIsLoading } = useProfitLoss(  selectedProject,startDate?.getFullYear());
