@@ -6,7 +6,7 @@ import { CalendarDaysIcon, Clock, Dot } from "lucide-react";
 import { format } from "date-fns";
 import KpiCard from "@/components/kpicard";
 
-const ProjectDetailsMain = ({ project }) => {
+const ProjectDetailsMain = ({ project ,expenseSum}) => {
   const totalHoursWorked = project.all_user_projects.reduce(
     (total, userProject) => {
       const utilization = parseFloat(userProject.utilization); // Convert utilization to a number
@@ -113,7 +113,8 @@ const ProjectDetailsMain = ({ project }) => {
         <KpiCard title="Total Revenue" value={totalIncome} hasSubText={false} />
         <KpiCard
           title="Total Expense"
-          value={totalExpense}
+          value={expenseSum}
+          // value={totalExpense}
           hasSubText={false}
         />
         <KpiCard title="Total Profit" value={totalProfit} hasSubText={false} />

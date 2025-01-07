@@ -2,6 +2,7 @@
 
     import MultiLineNameCell from "@/components/MultiLineNameCell";
     import SimpleTableActionsDropdown from "@/components/SimpleTableActionsDropdown";
+import { Badge } from "@/components/ui/badge";
 import { formatAmountToNOK } from "@/lib/utils";
     import { format } from "date-fns";
 
@@ -40,7 +41,22 @@ import { formatAmountToNOK } from "@/lib/utils";
         header: "Payment Status",
         cell: ({ row }) => {
         const { payment_status } = row.original; // Access the full row data
-        return payment_status;
+        return  (
+                <Badge
+                className={`${
+                    payment_status === "Paid"
+                    ? "bg-green-100 text-green-800"
+                    : payment_status === "Pending"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : payment_status === "Cancelled"
+                    ? "bg-red-100 text-red-800"
+                    : payment_status==="Budget"
+                    ? "bg-orange-200 text-orange-800":"bg-gray-100 text-black"
+                }`}
+                >
+                {payment_status || "No Data"} {/* Show "No Data" if status is empty */}
+                </Badge>
+          );
         },
         enableSorting: true,
     },

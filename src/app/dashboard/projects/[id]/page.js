@@ -21,20 +21,20 @@ import { KpiSkeleton, ProjectPageSkeletonCard, RectangleSkeleton, SimpleSkeleton
 import { expenseColumns } from "./ExpenseColumns";
 
 export default function ProjectDetails() {
-  const [error, setError] = useState(null);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState('Ongoing');
+  const[invoiceTab,setInvoiceTab]=useState('All')
   const { id } = useParams();
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-      if (!startDate && !endDate) {
-          const currentDate = new Date();
-          const firstDayOfMonth = startOfMonth(currentDate);
-          setStartDate(firstDayOfMonth);
-          setEndDate(currentDate);
-        }
+    //   if (!startDate && !endDate) {
+    //       const currentDate = new Date();
+    //       const firstDayOfMonth = startOfMonth(currentDate);
+    //       setStartDate(firstDayOfMonth);
+    //       setEndDate(currentDate);
+    //     }
 
-        const formattedStartDate = startDate ? format(new Date(startDate), "yyyy-MM-dd") :  format(startOfMonth(new Date()), "yyyy-MM-dd");;
-        const formattedEndDate = endDate ? format(new Date(endDate), "yyyy-MM-dd") :  format(endOfMonth(new Date()), "yyyy-MM-dd");
+        const formattedStartDate = startDate ? format(new Date(startDate), "yyyy-MM-dd") :  "";;
+        const formattedEndDate = endDate ? format(new Date(endDate), "yyyy-MM-dd") :  "";
     const{data:project,isLoading:loading,refetch:refetchProject}=useProjectById(id ,  formattedStartDate,formattedEndDate)
     // const{data:project,isLoading:loading,refetch:refetchProject}=useProjectById(id ,  format(startDate, "yyyy-MM-dd"),format(endDate, "yyyy-MM-dd"))
     const handleDateChange = (newStartDate, newEndDate) => {
@@ -64,6 +64,13 @@ export default function ProjectDetails() {
   };
 
 
+  const filterResourcesByTransactionType = (resources, type) => {
+    if (type === 'All') return resources;
+    return resources.filter(resource => resource.transaction_type === type);
+  };
+
+
+
   const onDeleteRow = async (resourceId) => {
     try {
       await deleteResourceUtilization(resourceId);
@@ -76,14 +83,20 @@ export default function ProjectDetails() {
   };
 
   const filterValues = [ 'Ongoing', 'Completed'];
-
+  const filterInvoiceValues=['All', 'Revenue', 'Expense']
   // Filter the resources based on selected tab
   const filteredResources = project 
     ? filterResourcesByStatus(project.all_user_projects, selectedTab) 
     : [];
+  const filteredTransactionResource = project 
+    ? filterResourcesByTransactionType(project.invoices, invoiceTab) 
+    : [];
 
 
-
+    const expenseSum = project?.invoices
+    .filter(resource => resource.transaction_type === 'Expense')
+    .reduce((sum, resource) => sum + Number(resource.amount || 0), 0);
+  
   return (
 
 
@@ -95,6 +108,7 @@ export default function ProjectDetails() {
                           initialStartDate={startDate}
                           initialEndDate={endDate}
                           isMonthPicker={true}
+                          allDate={true}
                         />
                 </div>
                 <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
@@ -111,7 +125,7 @@ export default function ProjectDetails() {
 
           
           :
-              <ProjectDetailsMain project={project} />}
+              <ProjectDetailsMain project={project} expenseSum={expenseSum}/>}
         {!isDescriptionOpen && !loading && (
           <Button onClick={() => setIsDescriptionOpen(true)} variant="outline">
             Description
@@ -137,14 +151,17 @@ export default function ProjectDetails() {
             {filteredResources?.length}
           </span>
     </TabsTrigger>
-    <TabsTrigger value="expense">
-    <h2 className="text-lg font-semibold">Resource Expense</h2>
+    <TabsTrigger value="expense" className="flex items-center gap-2">
+    <h2 className="text-lg font-semibold">Revenue-cost Streams</h2>
+    <span className="text-muted-foreground text-xs bg-green-400 text-white font-semibold rounded-full px-2 py-0">
+            {filteredTransactionResource?.length}
+          </span>
     </TabsTrigger>
   </TabsList>
   </CardHeader>
   <CardContent>
   <TabsContent value="utilization" className="mt-4">
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
     <TableTitle
       subtitle="List of all employees in the project"
       // totalItemCount={filteredResources.length}
@@ -164,15 +181,20 @@ export default function ProjectDetails() {
   </TabsContent>
 
   <TabsContent value="expense" className="mt-4">
+  <div className="flex justify-between items-center">
     <TableTitle
       subtitle="List of expense of all employees in the project"
     />
-    {/* <div className="text-lg font-medium text-center">
-      Expense data will be available soon.
-    </div> */}
+        <TabFilters
+        filterValues={filterInvoiceValues}
+        selectedTab={invoiceTab}
+        setSelectedTab={setInvoiceTab}
+      />
+      </div>
        <SimpleDataTable
       columns={expenseColumns}
-      data={project?.invoices}
+      // data={project?.invoices}
+      data={filteredTransactionResource}
       onDeleteRow={onDeleteRow}
     />
   </TabsContent>

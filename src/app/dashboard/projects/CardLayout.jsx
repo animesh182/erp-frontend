@@ -22,6 +22,7 @@ export default function CardLayout({ projects }) {
     router.push(`/dashboard/projects/${projectId}`);
   };
 
+
   return (
     <div className="flex flex-col gap-4 w-full p-6 border rounded-md">
       <TableTitle
@@ -30,7 +31,13 @@ export default function CardLayout({ projects }) {
         totalItemCount={projects.length}
       />
       <div className="w-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {projects.map((project) => (
+        {projects.map((project) => {
+          
+          const teamMembers = project?.all_user_projects?.map((user) => ({
+            name: user.user_name,
+            image: null, // You can replace this with a proper avatar URL if available
+          }));
+          return (
           <Card
             key={project.id}
             className="w-full p-6 cursor-pointer hover:shadow-md transition-shadow duration-300"
@@ -39,7 +46,7 @@ export default function CardLayout({ projects }) {
             <CardHeader className="p-0">
               <CardTitle className="text-lg p-0">
                 {project.name}
-                <ProjectHealth health={project.project_health} />
+                {/* <ProjectHealth health={project.project_health} /> */}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0 mt-4">
@@ -51,26 +58,19 @@ export default function CardLayout({ projects }) {
               <Badge
                 variant="subtle"
                 className={`${
-                  project.project_status === "1"
+                  project.project_status === "Done"
                     ? "bg-green-100 text-green-800"
-                    : project.project_status === "2"
+                    : project.project_status ===  "Not Started"
                     ? "bg-red-100 text-red-800"
                     : "bg-yellow-100 text-yellow-800"
                 } my-4`}
               >
-                {project.project_status === "1"
-                  ? "Done"
-                  : project.project_status === "2"
-                  ? "Not Started"
-                  : "Ongoing"}
+                  {project.project_status}
               </Badge>
               <div>
                 <p className="text-xs mb-2">Team Members</p>
                 <TeamAvatars
-                  teamMembersImage={[
-                    "/default-avatar.jpg",
-                    "/default-avatar.jpg",
-                  ]}
+                  teamMembers={teamMembers}
                   teamMembersCount={project.all_user_projects.length}
                   size="medium"
                 />
@@ -99,7 +99,7 @@ export default function CardLayout({ projects }) {
               <span className="ml-2 text-xs">{project.completion}%</span>
             </CardFooter>
           </Card>
-        ))}
+        )})}
       </div>
     </div>
   );
