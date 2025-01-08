@@ -44,7 +44,7 @@ export function UploadSheetDialog({
         }
       } catch (error) {
         console.error("Upload failed:", error);
-        toast.error("Failed to upload payroll sheet");
+        toast.error(error.message || "Failed to upload payroll sheet");
       } finally {
         setIsUploading(false);
         setIsOpen(false)
@@ -64,7 +64,7 @@ export function UploadSheetDialog({
         }
       } catch (error) {
         console.error("Upload failed:", error);
-        toast.error("Failed to upload expense sheet");
+        toast.error( error.message  || "Failed to upload expense sheet");
       } finally {
         setIsUploading(false);
         setIsOpen(false)
@@ -84,7 +84,7 @@ export function UploadSheetDialog({
         }
       } catch (error) {
         console.error("Upload failed:", error);
-        toast.error("Failed to upload revenue sheet");
+        toast.error(error.message || "Failed to upload revenue sheet");
       } finally {
         setIsUploading(false);
         setIsOpen(false)
