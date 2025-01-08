@@ -91,6 +91,7 @@ export default function Payroll() {
                 icon={card.icon}
                 isMoney={card.isMoney}
                 hasSubText={false}
+                date={card.date}
               />
             ))
           : [...Array(3)].map((_, index) => (

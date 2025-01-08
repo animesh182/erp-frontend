@@ -29,12 +29,15 @@ import { toast } from 'sonner';
             },
             {
             title: "Upcoming Payroll",
-            value: upcoming_payroll.earliest_date
-                ? format(new Date(upcoming_payroll.earliest_date), "MMM d, yyyy")
+            value: upcoming_payroll.total_amount
+                ?upcoming_payroll.total_amount
                 : "No Upcoming Payroll",
             subtitle: "Next payroll due",
             icon: <CreditCard className="h-4 w-4" />,
-            isMoney: false,
+            isMoney: true,
+            date:upcoming_payroll.earliest_date
+            ? `Earliest Date: ${format(new Date(upcoming_payroll.earliest_date), "MMM d, yyyy")}`
+            : "No Upcoming Date",
             },
             {
             title: "Previous Payroll",
@@ -48,7 +51,13 @@ import { toast } from 'sonner';
                 )}`
                 : "No Previous Date",
             icon: <DollarSign className="h-4 w-4" />,
-            isMoney: false,
+            isMoney: true,
+            date: previous_payroll.most_recent_date
+            ? `Paid on ${format(
+                new Date(previous_payroll.most_recent_date),
+                "MMM d, yyyy"
+            )}`
+            : "No Previous Date",
             },
         ];
         },

@@ -164,12 +164,12 @@ export default function AppSidebar({ userId ,userName }) {
                 side="top"
                 className="w-[--radix-popper-anchor-width]"
               >
-                <DropdownMenuItem>
+                {/* <DropdownMenuItem>
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <span>Support</span>
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
                 <DropdownMenuItem onClick={handleLogout}>
                   Logout
                 </DropdownMenuItem>
