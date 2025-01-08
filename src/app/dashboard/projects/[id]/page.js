@@ -19,6 +19,8 @@ import ProjectDetailsMain from "./ProjectDetailsMain";
 import ProjectDetailsSidebar from "./ProjectDetailsSidebar";
 import { KpiSkeleton, ProjectPageSkeletonCard, RectangleSkeleton, SimpleSkeleton } from "@/components/Skeletons";
 import { expenseColumns } from "./ExpenseColumns";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function ProjectDetails() {
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
@@ -89,7 +91,7 @@ export default function ProjectDetails() {
     ? filterResourcesByStatus(project.all_user_projects, selectedTab) 
     : [];
   const filteredTransactionResource = project 
-    ? filterResourcesByTransactionType(project.invoices, invoiceTab) 
+    ? filterResourcesByTransactionType(project.resource_cost_streams, invoiceTab) 
     : [];
 
 
@@ -101,7 +103,11 @@ export default function ProjectDetails() {
 
 
               <main className="p-6 min-h-screen space-y-4">
-                <div className="flex justify-end">
+                <div className="flex justify-between">
+                  <Link className="flex text-muted-foreground" href="/dashboard/projects"> 
+                        <ChevronLeft/>Projects
+                  </Link>
+
                     <DateRangePicker
                           // numberOfMonths={2}
                           onDateChange={handleDateChange}
@@ -125,7 +131,7 @@ export default function ProjectDetails() {
 
           
           :
-              <ProjectDetailsMain project={project} expenseSum={expenseSum}/>}
+              <ProjectDetailsMain project={project} />}
         {!isDescriptionOpen && !loading && (
           <Button onClick={() => setIsDescriptionOpen(true)} variant="outline">
             Description
@@ -183,7 +189,7 @@ export default function ProjectDetails() {
   <TabsContent value="expense" className="mt-4">
   <div className="flex justify-between items-center">
     <TableTitle
-      subtitle="List of expense of all employees in the project"
+      subtitle="List of revenue and cost associated with the project"
     />
         <TabFilters
         filterValues={filterInvoiceValues}

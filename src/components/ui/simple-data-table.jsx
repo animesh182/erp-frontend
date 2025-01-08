@@ -108,7 +108,7 @@ function SimpleDataTable({ columns, data, onRowSelect, onDeleteRow }) {
             </TableBody>
           </Table>
         </div>
-        <Pagination className="justify-end mt-4">
+        {/* <Pagination className="justify-end mt-4">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
@@ -127,10 +127,7 @@ function SimpleDataTable({ columns, data, onRowSelect, onDeleteRow }) {
               </PaginationItem>
             ))}
             <PaginationItem>
-              {/* <PaginationNext
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              /> */}
+      
               <PaginationNext
               onClick={() => {
                 if (table.getCanNextPage()) {
@@ -139,6 +136,75 @@ function SimpleDataTable({ columns, data, onRowSelect, onDeleteRow }) {
               }}
               disabled={!table.getCanNextPage()}
             />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination> */}
+        <Pagination className="justify-end mt-4">
+          <PaginationContent>
+            {/* Previous Button */}
+            <PaginationItem>
+           {table.getCanPreviousPage() &&  <PaginationPrevious
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              />}
+            </PaginationItem>
+        
+            {/* First Page Button */}
+            <PaginationItem>
+              <PaginationLink
+                onClick={() => table.setPageIndex(0)}
+                isActive={table.getState().pagination.pageIndex === 0}
+              >
+                1
+              </PaginationLink>
+            </PaginationItem>
+        
+            {/* Dynamic Page Numbers */}
+            {(() => {
+              const currentPage = table.getState().pagination.pageIndex;
+              const totalPages = table.getPageCount();
+              const lastPage = totalPages - 1;
+        
+              const pages = [];
+        
+              // Add pages dynamically
+              for (let page = Math.max(1, currentPage - 1); page <= Math.min(lastPage - 1, currentPage + 1); page++) {
+                pages.push(page);
+              }
+        
+              return pages.map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    onClick={() => table.setPageIndex(page)}
+                    isActive={currentPage === page}
+                  >
+                    {page + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ));
+            })()}
+        
+            {/* Last Page Button */}
+            {table.getPageCount() > 1 && (
+              <PaginationItem>
+                <PaginationLink
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  isActive={
+                    table.getState().pagination.pageIndex ===
+                    table.getPageCount() - 1
+                  }
+                >
+                  {table.getPageCount()}
+                </PaginationLink>
+              </PaginationItem>
+            )}
+        
+            {/* Next Button */}
+            <PaginationItem>
+           {table.getCanNextPage() &&   <PaginationNext
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              />}
             </PaginationItem>
           </PaginationContent>
         </Pagination>
