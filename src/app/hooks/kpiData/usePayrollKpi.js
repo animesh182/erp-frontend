@@ -17,13 +17,13 @@ import { toast } from 'sonner';
         }
         },
         select: (data) => {
-        const { total_outstanding, upcoming_payroll, previous_payroll } = data;
+        const { total_salary, upcoming_payroll, previous_payroll } = data;
 
         return [
             {
-            title: "Total Outstanding",
-            value: total_outstanding,
-            subtitle: "Total outstanding invoices",
+            title: "Total Salary",
+            value: total_salary,
+            subtitle: "Total Salary invoices",
             icon: <DollarSign className="h-4 w-4" />,
             isMoney: true,
             },
@@ -45,7 +45,7 @@ import { toast } from 'sonner';
                 ? previous_payroll.total_amount
                 : "No Previous Payroll",
             subtitle: previous_payroll.most_recent_date
-                ? `Paid on ${format(
+                ? `Most Recent Date: ${format(
                     new Date(previous_payroll.most_recent_date),
                     "MMM d, yyyy"
                 )}`
@@ -53,7 +53,7 @@ import { toast } from 'sonner';
             icon: <DollarSign className="h-4 w-4" />,
             isMoney: true,
             date: previous_payroll.most_recent_date
-            ? `Paid on ${format(
+            ? `Most Recent Date: ${format(
                 new Date(previous_payroll.most_recent_date),
                 "MMM d, yyyy"
             )}`

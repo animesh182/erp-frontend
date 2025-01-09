@@ -105,7 +105,7 @@ export default function ProjectDetails() {
               <main className="p-6 min-h-screen space-y-4">
                 <div className="flex justify-between">
                   <Link className="flex text-muted-foreground" href="/dashboard/projects"> 
-                        <ChevronLeft/>Projects
+                        <ChevronLeft/>All Projects
                   </Link>
 
                     <DateRangePicker

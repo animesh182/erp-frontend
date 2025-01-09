@@ -19,7 +19,7 @@ export async function editEmployee(employeeId, employeeData) {
       level: employeeData.level,
       gender: employeeData.gender,
       marital_status: employeeData.maritalStatus,
-      linkedin_name: employeeData.linkedInName,
+      linkedin_name: employeeData.linkedin_name,
       linkedin_url: employeeData.linkedInUrl,
       date_of_birth: employeeData.dateOfBirth,
     // Add any other fields that the API expects

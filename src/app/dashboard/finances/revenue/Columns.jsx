@@ -16,16 +16,19 @@ export const columns = [
     accessorKey: "projectName",
     header: "Project Name",
     enableSorting: true,
+    hideOnMobile:true
   },
   {
     accessorKey: "invoice",
     header: "Invoice",
     enableSorting: false,
+    hideOnMobile:true
   },
   {
     accessorKey: "invoiceIssuedDate",
     header: "Invoice Issued Date",
     enableSorting: false,
+    hideOnMobile:true,
     cell: ({ row }) => {
       const { invoiceIssuedDate } = row.original;
       return (
@@ -60,6 +63,7 @@ export const columns = [
       );
     },
     enableSorting: false, // Disable sorting for this column
+    hideOnMobile:true,
     filterFn: (row, columnId, filterValue) => {
       if (!filterValue) return true; // Show all rows when no filter is selected
       return row.getValue(columnId) === filterValue; // Only show rows that match the selected status
@@ -77,6 +81,7 @@ export const columns = [
       );
     },
     enableSorting: true,
+    hideOnMobile:true,
     cell: ({ row }) => {
       const { paidDate } = row.original;
 
@@ -94,10 +99,12 @@ export const columns = [
     accessorKey: "type",
     header: "Type",
     enableSorting: false,
+    hideOnMobile:true,
     cell: ({ row }) => {
-      const paymentType =
-        row.original.type === "One-Time" ? "One-Time" : "Recurring";
-      return <span>{paymentType}</span>;
+      const { type } = row.original;
+      // const paymentType =
+      //   row.original.type === "One-Time" ? "One-Time" : "Recurring";
+      return <span>{type}</span>;
     },
   },
   {

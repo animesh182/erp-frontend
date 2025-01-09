@@ -26,6 +26,10 @@ export async function createPayroll(file) {
         return createPayroll(file); // Retry with new token
       }
     }
+    if (response.status === 400) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Something wrong with the file");
+      }
 
     if (response.status !== 201) {
       const errorData = await response.json();

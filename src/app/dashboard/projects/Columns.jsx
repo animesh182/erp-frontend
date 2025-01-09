@@ -38,6 +38,7 @@ export const projectColumns = (clients) => [
       );
     },
     enableSorting: false,
+    hideOnMobile:true
   },
   {
     accessorKey: "client",
@@ -53,6 +54,7 @@ export const projectColumns = (clients) => [
       );
     },
     enableSorting: false,
+    hideOnMobile:true
   },
   {
     accessorKey: "project_status",
@@ -74,6 +76,7 @@ export const projectColumns = (clients) => [
       );
     },
     enableSorting: false,
+    hideOnMobile:true
   },
   {
     accessorKey: "team",
@@ -93,6 +96,7 @@ export const projectColumns = (clients) => [
       );
     },
     enableSorting: false,
+    hideOnMobile:true
   },
   {
     accessorKey: "progressTracking",
@@ -110,6 +114,7 @@ export const projectColumns = (clients) => [
       );
     },
     enableSorting: false,
+    hideOnMobile:true
   },
   {
     accessorKey: "timeline",
@@ -128,6 +133,7 @@ export const projectColumns = (clients) => [
       );
     },
     enableSorting: false,
+    hideOnMobile:true
   },
   {
     accessorKey: "budget",

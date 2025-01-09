@@ -18,6 +18,7 @@ export const columns = [
     accessorKey: "projectName",
     header: "Project Name",
     enableSorting: true,
+    hideOnMobile:true,
     cell: ({ row }) => {
       const { projectName } = row.original;
       return projectName ? projectName : "No Data"; // Show "No Data" if the project is null or undefined
@@ -27,6 +28,7 @@ export const columns = [
     accessorKey: "invoice_no",
     header: "Invoice",
     enableSorting: false,
+    hideOnMobile:true,
     cell: ({ row }) => {
       const { invoice_no } = row.original;
       return invoice_no ? invoice_no : "No Data"; // Show "No Data" if the invoice_no is null or undefined
@@ -35,6 +37,7 @@ export const columns = [
   {
     accessorKey: "invoiceIssuedDate",
     header: "Invoice Issued Date",
+    hideOnMobile:true,
     cell: ({ row }) => {
       const { invoiceIssuedDate } = row.original;
       return (
@@ -142,6 +145,7 @@ export const columns = [
       );
     },
     enableSorting: false, // Disable sorting for this column
+    hideOnMobile:true,
     filterFn: (row, columnId, filterValue) => {
       if (!filterValue) return true; // Show all rows when no filter is selected
       return row.getValue(columnId) === filterValue; // Only show rows that match the selected status
@@ -160,11 +164,13 @@ export const columns = [
       );
     },
     enableSorting: false,
+    hideOnMobile:true
   },
   {
     accessorKey: "type",
     header: "Type",
     enableSorting: false,
+    hideOnMobile:true,
     cell: ({ row }) => {
       const { type } = row.original;
       return type ? <span className="capitalize">{type}</span> : "No Data"; // Show "No Data" if the payment_type is null or undefined
