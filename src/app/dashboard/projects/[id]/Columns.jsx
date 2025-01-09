@@ -35,13 +35,7 @@ export const columns = [
   // },
   {
     accessorKey: "utilization",
-    // header: "Time Allocated",
-    header: ()=>(
-      <div className="">
-        Time Allocated
-        <p className="text-xs">(as per 24 days in a month)</p>
-      </div>
-    ),
+    header:"Time Allocated",
     cell: ({ row }) => {
       const { utilization } = row.original;
       return <div>{utilization} hrs</div>;
@@ -49,11 +43,9 @@ export const columns = [
     enableSorting: false,
     cell: ({ row }) => {
       const { utilization } = row.original;
-      const daysInMonth=24
-      const monthlyUtlization=(utilization*24).toFixed(2)
       return (
         <div>
-          {monthlyUtlization} <span className="text-xs font-medium">hrs/month</span>
+          {utilization} <span className="text-xs font-medium">hrs/day</span>
         </div>
       );
     },

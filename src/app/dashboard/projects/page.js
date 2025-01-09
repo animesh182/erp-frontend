@@ -182,18 +182,38 @@ export default function Projects() {
   const { data: clients, refetch: refetchClient } = useClients();
 
   // Filter projects based on start date month using useMemo
+  // const filteredProjects = useMemo(() => {
+  //   if (!projects) return [];
+  //   if (!startDate || !endDate) return projects;
+
+  //   const start = startOfMonth(startDate);
+  //   const end = endOfMonth(endDate);
+
+  //   return projects.filter(project => {
+  //     const projectStartDate = new Date(project.start_date);
+  //     return projectStartDate >= start && projectStartDate <= end;
+  //   });
+  // }, [projects, startDate, endDate]);
+
+
   const filteredProjects = useMemo(() => {
     if (!projects) return [];
     if (!startDate || !endDate) return projects;
-
+  
     const start = startOfMonth(startDate);
     const end = endOfMonth(endDate);
-
+  
     return projects.filter(project => {
       const projectStartDate = new Date(project.start_date);
-      return projectStartDate >= start && projectStartDate <= end;
+      const projectCompletionDate = project.completion_date ? new Date(project.completion_date) : null;
+      return (
+        (projectStartDate >= start && projectStartDate <= end) || // Started within range
+        (projectCompletionDate && projectCompletionDate >= start && projectCompletionDate <= end) ||// Completed within range
+        (projectStartDate <= end && !projectCompletionDate) // Started before range end and not yet completed
+      );
     });
   }, [projects, startDate, endDate]);
+  
 
   const handleDateChange = (newStartDate, newEndDate) => {
     setStartDate(newStartDate);
