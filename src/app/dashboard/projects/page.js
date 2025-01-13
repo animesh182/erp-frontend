@@ -207,9 +207,9 @@ export default function Projects() {
       const projectStartDate = new Date(project.start_date);
       const projectCompletionDate = project.completion_date ? new Date(project.completion_date) : null;
       return (
-        (projectStartDate >= start && projectStartDate <= end) || // Started within range
-        (projectCompletionDate && projectCompletionDate >= start && projectCompletionDate <= end) ||// Completed within range
-        (projectStartDate <= end && !projectCompletionDate) // Started before range end and not yet completed
+        (projectStartDate >= start && projectStartDate <= end) || 
+        (projectCompletionDate && projectCompletionDate >= start && projectCompletionDate <= end) ||
+        (projectStartDate <= end && !projectCompletionDate) 
       );
     });
   }, [projects, startDate, endDate]);
