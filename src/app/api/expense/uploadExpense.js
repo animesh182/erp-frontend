@@ -38,7 +38,7 @@ export async function uploadExpense(file) {
     
     catch (error) {
         console.error("Error uploading expense:", error);
-        throw new Error(error.message || "Failed to upload expense");
+        throw new Error(error || "Failed to upload expense");
     }
 
 }

@@ -19,22 +19,25 @@ import ProjectDetailsMain from "./ProjectDetailsMain";
 import ProjectDetailsSidebar from "./ProjectDetailsSidebar";
 import { KpiSkeleton, ProjectPageSkeletonCard, RectangleSkeleton, SimpleSkeleton } from "@/components/Skeletons";
 import { expenseColumns } from "./ExpenseColumns";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { formatAmountToNOK } from "@/lib/utils";
 
 export default function ProjectDetails() {
-  const [error, setError] = useState(null);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
-  const [selectedTab, setSelectedTab] = useState('Ongoing');
+  const[invoiceTab,setInvoiceTab]=useState('All')
   const { id } = useParams();
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-      if (!startDate && !endDate) {
-          const currentDate = new Date();
-          const firstDayOfMonth = startOfMonth(currentDate);
-          setStartDate(firstDayOfMonth);
-          setEndDate(currentDate);
-        }
+    //   if (!startDate && !endDate) {
+    //       const currentDate = new Date();
+    //       const firstDayOfMonth = startOfMonth(currentDate);
+    //       setStartDate(firstDayOfMonth);
+    //       setEndDate(currentDate);
+    //     }
 
-        const formattedStartDate = startDate ? format(new Date(startDate), "yyyy-MM-dd") :  format(startOfMonth(new Date()), "yyyy-MM-dd");;
-        const formattedEndDate = endDate ? format(new Date(endDate), "yyyy-MM-dd") :  format(endOfMonth(new Date()), "yyyy-MM-dd");
+        const formattedStartDate = startDate ? format(new Date(startDate), "yyyy-MM-dd") :  "";;
+        const formattedEndDate = endDate ? format(new Date(endDate), "yyyy-MM-dd") :  "";
     const{data:project,isLoading:loading,refetch:refetchProject}=useProjectById(id ,  formattedStartDate,formattedEndDate)
     // const{data:project,isLoading:loading,refetch:refetchProject}=useProjectById(id ,  format(startDate, "yyyy-MM-dd"),format(endDate, "yyyy-MM-dd"))
     const handleDateChange = (newStartDate, newEndDate) => {
@@ -44,24 +47,14 @@ export default function ProjectDetails() {
   
 
 
-  const getResourceStatus = (endDate) => {
-    if (!endDate) return "Ongoing"; // No end date means ongoing
-    
-    const currentDate = new Date();
-    const resourceEndDate = new Date(endDate);
-    
-    return isAfter(currentDate, resourceEndDate) ? "Completed" : "Ongoing";
-  };
 
   // Filter resources based on selected tab
-  const filterResourcesByStatus = (resources, status) => {
-    // if (status === 'All') return resources;
-    
-    return resources.filter(resource => {
-      const resourceStatus = getResourceStatus(resource.end_date);
-      return resourceStatus === status;
-    });
+
+  const filterResourcesByTransactionType = (resources, type) => {
+    if (type === 'All') return resources;
+    return resources.filter(resource => resource.transaction_type === type);
   };
+
 
 
   const onDeleteRow = async (resourceId) => {
@@ -75,26 +68,45 @@ export default function ProjectDetails() {
     }
   };
 
-  const filterValues = [ 'Ongoing', 'Completed'];
-
+  const filterInvoiceValues=['All', 'Revenue', 'Expense']
   // Filter the resources based on selected tab
-  const filteredResources = project 
-    ? filterResourcesByStatus(project.all_user_projects, selectedTab) 
+  const filteredTransactionResource = project 
+    ? filterResourcesByTransactionType(project.resource_cost_streams, invoiceTab) 
     : [];
 
+    const categorizedResources = {
+      itCost: [],
+      salary: [],
+      general: [],
+    };
 
-
+    filteredTransactionResource.forEach((resource) => {
+      const sourceLower = resource.source.toLowerCase();
+      if (sourceLower.includes("it cost")) {
+        categorizedResources.itCost.push(resource);
+      } else if (sourceLower.includes("salary")) {
+        categorizedResources.salary.push(resource);
+      } else {
+        categorizedResources.general.push(resource);
+      }
+    });
+    
   return (
 
 
               <main className="p-6 min-h-screen space-y-4">
-                <div className="flex justify-end">
+                <div className="flex justify-between">
+                  <Link className="flex text-muted-foreground" href="/dashboard/projects"> 
+                        <ChevronLeft/>All Projects
+                  </Link>
+
                     <DateRangePicker
                           // numberOfMonths={2}
                           onDateChange={handleDateChange}
                           initialStartDate={startDate}
                           initialEndDate={endDate}
                           isMonthPicker={true}
+                          allDate={true}
                         />
                 </div>
                 <div className="flex flex-col md:flex-row justify-between gap-4 w-full">
@@ -128,53 +140,61 @@ export default function ProjectDetails() {
       <div className="">
         
         <Card>
-             <Tabs defaultValue="utilization" className="mt-10">
+            <Tabs defaultValue="utilization" className="mt-10">
               <CardHeader>
   <TabsList className="flex justify-start w-fit gap-4 h-fit">
     <TabsTrigger value="utilization" className="flex items-center gap-2">
     <h2 className="text-lg font-semibold">Resource Utilization</h2>
       <span className="text-muted-foreground text-xs bg-green-400 text-white font-semibold rounded-full px-2 py-0">
-            {filteredResources?.length}
+            {project?.all_user_projects?.length}
           </span>
     </TabsTrigger>
-    <TabsTrigger value="expense">
-    <h2 className="text-lg font-semibold">Resource Expense</h2>
+    <TabsTrigger value="expense" className="flex items-center gap-2">
+    <h2 className="text-lg font-semibold">Revenue-cost Streams</h2>
+    <span className="text-muted-foreground text-xs bg-green-400 text-white font-semibold rounded-full px-2 py-0">
+            {filteredTransactionResource?.length}
+          </span>
     </TabsTrigger>
   </TabsList>
   </CardHeader>
   <CardContent>
   <TabsContent value="utilization" className="mt-4">
-    <div className="flex justify-between">
+    <div className="flex justify-between items-center">
     <TableTitle
       subtitle="List of all employees in the project"
       // totalItemCount={filteredResources.length}
     />
     
-           <TabFilters
-          filterValues={filterValues}
-          selectedTab={selectedTab}
-          setSelectedTab={setSelectedTab}
-        />
         </div>
     <SimpleDataTable
       columns={columns}
-      data={filteredResources}
+      data={project?.all_user_projects}
       onDeleteRow={onDeleteRow}
     />
   </TabsContent>
 
   <TabsContent value="expense" className="mt-4">
+  <div className="flex justify-between items-center">
     <TableTitle
-      subtitle="List of expense of all employees in the project"
+      subtitle="List of revenue and cost associated with the project"
     />
-    {/* <div className="text-lg font-medium text-center">
-      Expense data will be available soon.
-    </div> */}
-       <SimpleDataTable
+        <TabFilters
+        filterValues={filterInvoiceValues}
+        selectedTab={invoiceTab}
+        setSelectedTab={setInvoiceTab}
+      />
+      </div>
+      {/* <SimpleDataTable
       columns={expenseColumns}
-      data={project?.invoices}
+      // data={project?.invoices}
+      data={filteredTransactionResource}
       onDeleteRow={onDeleteRow}
-    />
+    /> */}
+      <CategorizedTransactionAccordion
+    categorizedResources={categorizedResources}
+    onDeleteRow={onDeleteRow}
+    expenseColumns={expenseColumns}
+  />
   </TabsContent>
   </CardContent>
 </Tabs>
@@ -184,3 +204,61 @@ export default function ProjectDetails() {
     </main>
   );
 }
+
+
+const CategorizedTransactionAccordion = ({ categorizedResources, onDeleteRow, expenseColumns }) => {
+  const calculateSum = (resources) => {
+    return resources.reduce((total, resource) => total + resource.amount, 0).toFixed(2);
+  };
+
+  const sections = [
+    {
+      value: 'general',
+      title: 'General Transactions',
+      data: categorizedResources.general,
+      sum: calculateSum(categorizedResources.general),
+      bgColor: 'bg-[#FFF5E6]/30',
+      contentColor: 'bg-[#FFF5E6]/10',
+      hoverColor: 'hover:bg-[#FFF5E6]',
+      
+    },
+    {
+      value: 'itCost',
+      title: 'IT Cost Transactions',
+      data: categorizedResources.itCost,
+      sum: calculateSum(categorizedResources.itCost),
+      bgColor: 'bg-[#EEF4FF]/30',
+      contentColor: 'bg-[#EEF4FF]/10',
+      hoverColor: 'hover:bg-[#EEF4FF]',
+    },
+    {
+      value: 'salary',
+      title: 'Employee Salary Transactions',
+      data: categorizedResources.salary,
+      sum: calculateSum(categorizedResources.salary),
+      bgColor: 'bg-[#E9F7EF]/30',
+      contentColor: 'bg-[#E9F7EF]/10',
+      hoverColor: 'hover:bg-[#E9F7EF]',
+    }
+  ];
+
+  return (
+    <Accordion type="single" collapsible>
+      {sections.map((section) => (
+  <AccordionItem key={section.value} value={section?.value}>
+  <AccordionTrigger className={`m-2 ${section?.bgColor} rounded-2xl p-5 hover:no-underline ${section?.hoverColor}  `}>
+    <h2 className="w-1/2 text-start">{section?.title}</h2>
+    <p className="w-1/2 text-end mr-10">{formatAmountToNOK(section?.sum)}</p>
+  </AccordionTrigger>
+  <AccordionContent className={`m-2 ${section?.contentColor} rounded-2xl p-5`}>
+    <SimpleDataTable
+      columns={expenseColumns}
+      data={section?.data}
+      onDeleteRow={onDeleteRow}
+    />
+  </AccordionContent>
+</AccordionItem>
+      ))}
+    </Accordion>
+  );
+};

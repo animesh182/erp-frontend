@@ -58,14 +58,17 @@ export default function ComboboxProjects({ projectNames, onSelectProject,prop })
                     key={name}
                     value={name}
                     onSelect={handleSelect} // Use handleSelect here
+                    className="flex items-start p-2 " 
                   >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === name ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {name}
+                    <div className="flex items-center w-full">
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4 flex-shrink-0", 
+                            value === name ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {name}
+            </div>
                   </CommandItem>
                 ))}
               </CommandGroup>

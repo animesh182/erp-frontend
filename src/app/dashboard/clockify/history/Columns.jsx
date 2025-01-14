@@ -57,16 +57,19 @@ export const columns = () => [
         );
         },
         enableSorting: false,
+        hideOnMobile:true
     },
 {
     accessorKey: "name",
     header: "User",
     cell: ({ row }) => {
-    const { name, user_email } = row.original; 
+    const { name, user_email,projectName,project_color } = row.original; 
     return (
         <div>
         <p className="">{name || "N/A"}</p>
-        <p className="text-muted-foreground  text-sm">{user_email|| "N/A"}</p>
+        {/* <p className="text-muted-foreground  text-sm">{user_email|| "N/A"}</p> */}
+        <p className="text-muted-foreground text-sm hidden md:block">{user_email || "N/A"}</p>
+        <p className="text-sm md:hidden lg:hidden block" style={{ color:project_color|| "gray" }} >{projectName}</p>
         
         </div>
     );
@@ -99,6 +102,7 @@ export const columns = () => [
         );
         },
         enableSorting: true,
+        hideOnMobile:true
     },
 
 

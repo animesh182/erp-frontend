@@ -43,11 +43,12 @@ const ClockifyTimeEntry = React.memo(({onRefresh }) => {
     });
     const matchedProject = useMemo(() => {
         if (clockifyProjects && selectedProject) {
-            const selectedFirstWord = selectedProject.split(' ')[0]?.toLowerCase();
+            // const selectedFirstWord = selectedProject.split(' ')[0]?.toLowerCase();
     
             return clockifyProjects.find((project) => {
-                const projectFirstWord = project.projectName?.split(' ')[0]?.toLowerCase();
-                return projectFirstWord === selectedFirstWord;
+                // const projectFirstWord = project.projectName?.split(' ')[0]?.toLowerCase();
+                return project.projectName === selectedProject;
+                // return projectFirstWord === selectedFirstWord;
             });
         }
         return null;

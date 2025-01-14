@@ -15,11 +15,13 @@ export const columns = [
     accessorKey: "projectName",
     header: "Project Name",
     enableSorting: true,
+    hideOnMobile:true
   },
   {
     accessorKey: "invoice",
     header: "Invoice",
     enableSorting: false,
+    hideOnMobile:true
   },
   {
     accessorKey: "invoiceIssuedDate",
@@ -35,6 +37,7 @@ export const columns = [
       );
     },
     enableSorting: true,
+    hideOnMobile:true
   },
 {
     accessorKey: "status",
@@ -82,6 +85,7 @@ export const columns = [
       );
     },
     enableSorting: false,
+    hideOnMobile:true,
     filterFn: (row, columnId, filterValue) => {
       if (!filterValue) return true;
       return row.getValue(columnId) === filterValue;
@@ -99,11 +103,13 @@ export const columns = [
       );
     },
     enableSorting: true,
+    hideOnMobile:true
   },
   {
     accessorKey: "costType",
     header: "Cost Type",
     enableSorting: false,
+    hideOnMobile:true,
     cell: ({ row }) => {
       const { costType } = row.original;
       return <span className="capitalize">{costType}</span>;
@@ -114,6 +120,7 @@ export const columns = [
     accessorKey: "type",
     header: "Type",
     enableSorting: false,
+    hideOnMobile:true,
     cell: ({ row }) => {
       const { type } = row.original;
       return <span className="capitalize">{type}</span>;

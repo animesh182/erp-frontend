@@ -20,7 +20,7 @@ export async function getExcelPayroll() {
           const errorData = await response.json();
           if (errorData.code === "token_not_valid") {
             token = await refreshToken();
-            response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}api/generate_employee_excel/`, {
+            response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/generate_employee_excel/`, {
               method: 'GET', // Adjust if needed
               headers: {
                 Authorization: `Bearer ${token}`,

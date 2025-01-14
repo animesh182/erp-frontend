@@ -29,6 +29,7 @@ export const columns = [
     accessorKey: "invoice",
     header: "Invoice",
     enableSorting: false,
+    hideOnMobile:true
   },
   {
     accessorKey: "invoiceIssuedDate",
@@ -44,6 +45,7 @@ export const columns = [
       );
     },
     enableSorting: false,
+    hideOnMobile:true
   },
   {
     accessorKey: "status",
@@ -68,6 +70,7 @@ export const columns = [
     accessorKey: "paidDate",
     header: "Paid Date",
     enableSorting: false,
+    hideOnMobile:true,
     cell: ({ row }) => {
       const { paidDate } = row.original;
       return (
@@ -82,6 +85,7 @@ export const columns = [
     accessorKey: "type",
     header: "Type",
     enableSorting: false,
+    hideOnMobile:true,
     cell: ({ row }) => {
       const { type } = row.original;
       return <span className="capitalize">{type}</span>;

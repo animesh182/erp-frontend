@@ -45,14 +45,13 @@ const EmployeeDetailsTab = ({ employeeDetails, levelOptions, roleOptions,setEmpl
       value: employeeDetails?.marital_status || "N/A",
     },
   ];
-
   const contactInformation = [
     { label: "Country", value: employeeDetails?.country },
     { label: "Phone", value: employeeDetails?.phone_number },
     { label: "Email", value: employeeDetails?.email },
     {
       label: "LinkedIn",
-      value: employeeDetails?.fullName,
+      value: employeeDetails?.linkedin_url,
       link: employeeDetails?.linkedInUrl,
     },
   ];

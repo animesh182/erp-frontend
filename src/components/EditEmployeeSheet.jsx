@@ -1,4 +1,5 @@
-"use client";
+import React from 'react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
 import { DatePicker } from "@/components/DatePicker";
 import { Button } from "@/components/ui/button";
@@ -12,9 +13,9 @@ import {
 } from "@/components/ui/select";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { cn, prettifyText } from "@/lib/utils";
-import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
+
 export function EditEmployeeSheet({
   isOpen,
   onClose,
@@ -24,6 +25,9 @@ export function EditEmployeeSheet({
   roleOptions,
   levelOptions,
 }) {
+  const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
+  const [initialValues, setInitialValues] = React.useState({});
+  
   const {
     getValues,
     watch,
@@ -35,75 +39,100 @@ export function EditEmployeeSheet({
     defaultValues: employeeData || {},
   });
 
-  // useEffect(() => {
-  //   if (employeeData) {
-  //     console.log(watch(), "edit");
-  //   } else {
-  //     console.log(watch(), "add");
-  //   }
-  // }, [watch()]);
+  // Watch all form values
+  const formValues = watch();
+
+  // Function to check if form values have changed
+  const hasFormChanged = React.useCallback(() => {
+    const currentValues = getValues();
+    return Object.keys(currentValues).some(key => {
+      // Handle null/undefined cases
+      const initial = initialValues[key] ?? '';
+      const current = currentValues[key] ?? '';
+      
+      // Convert dates to comparable strings
+      if (current instanceof Date) {
+        return initial?.toISOString() !== current.toISOString();
+      }
+      
+      return initial !== current;
+    });
+  }, [getValues, initialValues]);
+
   React.useEffect(() => {
     if (isOpen) {
-      if (employeeData) {
-        reset({
-          employeeId: employeeData.employee_id,
-          dateOfBirth: employeeData.date_of_birth,
-          gender: employeeData.gender,
-          maritalStatus: employeeData.marital_status,
-          fullName: employeeData.full_name,
-          startDate: employeeData.start_date,
-          endDate: employeeData.end_date,
-          country: employeeData.country,
-          phone: employeeData.phone_number,
-          email: employeeData.email,
-          linkedInName: employeeData.linkedin_name,
-          linkedInUrl: employeeData.linkedin_url,
-          // jobTitle:  employeeData.,
-          jobTitle: employeeData.role,
-          level: employeeData.level,
-          department: employeeData.department,
-          employeeType: employeeData.employment_type,
-          supervisor: employeeData.supervisor,
-          salary: employeeData.salary,
-          panNumber: employeeData.pan_number,
-        });
-      } else {
-        reset({
-          employeeId: "",
-          dateOfBirth: null,
-          gender: "",
-          maritalStatus: "",
-          fullName: "",
-          startDate: null,
-          endDate: null,
-          country: "",
-          phone: "",
-          email: "",
-          startDate: "",
-          endDate: "",
-          linkedInName: "",
-          linkedInUrl: "",
-          jobTitle: "",
-          level: "",
-          department: "",
-          employeeType: "",
-          supervisor: "",
-          salary: "",
-          panNumber: "",
-        });
-      }
+      const defaults = employeeData ? {
+        employeeId: employeeData.employee_id,
+        dateOfBirth: employeeData.date_of_birth,
+        gender: employeeData.gender,
+        maritalStatus: employeeData.marital_status,
+        fullName: employeeData.full_name,
+        startDate: employeeData.start_date,
+        endDate: employeeData.end_date,
+        country: employeeData.country,
+        phone: employeeData.phone_number,
+        email: employeeData.email,
+        linkedInName: employeeData.linkedin_name,
+        linkedInUrl: employeeData.linkedin_url,
+        jobTitle: employeeData.role,
+        level: employeeData.level,
+        department: employeeData.department,
+        employeeType: employeeData.employment_type,
+        supervisor: employeeData.supervisor,
+        salary: employeeData.salary,
+        panNumber: employeeData.pan_number,
+      } : {
+        employeeId: "",
+        dateOfBirth: null,
+        gender: "",
+        maritalStatus: "",
+        fullName: "",
+        startDate: null,
+        endDate: null,
+        country: "",
+        phone: "",
+        email: "",
+        linkedInName: "",
+        linkedInUrl: "",
+        jobTitle: "",
+        level: "",
+        department: "",
+        employeeType: "",
+        supervisor: "",
+        salary: "",
+        panNumber: "",
+      };
+      
+      setInitialValues(defaults);
+      reset(defaults);
     }
   }, [isOpen, employeeData, reset]);
 
-  // console.log(watch());
+  const handleClose = () => {
+    if (hasFormChanged()) {
+      setShowConfirmDialog(true);
+    } else {
+      onClose();
+    }
+  };
+
+  const handleConfirmClose = () => {
+    setShowConfirmDialog(false);
+    reset(initialValues);
+    onClose();
+  };
+
+  const handleCancelClose = () => {
+    setShowConfirmDialog(false);
+  };
+
   const onSubmit = (data) => {
     if (employeeData) {
-      
       onEditEmployee(data);
     } else {
       onAddEmployee(data);
     }
-    reset();
+    setInitialValues(data);
     onClose();
   };
 
@@ -179,8 +208,9 @@ export function EditEmployeeSheet({
   };
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="overflow-y-auto">
+    <>
+     <Sheet open={isOpen} onOpenChange={handleClose}>
+       <SheetContent className="overflow-y-auto">
         <CustomSheetTitle
           title={employeeData ? "Edit Employee" : "Add Employee"}
         />
@@ -288,5 +318,21 @@ export function EditEmployeeSheet({
         </form>
       </SheetContent>
     </Sheet>
+
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes. Are you sure you want to close without saving?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelClose}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmClose}>Close without saving</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

@@ -12,7 +12,8 @@ export default function KpiCard({
   isPercentage = false,
   iconSize = "w-4 h-4", // Default size for icons
   hasSubText = true,
-  isSmall=false
+  isSmall=false,
+  date
 }) {
   return (
     <Card x-chunk="dashboard-01-chunk-0" className="w-full hover:bg-muted">
@@ -31,6 +32,11 @@ export default function KpiCard({
         <p className="text-xs text-muted-foreground">
           {/* {hasSubText && isTrend ? `${change}% from last ${period}` : period} */}
           {period && (hasSubText && isTrend ? `${change}% from last ${period}` : period)}
+
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {/* {hasSubText && isTrend ? `${change}% from last ${period}` : period} */}
+          {date && <p>{date}</p>}
 
         </p>
       </CardContent>

@@ -37,6 +37,8 @@ export const DateRangeProvider = ({ children }) => {
 
     if (!isInitialized) return null;
 
+
+
     return (
         <DateRangeContext.Provider value={{ 
             startDate, 

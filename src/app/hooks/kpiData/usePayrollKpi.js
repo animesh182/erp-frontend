@@ -17,24 +17,27 @@ import { toast } from 'sonner';
         }
         },
         select: (data) => {
-        const { total_outstanding, upcoming_payroll, previous_payroll } = data;
+        const { total_salary, upcoming_payroll, previous_payroll } = data;
 
         return [
             {
-            title: "Total Outstanding",
-            value: total_outstanding,
-            subtitle: "Total outstanding invoices",
+            title: "Total Salary",
+            value: total_salary,
+            subtitle: "Total Salary invoices",
             icon: <DollarSign className="h-4 w-4" />,
             isMoney: true,
             },
             {
             title: "Upcoming Payroll",
-            value: upcoming_payroll.earliest_date
-                ? format(new Date(upcoming_payroll.earliest_date), "MMM d, yyyy")
+            value: upcoming_payroll.total_amount
+                ?upcoming_payroll.total_amount
                 : "No Upcoming Payroll",
             subtitle: "Next payroll due",
             icon: <CreditCard className="h-4 w-4" />,
-            isMoney: false,
+            isMoney: true,
+            date:upcoming_payroll.earliest_date
+            ? `Earliest Date: ${format(new Date(upcoming_payroll.earliest_date), "MMM d, yyyy")}`
+            : "No Upcoming Date",
             },
             {
             title: "Previous Payroll",
@@ -42,13 +45,19 @@ import { toast } from 'sonner';
                 ? previous_payroll.total_amount
                 : "No Previous Payroll",
             subtitle: previous_payroll.most_recent_date
-                ? `Paid on ${format(
+                ? `Most Recent Date: ${format(
                     new Date(previous_payroll.most_recent_date),
                     "MMM d, yyyy"
                 )}`
                 : "No Previous Date",
             icon: <DollarSign className="h-4 w-4" />,
-            isMoney: false,
+            isMoney: true,
+            date: previous_payroll.most_recent_date
+            ? `Most Recent Date: ${format(
+                new Date(previous_payroll.most_recent_date),
+                "MMM d, yyyy"
+            )}`
+            : "No Previous Date",
             },
         ];
         },

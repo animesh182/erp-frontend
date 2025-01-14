@@ -113,6 +113,7 @@ const ProjectDetailsMain = ({ project }) => {
         <KpiCard title="Total Revenue" value={totalIncome} hasSubText={false} />
         <KpiCard
           title="Total Expense"
+          // value={expenseSum}
           value={totalExpense}
           hasSubText={false}
         />

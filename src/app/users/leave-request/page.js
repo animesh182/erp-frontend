@@ -77,13 +77,13 @@ const LeaveRequest = () => {
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex justify-end gap-2">
-        <Button
+        {/* <Button
           className="flex items-center justify-center gap-3 py-2 h-8"
           variant="outline"
         >
           <Filter className="w-4" />
           Filter
-        </Button>
+        </Button> */}
 
         <Button
           className="flex items-center justify-center gap-3 py-2 h-8"
