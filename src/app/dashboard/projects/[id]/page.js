@@ -21,10 +21,11 @@ import { KpiSkeleton, ProjectPageSkeletonCard, RectangleSkeleton, SimpleSkeleton
 import { expenseColumns } from "./ExpenseColumns";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { formatAmountToNOK } from "@/lib/utils";
 
 export default function ProjectDetails() {
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
-  const [selectedTab, setSelectedTab] = useState('Ongoing');
   const[invoiceTab,setInvoiceTab]=useState('All')
   const { id } = useParams();
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
@@ -46,25 +47,8 @@ export default function ProjectDetails() {
   
 
 
-  const getResourceStatus = (endDate) => {
-    if (!endDate) return "Ongoing"; // No end date means ongoing
-    
-    const currentDate = new Date();
-    const resourceEndDate = new Date(endDate);
-    
-    return isAfter(currentDate, resourceEndDate) ? "Completed" : "Ongoing";
-  };
 
   // Filter resources based on selected tab
-  const filterResourcesByStatus = (resources, status) => {
-    // if (status === 'All') return resources;
-    
-    return resources.filter(resource => {
-      const resourceStatus = getResourceStatus(resource.end_date);
-      return resourceStatus === status;
-    });
-  };
-
 
   const filterResourcesByTransactionType = (resources, type) => {
     if (type === 'All') return resources;
@@ -84,21 +68,29 @@ export default function ProjectDetails() {
     }
   };
 
-  const filterValues = [ 'Ongoing', 'Completed'];
   const filterInvoiceValues=['All', 'Revenue', 'Expense']
   // Filter the resources based on selected tab
-  const filteredResources = project 
-    ? filterResourcesByStatus(project.all_user_projects, selectedTab) 
-    : [];
   const filteredTransactionResource = project 
     ? filterResourcesByTransactionType(project.resource_cost_streams, invoiceTab) 
     : [];
 
+    const categorizedResources = {
+      itCost: [],
+      salary: [],
+      general: [],
+    };
 
-    const expenseSum = project?.invoices
-    .filter(resource => resource.transaction_type === 'Expense')
-    .reduce((sum, resource) => sum + Number(resource.amount || 0), 0);
-  
+    filteredTransactionResource.forEach((resource) => {
+      const sourceLower = resource.source.toLowerCase();
+      if (sourceLower.includes("it cost")) {
+        categorizedResources.itCost.push(resource);
+      } else if (sourceLower.includes("salary")) {
+        categorizedResources.salary.push(resource);
+      } else {
+        categorizedResources.general.push(resource);
+      }
+    });
+    
   return (
 
 
@@ -148,13 +140,13 @@ export default function ProjectDetails() {
       <div className="">
         
         <Card>
-             <Tabs defaultValue="utilization" className="mt-10">
+            <Tabs defaultValue="utilization" className="mt-10">
               <CardHeader>
   <TabsList className="flex justify-start w-fit gap-4 h-fit">
     <TabsTrigger value="utilization" className="flex items-center gap-2">
     <h2 className="text-lg font-semibold">Resource Utilization</h2>
       <span className="text-muted-foreground text-xs bg-green-400 text-white font-semibold rounded-full px-2 py-0">
-            {filteredResources?.length}
+            {project?.all_user_projects?.length}
           </span>
     </TabsTrigger>
     <TabsTrigger value="expense" className="flex items-center gap-2">
@@ -173,15 +165,10 @@ export default function ProjectDetails() {
       // totalItemCount={filteredResources.length}
     />
     
-           <TabFilters
-          filterValues={filterValues}
-          selectedTab={selectedTab}
-          setSelectedTab={setSelectedTab}
-        />
         </div>
     <SimpleDataTable
       columns={columns}
-      data={filteredResources}
+      data={project?.all_user_projects}
       onDeleteRow={onDeleteRow}
     />
   </TabsContent>
@@ -197,12 +184,17 @@ export default function ProjectDetails() {
         setSelectedTab={setInvoiceTab}
       />
       </div>
-       <SimpleDataTable
+      {/* <SimpleDataTable
       columns={expenseColumns}
       // data={project?.invoices}
       data={filteredTransactionResource}
       onDeleteRow={onDeleteRow}
-    />
+    /> */}
+      <CategorizedTransactionAccordion
+    categorizedResources={categorizedResources}
+    onDeleteRow={onDeleteRow}
+    expenseColumns={expenseColumns}
+  />
   </TabsContent>
   </CardContent>
 </Tabs>
@@ -212,3 +204,58 @@ export default function ProjectDetails() {
     </main>
   );
 }
+
+
+const CategorizedTransactionAccordion = ({ categorizedResources, onDeleteRow, expenseColumns }) => {
+  const calculateSum = (resources) => {
+    return resources.reduce((total, resource) => total + resource.amount, 0).toFixed(2);
+  };
+
+  const sections = [
+    {
+      value: 'general',
+      title: 'General Transactions',
+      data: categorizedResources.general,
+      sum: calculateSum(categorizedResources.general),
+      bgColor: 'bg-[#FFF5E6]/30',
+      contentColor: 'bg-[#FFF5E6]/10',
+      
+    },
+    {
+      value: 'itCost',
+      title: 'IT Cost Transactions',
+      data: categorizedResources.itCost,
+      sum: calculateSum(categorizedResources.itCost),
+      bgColor: 'bg-[#EEF4FF]/30',
+      contentColor: 'bg-[#EEF4FF]/10',
+    },
+    {
+      value: 'salary',
+      title: 'Employee Salary Transactions',
+      data: categorizedResources.salary,
+      sum: calculateSum(categorizedResources.salary),
+      bgColor: 'bg-[#E9F7EF]/30',
+      contentColor: 'bg-[#E9F7EF]/10',
+    }
+  ];
+
+  return (
+    <Accordion type="single" collapsible>
+      {sections.map((section) => (
+  <AccordionItem key={section.value} value={section?.value}>
+  <AccordionTrigger className={`m-2 ${section?.bgColor} rounded-2xl p-5 `}>
+    <h2 className="w-1/2 text-start">{section?.title}</h2>
+    <p className="w-1/2 text-end mr-10">{formatAmountToNOK(section?.sum)}</p>
+  </AccordionTrigger>
+  <AccordionContent className={`m-2 ${section?.contentColor} rounded-2xl p-5`}>
+    <SimpleDataTable
+      columns={expenseColumns}
+      data={section?.data}
+      onDeleteRow={onDeleteRow}
+    />
+  </AccordionContent>
+</AccordionItem>
+      ))}
+    </Accordion>
+  );
+};

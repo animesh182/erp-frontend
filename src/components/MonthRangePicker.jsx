@@ -56,12 +56,12 @@ const BASE_QUICK_SELECTORS = [
   {
     label: "This year",
     startMonth: new Date(new Date().getFullYear(), 0),
-    endMonth: new Date(new Date().getFullYear(), 11),
+    endMonth: new Date(new Date().getFullYear(), 11,31),
   },
   {
     label: "Last year",
     startMonth: new Date(new Date().getFullYear() - 1, 0),
-    endMonth: new Date(new Date().getFullYear() - 1, 11),
+    endMonth: new Date(new Date().getFullYear() - 1, 11,31),
   },
   {
     label: "Last 6 months",
@@ -347,7 +347,6 @@ function MonthRangeCal({
         </table>
       </div>
 
-     
       {showQuickSelectors ? (
         <div className=" flex flex-col gap-1 justify-center">
           {quickSelectors.map((s) => {
