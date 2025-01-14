@@ -219,6 +219,7 @@ const CategorizedTransactionAccordion = ({ categorizedResources, onDeleteRow, ex
       sum: calculateSum(categorizedResources.general),
       bgColor: 'bg-[#FFF5E6]/30',
       contentColor: 'bg-[#FFF5E6]/10',
+      hoverColor: 'hover:bg-[#FFF5E6]',
       
     },
     {
@@ -228,6 +229,7 @@ const CategorizedTransactionAccordion = ({ categorizedResources, onDeleteRow, ex
       sum: calculateSum(categorizedResources.itCost),
       bgColor: 'bg-[#EEF4FF]/30',
       contentColor: 'bg-[#EEF4FF]/10',
+      hoverColor: 'hover:bg-[#EEF4FF]',
     },
     {
       value: 'salary',
@@ -236,6 +238,7 @@ const CategorizedTransactionAccordion = ({ categorizedResources, onDeleteRow, ex
       sum: calculateSum(categorizedResources.salary),
       bgColor: 'bg-[#E9F7EF]/30',
       contentColor: 'bg-[#E9F7EF]/10',
+      hoverColor: 'hover:bg-[#E9F7EF]',
     }
   ];
 
@@ -243,7 +246,7 @@ const CategorizedTransactionAccordion = ({ categorizedResources, onDeleteRow, ex
     <Accordion type="single" collapsible>
       {sections.map((section) => (
   <AccordionItem key={section.value} value={section?.value}>
-  <AccordionTrigger className={`m-2 ${section?.bgColor} rounded-2xl p-5 `}>
+  <AccordionTrigger className={`m-2 ${section?.bgColor} rounded-2xl p-5 hover:no-underline ${section?.hoverColor}  `}>
     <h2 className="w-1/2 text-start">{section?.title}</h2>
     <p className="w-1/2 text-end mr-10">{formatAmountToNOK(section?.sum)}</p>
   </AccordionTrigger>

@@ -17,7 +17,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { ArrowUpDown, Search } from "lucide-react";
+import { ArrowUpDown, Ellipsis, Search } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -319,10 +319,12 @@ function DataTable({
   <PaginationContent>
     {/* Previous Button */}
     <PaginationItem>
-   {table.getCanPreviousPage() &&  <PaginationPrevious
-        onClick={() => table.previousPage()}
-        disabled={!table.getCanPreviousPage()}
-      />}
+      {table.getCanPreviousPage() && (
+        <PaginationPrevious
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        />
+      )}
     </PaginationItem>
 
     {/* First Page Button */}
@@ -334,7 +336,7 @@ function DataTable({
         1
       </PaginationLink>
     </PaginationItem>
-
+    
     {/* Dynamic Page Numbers */}
     {(() => {
       const currentPage = table.getState().pagination.pageIndex;
@@ -342,48 +344,66 @@ function DataTable({
       const lastPage = totalPages - 1;
 
       const pages = [];
+      // const showEllipsisLeft = currentPage > 1; // Show ellipsis on the left
+      const showEllipsisRight = currentPage < lastPage - 2; // Show ellipsis on the right
 
       // Add pages dynamically
       for (let page = Math.max(1, currentPage - 1); page <= Math.min(lastPage - 1, currentPage + 1); page++) {
         pages.push(page);
       }
 
-      return pages.map((page) => (
-        <PaginationItem key={page}>
-          <PaginationLink
-            onClick={() => table.setPageIndex(page)}
-            isActive={currentPage === page}
-          >
-            {page + 1}
-          </PaginationLink>
-        </PaginationItem>
-      ));
-    })()}
+      return (
+        <>
+          {/* {showEllipsisLeft && (
+            <PaginationItem disabled>
+              <PaginationLink>...</PaginationLink>
+            </PaginationItem>
+          )} */}
+          
+          {pages.map((page) => (
+            <PaginationItem key={page}>
+              <PaginationLink
+                onClick={() => table.setPageIndex(page)}
+                isActive={currentPage === page}
+              >
+                {page + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          
+                {showEllipsisRight && (
+                      <PaginationItem disabled>
+                        <Ellipsis className="h-4 w-4"/>
+                      </PaginationItem>
+                    )}
 
-    {/* Last Page Button */}
-    {table.getPageCount() > 1 && (
-      <PaginationItem>
-        <PaginationLink
-          onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-          isActive={
-            table.getState().pagination.pageIndex ===
-            table.getPageCount() - 1
-          }
-        >
-          {table.getPageCount()}
-        </PaginationLink>
-      </PaginationItem>
-    )}
+          {/* Last Page Button */}
+          {totalPages > 1 && (
+            <PaginationItem>
+              <PaginationLink
+                onClick={() => table.setPageIndex(lastPage)}
+                isActive={currentPage === lastPage}
+              >
+                {totalPages}
+              </PaginationLink>
+            </PaginationItem>
+          )}
+        </>
+      );
+    })()}
 
     {/* Next Button */}
     <PaginationItem>
-   {table.getCanNextPage() &&   <PaginationNext
-        onClick={() => table.nextPage()}
-        disabled={!table.getCanNextPage()}
-      />}
+      {table.getCanNextPage() && (
+        <PaginationNext
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        />
+      )}
     </PaginationItem>
   </PaginationContent>
 </Pagination>
+
 
 
             </div>
