@@ -26,16 +26,9 @@ import { formatAmountToNOK } from "@/lib/utils";
 
 export default function ProjectDetails() {
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
-  const[invoiceTab,setInvoiceTab]=useState('All')
+  
   const { id } = useParams();
     const { startDate, endDate, setStartDate, setEndDate } = useDateRange();
-    //   if (!startDate && !endDate) {
-    //       const currentDate = new Date();
-    //       const firstDayOfMonth = startOfMonth(currentDate);
-    //       setStartDate(firstDayOfMonth);
-    //       setEndDate(currentDate);
-    //     }
-
         const formattedStartDate = startDate ? format(new Date(startDate), "yyyy-MM-dd") :  "";;
         const formattedEndDate = endDate ? format(new Date(endDate), "yyyy-MM-dd") :  "";
     const{data:project,isLoading:loading,refetch:refetchProject}=useProjectById(id ,  formattedStartDate,formattedEndDate)
@@ -45,15 +38,6 @@ export default function ProjectDetails() {
       setEndDate(newEndDate);
     };
   
-
-
-
-  // Filter resources based on selected tab
-
-  const filterResourcesByTransactionType = (resources, type) => {
-    if (type === 'All') return resources;
-    return resources.filter(resource => resource.transaction_type === type);
-  };
 
 
 
@@ -68,11 +52,11 @@ export default function ProjectDetails() {
     }
   };
 
-  const filterInvoiceValues=['All', 'Revenue', 'Expense']
-  // Filter the resources based on selected tab
   const filteredTransactionResource = project 
-    ? filterResourcesByTransactionType(project.resource_cost_streams, invoiceTab) 
+    ? (project.resource_cost_streams) 
     : [];
+
+    console.log(filteredTransactionResource,"resosooso")
 
     const categorizedResources = {
       itCost: [],
@@ -82,15 +66,26 @@ export default function ProjectDetails() {
 
     filteredTransactionResource.forEach((resource) => {
       const sourceLower = resource.source.toLowerCase();
-      if (sourceLower.includes("it cost")) {
-        categorizedResources.itCost.push(resource);
-      } else if (sourceLower.includes("salary")) {
+      if(resource.transaction_type==="Revenue")
+        categorizedResources.general.push(resource);
+  
+      else if  (sourceLower.includes("salary")) {
         categorizedResources.salary.push(resource);
       } else {
-        categorizedResources.general.push(resource);
+        categorizedResources.itCost.push(resource);
       }
     });
     
+    // filteredTransactionResource.forEach((resource) => {
+    //   const sourceLower = resource.source.toLowerCase();
+    //   if (sourceLower.includes("it cost")) {
+    //     categorizedResources.itCost.push(resource);
+    //   } else if (sourceLower.includes("salary")) {
+    //     categorizedResources.salary.push(resource);
+    //   } else {
+    //     categorizedResources.general.push(resource);
+    //   }
+    // });
   return (
 
 
@@ -178,18 +173,7 @@ export default function ProjectDetails() {
     <TableTitle
       subtitle="List of revenue and cost associated with the project"
     />
-        <TabFilters
-        filterValues={filterInvoiceValues}
-        selectedTab={invoiceTab}
-        setSelectedTab={setInvoiceTab}
-      />
       </div>
-      {/* <SimpleDataTable
-      columns={expenseColumns}
-      // data={project?.invoices}
-      data={filteredTransactionResource}
-      onDeleteRow={onDeleteRow}
-    /> */}
       <CategorizedTransactionAccordion
     categorizedResources={categorizedResources}
     onDeleteRow={onDeleteRow}
@@ -214,7 +198,7 @@ const CategorizedTransactionAccordion = ({ categorizedResources, onDeleteRow, ex
   const sections = [
     {
       value: 'general',
-      title: 'General Transactions',
+      title: 'Revenue',
       data: categorizedResources.general,
       sum: calculateSum(categorizedResources.general),
       bgColor: 'bg-[#FFF5E6]/30',
@@ -224,7 +208,7 @@ const CategorizedTransactionAccordion = ({ categorizedResources, onDeleteRow, ex
     },
     {
       value: 'itCost',
-      title: 'IT Cost Transactions',
+      title: 'Office Expense',
       data: categorizedResources.itCost,
       sum: calculateSum(categorizedResources.itCost),
       bgColor: 'bg-[#EEF4FF]/30',
@@ -233,7 +217,7 @@ const CategorizedTransactionAccordion = ({ categorizedResources, onDeleteRow, ex
     },
     {
       value: 'salary',
-      title: 'Employee Salary Transactions',
+      title: 'Employee Salary',
       data: categorizedResources.salary,
       sum: calculateSum(categorizedResources.salary),
       bgColor: 'bg-[#E9F7EF]/30',
@@ -241,13 +225,17 @@ const CategorizedTransactionAccordion = ({ categorizedResources, onDeleteRow, ex
       hoverColor: 'hover:bg-[#E9F7EF]',
     }
   ];
-
   return (
     <Accordion type="single" collapsible>
       {sections.map((section) => (
   <AccordionItem key={section.value} value={section?.value}>
-  <AccordionTrigger className={`m-2 ${section?.bgColor} rounded-2xl p-5 hover:no-underline ${section?.hoverColor}  `}>
-    <h2 className="w-1/2 text-start">{section?.title}</h2>
+  <AccordionTrigger className={`m-2 ${section?.bgColor} rounded-2xl p-5 hover:no-underline ${section?.hoverColor} hover:text-black`}>
+    <div className="flex items-center gap-2  w-1/2">
+    <h2 className=" text-start">{section?.title} </h2>
+    <span className="text-muted-foreground text-xs bg-green-400 text-white font-semibold rounded-full px-2 py-0">
+            {section?.data?.length}
+          </span>
+          </div>
     <p className="w-1/2 text-end mr-10">{formatAmountToNOK(section?.sum)}</p>
   </AccordionTrigger>
   <AccordionContent className={`m-2 ${section?.contentColor} rounded-2xl p-5`}>
