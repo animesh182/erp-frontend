@@ -13,7 +13,7 @@ export async function editProject(projectId, formData) {
           budget: formData.budget,
           project_category: formData.projectCategory,
           type: formData.type,
-          client: formData.clientName,
+          client: formData.client,
           project_status: formData.status,
           completion: formData.progress,
           project_health: formData.health,
