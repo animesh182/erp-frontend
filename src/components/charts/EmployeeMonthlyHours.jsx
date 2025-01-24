@@ -47,14 +47,16 @@ const colorPalette = [
   "#A3E4D7", // Aqua
 ];
 
-
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
-    const rawData = payload[0]?.payload.raw; // Access raw data from payload
+    const rawData = payload[0]?.payload.raw;
+    //desc order
+    const sortedPayload = payload.sort((a, b) => b.value - a.value);
+
     return (
       <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-1.5 py-0.5 text-xs shadow-xl">
         <p style={{ fontWeight: "bold", marginBottom: "5px" }}>{label}</p>
-        {payload.map((entry, index) => {
+        {sortedPayload.map((entry, index) => {
           const rawValue = rawData[entry.name] || 0; // Get raw value for the key
           const percentageValue = entry.value; // Percentage value from processed data
           return (
@@ -132,7 +134,6 @@ function generateChartConfig(rawData) {
 export default function EmployeeMonthlyHours({ rawData }) {
   const chartConfig = useMemo(() => generateChartConfig(rawData), [rawData]);
   const data = useMemo(() => convertHoursToPercentage(rawData), [rawData]);
-
 
   if (!rawData) return <>Loading...</>;
   const CustomYAxisTick = ({ x, y, payload }) => {

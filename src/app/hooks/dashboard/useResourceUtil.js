@@ -24,6 +24,6 @@ import { useQuery } from '@tanstack/react-query';
             name: user.user_name || "Unknown",
             ...userProjects,
             };
-        }),
+        }).sort((a, b) => a.name.localeCompare(b.name)),
     });
     };

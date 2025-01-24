@@ -50,7 +50,6 @@ export default function Dashboard() {
     const { data:profitLoss,isLoading :profitLossIsLoading } = useProfitLoss(  selectedProject,startDate?.getFullYear());
     const { data:projects,isLoading :projectsIsLoading } = useOngoingProjects(formattedStartDate,formattedEndDate);
     const { data:clockifyProjects, isLoading:clockifyProjectsIsLoading } = useClockifyProjects(true);
-
   useEffect(() => {
     if (fetchedKpiData) {
       const updatedKpiDatas = {
