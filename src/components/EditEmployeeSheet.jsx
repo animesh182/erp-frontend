@@ -1,5 +1,14 @@
-import React from 'react';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import React from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import CustomSheetTitle from "@/components/CustomSheetTitle";
 import { DatePicker } from "@/components/DatePicker";
 import { Button } from "@/components/ui/button";
@@ -9,7 +18,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { cn, prettifyText } from "@/lib/utils";
@@ -27,7 +36,7 @@ export function EditEmployeeSheet({
 }) {
   const [showConfirmDialog, setShowConfirmDialog] = React.useState(false);
   const [initialValues, setInitialValues] = React.useState({});
-  
+
   const {
     getValues,
     watch,
@@ -39,70 +48,69 @@ export function EditEmployeeSheet({
     defaultValues: employeeData || {},
   });
 
-  // Watch all form values
-  const formValues = watch();
-
   // Function to check if form values have changed
   const hasFormChanged = React.useCallback(() => {
     const currentValues = getValues();
-    return Object.keys(currentValues).some(key => {
+    return Object.keys(currentValues).some((key) => {
       // Handle null/undefined cases
-      const initial = initialValues[key] ?? '';
-      const current = currentValues[key] ?? '';
-      
+      const initial = initialValues[key] ?? "";
+      const current = currentValues[key] ?? "";
+
       // Convert dates to comparable strings
       if (current instanceof Date) {
         return initial?.toISOString() !== current.toISOString();
       }
-      
+
       return initial !== current;
     });
   }, [getValues, initialValues]);
 
   React.useEffect(() => {
     if (isOpen) {
-      const defaults = employeeData ? {
-        employeeId: employeeData.employee_id,
-        dateOfBirth: employeeData.date_of_birth,
-        gender: employeeData.gender,
-        maritalStatus: employeeData.marital_status,
-        fullName: employeeData.full_name,
-        startDate: employeeData.start_date,
-        endDate: employeeData.end_date,
-        country: employeeData.country,
-        phone: employeeData.phone_number,
-        email: employeeData.email,
-        linkedInName: employeeData.linkedin_name,
-        linkedInUrl: employeeData.linkedin_url,
-        jobTitle: employeeData.role,
-        level: employeeData.level,
-        department: employeeData.department,
-        employeeType: employeeData.employment_type,
-        supervisor: employeeData.supervisor,
-        salary: employeeData.salary,
-        panNumber: employeeData.pan_number,
-      } : {
-        employeeId: "",
-        dateOfBirth: null,
-        gender: "",
-        maritalStatus: "",
-        fullName: "",
-        startDate: null,
-        endDate: null,
-        country: "",
-        phone: "",
-        email: "",
-        linkedInName: "",
-        linkedInUrl: "",
-        jobTitle: "",
-        level: "",
-        department: "",
-        employeeType: "",
-        supervisor: "",
-        salary: "",
-        panNumber: "",
-      };
-      
+      const defaults = employeeData
+        ? {
+            employeeId: employeeData.employee_id,
+            dateOfBirth: employeeData.date_of_birth,
+            gender: employeeData.gender,
+            maritalStatus: employeeData.marital_status,
+            fullName: employeeData.full_name,
+            startDate: employeeData.start_date,
+            endDate: employeeData.end_date,
+            country: employeeData.country,
+            phone: employeeData.phone_number,
+            email: employeeData.email,
+            linkedInName: employeeData.linkedin_name,
+            linkedInUrl: employeeData.linkedin_url,
+            jobTitle: employeeData.role,
+            level: employeeData.level,
+            department: employeeData.department,
+            employeeType: employeeData.employment_type,
+            supervisor: employeeData.supervisor,
+            salary: employeeData.salary,
+            panNumber: employeeData.pan_number,
+          }
+        : {
+            employeeId: "",
+            dateOfBirth: null,
+            gender: "",
+            maritalStatus: "",
+            fullName: "",
+            startDate: null,
+            endDate: null,
+            country: "",
+            phone: "",
+            email: "",
+            linkedInName: "",
+            linkedInUrl: "",
+            jobTitle: "",
+            level: "",
+            department: "",
+            employeeType: "",
+            supervisor: "",
+            salary: "",
+            panNumber: "",
+          };
+
       setInitialValues(defaults);
       reset(defaults);
     }
@@ -209,127 +217,135 @@ export function EditEmployeeSheet({
 
   return (
     <>
-     <Sheet open={isOpen} onOpenChange={handleClose}>
-       <SheetContent className="overflow-y-auto">
-        <CustomSheetTitle
-          title={employeeData ? "Edit Employee" : "Add Employee"}
-        />
-        <form
-          onSubmit={handleSubmit(onSubmit, onError)}
-          className="space-y-6 mt-4"
-        >
-          <div>
-            <h3 className="font-semibold mb-2">Basic Details</h3>
-            <div className="space-y-4">
-              {renderField("employeeId", Input, { required: true })}
-              {renderField("fullName", Input, { required: true })}
+      <Sheet open={isOpen} onOpenChange={handleClose}>
+        <SheetContent className="overflow-y-auto">
+          <CustomSheetTitle
+            title={employeeData ? "Edit Employee" : "Add Employee"}
+          />
+          <form
+            onSubmit={handleSubmit(onSubmit, onError)}
+            className="space-y-6 mt-4"
+          >
+            <div>
+              <h3 className="font-semibold mb-2">Basic Details</h3>
+              <div className="space-y-4">
+                {renderField("employeeId", Input, { required: true })}
+                {renderField("fullName", Input, { required: true })}
 
-              {renderField("dateOfBirth", DatePicker, { required: true })}
-              {renderField("gender", Select, {
-                required: true,
-                children: (
-                  <>
-                    <SelectItem value="Male">Male</SelectItem>
-                    <SelectItem value="Female">Female</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </>
-                ),
-              })}
-              {renderField("maritalStatus", Select, {
-                required: true,
-                children: (
-                  <>
-                    <SelectItem value="single">Single</SelectItem>
-                    <SelectItem value="married">Married</SelectItem>
-                    <SelectItem value="divorced">Divorced</SelectItem>
-                    <SelectItem value="widowed">Widowed</SelectItem>
-                  </>
-                ),
-              })}
-              {renderField("startDate", DatePicker, { required: true })}
-              {renderField("endDate", DatePicker, { required: false })}
+                {renderField("dateOfBirth", DatePicker, { required: true })}
+                {renderField("gender", Select, {
+                  required: true,
+                  children: (
+                    <>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </>
+                  ),
+                })}
+                {renderField("maritalStatus", Select, {
+                  required: true,
+                  children: (
+                    <>
+                      <SelectItem value="single">Single</SelectItem>
+                      <SelectItem value="married">Married</SelectItem>
+                      <SelectItem value="divorced">Divorced</SelectItem>
+                      <SelectItem value="widowed">Widowed</SelectItem>
+                    </>
+                  ),
+                })}
+                {renderField("startDate", DatePicker, { required: true })}
+                {renderField("endDate", DatePicker, { required: false })}
+              </div>
             </div>
-          </div>
 
-          <div>
-            <h3 className="font-semibold mb-2">Contact Information</h3>
-            <div className="space-y-4">
-              {renderField("country", Input, { required: true })}
-              {renderField("phone", Input, { required: true })}
-              {renderField("email", Input, { required: true })}
-              {renderField("linkedInUrl", Input)}
+            <div>
+              <h3 className="font-semibold mb-2">Contact Information</h3>
+              <div className="space-y-4">
+                {renderField("country", Input, { required: true })}
+                {renderField("phone", Input, { required: true })}
+                {renderField("email", Input, { required: true })}
+                {renderField("linkedInUrl", Input)}
+              </div>
             </div>
-          </div>
 
-          <div>
-            <h3 className="font-semibold mb-2">Employment Details</h3>
-            <div className="space-y-4">
-              {renderField("jobTitle", Select, {
-                required: true,
-                children: (
-                  <>
-                    {roleOptions?.map((role) => (
-                      <SelectItem key={role.id} value={role.title}>
-                        {role.title}
-                      </SelectItem>
-                    ))}
-                  </>
-                ),
-              })}
-              {renderField("level", Select, {
-                required: true,
-                children: (
-                  <>
-                    {levelOptions?.map((level) => (
-                      <SelectItem key={level.id} value={level.description}>
-                        {level.description}
-                      </SelectItem>
-                    ))}
-                  </>
-                ),
-              })}
-              {renderField("department", Input, { required: true })}
-              {renderField("employeeType", Select, {
-                required: true,
-                children: (
-                  <>
-                    <SelectItem value="full-time">Full-time</SelectItem>
-                    <SelectItem value="part-time">Part-time</SelectItem>
-                    <SelectItem value="contract">Contract</SelectItem>
-                    <SelectItem value="intern">Intern</SelectItem>
-                  </>
-                ),
-              })}
-              {renderField("supervisor", Input, { required: false })}
+            <div>
+              <h3 className="font-semibold mb-2">Employment Details</h3>
+              <div className="space-y-4">
+                {renderField("jobTitle", Select, {
+                  required: true,
+                  children: (
+                    <>
+                      {roleOptions?.map((role) => (
+                        <SelectItem key={role.id} value={role.title}>
+                          {role.title}
+                        </SelectItem>
+                      ))}
+                    </>
+                  ),
+                })}
+                {renderField("level", Select, {
+                  required: true,
+                  children: (
+                    <>
+                      {levelOptions?.map((level) => (
+                        <SelectItem key={level.id} value={level.description}>
+                          {level.description}
+                        </SelectItem>
+                      ))}
+                    </>
+                  ),
+                })}
+                {renderField("department", Input, { required: true })}
+                {renderField("employeeType", Select, {
+                  required: true,
+                  children: (
+                    <>
+                      <SelectItem value="full-time">Full-time</SelectItem>
+                      <SelectItem value="part-time">Part-time</SelectItem>
+                      <SelectItem value="contract">Contract</SelectItem>
+                      <SelectItem value="intern">Intern</SelectItem>
+                    </>
+                  ),
+                })}
+                {renderField("supervisor", Input, { required: false })}
+              </div>
             </div>
-          </div>
 
-          <div>
-            <h3 className="font-semibold mb-2">Compensation & Benefits</h3>
-            <div className="space-y-4">
-              {renderField("salary", Input, { type: "number", required: true })}
-              {renderField("panNumber", Input, { required: true })}
+            <div>
+              <h3 className="font-semibold mb-2">Compensation & Benefits</h3>
+              <div className="space-y-4">
+                {renderField("salary", Input, {
+                  type: "number",
+                  required: true,
+                })}
+                {renderField("panNumber", Input, { required: true })}
+              </div>
             </div>
-          </div>
 
-          <Button type="submit">
-            {employeeData ? "Save Changes" : "Add Employee"}
-          </Button>
-        </form>
-      </SheetContent>
-    </Sheet>
+            <Button type="submit">
+              {employeeData ? "Save Changes" : "Add Employee"}
+            </Button>
+          </form>
+        </SheetContent>
+      </Sheet>
 
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
             <AlertDialogDescription>
-              You have unsaved changes. Are you sure you want to close without saving?
+              You have unsaved changes. Are you sure you want to close without
+              saving?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancelClose}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmClose}>Close without saving</AlertDialogAction>
+            <AlertDialogCancel onClick={handleCancelClose}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmClose}>
+              Close without saving
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
