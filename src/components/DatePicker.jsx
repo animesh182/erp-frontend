@@ -6,6 +6,7 @@ import {
   Calendar as CalendarIcon,
   ChevronLeft,
   ChevronRight,
+  X,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -43,7 +44,13 @@ export function DatePicker({ value, onChange, minDate, disabled }) {
   }, [value]);
 
   const handleDateChange = (selectedDate) => {
-    if (!selectedDate) return;
+    if (!selectedDate) {
+      setDate(null);
+      setYear(new Date().getFullYear());
+      setMonth(new Date().getMonth());
+      onChange(null);
+      return;
+    }
 
     const adjustedDate = new Date(selectedDate.setHours(12, 0, 0, 0));
     let formattedDate;
@@ -86,14 +93,29 @@ export function DatePicker({ value, onChange, minDate, disabled }) {
         <Button
           variant={"outline"}
           className={cn(
-            "w-full justify-start text-left font-normal",
+            "w-full justify-start text-left font-normal relative",
             !date && "text-muted-foreground",
             disabled && "cursor-not-allowed opacity-50"
           )}
           disabled={disabled}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
+          <div className="flex items-center w-full">
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date ? format(date, "PPP") : <span>Pick a date</span>}
+            {date && !disabled && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="ml-auto h-6 w-6 hover:bg-transparent"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDateChange(null);
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </Button>
       </PopoverTrigger>
       {!disabled && (
