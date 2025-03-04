@@ -28,7 +28,7 @@ export async function uploadExpense(file) {
 
         if (response.status === 400) {
         const errorData = await response.json();
-        throw new Error(errorData.details || "Something wrong with the file");
+        throw new Error(errorData.details[0]?.details?.invoice?.amount[0] || errorData.details || "Something wrong with the file");
         }
 
         return await response.json();
