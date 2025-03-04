@@ -11,7 +11,7 @@ export default function DashboardLayout({ children }) {
   return (
     <SidebarProvider>
       <AppSidebar userName={clockifyUserData?.full_name}/>
-      <main className="w-full">
+      <main className="w-full overflow-auto">
         <Header />
         <QueryClientProvider client={queryclient}>
         {children}
