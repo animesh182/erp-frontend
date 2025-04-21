@@ -35,6 +35,7 @@ import {
   Package,
   PieChart,
   ShoppingCart,
+  SquareDashedKanban,
   TrendingDown,
   TrendingUp,
   UserCheck,
@@ -103,6 +104,11 @@ export const navItems = [
     label: "Projects",
     href: "/dashboard/projects",
     icon: <Package className="h-4 w-4" />,
+  },
+  {
+    label: "Task Board",
+    href: "/dashboard/taskboard",
+    icon: <SquareDashedKanban className="h-4 w-4" />,
   },
   {
     label: "Employees",

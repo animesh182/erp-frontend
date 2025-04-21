@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
       <body className={GeistSans.className}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="system" 
           enableSystem
           disableTransitionOnChange
         >

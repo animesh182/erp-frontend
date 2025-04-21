@@ -67,6 +67,9 @@ import { NextResponse } from "next/server";
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;
+  // //bypass auth for now
+  // return NextResponse.next();
+
   if (
     pathname === "/" ||
     pathname.startsWith("/_next/") ||
