@@ -6,6 +6,7 @@
 		'./components/**/*.{js,jsx}',
 		'./app/**/*.{js,jsx}',
 		'./src/**/*.{js,jsx}',
+		'./src/**/*.{js,ts,jsx,tsx}'
 	],
 	prefix: "",
 	theme: {
@@ -92,5 +93,6 @@
     		}
     	}
     },
-	plugins: [require("tailwindcss-animate")],
+	plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+
 	}

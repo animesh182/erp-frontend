@@ -7,23 +7,43 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"; // Adjust path as needed
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { PlusCircleIcon } from "lucide-react";
 
 function ProjectSelector({
   title,
   options,
   defaultValue,
   onValueChange,
-  triggerClassName = "w-[150px] mt-2",
   placeholder = "Select",
 }) {
   const [selectedValue, setSelectedValue] = useState(defaultValue || "");
+  const [addProjectDialogOpen, setAddProjectDialogOpen] = useState(false);
 
   const handleSelectChange = (value) => {
-    setSelectedValue(value);
-    if (onValueChange) {
-      onValueChange(value);
+    if (value === "__add_project__") {
+      openAddProjectDialog();
+      setSelectedValue(defaultValue || "");
+    } else {
+      setSelectedValue(value);
+      if (onValueChange) {
+        onValueChange(value);
+      }
     }
+  };
+
+  const openAddProjectDialog = () => {
+    setAddProjectDialogOpen(true);
   };
 
   return (
@@ -43,9 +63,95 @@ function ProjectSelector({
               {option.label}
             </SelectItem>
           ))}
+          <SelectItem
+            value="__add_project__"
+            className=" px-3 border-muted border-2 w-full cursor-pointer rounded-md bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium shadow-sm hover:shadow-md transition-all flex justify-center items-center text-center"
+          >
+            <span className="flex flex-row justify-center items-end gap-1">
+              <PlusCircleIcon className="w-4 h-4" />
+              <span className="leading-none text-sm">Add New Project</span>
+            </span>
+          </SelectItem>
         </SelectContent>
       </Select>
+      <AddProjectDialog
+        open={addProjectDialogOpen}
+        onOpenChange={setAddProjectDialogOpen}
+      />
     </div>
+  );
+}
+
+function AddProjectDialog({ open, onOpenChange }) {
+  const [newProjectId, setNewProjectId] = useState("");
+  const [newTaskboardName, setNewTaskboardName] = useState("");
+
+  const handleAddProject = (projectId, taskboardName) => {
+    console.log(
+      `Adding project: ${projectId} with taskboard: ${taskboardName}`
+    );
+    onOpenChange(false);
+    setNewProjectId("");
+    setNewTaskboardName("");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Add New Project</DialogTitle>
+          <DialogDescription>
+            Specify the project ID and a name for the new taskboard.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label
+              htmlFor="newProjectId"
+              className="text-right text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Project ID
+            </label>
+            <Input
+              id="newProjectId"
+              className="col-span-3"
+              value={newProjectId}
+              onChange={(e) => setNewProjectId(e.target.value)}
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label
+              htmlFor="newTaskboardName"
+              className="text-right text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Taskboard Name
+            </label>
+            <Input
+              id="newTaskboardName"
+              className="col-span-3"
+              value={newTaskboardName}
+              onChange={(e) => setNewTaskboardName(e.target.value)}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => onOpenChange(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            onClick={() => handleAddProject(newProjectId, newTaskboardName)}
+            disabled={!newProjectId || !newTaskboardName}
+          >
+            Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
