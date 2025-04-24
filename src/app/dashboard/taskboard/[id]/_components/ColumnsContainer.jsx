@@ -2,8 +2,32 @@
 import React, { useState } from "react";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { PlusIcon, TrashIcon } from "lucide-react";
+import {
+  FolderPen,
+  MoreHorizontalIcon,
+  MoreVerticalIcon,
+  PlusIcon,
+  TrashIcon,
+} from "lucide-react";
 import TaskCard from "./TaskCard";
+
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 const ColumnsContainer = ({
   column,
@@ -18,6 +42,8 @@ const ColumnsContainer = ({
   onAddLabel,
 }) => {
   const [editMode, setEditMode] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { setNodeRef, attributes, listeners, transform, isDragging } =
     useSortable({
@@ -42,12 +68,10 @@ const ColumnsContainer = ({
       <div
         {...attributes}
         {...listeners}
-        onMouseDown={(e) => {
-          // Only enable edit mode if not dragging
-          if (!isDragging && !editMode) {
-            setEditMode(true);
-          }
-        }}
+        //this was to enabkle the edit tiltle on tap but, draggable component is oveerridding it thus not working for now
+        // onMouseDown={(e) => {
+        //   if (!isDragging && !editMode) setEditMode(true);
+        // }}
         className="h-[60px] flex items-center justify-between px-3 font-semibold cursor-grab border-b border-border bg-muted"
       >
         <div className="flex items-center gap-2">
@@ -62,25 +86,54 @@ const ColumnsContainer = ({
               onChange={(e) => updateColumn(column.id, e.target.value)}
               autoFocus
               onBlur={() => setEditMode(false)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") setEditMode(false);
-              }}
+              onKeyDown={(e) => e.key === "Enter" && setEditMode(false)}
             />
           )}
         </div>
-        <div>
-          <button
-            onClick={() => deleteColumn(column.id)}
-            className="p-2 rounded hover:bg-destructive/10"
-          >
-            <TrashIcon className="text-foreground" />
-          </button>
+
+        <div className="flex items-center gap-1">
           <button
             onClick={() => createTask(column.id)}
-            className="p-2 rounded hover:bg-destructive/10"
+            className="p-2 rounded hover:bg-primary/10"
           >
             <PlusIcon className="text-primary" />
           </button>
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+            <DropdownMenuTrigger asChild>
+              <button
+                aria-label="Column options"
+                className="p-2 rounded hover:bg-accent/10"
+              >
+                <MoreVerticalIcon className="text-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Columns action</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  setEditMode(true);
+                  setMenuOpen(false);
+                }}
+              >
+                <div className="flex flex-row  w-full items-center gap-1 justify-between">
+                  Rename column
+                  <FolderPen className="w-4 h-4" />
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-destructive focus:text-white focus:bg-destructive/90"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setDeleteDialogOpen(true);
+                }}
+              >
+                <div className="flex flex-row w-full items-center gap-1 justify-between">
+                  Delete column <TrashIcon className="w-4 h-4" />
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -100,6 +153,26 @@ const ColumnsContainer = ({
           ))}
         </SortableContext>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogTitle>Delete column</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete this column? This action cannot be
+            undone and will remove all tasks in this column.
+          </AlertDialogDescription>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              deleteColumn(column.id);
+              setDeleteDialogOpen(false);
+            }}
+          >
+            Delete
+          </AlertDialogAction>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

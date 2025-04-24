@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,8 @@ import {
 import { Paperclip, Tag, MessageCircle, User } from "lucide-react";
 import { marked } from "marked";
 import { Card } from "@/components/ui/card";
+import Cookie from "js-cookie";
+import { format } from "date-fns";
 
 const LABELS = [
   { name: "Urgent", color: "bg-red-500", hoverColor: "bg-red-400" },
@@ -40,7 +42,22 @@ const TaskCard = ({
   const [isEditingFullDescription, setIsEditingFullDescription] =
     useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [userName, setUserName] = useState("Unknown User");
   const titleInputRef = useRef(null);
+
+  useEffect(() => {
+    const clockifyUserDataCookie = Cookie.get("clockifyUserData");
+    if (clockifyUserDataCookie) {
+      try {
+        const userData = JSON.parse(clockifyUserDataCookie);
+        if (userData?.full_name) {
+          setUserName(userData.full_name);
+        }
+      } catch (error) {
+        console.error("Failed to parse clockifyUserData cookie:", error);
+      }
+    }
+  }, []);
 
   const handleTitleClick = () => {
     setIsEditingTitle(true);
@@ -74,9 +91,9 @@ const TaskCard = ({
     opacity: isDragging ? 0.4 : 1,
   };
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
+  // const handleTitleChange = (e) => {
+  //   setTitle(e.target.value);
+  // };
 
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
@@ -90,7 +107,12 @@ const TaskCard = ({
 
   const handleAddComment = () => {
     if (newComment.trim()) {
-      onAddComment(card.id, newComment);
+      const commentObject = {
+        text: newComment,
+        author: userName,
+        timestamp: new Date().toISOString(),
+      };
+      onAddComment(card.id, commentObject);
       setNewComment("");
     }
   };
@@ -131,6 +153,17 @@ const TaskCard = ({
 
   const cardLabel = getCardLabel();
 
+  const formatCommentDate = (timestamp) => {
+    if (!timestamp) return "";
+    try {
+      const date = new Date(timestamp);
+      return format(date, "HH:mm dd MMM, yyyy");
+    } catch (error) {
+      console.error("Failed to format date:", error);
+      return "Invalid Date";
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -159,9 +192,12 @@ const TaskCard = ({
             {/* Description (truncated) */}
             {card.description && (
               <div
-                className="prose prose-sm max-w-none text-foreground break-words"
+                className="marked-files-content prose prose-sm max-w-none text-foreground break-words"
                 dangerouslySetInnerHTML={{
                   __html: marked.parse(truncateDescription(card.description)),
+                  style: {
+                    color: "var(--foreground)",
+                  },
                 }}
               />
             )}
@@ -264,9 +300,10 @@ const TaskCard = ({
               <div className="flex flex-row gap-6 flex-1 overflow-hidden">
                 {/* Left Column - Scrollable */}
 
-                <Card className="flex-1 overflow-y-auto p-2">
-                  <div className="bg-input border-input text-foreground p-2 rounded-md prose prose-sm max-w-none">
+                <Card className="flex-1 overflow-y-auto p-2 ">
+                  <div className="bg-input border-input text-foreground p-2 rounded-md prose prose-sm min-h-8 ">
                     <div
+                      className="marked-files-content prose prose-sm max-w-none text-foreground break-words"
                       dangerouslySetInnerHTML={{
                         __html: marked.parse(description),
                       }}
@@ -275,9 +312,9 @@ const TaskCard = ({
 
                   {/* Task metadata */}
                   <div className="space-y-4 py-4">
-                    <Card className="p-2 bg-card">
-                      <h4 className="font-medium leading-none flex items-center gap-1">
-                        <MessageCircle className="w-4 h-4" /> Comments
+                    <Card>
+                      <h4 className="font-medium leading-none flex items-center gap-1 px-2 pt-2">
+                        Comments
                         <div className="bg-muted rounded-full w-6 h-6 flex items-center justify-center p-1">
                           {card?.comments?.length > 0 && (
                             <span className="text-xs">
@@ -286,25 +323,35 @@ const TaskCard = ({
                           )}
                         </div>
                       </h4>
-                      <div className="space-y-4 mt-2">
-                        {card?.comments?.map((comment, index) => (
-                          <div
-                            key={index}
-                            className="p-2 rounded bg-muted text-muted-foreground"
-                          >
-                            {comment}
-                          </div>
-                        ))}
-                        <div className="flex gap-2 p-1">
+                      <div className="h-px bg-gray-300 w-full my-4"></div>
+
+                      <div className="space-y-4 my-2 p-2">
+                        <div className="flex gap-2">
                           <Input
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                             placeholder="Add a comment..."
                             className="bg-input border-input text-foreground"
                           />
-                          <Button onClick={handleAddComment} size="sm">
-                            Post
-                          </Button>
+
+                          <Button onClick={handleAddComment}>Post</Button>
+                        </div>
+                        <div className="flex flex-col gap-2 w-full">
+                          {/* Render comments with author and timestamp */}
+                          {card?.comments?.map((comment, index) => (
+                            <div
+                              key={index}
+                              className="p-2 rounded bg-muted text-muted-foreground text-sm"
+                            >
+                              <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                                <span>{comment.author || "Unknown User"}</span>
+                                <span>
+                                  {formatCommentDate(comment.timestamp)}
+                                </span>
+                              </div>
+                              {comment.text}
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </Card>
@@ -354,7 +401,7 @@ const TaskCard = ({
             </div>
           ) : (
             /* Regular view when not editing description */
-            <div className="flex flex-col max-h-[80vh]">
+            <div className="flex flex-col max-h-[80vh] overflow-x-hidden">
               <div className="mb-4">
                 {isEditingTitle ? (
                   <Input
@@ -401,40 +448,41 @@ const TaskCard = ({
                 </div>
               </div>
 
-              <Card className="overflow-y-auto flex-1 p-2">
+              <Card className="overflow-y-auto overflow-x-hidden flex-1 p-2 max-w-[100%]">
                 <div
                   onClick={handleDescriptionClick}
-                  className="bg-input border-input text-foreground p-2 rounded-md cursor-pointer max-w-none mb-4"
+                  className="bg-input border-input text-foreground p-2 rounded-md cursor-pointer prose prose-sm min-h-8"
                 >
+                  <h2 className="text-foreground">
+                    Description <small>(click to change)</small>
+                    <div className="h-px bg-gray-300 w-full my-2"></div>
+                  </h2>
+
                   <div
-                    className="prose prose-sm max-w-none text-foreground"
+                    className="marked-files-content prose prose-sm max-w-none text-foreground break-words"
                     dangerouslySetInnerHTML={{
                       __html: marked.parse(description),
                     }}
                   />
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium leading-none flex items-center gap-1">
-                      <MessageCircle className="w-4 h-4" /> Comments
+                <div className="space-y-4 pt-2">
+                  <Card>
+                    <h4 className="font-medium leading-none flex items-center gap-1 px-2 pt-2">
+                      Comments
                       <div className="bg-muted rounded-full w-6 h-6 flex items-center justify-center p-1">
-                        {card?.comments?.length > 0 && (
+                        {card?.comments?.length > 0 ? (
                           <span className="text-xs">
                             {card.comments.length}
                           </span>
+                        ) : (
+                          <span className="text-xs">0</span>
                         )}
                       </div>
                     </h4>
-                    <div className="space-y-4 mt-2 px-2">
-                      {card?.comments?.map((comment, index) => (
-                        <div
-                          key={index}
-                          className="p-2 rounded bg-muted text-muted-foreground"
-                        >
-                          {comment}
-                        </div>
-                      ))}
+                    <div className="h-px bg-gray-300 w-full my-4"></div>
+
+                    <div className="space-y-4 my-2 p-2">
                       <div className="flex gap-2">
                         <Input
                           value={newComment}
@@ -442,12 +490,28 @@ const TaskCard = ({
                           placeholder="Add a comment..."
                           className="bg-input border-input text-foreground"
                         />
-                        <Button onClick={handleAddComment} size="sm">
-                          Post
-                        </Button>
+
+                        <Button onClick={handleAddComment}>Post</Button>
+                      </div>
+                      <div className="flex flex-col gap-2 w-full">
+                        {/* Render comments with author and timestamp */}
+                        {card?.comments?.map((comment, index) => (
+                          <div
+                            key={index}
+                            className="p-2 rounded bg-muted text-muted-foreground text-sm"
+                          >
+                            <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                              <span>{comment.author || "Unknown User"}</span>
+                              <span>
+                                {formatCommentDate(comment.timestamp)}
+                              </span>
+                            </div>
+                            {comment.text}
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  </div>
+                  </Card>
                   <div>
                     <h4 className="font-medium leading-none flex items-center gap-1">
                       <Paperclip className="w-4 h-4" /> Attachments

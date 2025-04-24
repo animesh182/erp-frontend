@@ -67,6 +67,26 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
     --light-green: 168 20% 20%;
   }
+  .marked-files-content{
+    @apply text-foreground;
+  }
+  .marked-files-content h1,
+  .marked-files-content h2,
+  .marked-files-content h3,
+  .marked-files-content h4,
+  .marked-files-content h5,
+  .marked-files-content h6 {
+    @apply text-foreground;
+    @apply break-words;
+
+  }
+  .marked-files-content blockquote {
+    @apply text-foreground; 
+  }
+
+   .marked-files-content blockquote p {
+     @apply text-foreground;
+   }
 }
 
 @layer base {

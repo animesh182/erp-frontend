@@ -37,14 +37,15 @@ const KanbanBoard = () => {
     router.push(`/dashboard/taskboard/${projectId}`);
   };
 
+  // Add a state to track if this is the initial load
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const [columns, setColumns] = useState(() => {
-    const savedColumns = localStorage.getItem("columns")
+    const savedColumns = localStorage.getItem("columns");
     const loadedColumns = savedColumns ? JSON.parse(savedColumns) : [];
     console.log("Initial columns loaded:", loadedColumns);
     return loadedColumns;
   });
-
 
   const [tasks, setTasks] = useState(() => {
     const savedTasks = localStorage.getItem("tasks");
@@ -65,38 +66,63 @@ const KanbanBoard = () => {
   );
 
   useEffect(() => {
+    // Skip the first render to prevent the infinite loop
+    if (isInitialLoad) {
+      setIsInitialLoad(false);
+      return;
+    }
+
     console.log("Saving columns to localStorage:", columns);
     localStorage.setItem("columns", JSON.stringify(columns));
-  }, [columns]);
+
+    // Here would be a good place to add API calls to update columns in your backend
+    // if (!isInitialLoad) {
+    //   updateColumnsInBackend(columns);
+    // }
+  }, [columns, isInitialLoad]);
 
   useEffect(() => {
+    // Skip the first render to prevent the infinite loop
+    if (isInitialLoad) {
+      return;
+    }
+
     console.log("Saving tasks to localStorage:", tasks);
     localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
+
+    // Here would be a good place to add API calls to update tasks in your backend
+    // if (!isInitialLoad) {
+    //   updateTasksInBackend(tasks);
+    // }
+  }, [tasks, isInitialLoad]);
 
   const generateId = () => Math.floor(Math.random() * 10001);
 
   const handleClick = () => {
     const columnToAdd = {
       id: generateId(),
-
       title: `Column ${columns.length + 1}`,
     };
 
     console.log("Adding new column:", columnToAdd);
     setColumns([...columns, columnToAdd]);
+
+    // API call to create column in backend
+    // createColumnInBackend(columnToAdd);
   };
 
   const deleteColumn = (id) => {
     console.log("Deleting column with ID:", id);
 
     // Get tasks that will be deleted with this column
-
     const tasksToDelete = tasks.filter((task) => task.columnId === id);
     console.log("Tasks being deleted with column:", tasksToDelete);
 
     setColumns(columns.filter((col) => col.id !== id));
     setTasks(tasks.filter((task) => task.columnId !== id));
+
+    // API call to delete column and associated tasks
+    // deleteColumnInBackend(id, tasksToDelete.map(task => task.id));
   };
 
   const onDragStart = (event) => {
@@ -104,17 +130,13 @@ const KanbanBoard = () => {
 
     if (event.active.data.current?.type === "Column") {
       console.log("Column drag started:", event.active.data.current.column);
-
       setActiveColumn(event.active.data.current.column);
-
       return;
     }
 
     if (event.active.data.current?.type === "Task") {
       console.log("Task drag started:", event.active.data.current.task);
-
       setActiveTask(event.active.data.current.task);
-
       return;
     }
   };
@@ -123,24 +145,20 @@ const KanbanBoard = () => {
     console.log("Drag ended:", event);
 
     setActiveColumn(null);
-
     setActiveTask(null);
 
     const { active, over } = event;
 
     if (!over) {
       console.log("Drag ended outside of any droppable area");
-
       return;
     }
 
     const activeColumnId = active.id;
-
     const overColumnId = over.id;
 
     if (activeColumnId === overColumnId) {
       console.log("Dragged onto the same column - no changes needed");
-
       return;
     }
 
@@ -150,16 +168,19 @@ const KanbanBoard = () => {
 
     setColumns((columns) => {
       const activeIndex = columns.findIndex((col) => col.id === activeColumnId);
-
       const overIndex = columns.findIndex((col) => col.id === overColumnId);
 
       // move columns logic
-
       console.log(
         `Moving column from index ${activeIndex} to index ${overIndex}`
       );
 
-      return arrayMove(columns, activeIndex, overIndex);
+      const newColumns = arrayMove(columns, activeIndex, overIndex);
+
+      // API call to update column order
+      // updateColumnOrderInBackend(newColumns);
+
+      return newColumns;
     });
   };
 
@@ -170,29 +191,23 @@ const KanbanBoard = () => {
 
     if (!over) {
       console.log("Dragging over nothing");
-
       return;
     }
 
     const activeId = active.id;
-
     const overId = over.id;
 
     if (activeId === overId) {
       console.log("Dragging over the same element");
-
       return;
     }
 
     const isActiveATask = active.data.current?.type === "Task";
-
     const isOverATask = over.data.current?.type === "Task";
-
     const isOverAColumn = over.data.current?.type === "Column";
 
     if (!isActiveATask) {
       console.log("Active element is not a task");
-
       return;
     }
 
@@ -201,11 +216,9 @@ const KanbanBoard = () => {
 
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((t) => t.id === activeId);
-
         const overIndex = tasks.findIndex((t) => t.id === overId);
 
         // understand the column ID of the task being dragged over
-
         const targetColumnId = tasks[overIndex].columnId;
 
         console.log(
@@ -213,10 +226,18 @@ const KanbanBoard = () => {
         );
 
         // Update the column ID
+        const updatedTasks = [...tasks];
+        updatedTasks[activeIndex] = {
+          ...updatedTasks[activeIndex],
+          columnId: targetColumnId,
+        };
 
-        tasks[activeIndex].columnId = targetColumnId;
+        const reorderedTasks = arrayMove(updatedTasks, activeIndex, overIndex);
 
-        return arrayMove(tasks, activeIndex, overIndex);
+        // API call to update task order and column
+        // updateTaskPositionInBackend(activeId, targetColumnId, reorderedTasks);
+
+        return reorderedTasks;
       });
     }
 
@@ -230,11 +251,17 @@ const KanbanBoard = () => {
           `Moving task from index ${activeIndex} to column ${overId}`
         );
 
-        // Update the task with the new column ID
+        // Create a new array to avoid direct mutation
+        const updatedTasks = [...tasks];
+        updatedTasks[activeIndex] = {
+          ...updatedTasks[activeIndex],
+          columnId: overId,
+        };
 
-        tasks[activeIndex].columnId = overId;
+        // API call to update task column
+        // updateTaskColumnInBackend(activeId, overId);
 
-        return [...tasks];
+        return updatedTasks;
       });
     }
   };
@@ -247,34 +274,38 @@ const KanbanBoard = () => {
     );
 
     setColumns(newColumns);
+
+    // API call to update column title
+    // updateColumnTitleInBackend(id, title);
   };
 
   const createTask = (columnId) => {
     const newTask = {
       id: generateId(),
-
       columnId,
-
       title: `Task ${tasks.length + 1}`,
-
       description: "",
-
       comments: [],
     };
 
     console.log(`Creating new task in column ${columnId}:`, newTask);
 
     setTasks([...tasks, newTask]);
+
+    // API call to create task in backend
+    // createTaskInBackend(newTask);
   };
 
   const deleteTask = (id) => {
     console.log(`Deleting task with ID: ${id}`);
 
     const taskToDelete = tasks.find((task) => task.id === id);
-
     console.log("Task being deleted:", taskToDelete);
 
     setTasks(tasks.filter((task) => task.id !== id));
+
+    // API call to delete task in backend
+    // deleteTaskInBackend(id);
   };
 
   const updateTask = (id, updates) => {
@@ -286,8 +317,10 @@ const KanbanBoard = () => {
           const updatedTask = { ...task, ...updates };
 
           console.log("Task before update:", task);
-
           console.log("Task after update:", updatedTask);
+
+          // API call to update task in backend
+          // updateTaskInBackend(id, updatedTask);
 
           return updatedTask;
         }
@@ -307,6 +340,9 @@ const KanbanBoard = () => {
 
           console.log(`Task ${cardId} comments updated:`, updatedComments);
 
+          // API call to add comment in backend
+          // addCommentToTaskInBackend(cardId, comment);
+
           return { ...task, comments: updatedComments };
         }
 
@@ -325,13 +361,14 @@ const KanbanBoard = () => {
 
           console.log(
             `Task ${cardId} attachments updated:`,
-
             updatedAttachments
           );
 
+          // API call to add attachment in backend
+          // addAttachmentToTaskInBackend(cardId, attachment);
+
           return {
             ...task,
-
             attachments: updatedAttachments,
           };
         }
@@ -350,14 +387,15 @@ const KanbanBoard = () => {
           const labels = task.labels || [];
 
           // Toggle label (if exists, remove it; if doesn't exist, add it)
-
           const updatedLabels = labels.includes(label) ? [] : [label];
 
           console.log(`Task ${cardId} labels updated:`, updatedLabels);
 
+          // API call to update labels in backend
+          // updateTaskLabelsInBackend(cardId, updatedLabels);
+
           return {
             ...task,
-
             labels: updatedLabels,
           };
         }
@@ -451,7 +489,6 @@ const KanbanBoard = () => {
                   />
                 )}
               </DragOverlay>,
-
               document.body
             )}
           </DndContext>
