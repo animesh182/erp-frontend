@@ -14,7 +14,15 @@ import {
   DialogHeader,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Paperclip, Tag, MessageCircle, User } from "lucide-react";
+import {
+  Paperclip,
+  Tag,
+  MessageCircle,
+  User,
+  ChevronDown,
+  ChevronUp,
+  Reply,
+} from "lucide-react";
 import { marked } from "marked";
 import { Card } from "@/components/ui/card";
 import Cookie from "js-cookie";
@@ -26,6 +34,114 @@ const LABELS = [
   { name: "Medium", color: "bg-amber-500", hoverColor: "bg-amber-400" },
   { name: "Low", color: "bg-emerald-400", hoverColor: "bg-emerald-300" },
 ];
+
+const ReplyItem = ({ reply, currentUser }) => {
+  const isCurrentUser = reply.author === currentUser;
+
+  return (
+    <div
+      className={`p-2 rounded bg-muted/50 text-muted-foreground text-sm mb-1 w-[80%] ${
+        isCurrentUser ? "ml-auto" : "mr-auto"
+      }`}
+    >
+      <div className="flex justify-between text-xs text-muted-foreground mb-1">
+        <span>{reply.author || "Unknown User"}</span>
+        <span>{formatCommentDate(reply.timestamp)}</span>
+      </div>
+      {reply.text}
+    </div>
+  );
+};
+
+const CommentItem = ({ comment, currentUser, onAddReply }) => {
+  const [isRepliesVisible, setIsRepliesVisible] = useState(true);
+  const [replyText, setReplyText] = useState("");
+  const [showReplyInput, setShowReplyInput] = useState(false);
+  const hasReplies = comment.replies && comment.replies.length > 0;
+
+  const handleAddReply = () => {
+    if (replyText.trim()) {
+      onAddReply({
+        text: replyText,
+        author: currentUser,
+        timestamp: new Date().toISOString(),
+      });
+      setReplyText("");
+      setShowReplyInput(false);
+    }
+  };
+
+  return (
+    <div className="p-2 rounded bg-muted text-muted-foreground text-sm">
+      <div className="flex justify-between text-xs text-muted-foreground mb-1">
+        <span>{comment.author || "Unknown User"}</span>
+        <span>{formatCommentDate(comment.timestamp)}</span>
+      </div>
+      {comment.text}
+
+      <div className="flex justify-between mt-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-xs h-6 p-1"
+          onClick={() => setShowReplyInput(!showReplyInput)}
+        >
+          <Reply size={12} className="mr-1" /> Reply
+        </Button>
+
+        {hasReplies && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs h-6 p-1"
+            onClick={() => setIsRepliesVisible(!isRepliesVisible)}
+          >
+            {isRepliesVisible ? (
+              <ChevronUp size={12} className="mr-1" />
+            ) : (
+              <ChevronDown size={12} className="mr-1" />
+            )}
+            {comment.replies.length}{" "}
+            {comment.replies.length === 1 ? "reply" : "replies"}
+          </Button>
+        )}
+      </div>
+
+      {showReplyInput && (
+        <div className="mt-2 flex gap-2">
+          <Input
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            placeholder="Write a reply..."
+            className="bg-input border-input text-foreground text-xs h-8"
+          />
+          <Button onClick={handleAddReply} size="sm" className="h-8">
+            Post
+          </Button>
+        </div>
+      )}
+
+      {hasReplies && isRepliesVisible && (
+        <div className="mt-2 pl-4 border-l-2 border-muted-foreground/20">
+          {comment.replies.map((reply, index) => (
+            <ReplyItem key={index} reply={reply} currentUser={currentUser} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const formatCommentDate = (timestamp) => {
+  if (!timestamp) return "";
+  try {
+    const date = new Date(timestamp);
+    return format(date, "HH:mm dd MMM, yyyy");
+  } catch (error) {
+    console.error("Failed to format date:", error);
+    return "Invalid Date";
+  }
+};
 
 const TaskCard = ({
   card,
@@ -91,10 +207,6 @@ const TaskCard = ({
     opacity: isDragging ? 0.4 : 1,
   };
 
-  // const handleTitleChange = (e) => {
-  //   setTitle(e.target.value);
-  // };
-
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
   };
@@ -111,10 +223,20 @@ const TaskCard = ({
         text: newComment,
         author: userName,
         timestamp: new Date().toISOString(),
+        replies: [],
       };
       onAddComment(card.id, commentObject);
       setNewComment("");
     }
+  };
+
+  const handleAddReply = (commentIndex, reply) => {
+    const updatedComments = [...card.comments];
+    if (!updatedComments[commentIndex].replies) {
+      updatedComments[commentIndex].replies = [];
+    }
+    updatedComments[commentIndex].replies.push(reply);
+    onUpdateCard(card.id, { ...card, comments: updatedComments });
   };
 
   const handleAddAttachment = (event) => {
@@ -153,16 +275,7 @@ const TaskCard = ({
 
   const cardLabel = getCardLabel();
 
-  const formatCommentDate = (timestamp) => {
-    if (!timestamp) return "";
-    try {
-      const date = new Date(timestamp);
-      return format(date, "HH:mm dd MMM, yyyy");
-    } catch (error) {
-      console.error("Failed to format date:", error);
-      return "Invalid Date";
-    }
-  };
+  const D_width = 600;
 
   return (
     <div
@@ -225,10 +338,15 @@ const TaskCard = ({
                 )}
 
                 {/* Files count */}
-                {card?.files?.length > 0 && (
+                {card?.files?.length > 0 ? (
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Paperclip size={14} />
                     <span>{card.files.length}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Paperclip size={14} />
+                    <span>0</span>
                   </div>
                 )}
               </div>
@@ -237,7 +355,9 @@ const TaskCard = ({
         </DialogTrigger>
         <DialogContent
           className={`bg-background text-foreground px-4 py-8 ${
-            isEditingFullDescription ? "sm:max-w-[1200px]" : "sm:max-w-[600px]"
+            isEditingFullDescription
+              ? `sm:max-w-[${2 * D_width}px]`
+              : `sm:max-w-[${D_width}]`
           }`}
         >
           {isEditingFullDescription ? (
@@ -303,7 +423,7 @@ const TaskCard = ({
                 <Card className="flex-1 overflow-y-auto p-2 ">
                   <div className="bg-input border-input text-foreground p-2 rounded-md prose prose-sm min-h-8 ">
                     <div
-                      className="marked-files-content prose prose-sm max-w-none text-foreground break-words"
+                      className="marked-files-content w-full prose prose-sm max-w-none text-foreground break-words"
                       dangerouslySetInnerHTML={{
                         __html: marked.parse(description),
                       }}
@@ -339,18 +459,14 @@ const TaskCard = ({
                         <div className="flex flex-col gap-2 w-full">
                           {/* Render comments with author and timestamp */}
                           {card?.comments?.map((comment, index) => (
-                            <div
+                            <CommentItem
                               key={index}
-                              className="p-2 rounded bg-muted text-muted-foreground text-sm"
-                            >
-                              <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                                <span>{comment.author || "Unknown User"}</span>
-                                <span>
-                                  {formatCommentDate(comment.timestamp)}
-                                </span>
-                              </div>
-                              {comment.text}
-                            </div>
+                              comment={comment}
+                              currentUser={userName}
+                              onAddReply={(reply) =>
+                                handleAddReply(index, reply)
+                              }
+                            />
                           ))}
                         </div>
                       </div>
@@ -404,15 +520,17 @@ const TaskCard = ({
             <div className="flex flex-col max-h-[80vh] overflow-x-hidden">
               <div className="mb-4">
                 {isEditingTitle ? (
-                  <Input
-                    ref={titleInputRef}
-                    defaultValue={card?.title}
-                    onBlur={handleTitleBlur}
-                    onKeyDown={handleTitleKeyDown}
-                    placeholder="Card Title"
-                    className="bg-input border-input text-foreground"
-                    autoFocus
-                  />
+                  <div className="w-full p-2">
+                    <Input
+                      ref={titleInputRef}
+                      defaultValue={card?.title}
+                      onBlur={handleTitleBlur}
+                      onKeyDown={handleTitleKeyDown}
+                      placeholder="Card Title"
+                      className="bg-input border-input text-foreground"
+                      autoFocus
+                    />
+                  </div>
                 ) : (
                   <span
                     onClick={handleTitleClick}
@@ -454,7 +572,7 @@ const TaskCard = ({
                   className="bg-input border-input text-foreground p-2 rounded-md cursor-pointer prose prose-sm min-h-8"
                 >
                   <h2 className="text-foreground">
-                    Description <small>(click to change)</small>
+                    Description
                     <div className="h-px bg-gray-300 w-full my-2"></div>
                   </h2>
 
@@ -496,18 +614,12 @@ const TaskCard = ({
                       <div className="flex flex-col gap-2 w-full">
                         {/* Render comments with author and timestamp */}
                         {card?.comments?.map((comment, index) => (
-                          <div
+                          <CommentItem
                             key={index}
-                            className="p-2 rounded bg-muted text-muted-foreground text-sm"
-                          >
-                            <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                              <span>{comment.author || "Unknown User"}</span>
-                              <span>
-                                {formatCommentDate(comment.timestamp)}
-                              </span>
-                            </div>
-                            {comment.text}
-                          </div>
+                            comment={comment}
+                            currentUser={userName}
+                            onAddReply={(reply) => handleAddReply(index, reply)}
+                          />
                         ))}
                       </div>
                     </div>

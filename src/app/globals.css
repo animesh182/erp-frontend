@@ -69,6 +69,7 @@
   }
   .marked-files-content{
     @apply text-foreground;
+    @apply w-full
   }
   .marked-files-content h1,
   .marked-files-content h2,

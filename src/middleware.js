@@ -81,7 +81,9 @@ export function middleware(request) {
     pathname.startsWith("/users/email-verify") 
 
   ) {
-    return NextResponse.next();
+    return NextResponse.next(`${process.env.NEXT_PUBLIC_URL}`,302);
+    // `${env.NEXT_PUBLIC_SITE_URL}/catalog`), 302
+
   }
 
   // Check for the authentication token in cookies

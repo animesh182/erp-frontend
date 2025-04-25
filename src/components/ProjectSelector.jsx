@@ -15,10 +15,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { PlusCircleIcon } from "lucide-react";
+import { Switch } from "./ui/switch";
+import { PlusCircleIcon, User } from "lucide-react";
+import { InviteMember } from "@/app/dashboard/taskboard/[id]/_components/InviteMember";
 
 function ProjectSelector({
   title,
@@ -47,37 +50,49 @@ function ProjectSelector({
   };
 
   return (
-    <div className="flex flex-row gap-2 align-center justify-start p-4">
-      <h2 className="text-xl font-semibold self-end">{title}</h2>
-      <Select onValueChange={handleSelectChange} value={selectedValue}>
-        <SelectTrigger className="h-8 px-2 text-xs rounded-sm border border-gray-300 w-fit">
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent className="text-xs">
-          {options.map((option) => (
+    <div className="flex flex-row gap-2 align-center justify-between p-4">
+      <div className="flex flex-row gap-4 items-center">
+        <h2 className="text-xl font-semibold text-center">{title}</h2>
+        <Select onValueChange={handleSelectChange} value={selectedValue}>
+          <SelectTrigger className="h-8 px-2 text-xs rounded-sm border border-gray-300 w-fit">
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent className="text-xs">
+            {options.map((option) => (
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                className="py-1 px-2 text-xs"
+              >
+                {option.label}
+              </SelectItem>
+            ))}
             <SelectItem
-              key={option.value}
-              value={option.value}
-              className="py-1 px-2 text-xs"
+              value="__add_project__"
+              className=" px-3 border-muted border-2 w-full cursor-pointer rounded-md bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium shadow-sm hover:shadow-md transition-all flex justify-center items-center text-center"
             >
-              {option.label}
+              <span className="flex flex-row justify-center items-end gap-1">
+                <PlusCircleIcon className="w-4 h-4" />
+                <span className="leading-none text-sm">Add New Project</span>
+              </span>
             </SelectItem>
-          ))}
-          <SelectItem
-            value="__add_project__"
-            className=" px-3 border-muted border-2 w-full cursor-pointer rounded-md bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium shadow-sm hover:shadow-md transition-all flex justify-center items-center text-center"
-          >
-            <span className="flex flex-row justify-center items-end gap-1">
-              <PlusCircleIcon className="w-4 h-4" />
-              <span className="leading-none text-sm">Add New Project</span>
-            </span>
-          </SelectItem>
-        </SelectContent>
-      </Select>
-      <AddProjectDialog
-        open={addProjectDialogOpen}
-        onOpenChange={setAddProjectDialogOpen}
-      />
+          </SelectContent>
+        </Select>
+        <AddProjectDialog
+          open={addProjectDialogOpen}
+          onOpenChange={setAddProjectDialogOpen}
+        />
+      </div>
+      <div className="flex flex-row gap-4 items-center">
+        <Switch />
+        <h2>View assigned onlly</h2>
+        <div className="flex items-center">
+          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+            <User size={14} className="text-primary" />
+          </div>
+        </div>
+        <InviteMember />
+      </div>
     </div>
   );
 }
