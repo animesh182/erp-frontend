@@ -85,7 +85,7 @@ function ProjectSelector({
       </div>
       <div className="flex flex-row gap-4 items-center">
         <Switch />
-        <h2>View assigned onlly</h2>
+        <h2>View assigned only</h2>
         <div className="flex items-center">
           <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
             <User size={14} className="text-primary" />

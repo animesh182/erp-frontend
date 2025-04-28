@@ -27,6 +27,7 @@ import { marked } from "marked";
 import { Card } from "@/components/ui/card";
 import Cookie from "js-cookie";
 import { format } from "date-fns";
+import { AttachmentsSection } from "./AttachmentsSection";
 
 const LABELS = [
   { name: "Urgent", color: "bg-red-500", hoverColor: "bg-red-400" },
@@ -40,13 +41,15 @@ const ReplyItem = ({ reply, currentUser }) => {
 
   return (
     <div
-      className={`p-2 rounded bg-muted/50 text-muted-foreground text-sm mb-1 w-[80%] ${
-        isCurrentUser ? "ml-auto" : "mr-auto"
+      className={`p-2 rounded bg-muted/50  text-sm mb-1 w-[80%] ${
+        isCurrentUser ? "mr-auto" : "ml-auto"
       }`}
     >
-      <div className="flex justify-between text-xs text-muted-foreground mb-1">
+      <div className="flex justify-start gap-4 text-xs  mb-1">
         <span>{reply.author || "Unknown User"}</span>
-        <span>{formatCommentDate(reply.timestamp)}</span>
+        <span className="text-muted-foreground">
+          {formatCommentDate(reply.timestamp)}
+        </span>
       </div>
       {reply.text}
     </div>
@@ -72,8 +75,8 @@ const CommentItem = ({ comment, currentUser, onAddReply }) => {
   };
 
   return (
-    <div className="p-2 rounded bg-muted text-muted-foreground text-sm">
-      <div className="flex justify-between text-xs text-muted-foreground mb-1">
+    <div className="p-2 rounded bg-muted  text-sm">
+      <div className="flex justify-between text-xs mb-1">
         <span>{comment.author || "Unknown User"}</span>
         <span>{formatCommentDate(comment.timestamp)}</span>
       </div>
@@ -136,12 +139,58 @@ const formatCommentDate = (timestamp) => {
   if (!timestamp) return "";
   try {
     const date = new Date(timestamp);
-    return format(date, "HH:mm dd MMM, yyyy");
+    return format(date, "HH:mm MMM dd, yyyy");
   } catch (error) {
     console.error("Failed to format date:", error);
     return "Invalid Date";
   }
 };
+
+const CommentsSection = ({
+  card,
+  newComment,
+  setNewComment,
+  handleAddComment,
+  handleAddReply,
+  userName,
+}) => (
+  <Card className="space-y-4 py-4 mt-4">
+    <h4 className="font-medium leading-none flex items-center gap-1 px-2 pt-2">
+      Comments
+      <div className="bg-muted rounded-full w-6 h-6 flex items-center justify-center p-1">
+        {card?.comments?.length > 0 ? (
+          <span className="text-xs">{card.comments.length}</span>
+        ) : (
+          <span className="text-xs">0</span>
+        )}
+      </div>
+    </h4>
+    <div className="h-px bg-gray-300 w-full my-4"></div>
+
+    <div className="space-y-4 my-2 p-2">
+      <div className="flex gap-2">
+        <Input
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Add a comment..."
+          className="bg-input border-input text-foreground"
+        />
+        <Button onClick={handleAddComment}>Post</Button>
+      </div>
+      <div className="flex flex-col gap-2 w-full">
+        {/* Render comments with author and timestamp */}
+        {card?.comments?.map((comment, index) => (
+          <CommentItem
+            key={index}
+            comment={comment}
+            currentUser={userName}
+            onAddReply={(reply) => handleAddReply(index, reply)}
+          />
+        ))}
+      </div>
+    </div>
+  </Card>
+);
 
 const TaskCard = ({
   card,
@@ -275,8 +324,6 @@ const TaskCard = ({
 
   const cardLabel = getCardLabel();
 
-  const D_width = 600;
-
   return (
     <div
       ref={setNodeRef}
@@ -305,7 +352,7 @@ const TaskCard = ({
             {/* Description (truncated) */}
             {card.description && (
               <div
-                className="marked-files-content prose prose-sm max-w-none text-foreground break-words"
+                className="marked-files-content prose prose-sm [&>*]:max-w-none text-foreground break-words"
                 dangerouslySetInnerHTML={{
                   __html: marked.parse(truncateDescription(card.description)),
                   style: {
@@ -355,28 +402,35 @@ const TaskCard = ({
         </DialogTrigger>
         <DialogContent
           className={`bg-background text-foreground px-4 py-8 ${
-            isEditingFullDescription
-              ? `sm:max-w-[${2 * D_width}px]`
-              : `sm:max-w-[${D_width}]`
+            isEditingFullDescription ? "sm:max-w-[1400px]" : "sm:max-w-[700px]"
           }`}
         >
-          {isEditingFullDescription ? (
-            <div className="flex flex-col h-[700px] max-h-[80vh]">
-              {/* Title Input - Takes 10% of space */}
-              <div className="mb-4">
-                <DialogHeader className="mb-2">
-                  <DialogTitle></DialogTitle>
-                  <DialogDescription></DialogDescription>
-                </DialogHeader>
+          <div className="flex flex-col max-h-[80vh] overflow-x-hidden">
+            {/* Card Header Section - Common to both views */}
+            <div className="mb-4">
+              {/* Title Input */}
+              <div className={isEditingFullDescription ? "mb-2" : ""}>
+                {isEditingFullDescription && (
+                  <DialogHeader className="mb-2">
+                    <DialogTitle></DialogTitle>
+                    <DialogDescription></DialogDescription>
+                  </DialogHeader>
+                )}
                 {isEditingTitle ? (
-                  <div className="w-full">
+                  <div
+                    className={`w-full ${
+                      isEditingFullDescription ? "" : "p-2"
+                    }`}
+                  >
                     <Input
                       ref={titleInputRef}
                       defaultValue={card?.title}
                       onBlur={handleTitleBlur}
                       onKeyDown={handleTitleKeyDown}
                       placeholder="Card Title"
-                      className="bg-input border-input text-foreground w-1/2"
+                      className={`bg-input border-input text-foreground ${
+                        isEditingFullDescription ? "w-1/2" : ""
+                      }`}
                       autoFocus
                     />
                   </div>
@@ -388,106 +442,70 @@ const TaskCard = ({
                     {card?.title || "Task Title"}
                   </span>
                 )}
-                <div className="flex flex-row justify-between items-center p-2">
-                  <div>
-                    <h4 className="font-medium leading-none flex items-center gap-1">
-                      <Tag className="w-4 h-4" /> Labels
-                    </h4>
-
-                    <div className="flex gap-2 mt-2">
-                      {LABELS.map((label) => (
-                        <Button
-                          key={label.name}
-                          variant="outline"
-                          size="sm"
-                          className={`text-foreground hover:bg-muted ${
-                            card?.labels?.includes(label.name)
-                              ? `${label.color} text-white hover:${label.hoverColor} hover:text-white`
-                              : "bg-card"
-                          }`}
-                          onClick={() => handleAddLabel(label.name)}
-                        >
-                          {label.name}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <hr className="border-t border-border my-2" />
               </div>
 
-              {/* Main Content - Takes 90% of space */}
+              {/* Labels Section */}
+              <div className="flex flex-row justify-between items-center p-2">
+                <div>
+                  <h4 className="font-medium leading-none flex items-center gap-1">
+                    <Tag className="w-4 h-4" /> Labels
+                  </h4>
+
+                  <div className="flex gap-2 mt-2">
+                    {LABELS.map((label) => (
+                      <Button
+                        key={label.name}
+                        variant="outline"
+                        size="sm"
+                        className={`text-foreground hover:bg-muted ${
+                          card?.labels?.includes(label.name)
+                            ? `${label.color} text-white hover:${label.hoverColor} hover:text-white`
+                            : "bg-card"
+                        }`}
+                        onClick={() => handleAddLabel(label.name)}
+                      >
+                        {label.name}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {isEditingFullDescription && (
+                <hr className="border-t border-border my-2" />
+              )}
+            </div>
+
+            {/* Main Content Area */}
+            {isEditingFullDescription ? (
+              /* Full Description Editing View */
               <div className="flex flex-row gap-6 flex-1 overflow-hidden">
                 {/* Left Column - Scrollable */}
-
-                <Card className="flex-1 overflow-y-auto p-2 ">
-                  <div className="bg-input border-input text-foreground p-2 rounded-md prose prose-sm min-h-8 ">
+                <Card className="flex-1 overflow-y-auto p-2">
+                  <div className="bg-input border-input text-foreground p-2 rounded-md prose prose-sm max-w-none w-full min-h-8">
                     <div
-                      className="marked-files-content w-full prose prose-sm max-w-none text-foreground break-words"
+                      className="marked-files-content prose prose-sm max-w-none w-full text-foreground break-words"
                       dangerouslySetInnerHTML={{
                         __html: marked.parse(description),
                       }}
                     />
                   </div>
 
-                  {/* Task metadata */}
-                  <div className="space-y-4 py-4">
-                    <Card>
-                      <h4 className="font-medium leading-none flex items-center gap-1 px-2 pt-2">
-                        Comments
-                        <div className="bg-muted rounded-full w-6 h-6 flex items-center justify-center p-1">
-                          {card?.comments?.length > 0 && (
-                            <span className="text-xs">
-                              {card.comments.length}
-                            </span>
-                          )}
-                        </div>
-                      </h4>
-                      <div className="h-px bg-gray-300 w-full my-4"></div>
+                  {/* Task metadata - will be replaced with shared components */}
+                  <CommentsSection
+                    card={card}
+                    newComment={newComment}
+                    setNewComment={setNewComment}
+                    handleAddComment={handleAddComment}
+                    handleAddReply={handleAddReply}
+                    userName={userName}
+                  />
 
-                      <div className="space-y-4 my-2 p-2">
-                        <div className="flex gap-2">
-                          <Input
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            placeholder="Add a comment..."
-                            className="bg-input border-input text-foreground"
-                          />
-
-                          <Button onClick={handleAddComment}>Post</Button>
-                        </div>
-                        <div className="flex flex-col gap-2 w-full">
-                          {/* Render comments with author and timestamp */}
-                          {card?.comments?.map((comment, index) => (
-                            <CommentItem
-                              key={index}
-                              comment={comment}
-                              currentUser={userName}
-                              onAddReply={(reply) =>
-                                handleAddReply(index, reply)
-                              }
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </Card>
-
-                    <div>
-                      <h4 className="font-medium leading-none flex items-center gap-1">
-                        <Paperclip className="w-4 h-4" /> Attachments
-                      </h4>
-                      <div className="mt-2">
-                        <input
-                          type="file"
-                          onChange={handleAddAttachment}
-                          className="text-foreground"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <AttachmentsSection
+                    handleAddAttachment={handleAddAttachment}
+                  />
                 </Card>
 
-                {/* Right Column - Full Description Editor (50% height) */}
+                {/* Right Column - Full Description Editor */}
                 <div className="flex-1 flex flex-col px-1 pb-1">
                   <div className="flex items-center justify-between mb-2 px-2">
                     <h3 className="font-medium">Edit Full Description</h3>
@@ -499,77 +517,16 @@ const TaskCard = ({
                     value={description}
                     onChange={handleDescriptionChange}
                     placeholder="Edit full description..."
-                    className="bg-input border-input text-foreground flex-1 overflow-y-auto resize-none "
+                    className="bg-input border-input text-foreground flex-1 overflow-y-auto resize-none"
                   />
                 </div>
               </div>
-
-              <DialogFooter className="mt-4">
-                <Button
-                  variant="destructive"
-                  onClick={() => onDeleteCard(card.id)}
-                  className="mr-2"
-                >
-                  Delete
-                </Button>
-                <Button onClick={handleSave}>Save</Button>
-              </DialogFooter>
-            </div>
-          ) : (
-            /* Regular view when not editing description */
-            <div className="flex flex-col max-h-[80vh] overflow-x-hidden">
-              <div className="mb-4">
-                {isEditingTitle ? (
-                  <div className="w-full p-2">
-                    <Input
-                      ref={titleInputRef}
-                      defaultValue={card?.title}
-                      onBlur={handleTitleBlur}
-                      onKeyDown={handleTitleKeyDown}
-                      placeholder="Card Title"
-                      className="bg-input border-input text-foreground"
-                      autoFocus
-                    />
-                  </div>
-                ) : (
-                  <span
-                    onClick={handleTitleClick}
-                    className="cursor-pointer font-bold text-lg"
-                  >
-                    {card?.title || "Task Title"}
-                  </span>
-                )}
-                <div className="flex flex-row justify-between items-center p-2">
-                  <div>
-                    <h4 className="font-medium leading-none flex items-center gap-1">
-                      <Tag className="w-4 h-4" /> Labels
-                    </h4>
-
-                    <div className="flex gap-2 mt-2">
-                      {LABELS.map((label) => (
-                        <Button
-                          key={label.name}
-                          variant="outline"
-                          size="sm"
-                          className={`text-foreground hover:bg-muted ${
-                            card?.labels?.includes(label.name)
-                              ? `${label.color} text-white hover:${label.hoverColor} hover:text-white`
-                              : "bg-card"
-                          }`}
-                          onClick={() => handleAddLabel(label.name)}
-                        >
-                          {label.name}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
+            ) : (
+              /* Regular View */
               <Card className="overflow-y-auto overflow-x-hidden flex-1 p-2 max-w-[100%]">
                 <div
                   onClick={handleDescriptionClick}
-                  className="bg-input border-input text-foreground p-2 rounded-md cursor-pointer prose prose-sm min-h-8"
+                  className="bg-input border-input text-foreground p-2 rounded-md cursor-pointer prose prose-sm max-w-none w-full min-h-8"
                 >
                   <h2 className="text-foreground">
                     Description
@@ -577,7 +534,7 @@ const TaskCard = ({
                   </h2>
 
                   <div
-                    className="marked-files-content prose prose-sm max-w-none text-foreground break-words"
+                    className="marked-files-content prose prose-sm max-w-none w-full text-foreground break-words"
                     dangerouslySetInnerHTML={{
                       __html: marked.parse(description),
                     }}
@@ -585,72 +542,34 @@ const TaskCard = ({
                 </div>
 
                 <div className="space-y-4 pt-2">
-                  <Card>
-                    <h4 className="font-medium leading-none flex items-center gap-1 px-2 pt-2">
-                      Comments
-                      <div className="bg-muted rounded-full w-6 h-6 flex items-center justify-center p-1">
-                        {card?.comments?.length > 0 ? (
-                          <span className="text-xs">
-                            {card.comments.length}
-                          </span>
-                        ) : (
-                          <span className="text-xs">0</span>
-                        )}
-                      </div>
-                    </h4>
-                    <div className="h-px bg-gray-300 w-full my-4"></div>
+                  <CommentsSection
+                    card={card}
+                    newComment={newComment}
+                    setNewComment={setNewComment}
+                    handleAddComment={handleAddComment}
+                    handleAddReply={handleAddReply}
+                    userName={userName}
+                  />
 
-                    <div className="space-y-4 my-2 p-2">
-                      <div className="flex gap-2">
-                        <Input
-                          value={newComment}
-                          onChange={(e) => setNewComment(e.target.value)}
-                          placeholder="Add a comment..."
-                          className="bg-input border-input text-foreground"
-                        />
-
-                        <Button onClick={handleAddComment}>Post</Button>
-                      </div>
-                      <div className="flex flex-col gap-2 w-full">
-                        {/* Render comments with author and timestamp */}
-                        {card?.comments?.map((comment, index) => (
-                          <CommentItem
-                            key={index}
-                            comment={comment}
-                            currentUser={userName}
-                            onAddReply={(reply) => handleAddReply(index, reply)}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </Card>
-                  <div>
-                    <h4 className="font-medium leading-none flex items-center gap-1">
-                      <Paperclip className="w-4 h-4" /> Attachments
-                    </h4>
-                    <div className="mt-2">
-                      <input
-                        type="file"
-                        onChange={handleAddAttachment}
-                        className="text-foreground"
-                      />
-                    </div>
-                  </div>
+                  <AttachmentsSection
+                    handleAddAttachment={handleAddAttachment}
+                  />
                 </div>
               </Card>
+            )}
 
-              <DialogFooter className="mt-4">
-                <Button
-                  variant="destructive"
-                  onClick={() => onDeleteCard(card.id)}
-                  className="mr-2"
-                >
-                  Delete
-                </Button>
-                <Button onClick={handleSave}>Save</Button>
-              </DialogFooter>
-            </div>
-          )}
+            {/* Footer - Common to both views */}
+            <DialogFooter className="mt-4">
+              <Button
+                variant="destructive"
+                onClick={() => onDeleteCard(card.id)}
+                className="mr-2"
+              >
+                Delete
+              </Button>
+              <Button onClick={handleSave}>Save</Button>
+            </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
