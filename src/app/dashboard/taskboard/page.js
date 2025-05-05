@@ -1,37 +1,45 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import ProjectSelector from '@/components/ProjectSelector';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import ProjectSelector from "@/components/ProjectSelector";
+import { useQuery } from "@tanstack/react-query";
+import { getBoards } from "@/app/api/taskboard/navbarSelector/getBoard";
+import { KanbanBoardSkeleton } from "@/components/Skeletons";
 
 export default function KanbanPage() {
-  const [selectedProjectId, setSelectedProjectId] = useState('');
+  const [selectedBoardId, setSelectedBoardId] = useState("");
   const router = useRouter();
 
-  const projectData = useMemo(() => [
-    { value: 'alpha', label: 'Project Alpha' },
-    { value: 'beta', label: 'Project Beta' },
-    { value: 'gamma', label: 'Project Gamma' },
-    { value: 'delta', label: 'Project Delta' },
-  ], []);
+  const { data: boardData } = useQuery({
+    queryKey: ["boardData"],
+    queryFn: getBoards,
+  });
 
-  const handleProjectSelection = (projectId) => {
-    setSelectedProjectId(projectId);
-    router.push(`/dashboard/taskboard/${projectId}`);
-  };
+  useEffect(() => {
+    if (boardData?.data?.length > 0 && !selectedBoardId) {
+      const firstBoardName = boardData.data[0].id;
+      setSelectedBoardId(firstBoardName);
+      router.push(`/dashboard/taskboard/${firstBoardName}`);
+    }
+  }, [boardData, selectedBoardId, router]);
 
-  if (projectData.length > 0 && !selectedProjectId) {
-    handleProjectSelection(projectData[0].value);
+  if (!boardData) {
+    return <KanbanBoardSkeleton />;
   }
 
   return (
     <div>
       <div className="mb-4">
         <ProjectSelector
-          title="Choose a Project"
-          options={projectData}
-          onValueChange={handleProjectSelection}
-          placeholder="Select a Project to View"
+          title="Choose a Board"
+          options={
+            boardData?.data?.map((board) => ({
+              value: board.id,
+              label: board.name,
+            })) || []
+          }
+          placeholder="Select a Board to View"
         />
       </div>
     </div>

@@ -22,12 +22,14 @@ import {
   ChevronDown,
   ChevronUp,
   Reply,
+  ListCollapse,
 } from "lucide-react";
 import { marked } from "marked";
 import { Card } from "@/components/ui/card";
 import Cookie from "js-cookie";
 import { format } from "date-fns";
 import { AttachmentsSection } from "./AttachmentsSection";
+import CollapsibleDetail from "./DetailsSection";
 
 const LABELS = [
   { name: "Urgent", color: "bg-red-500", hoverColor: "bg-red-400" },
@@ -324,6 +326,31 @@ const TaskCard = ({
 
   const cardLabel = getCardLabel();
 
+  //fake data remove afrer api is ready
+  const detailsData = [
+    {
+      id: "1",
+      name: "Kaustub karki",
+      description: "kaustub created this card",
+      created_at: "2025-04-26T10:00:00Z",
+      Card_id: "card-1",
+    },
+    {
+      id: "2",
+      name: "Sajjan Poudel",
+      description: "Another detail with a longer description that wraps.",
+      created_at: "2025-04-27T11:30:00Z",
+      Card_id: "card-1",
+    },
+    {
+      id: "3",
+      name: "Ishu Shrestha",
+      description: "",
+      created_at: "2025-04-28T09:15:00Z",
+      Card_id: "card-1",
+    },
+  ];
+
   return (
     <div
       ref={setNodeRef}
@@ -401,7 +428,7 @@ const TaskCard = ({
           </div>
         </DialogTrigger>
         <DialogContent
-          className={`bg-background text-foreground px-4 py-8 ${
+          className={`bg-background text-foreground px-4 space-y-4 ${
             isEditingFullDescription ? "sm:max-w-[1400px]" : "sm:max-w-[700px]"
           }`}
         >
@@ -491,18 +518,31 @@ const TaskCard = ({
                   </div>
 
                   {/* Task metadata - will be replaced with shared components */}
-                  <CommentsSection
-                    card={card}
-                    newComment={newComment}
-                    setNewComment={setNewComment}
-                    handleAddComment={handleAddComment}
-                    handleAddReply={handleAddReply}
-                    userName={userName}
-                  />
+                  <div className="space-y-4">
+                    <CommentsSection
+                      card={card}
+                      newComment={newComment}
+                      setNewComment={setNewComment}
+                      handleAddComment={handleAddComment}
+                      handleAddReply={handleAddReply}
+                      userName={userName}
+                    />
 
-                  <AttachmentsSection
-                    handleAddAttachment={handleAddAttachment}
-                  />
+                    <AttachmentsSection
+                      handleAddAttachment={handleAddAttachment}
+                    />
+                    <Card className="p-2 ">
+                      <div className="flex flex-col w-full">
+                        <div className="flex flex-row gap-2 items-center justify-start">
+                          <ListCollapse />
+                          <h2 className="text-md font-bold p-2">
+                            Details Section
+                          </h2>
+                        </div>
+                        <CollapsibleDetail data={detailsData} />
+                      </div>
+                    </Card>
+                  </div>
                 </Card>
 
                 {/* Right Column - Full Description Editor */}
@@ -528,10 +568,10 @@ const TaskCard = ({
                   onClick={handleDescriptionClick}
                   className="bg-input border-input text-foreground p-2 rounded-md cursor-pointer prose prose-sm max-w-none w-full min-h-8"
                 >
-                  <h2 className="text-foreground">
-                    Description
-                    <div className="h-px bg-gray-300 w-full my-2"></div>
-                  </h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-foreground m-0">Description</h2>
+                    <div className="h-px bg-gray-300 flex-1"></div>
+                  </div>
 
                   <div
                     className="marked-files-content prose prose-sm max-w-none w-full text-foreground break-words"
@@ -541,7 +581,7 @@ const TaskCard = ({
                   />
                 </div>
 
-                <div className="space-y-4 pt-2">
+                <div className="space-y-4">
                   <CommentsSection
                     card={card}
                     newComment={newComment}
@@ -554,6 +594,17 @@ const TaskCard = ({
                   <AttachmentsSection
                     handleAddAttachment={handleAddAttachment}
                   />
+                  <Card className="p-2 ">
+                    <div className="flex flex-col w-full">
+                      <div className="flex flex-row gap-2 items-center justify-start">
+                        <ListCollapse />
+                        <h2 className="text-md font-bold p-2">
+                          Details Section
+                        </h2>
+                      </div>
+                      <CollapsibleDetail data={detailsData} />
+                    </div>
+                  </Card>
                 </div>
               </Card>
             )}

@@ -13,51 +13,32 @@ import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import ColumnsContainer from "./_components/ColumnsContainer";
 import { PlusIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import ProjectSelector from "@/components/ProjectSelector";
 import { Card } from "@/components/ui/card";
 import TaskCard from "./_components/TaskCard";
+import { KanbanBoardSkeleton } from "@/components/Skeletons";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getBoards } from "@/app/api/taskboard/navbarSelector/getBoard";
+import { getColumns } from "@/app/api/taskboard/board/columnAction/getColumns";
+import { createColumns } from "@/app/api/taskboard/board/columnAction/createColumns";
+import { renameColumn } from "@/app/api/taskboard/board/columnAction/renameColumn";
+import { getCards } from "@/app/api/taskboard/board/cardAction/getCard";
+import { createCard } from "@/app/api/taskboard/board/cardAction/createCard";
+import { updateCardPosition } from "@/app/api/taskboard/board/cardAction/moveCard";
 
 const KanbanBoard = () => {
-  const [selectedProjectId, setSelectedProjectId] = useState("");
-  const router = useRouter();
-  const projectData = useMemo(
-    () => [
-      { value: "alpha", label: "Project Alpha" },
-      { value: "beta", label: "Project Beta" },
-      { value: "gamma", label: "Project Gamma" },
-      { value: "delta", label: "Project Delta" },
-    ],
-    []
-  );
-
-  const handleProjectSelection = (projectId) => {
-    console.log("Project selected:", projectId);
-    setSelectedProjectId(projectId);
-    router.push(`/dashboard/taskboard/${projectId}`);
-  };
-
-  // Add a state to track if this is the initial load
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-
-  const [columns, setColumns] = useState(() => {
-    const savedColumns = localStorage.getItem("columns");
-    const loadedColumns = savedColumns ? JSON.parse(savedColumns) : [];
-    console.log("Initial columns loaded:", loadedColumns);
-    return loadedColumns;
-  });
-
-  const [tasks, setTasks] = useState(() => {
-    const savedTasks = localStorage.getItem("tasks");
-    const loadedTasks = savedTasks ? JSON.parse(savedTasks) : [];
-    console.log("Initial tasks loaded:", loadedTasks);
-    return loadedTasks;
-  });
-
-  const columnId = useMemo(() => columns.map((col) => col.id), [columns]);
-
   const [activeColumn, setActiveColumn] = useState(null);
   const [activeTask, setActiveTask] = useState(null);
+  const [columns, setColumns] = useState([]);
+  const [tasks, setTasks] = useState([]);
+
+  const router = useRouter();
+  const params = useParams();
+  const boardId = params?.id;
+  const queryClient = useQueryClient();
+
+  const columnId = useMemo(() => columns.map((col) => col.id), [columns]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -65,64 +46,130 @@ const KanbanBoard = () => {
     })
   );
 
+  // useQuery hooks
+  const { data: boardData } = useQuery({
+    queryKey: ["boardData"],
+    queryFn: () => getBoards(),
+  });
+
+  const { data: columnsListData, isLoading } = useQuery({
+    queryKey: ["columnsList", boardId],
+    queryFn: () => getColumns(boardId),
+    enabled: !!boardId,
+  });
+
+  const { data: columnsCardData } = useQuery({
+    queryKey: ["cardList", columnId],
+    queryFn: () => getCards(columnId),
+    enabled: !!boardId,
+  });
+  console.log(columnsCardData);
+
   useEffect(() => {
-    // Skip the first render to prevent the infinite loop
-    if (isInitialLoad) {
-      setIsInitialLoad(false);
-      return;
+    if (columnsListData?.data) {
+      // Add null check with optional chaining
+      const transformed = columnsListData.data.map((col) => ({
+        ...col,
+        title: col.name,
+      }));
+      setColumns(transformed);
+    } else {
+      setColumns([]);
     }
-
-    console.log("Saving columns to localStorage:", columns);
-    localStorage.setItem("columns", JSON.stringify(columns));
-
-    // Here would be a good place to add API calls to update columns in your backend
-    // if (!isInitialLoad) {
-    //   updateColumnsInBackend(columns);
-    // }
-  }, [columns, isInitialLoad]);
+  }, [columnsListData]);
 
   useEffect(() => {
-    // Skip the first render to prevent the infinite loop
-    if (isInitialLoad) {
-      return;
+    if (columnsCardData?.data) {
+      const transformedCards = columnsCardData.data.map((card) => ({
+        id: card.id,
+        board_list: card.board_list,
+        title: card.title,
+        description: card.description,
+        labels: card.labels,
+        comments: card.comments || [],
+        position: card.card_position,
+        assignedUsers: card.assigned_users,
+        createdAt: card.created_at,
+        coverImage: card.cover_image,
+      }));
+      setTasks(transformedCards);
+    } else {
+      setTasks([]);
     }
+  }, [columnsCardData]);
 
-    console.log("Saving tasks to localStorage:", tasks);
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+  const addColumnsMutation = useMutation({
+    mutationFn: (data) => createColumns(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["columnsList", boardId] });
+    },
+    onError: (e) => {
+      toast.error("Column creation failed: " + e.message);
+    },
+  });
 
-    // Here would be a good place to add API calls to update tasks in your backend
-    // if (!isInitialLoad) {
-    //   updateTasksInBackend(tasks);
-    // }
-  }, [tasks, isInitialLoad]);
+  const columnRename = useMutation({
+    mutationFn: (data) => renameColumn(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["columnsList", boardId] });
+    },
+    onError: (e) => {
+      toast.error("rename column failed: " + e.message);
+    },
+  });
 
-  const generateId = () => Math.floor(Math.random() * 10001);
+  const addCard = useMutation({
+    mutationFn: (data) => createCard(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cardList", columnId] });
+      queryClient.invalidateQueries({ queryKey: ["columnsList", boardId] });
+      queryClient.invalidateQueries({ queryKey: ["boardData"] });
+      toast.success("Card added successfully");
+    },
+    onError: (e) => {
+      toast.error("adding card failed " + e.message);
+    },
+  });
+
+  const moveCardMutation = useMutation({
+    mutationFn: (data) => updateCardPosition(data),
+    onMutate: () => {
+      // Optional: Add loading state
+      console.log("Moving card...");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cardList"] });
+      queryClient.invalidateQueries({ queryKey: ["columnsList", boardId] });
+      toast.success("Card moved successfully");
+    },
+    onError: (e) => {
+      toast.error("Failed to move card: " + e.message);
+      // Optional: Revert optimistic update
+      queryClient.invalidateQueries({ queryKey: ["cardList"] });
+    },
+  });
+
+  // Event handlers and other functions
+  const handleProjectSelection = (projectId) => {
+    router.push(`/dashboard/taskboard/${projectId}`);
+  };
 
   const handleClick = () => {
     const columnToAdd = {
-      id: generateId(),
-      title: `Column ${columns.length + 1}`,
+      boardId: boardId,
+      name: `Column ${columns.length + 1}`,
     };
-
-    console.log("Adding new column:", columnToAdd);
-    setColumns([...columns, columnToAdd]);
-
-    // API call to create column in backend
-    // createColumnInBackend(columnToAdd);
+    addColumnsMutation.mutate(columnToAdd);
   };
 
   const deleteColumn = (id) => {
     console.log("Deleting column with ID:", id);
 
-    // Get tasks that will be deleted with this column
     const tasksToDelete = tasks.filter((task) => task.columnId === id);
     console.log("Tasks being deleted with column:", tasksToDelete);
 
     setColumns(columns.filter((col) => col.id !== id));
     setTasks(tasks.filter((task) => task.columnId !== id));
-
-    // API call to delete column and associated tasks
-    // deleteColumnInBackend(id, tasksToDelete.map(task => task.id));
   };
 
   const onDragStart = (event) => {
@@ -142,158 +189,127 @@ const KanbanBoard = () => {
   };
 
   const onDragEnd = (event) => {
-    console.log("Drag ended:", event);
+    const { active, over } = event;
 
     setActiveColumn(null);
     setActiveTask(null);
 
-    const { active, over } = event;
-
-    if (!over) {
-      console.log("Drag ended outside of any droppable area");
-      return;
-    }
-
-    const activeColumnId = active.id;
-    const overColumnId = over.id;
-
-    if (activeColumnId === overColumnId) {
-      console.log("Dragged onto the same column - no changes needed");
-      return;
-    }
-
-    console.log(
-      `Reordering columns: ${activeColumnId} moved to position of ${overColumnId}`
-    );
-
-    setColumns((columns) => {
-      const activeIndex = columns.findIndex((col) => col.id === activeColumnId);
-      const overIndex = columns.findIndex((col) => col.id === overColumnId);
-
-      // move columns logic
-      console.log(
-        `Moving column from index ${activeIndex} to index ${overIndex}`
-      );
-
-      const newColumns = arrayMove(columns, activeIndex, overIndex);
-
-      // API call to update column order
-      // updateColumnOrderInBackend(newColumns);
-
-      return newColumns;
-    });
-  };
-
-  const onDragOver = (event) => {
-    console.log("Drag over event:", event);
-
-    const { active, over } = event;
-
-    if (!over) {
-      console.log("Dragging over nothing");
-      return;
-    }
+    if (!over) return;
 
     const activeId = active.id;
     const overId = over.id;
 
-    if (activeId === overId) {
-      console.log("Dragging over the same element");
-      return;
+    if (activeId === overId) return;
+
+    // Handle task movements
+    if (active.data.current?.type === "Task") {
+      const activeTask = tasks.find((task) => task.id === activeId);
+
+      if (over.data.current?.type === "Task") {
+        // Moving to another task's position
+        const overTask = tasks.find((task) => task.id === overId);
+
+        const movedCard = {
+          cardId: activeId,
+          board_list_id: overTask.board_list,
+          position: overTask.position,
+        };
+        moveCardMutation.mutate(movedCard);
+      }
+
+      if (over.data.current?.type === "Column") {
+        // Moving to a column directly
+        const columnTasks = tasks.filter((task) => task.board_list === overId);
+        const lastPosition =
+          columnTasks.length > 0
+            ? Math.max(...columnTasks.map((task) => task.position))
+            : 0;
+
+        const movedCard = {
+          cardId: activeId,
+          board_list_id: overId,
+          position: lastPosition,
+        };
+        console.log("mutation T-1 step ago");
+        moveCardMutation.mutate(movedCard);
+      }
     }
+
+    // Handle column movements (existing column drag logic)
+    if (active.data.current?.type === "Column") {
+      setColumns((columns) => {
+        const activeIndex = columns.findIndex((col) => col.id === activeId);
+        const overIndex = columns.findIndex((col) => col.id === overId);
+        return arrayMove(columns, activeIndex, overIndex);
+      });
+    }
+  };
+
+  const onDragOver = (event) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const activeId = active.id;
+    const overId = over.id;
+
+    if (activeId === overId) return;
 
     const isActiveATask = active.data.current?.type === "Task";
     const isOverATask = over.data.current?.type === "Task";
     const isOverAColumn = over.data.current?.type === "Column";
 
-    if (!isActiveATask) {
-      console.log("Active element is not a task");
-      return;
-    }
+    if (!isActiveATask) return;
 
+    // We'll only update the visual state here, actual mutation happens in onDragEnd
     if (isOverATask) {
-      console.log(`Task ${activeId} is being dragged over task ${overId}`);
-
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((t) => t.id === activeId);
         const overIndex = tasks.findIndex((t) => t.id === overId);
-
-        // understand the column ID of the task being dragged over
-        const targetColumnId = tasks[overIndex].columnId;
-
-        console.log(
-          `Moving task from index ${activeIndex} to index ${overIndex} in column ${targetColumnId}`
-        );
-
-        // Update the column ID
-        const updatedTasks = [...tasks];
-        updatedTasks[activeIndex] = {
-          ...updatedTasks[activeIndex],
-          columnId: targetColumnId,
-        };
-
-        const reorderedTasks = arrayMove(updatedTasks, activeIndex, overIndex);
-
-        // API call to update task order and column
-        // updateTaskPositionInBackend(activeId, targetColumnId, reorderedTasks);
-
-        return reorderedTasks;
+        return arrayMove(tasks, activeIndex, overIndex);
       });
     }
 
     if (isOverAColumn) {
-      console.log(`Task ${activeId} is being dragged over column ${overId}`);
-
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((t) => t.id === activeId);
-
-        console.log(
-          `Moving task from index ${activeIndex} to column ${overId}`
-        );
-
-        // Create a new array to avoid direct mutation
         const updatedTasks = [...tasks];
         updatedTasks[activeIndex] = {
           ...updatedTasks[activeIndex],
-          columnId: overId,
+          board_list: overId,
         };
-
-        // API call to update task column
-        // updateTaskColumnInBackend(activeId, overId);
-
         return updatedTasks;
       });
     }
   };
 
-  const updateColumn = (id, title) => {
+  const updateColumn = (id, title, isComplete = false) => {
     console.log(`Updating column ${id} with new title: "${title}"`);
 
+    // Update local state immediately for UI responsiveness
     const newColumns = columns.map((col) =>
       col.id !== id ? col : { ...col, title }
     );
-
     setColumns(newColumns);
 
-    // API call to update column title
-    // updateColumnTitleInBackend(id, title);
+    // Only trigger the mutation when editing is complete (dialog closes)
+    if (isComplete) {
+      columnRename.mutate({
+        columnId: id,
+        name: title,
+      });
+    }
   };
 
   const createTask = (columnId) => {
     const newTask = {
-      id: generateId(),
-      columnId,
+      board_list: columnId,
       title: `Task ${tasks.length + 1}`,
-      description: "",
-      comments: [],
     };
 
     console.log(`Creating new task in column ${columnId}:`, newTask);
 
-    setTasks([...tasks, newTask]);
-
-    // API call to create task in backend
-    // createTaskInBackend(newTask);
+    addCard.mutate(newTask);
   };
 
   const deleteTask = (id) => {
@@ -303,9 +319,6 @@ const KanbanBoard = () => {
     console.log("Task being deleted:", taskToDelete);
 
     setTasks(tasks.filter((task) => task.id !== id));
-
-    // API call to delete task in backend
-    // deleteTaskInBackend(id);
   };
 
   const updateTask = (id, updates) => {
@@ -318,9 +331,6 @@ const KanbanBoard = () => {
 
           console.log("Task before update:", task);
           console.log("Task after update:", updatedTask);
-
-          // API call to update task in backend
-          // updateTaskInBackend(id, updatedTask);
 
           return updatedTask;
         }
@@ -339,9 +349,6 @@ const KanbanBoard = () => {
           const updatedComments = [...task.comments, comment];
 
           console.log(`Task ${cardId} comments updated:`, updatedComments);
-
-          // API call to add comment in backend
-          // addCommentToTaskInBackend(cardId, comment);
 
           return { ...task, comments: updatedComments };
         }
@@ -364,9 +371,6 @@ const KanbanBoard = () => {
             updatedAttachments
           );
 
-          // API call to add attachment in backend
-          // addAttachmentToTaskInBackend(cardId, attachment);
-
           return {
             ...task,
             attachments: updatedAttachments,
@@ -386,13 +390,9 @@ const KanbanBoard = () => {
         if (task.id === cardId) {
           const labels = task.labels || [];
 
-          // Toggle label (if exists, remove it; if doesn't exist, add it)
           const updatedLabels = labels.includes(label) ? [] : [label];
 
           console.log(`Task ${cardId} labels updated:`, updatedLabels);
-
-          // API call to update labels in backend
-          // updateTaskLabelsInBackend(cardId, updatedLabels);
 
           return {
             ...task,
@@ -405,11 +405,20 @@ const KanbanBoard = () => {
     );
   };
 
+  if (isLoading) {
+    return <KanbanBoardSkeleton />;
+  }
+
   return (
     <div className="flex flex-col w-full h-[90vh] overflow-hidden">
       <ProjectSelector
         title="Taskboard"
-        options={projectData}
+        options={
+          boardData?.data?.map((project) => ({
+            value: project.id,
+            label: project.name,
+          })) || []
+        }
         onValueChange={handleProjectSelection}
         placeholder="Select a Project to View"
       />
@@ -425,28 +434,21 @@ const KanbanBoard = () => {
             <div className="flex gap-4 h-full">
               <div className="flex gap-4 h-full">
                 <SortableContext items={columnId}>
-                  {columns.map((col) => {
-                    const columnTasks = tasks.filter(
-                      (task) => task.columnId === col.id
-                    );
-
-                    return (
-                      <div key={col.id} className="h-full">
-                        <ColumnsContainer
-                          column={col}
-                          deleteColumn={deleteColumn}
-                          updateColumn={updateColumn}
-                          createTask={createTask}
-                          tasks={columnTasks}
-                          deleteTask={deleteTask}
-                          updateTask={updateTask}
-                          onAddComment={handleAddComment}
-                          onAddAttachment={handleAddAttachment}
-                          onAddLabel={handleAddLabel}
-                        />
-                      </div>
-                    );
-                  })}
+                  {columns.map((col) => (
+                    <ColumnsContainer
+                      key={col.id}
+                      column={col}
+                      deleteColumn={deleteColumn}
+                      updateColumn={updateColumn}
+                      createTask={createTask}
+                      tasks={tasks.filter((task) => task.board_list === col.id)} // Match board_list with column id
+                      deleteTask={deleteTask}
+                      updateTask={updateTask}
+                      onAddComment={handleAddComment}
+                      onAddAttachment={handleAddAttachment}
+                      onAddLabel={handleAddLabel}
+                    />
+                  ))}
                 </SortableContext>
               </div>
 
@@ -469,7 +471,7 @@ const KanbanBoard = () => {
                     createTask={createTask}
                     deleteTask={deleteTask}
                     tasks={tasks.filter(
-                      (task) => task.columnId === activeColumn.id
+                      (task) => task.board_list === activeColumn.id
                     )}
                     updateTask={updateTask}
                     onAddComment={handleAddComment}

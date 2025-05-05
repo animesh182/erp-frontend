@@ -2,13 +2,7 @@
 import React, { useState } from "react";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import {
-  FolderPen,
-  MoreHorizontalIcon,
-  MoreVerticalIcon,
-  PlusIcon,
-  TrashIcon,
-} from "lucide-react";
+import { FolderPen, MoreVerticalIcon, PlusIcon, TrashIcon } from "lucide-react";
 import TaskCard from "./TaskCard";
 
 import {
@@ -21,7 +15,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
-  AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogTitle,
   AlertDialogDescription,
@@ -52,6 +45,8 @@ const ColumnsContainer = ({
       disabled: editMode,
     });
 
+  console.log("from containers:", tasks);
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: isDragging ? "none" : "transform 200ms ease",
@@ -76,17 +71,21 @@ const ColumnsContainer = ({
       >
         <div className="flex items-center gap-2">
           <div className="flex justify-center items-center px-2 py-1 text-sm rounded-full bg-accent text-foreground">
-            {tasks.length}
+            {tasks?.length || 0}
           </div>
           {!editMode && <span className="text-foreground">{column.title}</span>}
           {editMode && (
             <input
               className="bg-background text-foreground border border-border focus:ring-2 focus:ring-primary rounded px-1"
               value={column.title}
-              onChange={(e) => updateColumn(column.id, e.target.value)}
-              autoFocus
-              onBlur={() => setEditMode(false)}
-              onKeyDown={(e) => e.key === "Enter" && setEditMode(false)}
+              onChange={(e) => updateColumn(column.id, e.target.value, false)}
+              onBlur={(e) => updateColumn(column.id, e.target.value, true)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  updateColumn(column.id, e.target.value, true);
+                  setEditMode(false);
+                }
+              }}
             />
           )}
         </div>
@@ -139,19 +138,25 @@ const ColumnsContainer = ({
 
       {/* Task List */}
       <div className="flex flex-col flex-grow gap-2 p-2 bg-muted overflow-y-auto !h-[50vh]">
-        <SortableContext items={tasks.map((t) => t.id)}>
-          {tasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              card={task}
-              onUpdateCard={updateTask}
-              onDeleteCard={deleteTask}
-              onAddComment={onAddComment}
-              onAddAttachment={onAddAttachment}
-              onAddLabel={onAddLabel}
-            />
-          ))}
-        </SortableContext>
+        {tasks && tasks.length > 0 ? (
+          <SortableContext items={tasks.map((t) => t.id)}>
+            {tasks.map((task) => (
+              <TaskCard
+                key={task.id}
+                card={task}
+                onUpdateCard={updateTask}
+                onDeleteCard={deleteTask}
+                onAddComment={onAddComment}
+                onAddAttachment={onAddAttachment}
+                onAddLabel={onAddLabel}
+              />
+            ))}
+          </SortableContext>
+        ) : (
+          <div className="text-muted-foreground text-center py-4">
+            No tasks in this column
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Dialog */}

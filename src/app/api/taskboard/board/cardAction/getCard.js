@@ -1,12 +1,11 @@
 import { apiClient } from "@/lib/utils";
 
-
-export async function getColumns(id) {
+export async function getCards(id) {
   try {
     const response = await apiClient(
       `${process.env.NEXT_PUBLIC_API_URL}/api/cards/?list_id=${id}`
     );
-    return { status: 200, data: response.data };
+    return { status: 200, data: response };
   } catch (error) {
     return {
       status: error.status || 500,
