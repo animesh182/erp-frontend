@@ -58,11 +58,13 @@ export default function Page() {
 
           const res = response.user_details;
           setClockifyUserData(res);
-
+          console.log("router pushed");
           router.push("/dashboard");
         } else if (response.is_employee) {
           toast.success("Please Login as Employee!");
           router.push("/users");
+        } else if (response.first_time_login) {
+          router.push("/users/email-verify");
         }
       } else {
         toast.error(response.message || "An error occurred. Please try again.");

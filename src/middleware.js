@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 
 // export function middleware(request) {
@@ -8,10 +7,10 @@ import { NextResponse } from "next/server";
 //     pathname.startsWith("/_next/") ||
 //     pathname.startsWith("/api/") ||
 //     pathname.startsWith("/favicon.ico") ||
-//     pathname === "/users" || 
+//     pathname === "/users" ||
 //     pathname.startsWith("/users/login-password") ||
 //     pathname.startsWith("/users/employee-new-password") ||
-//     pathname.startsWith("/users/email-verify") 
+//     pathname.startsWith("/users/email-verify")
 
 //   ) {
 //     return NextResponse.next();
@@ -42,7 +41,6 @@ import { NextResponse } from "next/server";
 //     return NextResponse.redirect(new URL("/", request.url));
 //   }
 
-
 //   if (token && userRole === "employee" && pathname.startsWith("/")) {
 //     return NextResponse.redirect(new URL("/users", request.url));
 //   }
@@ -55,7 +53,6 @@ import { NextResponse } from "next/server";
 // }
 // // Function to parse a JWT and extract its payload
 
-
 // export const config = {
 //   matcher: [
 //     "/",
@@ -67,23 +64,21 @@ import { NextResponse } from "next/server";
 //current middleware function
 export function middleware(request) {
   const { pathname } = request.nextUrl;
-  // //bypass auth for now
-  return NextResponse.next();
+  //bypass auth for now
+  // return NextResponse.next();
 
   if (
     pathname === "/" ||
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/favicon.ico") ||
-    pathname === "/users" || 
+    pathname === "/users" ||
     pathname.startsWith("/users/login-password") ||
     pathname.startsWith("/users/employee-new-password") ||
-    pathname.startsWith("/users/email-verify") 
-
+    pathname.startsWith("/users/email-verify")
   ) {
-    return NextResponse.next(`${process.env.NEXT_PUBLIC_URL}`,302);
+    return NextResponse.next(`${process.env.NEXT_PUBLIC_URL}`, 302);
     // `${env.NEXT_PUBLIC_SITE_URL}/catalog`), 302
-
   }
 
   // Check for the authentication token in cookies
@@ -113,16 +108,15 @@ export function middleware(request) {
   const payload = parseJwt(token);
 
   // Hardcoded role logic based on user_id
-  const userRole = payload.user_type === 'employee' ? "user" : "admin";
+  const userRole = payload.user_type === "employee" ? "user" : "admin";
 
-  
   // Redirect based on role
   if (userRole === "user" && !pathname.startsWith("/users")) {
-    console.log("usususu")
+    console.log("usususu");
     return NextResponse.redirect(new URL("/users", request.url));
   }
   if (userRole === "admin" && !pathname.startsWith("/dashboard")) {
-    console.log("adadada")
+    console.log("adadada");
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -131,8 +125,6 @@ export function middleware(request) {
 }
 // Function to parse a JWT and extract its payload
 
-
 export const config = {
   matcher: "/((?!api|_next/static|favicon.ico).*)",
 };
-
