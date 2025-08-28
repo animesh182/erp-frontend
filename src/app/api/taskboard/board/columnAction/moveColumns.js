@@ -1,13 +1,15 @@
 import { apiClient } from "@/lib/utils";
 
-export async function updateColumnPosition(columnId, position) {
+export async function updateColumnPosition(movedColumn) {
   const transformedData = {
-    position: position,
+    position: movedColumn.position,
   };
+
+  const id = movedColumn.columnId;
 
   try {
     const response = await apiClient(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/board_lists/${columnId}/move/`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/board_lists/${id}/move/`,
       {
         method: "PATCH",
         body: JSON.stringify(transformedData),

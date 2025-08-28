@@ -45,8 +45,6 @@ const ColumnsContainer = ({
       disabled: editMode,
     });
 
-  console.log("from containers:", tasks);
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: isDragging ? "none" : "transform 200ms ease",

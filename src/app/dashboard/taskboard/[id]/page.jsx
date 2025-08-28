@@ -26,6 +26,7 @@ import { renameColumn } from "@/app/api/taskboard/board/columnAction/renameColum
 import { getCards } from "@/app/api/taskboard/board/cardAction/getCard";
 import { createCard } from "@/app/api/taskboard/board/cardAction/createCard";
 import { updateCardPosition } from "@/app/api/taskboard/board/cardAction/moveCard";
+import { updateColumnPosition } from "@/app/api/taskboard/board/columnAction/moveColumns";
 
 const KanbanBoard = () => {
   const [activeColumn, setActiveColumn] = useState(null);
@@ -42,7 +43,11 @@ const KanbanBoard = () => {
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 },
+      activationConstraint: {
+        distance: 1,
+        delay: 100,
+        tolerance: 5,
+      },
     })
   );
 
@@ -63,7 +68,6 @@ const KanbanBoard = () => {
     queryFn: () => getCards(columnId),
     enabled: !!boardId,
   });
-  console.log(columnsCardData);
 
   useEffect(() => {
     if (columnsListData?.data) {
@@ -144,7 +148,21 @@ const KanbanBoard = () => {
     },
     onError: (e) => {
       toast.error("Failed to move card: " + e.message);
-      // Optional: Revert optimistic update
+      queryClient.invalidateQueries({ queryKey: ["cardList"] });
+    },
+  });
+
+  const moveColumnMutation = useMutation({
+    mutationFn: (data) => updateColumnPosition(data),
+    onMutate: () => {
+      console.log("Moving Column...");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cardList"] });
+      queryClient.invalidateQueries({ queryKey: ["columnsList", boardId] });
+    },
+    onError: (e) => {
+      toast.error("Failed to move card: " + e.message);
       queryClient.invalidateQueries({ queryKey: ["cardList"] });
     },
   });
@@ -163,10 +181,7 @@ const KanbanBoard = () => {
   };
 
   const deleteColumn = (id) => {
-    console.log("Deleting column with ID:", id);
-
     const tasksToDelete = tasks.filter((task) => task.columnId === id);
-    console.log("Tasks being deleted with column:", tasksToDelete);
 
     setColumns(columns.filter((col) => col.id !== id));
     setTasks(tasks.filter((task) => task.columnId !== id));
@@ -201,47 +216,25 @@ const KanbanBoard = () => {
 
     if (activeId === overId) return;
 
-    // Handle task movements
-    if (active.data.current?.type === "Task") {
-      const activeTask = tasks.find((task) => task.id === activeId);
-
-      if (over.data.current?.type === "Task") {
-        // Moving to another task's position
-        const overTask = tasks.find((task) => task.id === overId);
-
-        const movedCard = {
-          cardId: activeId,
-          board_list_id: overTask.board_list,
-          position: overTask.position,
-        };
-        moveCardMutation.mutate(movedCard);
-      }
-
-      if (over.data.current?.type === "Column") {
-        // Moving to a column directly
-        const columnTasks = tasks.filter((task) => task.board_list === overId);
-        const lastPosition =
-          columnTasks.length > 0
-            ? Math.max(...columnTasks.map((task) => task.position))
-            : 0;
-
-        const movedCard = {
-          cardId: activeId,
-          board_list_id: overId,
-          position: lastPosition,
-        };
-        console.log("mutation T-1 step ago");
-        moveCardMutation.mutate(movedCard);
-      }
-    }
-
-    // Handle column movements (existing column drag logic)
+    // Handle column movements
     if (active.data.current?.type === "Column") {
+      // Update UI first for responsiveness
       setColumns((columns) => {
         const activeIndex = columns.findIndex((col) => col.id === activeId);
         const overIndex = columns.findIndex((col) => col.id === overId);
         return arrayMove(columns, activeIndex, overIndex);
       });
+
+      // Get the new positions after moving
+      const activeColumn = columns.find((col) => col.id === activeId);
+      const overColumn = columns.find((col) => col.id === overId);
+
+      const movedColumns = {
+        columnId: activeId,
+        position: overColumn.board_list_position,
+      };
+      // Trigger column position update mutation
+      moveColumnMutation.mutate(movedColumns);
     }
   };
 
@@ -261,16 +254,35 @@ const KanbanBoard = () => {
 
     if (!isActiveATask) return;
 
-    // We'll only update the visual state here, actual mutation happens in onDragEnd
+    // Handle task-to-task movement
     if (isOverATask) {
+      const overTask = tasks.find((task) => task.id === overId);
+
+      // Update UI
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((t) => t.id === activeId);
         const overIndex = tasks.findIndex((t) => t.id === overId);
         return arrayMove(tasks, activeIndex, overIndex);
       });
+
+      // Trigger mutation
+      const movedCard = {
+        cardId: activeId,
+        board_list_id: overTask.board_list,
+        position: overTask.position,
+      };
+      moveCardMutation.mutate(movedCard);
     }
 
+    // Handle task-to-column movement
     if (isOverAColumn) {
+      const columnTasks = tasks.filter((task) => task.board_list === overId);
+      const lastPosition =
+        columnTasks.length > 0
+          ? Math.max(...columnTasks.map((task) => task.position))
+          : 0;
+
+      // Update UI
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((t) => t.id === activeId);
         const updatedTasks = [...tasks];
@@ -280,6 +292,14 @@ const KanbanBoard = () => {
         };
         return updatedTasks;
       });
+
+      // Trigger mutation
+      const movedCard = {
+        cardId: activeId,
+        board_list_id: overId,
+        position: lastPosition + 1,
+      };
+      moveCardMutation.mutate(movedCard);
     }
   };
 
@@ -329,9 +349,6 @@ const KanbanBoard = () => {
         if (task.id === id) {
           const updatedTask = { ...task, ...updates };
 
-          console.log("Task before update:", task);
-          console.log("Task after update:", updatedTask);
-
           return updatedTask;
         }
 
@@ -359,8 +376,6 @@ const KanbanBoard = () => {
   };
 
   const handleAddAttachment = (cardId, attachment) => {
-    console.log(`Adding attachment to task ${cardId}:`, attachment);
-
     setTasks(
       tasks.map((task) => {
         if (task.id === cardId) {
@@ -383,16 +398,12 @@ const KanbanBoard = () => {
   };
 
   const handleAddLabel = (cardId, label) => {
-    console.log(`Modifying label for task ${cardId}:`, label);
-
     setTasks(
       tasks.map((task) => {
         if (task.id === cardId) {
           const labels = task.labels || [];
 
           const updatedLabels = labels.includes(label) ? [] : [label];
-
-          console.log(`Task ${cardId} labels updated:`, updatedLabels);
 
           return {
             ...task,
